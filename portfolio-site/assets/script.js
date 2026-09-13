@@ -1,11 +1,17 @@
 (function () {
   const CATEGORY_LABELS = {
-    image: "ภาพ",
-    video: "วิดีโอ",
     writing: "งานเขียน",
     code: "โค้ด",
-    music: "เพลง",
-    other: "อื่น ๆ"
+    image: "ภาพ",
+    video: "วิดีโอ",
+    audio: "เสียง/เพลง",
+    agent: "AI Agent/อัตโนมัติ",
+    data: "วิเคราะห์ข้อมูล",
+    research: "ค้นหา/วิจัย",
+    business: "ธุรกิจ/องค์กร",
+    science: "วิทยาศาสตร์/สุขภาพ",
+    design: "ออกแบบ/3D/เกม",
+    education: "การศึกษา"
   };
 
   const grid = document.getElementById("worksGrid");
