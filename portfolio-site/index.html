@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Works Portfolio — รวมผลงานจาก AI</title>
+  <meta name="description" content="เว็บไซต์รวบรวมผลงานที่สร้างขึ้นด้วยความช่วยเหลือของ AI ทุกประเภท ทั้งภาพ วิดีโอ เพลง งานเขียน และโค้ด" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark">✦</span>
+        <span>AI Works</span>
+      </a>
+      <p class="tagline">รวมผลงานจาก AI ทุกรูปแบบ ไว้ในที่เดียว</p>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero container">
+      <h1>ผลงานที่สร้างด้วย AI</h1>
+      <p>
+        รวมงานภาพ วิดีโอ เพลง บทความ และโค้ด ที่สร้างขึ้นโดยใช้เครื่องมือ AI
+        ต่าง ๆ ช่วยในกระบวนการทำงาน
+      </p>
+    </section>
+
+    <section class="controls container">
+      <div class="filters" id="filters" role="tablist" aria-label="กรองตามประเภทผลงาน">
+        <button class="filter-btn is-active" data-category="all" role="tab" aria-selected="true">
+          ทั้งหมด
+        </button>
+        <button class="filter-btn" data-category="image" role="tab" aria-selected="false">
+          🖼️ ภาพ
+        </button>
+        <button class="filter-btn" data-category="video" role="tab" aria-selected="false">
+          🎬 วิดีโอ
+        </button>
+        <button class="filter-btn" data-category="writing" role="tab" aria-selected="false">
+          📝 งานเขียน
+        </button>
+        <button class="filter-btn" data-category="code" role="tab" aria-selected="false">
+          💻 โค้ด
+        </button>
+        <button class="filter-btn" data-category="music" role="tab" aria-selected="false">
+          🎵 เพลง
+        </button>
+        <button class="filter-btn" data-category="other" role="tab" aria-selected="false">
+          ✨ อื่น ๆ
+        </button>
+      </div>
+
+      <div class="search-wrap">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="ค้นหาผลงาน หรือเครื่องมือ AI..."
+          aria-label="ค้นหาผลงาน"
+        />
+      </div>
+    </section>
+
+    <section class="container">
+      <p class="results-count" id="resultsCount"></p>
+      <div class="grid" id="worksGrid"></div>
+      <p class="empty-state" id="emptyState" hidden>ไม่พบผลงานที่ตรงกับการค้นหา</p>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="ปิด">✕</button>
+      <div class="modal-thumb" id="modalThumb"></div>
+      <span class="modal-tag" id="modalCategory"></span>
+      <h2 id="modalTitle"></h2>
+      <p class="modal-tool" id="modalTool"></p>
+      <p id="modalDescription"></p>
+      <p class="modal-date" id="modalDate"></p>
+      <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener noreferrer">
+        ดูผลงานฉบับเต็ม →
+      </a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>สร้างด้วย HTML/CSS/JS ล้วน ๆ — แก้ไขผลงานได้ที่ <code>assets/data/works.js</code></p>
+    </div>
+  </footer>
+
+  <script src="assets/data/works.js"></script>
+  <script src="assets/script.js"></script>
+</body>
+</html>
