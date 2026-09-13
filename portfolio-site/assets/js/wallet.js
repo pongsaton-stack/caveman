@@ -1,7 +1,19 @@
 // Wallet-connect (MetaMask / any EIP-1193 provider) via ethers.js, loaded
-// from CDN only when the visitor actually clicks "Connect Wallet" — most
-// people browsing a portfolio site never touch this, no reason to fetch a
-// crypto library for them.
+// only when the visitor actually clicks "Connect Wallet" — most people
+// browsing a portfolio site never touch this, no reason to fetch a crypto
+// library for them.
+//
+// ethers.js is VENDORED (assets/vendor/ethers.umd.min.js), not loaded from
+// a CDN. It's the exact ethers@6.13.4 dist/ethers.umd.min.js from the
+// official npm tarball (npm verified its integrity on download; recorded
+// sha384 at vendor time: e999743dcf338d2cfc2af98d79746f510818e2bc856fe07
+// 00ef28298b61c04c1348e801aaeee3dd6d4208bd07bcec30c — re-check this if you
+// ever replace the file). Serving it same-origin means there's no
+// third-party CDN in the trust chain for this script at all, and no CSP
+// script-src entry needed beyond 'self'. To upgrade the version: download
+// the new dist/ethers.umd.min.js from the matching ethers npm package,
+// verify npm's own integrity check passed, replace the vendored file, and
+// update the sha384 recorded here.
 //
 // SECURITY NOTES (read before wiring this into anything that moves real
 // money):
@@ -15,8 +27,7 @@
 //   funds are involved. Never assume this code is production-audited.
 import { isValidEthAddress } from "./render-utils.js";
 
-const ETHERS_CDN_URL =
-  "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js";
+const ETHERS_LOCAL_URL = new URL("../vendor/ethers.umd.min.js", import.meta.url).href;
 
 let ethersLoadPromise = null;
 let state = { provider: null, signer: null, address: null, chainName: null };
@@ -27,7 +38,7 @@ function loadEthers() {
   if (!ethersLoadPromise) {
     ethersLoadPromise = new Promise((resolve, reject) => {
       const script = document.createElement("script");
-      script.src = ETHERS_CDN_URL;
+      script.src = ETHERS_LOCAL_URL;
       script.onload = () => resolve(window.ethers);
       script.onerror = () => reject(new Error("failed-to-load-ethers"));
       document.head.appendChild(script);

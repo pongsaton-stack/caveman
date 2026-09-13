@@ -14,12 +14,15 @@
     header, per spec, and silently ignore it — or print a console warning —
     from <meta>), so this page has no clickjacking protection until it's
     hosted somewhere that can set real HTTP response headers. Everything
-    below IS fully enforced even via <meta>. See README "External attack
-    surface" for what this does and doesn't cover.
+    below IS fully enforced even via <meta>. script-src only needs
+    gstatic.com (Firebase's SDK, loaded from Google's own CDN as Firebase's
+    docs recommend) — the wallet library is vendored under assets/vendor/
+    and served same-origin, so there's no second CDN to allowlist. See
+    README "External attack surface" for what this does and doesn't cover.
   -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com;
+    script-src 'self' https://www.gstatic.com;
     style-src 'self' 'unsafe-inline';
     connect-src 'self' https://*.googleapis.com;
     img-src 'self' data:;
