@@ -1,0 +1,116 @@
+rules_version = '2';
+
+// Deploy with: firebase deploy --only firestore:rules
+// (requires the Firebase CLI and a firebase.json pointing at this file —
+// see README.md "Turning on membership" for the full setup).
+//
+// These rules are the ACTUAL security boundary for this app. The
+// client-side checks in assets/js/db.js are only there for a fast, friendly
+// UI — never trust them; a hostile client can call Firestore directly and
+// skip every one of them. Everything that matters is enforced here.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isNonEmptyString(value, maxLen) {
+      return value is string && value.size() > 0 && value.size() <= maxLen;
+    }
+
+    function isEthAddressOrEmpty(value) {
+      return value == '' || value.matches('^0x[a-fA-F0-9]{40}$');
+    }
+
+    // Only http(s) links, and only short ones — blocks `javascript:` URIs
+    // (an XSS vector: the client sets this straight into an <a href>) and
+    // stops one member from stuffing a huge string into a field the UI
+    // renders directly into the page.
+    function isHttpUrlOrEmpty(value) {
+      return value == '' || (value is string && value.size() <= 500 && value.matches('^https?://.+'));
+    }
+
+    // users/{uid} — public profile, only the owner may write it.
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isOwner(userId)
+        && isNonEmptyString(request.resource.data.displayName, 60)
+        && request.resource.data.bio is string
+        && request.resource.data.bio.size() <= 300
+        && isEthAddressOrEmpty(request.resource.data.walletAddress);
+      allow delete: if isOwner(userId);
+    }
+
+    // works/{workId} — public read; only signed-in users may create; only
+    // the original owner may edit or delete their own work. The same
+    // validation applies on update as on create — skipping it there would
+    // let an owner create a valid work and then edit it into something
+    // that breaks every assumption the rest of the app makes about this
+    // collection (wrong category, oversized fields, a javascript: link).
+    match /works/{workId} {
+      allow read: if true;
+
+      function isValidWork() {
+        return request.resource.data.ownerId == request.auth.uid
+          && isNonEmptyString(request.resource.data.title, 120)
+          && request.resource.data.category in [
+               'writing', 'code', 'image', 'video', 'audio', 'agent',
+               'data', 'research', 'business', 'science', 'design', 'education'
+             ]
+          && request.resource.data.tool is string && request.resource.data.tool.size() <= 60
+          && request.resource.data.description is string && request.resource.data.description.size() <= 500
+          && isNonEmptyString(request.resource.data.ownerName, 60)
+          && request.resource.data.thumbnail is string && request.resource.data.thumbnail.size() <= 8
+          && isHttpUrlOrEmpty(request.resource.data.link)
+          && isEthAddressOrEmpty(request.resource.data.ownerWalletAddress)
+          && request.resource.data.tags is list
+          && request.resource.data.tags.size() <= 5;
+      }
+
+      allow create: if isSignedIn() && isValidWork();
+
+      // Ownership can never transfer: ownerId must stay whatever it was,
+      // which isValidWork() already pins to the caller's own uid.
+      allow update: if isSignedIn()
+        && resource.data.ownerId == request.auth.uid
+        && isValidWork();
+
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+
+      // comments/{commentId} — public read; only signed-in users may post;
+      // no editing another member's comment. Deleting your own is allowed
+      // for basic moderation of your own posts.
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+          && request.resource.data.authorId == request.auth.uid
+          && isNonEmptyString(request.resource.data.text, 500)
+          && isNonEmptyString(request.resource.data.authorName, 60);
+        allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+        allow update: if false;
+      }
+    }
+
+    // reports/{reportId} — write-only from the app's point of view: any
+    // signed-in member can file one, nobody can read, edit or delete
+    // through the client SDK (not even their own). The site owner reviews
+    // these from the Firebase console, which uses admin access and
+    // bypasses these rules entirely — that's the intended moderation path
+    // for now (see README "Known limitations").
+    match /reports/{reportId} {
+      allow read, update, delete: if false;
+      allow create: if isSignedIn()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.targetType in ['work', 'comment']
+        && isNonEmptyString(request.resource.data.workId, 200)
+        && (request.resource.data.targetType == 'work' || isNonEmptyString(request.resource.data.commentId, 200))
+        && request.resource.data.reason in ['spam', 'inappropriate', 'illegal', 'other']
+        && request.resource.data.note is string && request.resource.data.note.size() <= 300;
+    }
+  }
+}

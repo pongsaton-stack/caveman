@@ -3,8 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Works Portfolio — รวมผลงานจาก AI</title>
-  <meta name="description" content="เว็บไซต์รวบรวมผลงานที่สร้างขึ้นด้วยความช่วยเหลือของ AI ทุกประเภท ทั้งภาพ วิดีโอ เพลง งานเขียน และโค้ด" />
+  <title>AI Works Portfolio — global AI works community</title>
+  <meta name="description" content="Community site for sharing and discussing works made with AI — images, video, writing, code, and more, from creators around the world." />
+  <link rel="icon" href="data:," />
+  <!--
+    Locks down where scripts/connections/styles can come from. GitHub
+    Pages can't set custom HTTP response headers, so this is delivered as
+    a <meta> tag instead — that means `frame-ancestors` and `X-Frame-Options`
+    CANNOT be set this way (browsers only honor frame-ancestors as a real
+    header, per spec, and silently ignore it — or print a console warning —
+    from <meta>), so this page has no clickjacking protection until it's
+    hosted somewhere that can set real HTTP response headers. Everything
+    below IS fully enforced even via <meta>. script-src only needs
+    gstatic.com (Firebase's SDK, loaded from Google's own CDN as Firebase's
+    docs recommend) — the wallet library is vendored under assets/vendor/
+    and served same-origin, so there's no second CDN to allowlist. See
+    README "External attack surface" for what this does and doesn't cover.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://www.gstatic.com;
+    style-src 'self' 'unsafe-inline';
+    connect-src 'self' https://*.googleapis.com;
+    img-src 'self' data:;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  " />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -12,103 +37,240 @@
     <div class="container header-inner">
       <a class="brand" href="#top">
         <span class="brand-mark">✦</span>
-        <span>AI Works</span>
+        <span data-i18n="siteName">AI Works</span>
       </a>
-      <p class="tagline">รวมผลงานจาก AI ทุกรูปแบบ ไว้ในที่เดียว</p>
+      <div class="header-actions">
+        <button class="lang-toggle" id="langToggle" type="button" aria-label="Toggle language">EN</button>
+        <div id="authArea" class="auth-area"></div>
+      </div>
     </div>
   </header>
 
+  <div id="demoBanner" class="demo-banner" hidden>
+    <span data-i18n="demoModeBanner"></span>
+  </div>
+
   <main id="top">
     <section class="hero container">
-      <h1>ผลงานที่สร้างด้วย AI</h1>
-      <p>
-        รวมงานภาพ วิดีโอ เพลง บทความ และโค้ด ที่สร้างขึ้นโดยใช้เครื่องมือ AI
-        ต่าง ๆ ช่วยในกระบวนการทำงาน
-      </p>
+      <h1 data-i18n="heroTitle">ผลงานที่สร้างด้วย AI จากทั่วโลก</h1>
+      <p data-i18n="heroSubtitle"></p>
     </section>
 
     <section class="controls container">
-      <div class="filters" id="filters" role="tablist" aria-label="กรองตามประเภทผลงาน">
-        <button class="filter-btn is-active" data-category="all" role="tab" aria-selected="true">
-          ทั้งหมด
-        </button>
-        <button class="filter-btn" data-category="writing" role="tab" aria-selected="false">
-          📝 งานเขียน
-        </button>
-        <button class="filter-btn" data-category="code" role="tab" aria-selected="false">
-          💻 โค้ด
-        </button>
-        <button class="filter-btn" data-category="image" role="tab" aria-selected="false">
-          🖼️ ภาพ
-        </button>
-        <button class="filter-btn" data-category="video" role="tab" aria-selected="false">
-          🎬 วิดีโอ
-        </button>
-        <button class="filter-btn" data-category="audio" role="tab" aria-selected="false">
-          🎵 เสียง/เพลง
-        </button>
-        <button class="filter-btn" data-category="agent" role="tab" aria-selected="false">
-          🤖 AI Agent/อัตโนมัติ
-        </button>
-        <button class="filter-btn" data-category="data" role="tab" aria-selected="false">
-          📊 วิเคราะห์ข้อมูล
-        </button>
-        <button class="filter-btn" data-category="research" role="tab" aria-selected="false">
-          🔍 ค้นหา/วิจัย
-        </button>
-        <button class="filter-btn" data-category="business" role="tab" aria-selected="false">
-          💼 ธุรกิจ/องค์กร
-        </button>
-        <button class="filter-btn" data-category="science" role="tab" aria-selected="false">
-          🧬 วิทยาศาสตร์/สุขภาพ
-        </button>
-        <button class="filter-btn" data-category="design" role="tab" aria-selected="false">
-          🎨 ออกแบบ/3D/เกม
-        </button>
-        <button class="filter-btn" data-category="education" role="tab" aria-selected="false">
-          🎓 การศึกษา
-        </button>
+      <div class="filters" id="filters" role="tablist" aria-label="Filter by category">
+        <button class="filter-btn is-active" data-category="all" role="tab" aria-selected="true" data-i18n="all">All</button>
+        <button class="filter-btn" data-category="writing" role="tab" aria-selected="false">📝 <span data-i18n="cat_writing"></span></button>
+        <button class="filter-btn" data-category="code" role="tab" aria-selected="false">💻 <span data-i18n="cat_code"></span></button>
+        <button class="filter-btn" data-category="image" role="tab" aria-selected="false">🖼️ <span data-i18n="cat_image"></span></button>
+        <button class="filter-btn" data-category="video" role="tab" aria-selected="false">🎬 <span data-i18n="cat_video"></span></button>
+        <button class="filter-btn" data-category="audio" role="tab" aria-selected="false">🎵 <span data-i18n="cat_audio"></span></button>
+        <button class="filter-btn" data-category="agent" role="tab" aria-selected="false">🤖 <span data-i18n="cat_agent"></span></button>
+        <button class="filter-btn" data-category="data" role="tab" aria-selected="false">📊 <span data-i18n="cat_data"></span></button>
+        <button class="filter-btn" data-category="research" role="tab" aria-selected="false">🔍 <span data-i18n="cat_research"></span></button>
+        <button class="filter-btn" data-category="business" role="tab" aria-selected="false">💼 <span data-i18n="cat_business"></span></button>
+        <button class="filter-btn" data-category="science" role="tab" aria-selected="false">🧬 <span data-i18n="cat_science"></span></button>
+        <button class="filter-btn" data-category="design" role="tab" aria-selected="false">🎨 <span data-i18n="cat_design"></span></button>
+        <button class="filter-btn" data-category="education" role="tab" aria-selected="false">🎓 <span data-i18n="cat_education"></span></button>
       </div>
 
-      <div class="search-wrap">
-        <input
-          type="search"
-          id="searchInput"
-          placeholder="ค้นหาผลงาน หรือเครื่องมือ AI..."
-          aria-label="ค้นหาผลงาน"
-        />
+      <div class="controls-row">
+        <div class="search-wrap">
+          <input type="search" id="searchInput" data-i18n-placeholder="searchPlaceholder" aria-label="Search works" />
+        </div>
+        <label class="sort-wrap">
+          <span data-i18n="sortLabel"></span>
+          <select id="sortSelect">
+            <option value="newest" data-i18n="sortNewest"></option>
+            <option value="oldest" data-i18n="sortOldest"></option>
+          </select>
+        </label>
+        <button class="btn btn-primary" id="submitWorkBtn" type="button" data-i18n="submitWork">+ Share work</button>
       </div>
     </section>
 
     <section class="container">
       <p class="results-count" id="resultsCount"></p>
       <div class="grid" id="worksGrid"></div>
-      <p class="empty-state" id="emptyState" hidden>ไม่พบผลงานที่ตรงกับการค้นหา</p>
+      <p class="empty-state" id="emptyState" hidden data-i18n="emptyState"></p>
     </section>
   </main>
 
+  <!-- Work detail modal -->
   <div class="modal-overlay" id="modalOverlay" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <button class="modal-close" id="modalClose" aria-label="ปิด">✕</button>
+      <button class="modal-close" id="modalClose" aria-label="Close" data-i18n-title="close">✕</button>
       <div class="modal-thumb" id="modalThumb"></div>
       <span class="modal-tag" id="modalCategory"></span>
       <h2 id="modalTitle"></h2>
       <p class="modal-tool" id="modalTool"></p>
       <p id="modalDescription"></p>
+      <div id="modalTags" class="modal-tags"></div>
       <p class="modal-date" id="modalDate"></p>
-      <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener noreferrer">
-        ดูผลงานฉบับเต็ม →
-      </a>
+      <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener noreferrer" data-i18n="viewFull" hidden></a>
+      <button class="report-link" id="reportWorkBtn" type="button" data-i18n="reportWork"></button>
+
+      <div id="modalSupport" class="support-box" hidden>
+        <p class="support-label" data-i18n="supportCreator"></p>
+        <div class="support-row">
+          <input type="number" id="tipAmount" min="0" step="0.0001" data-i18n-placeholder="tipAmountLabel" />
+          <button class="btn btn-secondary" id="tipSendBtn" type="button" data-i18n="sendTip"></button>
+        </div>
+        <p class="wallet-warning" data-i18n="testnetWarning"></p>
+        <p class="tip-status" id="tipStatus" role="status"></p>
+      </div>
+
+      <div class="comments-section">
+        <h3 data-i18n="commentsTitle"></h3>
+        <div id="commentsList" class="comments-list"></div>
+        <div class="comment-form">
+          <textarea id="commentInput" rows="2" data-i18n-placeholder="addCommentPlaceholder"></textarea>
+          <button class="btn btn-secondary" id="commentSendBtn" type="button" data-i18n="postComment"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth modal -->
+  <div class="modal-overlay" id="authOverlay" hidden>
+    <div class="modal modal-narrow" role="dialog" aria-modal="true">
+      <button class="modal-close" id="authClose" aria-label="Close">✕</button>
+      <h2 id="authTitle" data-i18n="authSignInTitle"></h2>
+      <p class="auth-error" id="authError" hidden></p>
+      <form id="authForm" class="form-stack">
+        <label class="field" id="authNameField" hidden>
+          <span data-i18n="displayNameLabel"></span>
+          <input type="text" id="authName" autocomplete="name" />
+        </label>
+        <label class="field">
+          <span data-i18n="emailLabel"></span>
+          <input type="email" id="authEmail" required autocomplete="email" />
+        </label>
+        <label class="field">
+          <span data-i18n="passwordLabel"></span>
+          <input type="password" id="authPassword" required minlength="6" autocomplete="current-password" />
+        </label>
+        <button type="submit" class="btn btn-primary" id="authSubmitBtn" data-i18n="authSubmitSignIn"></button>
+      </form>
+      <button class="link-btn" id="authForgotBtn" type="button" data-i18n="authForgotPassword" hidden></button>
+      <p class="auth-status" id="authStatus" hidden></p>
+      <button class="btn btn-google" id="authGoogleBtn" type="button" data-i18n="authGoogle"></button>
+      <button class="link-btn" id="authSwitchBtn" type="button" data-i18n="authSwitchToSignUp"></button>
+    </div>
+  </div>
+
+  <!-- Submit work modal -->
+  <div class="modal-overlay" id="submitOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="submitClose" aria-label="Close">✕</button>
+      <h2 data-i18n="submitTitle"></h2>
+      <p class="auth-error" id="submitError" hidden></p>
+      <form id="submitForm" class="form-stack">
+        <label class="field">
+          <span data-i18n="titleLabel"></span>
+          <input type="text" id="submitTitleInput" required maxlength="120" />
+        </label>
+        <label class="field">
+          <span data-i18n="categoryLabel"></span>
+          <select id="submitCategoryInput" required>
+            <option value="writing" data-i18n="cat_writing"></option>
+            <option value="code" data-i18n="cat_code"></option>
+            <option value="image" data-i18n="cat_image"></option>
+            <option value="video" data-i18n="cat_video"></option>
+            <option value="audio" data-i18n="cat_audio"></option>
+            <option value="agent" data-i18n="cat_agent"></option>
+            <option value="data" data-i18n="cat_data"></option>
+            <option value="research" data-i18n="cat_research"></option>
+            <option value="business" data-i18n="cat_business"></option>
+            <option value="science" data-i18n="cat_science"></option>
+            <option value="design" data-i18n="cat_design"></option>
+            <option value="education" data-i18n="cat_education"></option>
+          </select>
+        </label>
+        <label class="field">
+          <span data-i18n="toolLabel"></span>
+          <input type="text" id="submitToolInput" required maxlength="60" />
+        </label>
+        <label class="field">
+          <span data-i18n="descriptionLabel"></span>
+          <textarea id="submitDescriptionInput" rows="3" maxlength="500"></textarea>
+        </label>
+        <label class="field">
+          <span data-i18n="linkLabel"></span>
+          <input type="url" id="submitLinkInput" placeholder="https://..." />
+        </label>
+        <label class="field">
+          <span data-i18n="thumbnailLabel"></span>
+          <input type="text" id="submitThumbnailInput" maxlength="8" placeholder="✨" />
+        </label>
+        <label class="field">
+          <span data-i18n="tagsLabel"></span>
+          <input type="text" id="submitTagsInput" placeholder="lora, portrait, sdxl" />
+        </label>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" id="submitCancelBtn" data-i18n="cancelButton"></button>
+          <button type="submit" class="btn btn-primary" id="submitWorkSubmitBtn" data-i18n="submitButton"></button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Profile modal -->
+  <div class="modal-overlay" id="profileOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="profileClose" aria-label="Close">✕</button>
+      <h2 data-i18n="profileTitle"></h2>
+      <form id="profileForm" class="form-stack">
+        <label class="field">
+          <span data-i18n="displayNameLabel"></span>
+          <input type="text" id="profileNameInput" maxlength="60" />
+        </label>
+        <label class="field">
+          <span data-i18n="bioLabel"></span>
+          <textarea id="profileBioInput" rows="2" maxlength="300"></textarea>
+        </label>
+        <div class="wallet-box">
+          <span data-i18n="walletAddressLabel"></span>
+          <div id="walletStatus" class="wallet-status"></div>
+          <input type="text" id="profileWalletInput" placeholder="0x..." readonly />
+          <button type="button" class="btn btn-secondary" id="connectWalletBtn" data-i18n="connectWallet"></button>
+        </div>
+        <button type="submit" class="btn btn-primary" id="profileSaveBtn" data-i18n="saveProfile"></button>
+        <p class="save-status" id="profileSaveStatus" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Report modal -->
+  <div class="modal-overlay" id="reportOverlay" hidden>
+    <div class="modal modal-narrow" role="dialog" aria-modal="true">
+      <button class="modal-close" id="reportClose" aria-label="Close">✕</button>
+      <h2 data-i18n="reportTitle"></h2>
+      <form id="reportForm" class="form-stack">
+        <label class="field">
+          <span data-i18n="reportReasonLabel"></span>
+          <select id="reportReasonInput" required>
+            <option value="spam" data-i18n="reportReasonSpam"></option>
+            <option value="inappropriate" data-i18n="reportReasonInappropriate"></option>
+            <option value="illegal" data-i18n="reportReasonIllegal"></option>
+            <option value="other" data-i18n="reportReasonOther"></option>
+          </select>
+        </label>
+        <label class="field">
+          <span data-i18n="reportNoteLabel"></span>
+          <textarea id="reportNoteInput" rows="2" maxlength="300"></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary" id="reportSubmitBtn" data-i18n="reportSubmit"></button>
+        <p class="save-status" id="reportStatus" role="status"></p>
+      </form>
     </div>
   </div>
 
   <footer class="site-footer">
     <div class="container">
-      <p>สร้างด้วย HTML/CSS/JS ล้วน ๆ — แก้ไขผลงานได้ที่ <code>assets/data/works.js</code></p>
+      <p data-i18n="footerNote"></p>
     </div>
   </footer>
 
-  <script src="assets/data/works.js"></script>
-  <script src="assets/script.js"></script>
+  <script type="module" src="assets/script.js"></script>
 </body>
 </html>
