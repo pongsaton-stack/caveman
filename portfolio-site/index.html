@@ -118,6 +118,8 @@
         </label>
         <button type="submit" class="btn btn-primary" id="authSubmitBtn" data-i18n="authSubmitSignIn"></button>
       </form>
+      <button class="link-btn" id="authForgotBtn" type="button" data-i18n="authForgotPassword" hidden></button>
+      <p class="auth-status" id="authStatus" hidden></p>
       <button class="btn btn-google" id="authGoogleBtn" type="button" data-i18n="authGoogle"></button>
       <button class="link-btn" id="authSwitchBtn" type="button" data-i18n="authSwitchToSignUp"></button>
     </div>
@@ -169,7 +171,7 @@
         </label>
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" id="submitCancelBtn" data-i18n="cancelButton"></button>
-          <button type="submit" class="btn btn-primary" data-i18n="submitButton"></button>
+          <button type="submit" class="btn btn-primary" id="submitWorkSubmitBtn" data-i18n="submitButton"></button>
         </div>
       </form>
     </div>
@@ -195,7 +197,7 @@
           <input type="text" id="profileWalletInput" placeholder="0x..." readonly />
           <button type="button" class="btn btn-secondary" id="connectWalletBtn" data-i18n="connectWallet"></button>
         </div>
-        <button type="submit" class="btn btn-primary" data-i18n="saveProfile"></button>
+        <button type="submit" class="btn btn-primary" id="profileSaveBtn" data-i18n="saveProfile"></button>
         <p class="save-status" id="profileSaveStatus" role="status"></p>
       </form>
     </div>

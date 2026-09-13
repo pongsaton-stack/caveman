@@ -27,6 +27,14 @@ service cloud.firestore {
       return value == '' || value.matches('^0x[a-fA-F0-9]{40}$');
     }
 
+    // Only http(s) links, and only short ones — blocks `javascript:` URIs
+    // (an XSS vector: the client sets this straight into an <a href>) and
+    // stops one member from stuffing a huge string into a field the UI
+    // renders directly into the page.
+    function isHttpUrlOrEmpty(value) {
+      return value == '' || (value is string && value.size() <= 500 && value.matches('^https?://.+'));
+    }
+
     // users/{uid} — public profile, only the owner may write it.
     match /users/{userId} {
       allow read: if true;
@@ -39,24 +47,38 @@ service cloud.firestore {
     }
 
     // works/{workId} — public read; only signed-in users may create; only
-    // the original owner may edit or delete their own work.
+    // the original owner may edit or delete their own work. The same
+    // validation applies on update as on create — skipping it there would
+    // let an owner create a valid work and then edit it into something
+    // that breaks every assumption the rest of the app makes about this
+    // collection (wrong category, oversized fields, a javascript: link).
     match /works/{workId} {
       allow read: if true;
 
-      allow create: if isSignedIn()
-        && request.resource.data.ownerId == request.auth.uid
-        && isNonEmptyString(request.resource.data.title, 120)
-        && request.resource.data.category in [
-             'writing', 'code', 'image', 'video', 'audio', 'agent',
-             'data', 'research', 'business', 'science', 'design', 'education'
-           ]
-        && request.resource.data.tool is string && request.resource.data.tool.size() <= 60
-        && request.resource.data.description is string && request.resource.data.description.size() <= 500
-        && isNonEmptyString(request.resource.data.ownerName, 60)
-        && request.resource.data.thumbnail is string && request.resource.data.thumbnail.size() <= 8
-        && isEthAddressOrEmpty(request.resource.data.ownerWalletAddress);
+      function isValidWork() {
+        return request.resource.data.ownerId == request.auth.uid
+          && isNonEmptyString(request.resource.data.title, 120)
+          && request.resource.data.category in [
+               'writing', 'code', 'image', 'video', 'audio', 'agent',
+               'data', 'research', 'business', 'science', 'design', 'education'
+             ]
+          && request.resource.data.tool is string && request.resource.data.tool.size() <= 60
+          && request.resource.data.description is string && request.resource.data.description.size() <= 500
+          && isNonEmptyString(request.resource.data.ownerName, 60)
+          && request.resource.data.thumbnail is string && request.resource.data.thumbnail.size() <= 8
+          && isHttpUrlOrEmpty(request.resource.data.link)
+          && isEthAddressOrEmpty(request.resource.data.ownerWalletAddress);
+      }
 
-      allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if isSignedIn() && isValidWork();
+
+      // Ownership can never transfer: ownerId must stay whatever it was,
+      // which isValidWork() already pins to the caller's own uid.
+      allow update: if isSignedIn()
+        && resource.data.ownerId == request.auth.uid
+        && isValidWork();
+
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
 
       // comments/{commentId} — public read; only signed-in users may post;
       // no editing another member's comment. Deleting your own is allowed

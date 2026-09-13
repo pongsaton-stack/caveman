@@ -7,6 +7,7 @@ import {
   signUpWithEmail,
   signInWithEmail,
   signInWithGoogle,
+  sendPasswordReset,
   signOutUser
 } from "./js/auth.js";
 import { subscribeWorks, submitWork, subscribeComments, addComment, getUserProfile, saveUserProfile } from "./js/db.js";
@@ -19,7 +20,7 @@ import {
   getBalanceEth,
   sendPaymentEth
 } from "./js/wallet.js";
-import { escapeHtml, isValidEthAddress } from "./js/render-utils.js";
+import { escapeHtml, isValidEthAddress, isValidHttpUrl } from "./js/render-utils.js";
 import { AI_WORKS as DEMO_WORKS } from "./data/works.js";
 
 const $ = (id) => document.getElementById(id);
@@ -72,6 +73,8 @@ const els = {
   authEmail: $("authEmail"),
   authPassword: $("authPassword"),
   authSubmitBtn: $("authSubmitBtn"),
+  authForgotBtn: $("authForgotBtn"),
+  authStatus: $("authStatus"),
   authGoogleBtn: $("authGoogleBtn"),
   authSwitchBtn: $("authSwitchBtn"),
 
@@ -79,6 +82,7 @@ const els = {
   submitClose: $("submitClose"),
   submitError: $("submitError"),
   submitForm: $("submitForm"),
+  submitFormSubmitBtn: $("submitWorkSubmitBtn"),
   submitTitleInput: $("submitTitleInput"),
   submitCategoryInput: $("submitCategoryInput"),
   submitToolInput: $("submitToolInput"),
@@ -95,8 +99,25 @@ const els = {
   profileWalletInput: $("profileWalletInput"),
   walletStatus: $("walletStatus"),
   connectWalletBtn: $("connectWalletBtn"),
+  profileSaveBtn: $("profileSaveBtn"),
   profileSaveStatus: $("profileSaveStatus")
 };
+
+// Disables a button (with a lightweight "…" state) for the duration of an
+// async action, so a slow network or an impatient double-click can't fire
+// the same sign-up/comment/tip/submission twice.
+async function withLoading(button, fn) {
+  if (!button) return fn();
+  const original = button.textContent;
+  button.disabled = true;
+  button.textContent = "…";
+  try {
+    return await fn();
+  } finally {
+    button.disabled = false;
+    button.textContent = original;
+  }
+}
 
 // ------------------------------------------------------------------ i18n ---
 function refreshI18n() {
@@ -210,7 +231,11 @@ function openWorkModal(work, { keepScroll = false } = {}) {
   els.modalDescription.textContent = work.description || "";
   els.modalDate.textContent = formatDate(work.createdAt ?? work.date);
 
-  if (work.link) {
+  // Re-validate even though the write path and Firestore rules already
+  // require http(s) — a stale document from before the rules were
+  // tightened, or any other way bad data reaches this collection, must
+  // never end up as a clickable `javascript:` URI.
+  if (work.link && isValidHttpUrl(work.link)) {
     els.modalLink.href = work.link;
     els.modalLink.hidden = false;
   } else {
@@ -295,12 +320,14 @@ els.commentSendBtn.addEventListener("click", async () => {
   if (!openWork || !isRealWork(openWork)) return;
   const text = els.commentInput.value.trim();
   if (!text) return;
-  try {
-    await addComment(user, openWork.id, text);
-    els.commentInput.value = "";
-  } catch (err) {
-    console.error("addComment failed", err);
-  }
+  await withLoading(els.commentSendBtn, async () => {
+    try {
+      await addComment(user, openWork.id, text);
+      els.commentInput.value = "";
+    } catch (err) {
+      console.error("addComment failed", err);
+    }
+  });
 });
 
 // ------------------------------------------------------- wallet / tipping ---
@@ -355,14 +382,16 @@ els.tipSendBtn.addEventListener("click", async () => {
     els.tipStatus.textContent = t("walletNotFound");
     return;
   }
-  try {
-    if (!getWalletState().address) await connectWallet();
-    const hash = await sendPaymentEth(openWork.ownerWalletAddress, els.tipAmount.value);
-    els.tipStatus.textContent = `${t("tipSuccess")} (${hash.slice(0, 10)}...)`;
-  } catch (err) {
-    console.error("sendPaymentEth failed", err);
-    els.tipStatus.textContent = t("tipError");
-  }
+  await withLoading(els.tipSendBtn, async () => {
+    try {
+      if (!getWalletState().address) await connectWallet();
+      const hash = await sendPaymentEth(openWork.ownerWalletAddress, els.tipAmount.value);
+      els.tipStatus.textContent = `${t("tipSuccess")} (${hash.slice(0, 10)}...)`;
+    } catch (err) {
+      console.error("sendPaymentEth failed", err);
+      els.tipStatus.textContent = t("tipError");
+    }
+  });
 });
 
 // -------------------------------------------------------------- auth UI ---
@@ -407,13 +436,16 @@ function setAuthMode(mode) {
   els.authNameField.hidden = !isSignUp;
   els.authSubmitBtn.textContent = t(isSignUp ? "authSubmitSignUp" : "authSubmitSignIn");
   els.authSwitchBtn.textContent = t(isSignUp ? "authSwitchToSignIn" : "authSwitchToSignUp");
+  els.authForgotBtn.hidden = isSignUp;
   els.authError.hidden = true;
+  els.authStatus.hidden = true;
 }
 
 function openAuthModal(mode) {
   setAuthMode(mode);
   const disabled = !isMembershipEnabled();
   els.authForm.hidden = disabled;
+  els.authForgotBtn.hidden = disabled || mode === "signup";
   els.authGoogleBtn.hidden = disabled;
   els.authSwitchBtn.hidden = disabled;
   els.authError.hidden = !disabled;
@@ -448,29 +480,55 @@ els.authForm.addEventListener("submit", async (e) => {
   els.authError.hidden = true;
   const email = els.authEmail.value.trim();
   const password = els.authPassword.value;
-  try {
-    if (authMode === "signup") {
-      await signUpWithEmail(email, password, els.authName.value.trim());
-    } else {
-      await signInWithEmail(email, password);
+  await withLoading(els.authSubmitBtn, async () => {
+    try {
+      if (authMode === "signup") {
+        await signUpWithEmail(email, password, els.authName.value.trim());
+      } else {
+        await signInWithEmail(email, password);
+      }
+      closeAuthModal();
+    } catch (err) {
+      console.error("auth failed", err);
+      els.authError.textContent = friendlyAuthError(err);
+      els.authError.hidden = false;
     }
-    closeAuthModal();
-  } catch (err) {
-    console.error("auth failed", err);
-    els.authError.textContent = friendlyAuthError(err);
-    els.authError.hidden = false;
-  }
+  });
 });
 
 els.authGoogleBtn.addEventListener("click", async () => {
-  try {
-    await signInWithGoogle();
-    closeAuthModal();
-  } catch (err) {
-    console.error("google sign-in failed", err);
-    els.authError.textContent = friendlyAuthError(err);
-    els.authError.hidden = false;
+  await withLoading(els.authGoogleBtn, async () => {
+    try {
+      await signInWithGoogle();
+      closeAuthModal();
+    } catch (err) {
+      console.error("google sign-in failed", err);
+      els.authError.textContent = friendlyAuthError(err);
+      els.authError.hidden = false;
+    }
+  });
+});
+
+els.authForgotBtn.addEventListener("click", async () => {
+  els.authError.hidden = true;
+  els.authStatus.hidden = false;
+  const email = els.authEmail.value.trim();
+  if (!email.includes("@")) {
+    els.authStatus.textContent = t("authResetNeedEmail");
+    return;
   }
+  await withLoading(els.authForgotBtn, async () => {
+    try {
+      await sendPasswordReset(email);
+    } catch (err) {
+      // Deliberately don't distinguish "no such account" from success —
+      // doing so would let this form be used to check which emails are
+      // registered on the site. Real failures (network, rate limit) still
+      // get logged for debugging.
+      if (err?.code !== "auth/user-not-found") console.error("sendPasswordReset failed", err);
+    }
+    els.authStatus.textContent = t("authResetSent");
+  });
 });
 
 // -------------------------------------------------------- submit work UI ---
@@ -498,22 +556,24 @@ els.submitForm.addEventListener("submit", async (e) => {
   if (!user) return;
   els.submitError.hidden = true;
 
-  try {
-    await submitWork(user, {
-      title: els.submitTitleInput.value,
-      category: els.submitCategoryInput.value,
-      tool: els.submitToolInput.value,
-      description: els.submitDescriptionInput.value,
-      link: els.submitLinkInput.value,
-      thumbnail: els.submitThumbnailInput.value || "✨",
-      ownerWalletAddress: getWalletState().address || ""
-    });
-    closeSubmitModal();
-  } catch (err) {
-    console.error("submitWork failed", err);
-    els.submitError.textContent = t("authErrGeneric");
-    els.submitError.hidden = false;
-  }
+  await withLoading(els.submitFormSubmitBtn, async () => {
+    try {
+      await submitWork(user, {
+        title: els.submitTitleInput.value,
+        category: els.submitCategoryInput.value,
+        tool: els.submitToolInput.value,
+        description: els.submitDescriptionInput.value,
+        link: els.submitLinkInput.value,
+        thumbnail: els.submitThumbnailInput.value || "✨",
+        ownerWalletAddress: getWalletState().address || ""
+      });
+      closeSubmitModal();
+    } catch (err) {
+      console.error("submitWork failed", err);
+      els.submitError.textContent = t("authErrGeneric");
+      els.submitError.hidden = false;
+    }
+  });
 });
 
 // ----------------------------------------------------------- profile UI ---
@@ -553,17 +613,19 @@ els.profileForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = getCurrentUser();
   if (!user) return;
-  try {
-    await saveUserProfile(user, {
-      displayName: els.profileNameInput.value,
-      bio: els.profileBioInput.value,
-      walletAddress: els.profileWalletInput.value
-    });
-    els.profileSaveStatus.textContent = t("profileSaved");
-  } catch (err) {
-    console.error("saveUserProfile failed", err);
-    els.profileSaveStatus.textContent = t("authErrGeneric");
-  }
+  await withLoading(els.profileSaveBtn, async () => {
+    try {
+      await saveUserProfile(user, {
+        displayName: els.profileNameInput.value,
+        bio: els.profileBioInput.value,
+        walletAddress: els.profileWalletInput.value
+      });
+      els.profileSaveStatus.textContent = t("profileSaved");
+    } catch (err) {
+      console.error("saveUserProfile failed", err);
+      els.profileSaveStatus.textContent = t("authErrGeneric");
+    }
+  });
 });
 
 // ------------------------------------------------------------- keyboard ---

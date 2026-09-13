@@ -99,16 +99,27 @@ portfolio-site/
 - Browse/filter across 12 AI-capability categories, search by title/tool/description
 - Thai + English UI, one click to switch
 - Member sign-up/sign-in (email+password or Google), once Firebase is configured
+- Forgot-password flow (email reset link) — doesn't reveal whether an email is registered, to prevent account enumeration
 - Members can publish their own work and comment on others' — realtime updates
 - Optional wallet-connect and creator tipping in ETH
 - Dark mode follows system setting; fully responsive down to phone width
 - All user-generated text is HTML-escaped before rendering (see `render-utils.js`) — the real access control lives in `firestore.rules`, not in the client code
+- Buttons that trigger a network request (sign up/in, publish, comment, save profile, send tip) disable themselves while pending, so a slow connection or an impatient double-click can't create duplicate posts/comments
 
 ## Security notes
 
-- Never trust the client-side checks in `db.js` alone — they're for fast UI feedback. `firestore.rules` is what actually stops a malicious client from writing bad data.
+- Never trust the client-side checks in `db.js` alone — they're for fast UI feedback. `firestore.rules` is what actually stops a malicious client from writing bad data. The rules apply the same validation on **update** as on **create** — an early version of this only checked create, which let an owner edit their own work into something invalid after the fact.
+- Every field a member can write is validated in `firestore.rules`, including the `link` field on a work: it must be `http(s)://…` or empty. Without that check a work's "view full work" link could be set to a `javascript:` URI and executed in another visitor's browser when clicked (a stored XSS). The client (`script.js` and `db.js`) validates the same thing, but that's convenience, not the boundary.
 - The site never sees or stores a user's private keys or seed phrase. All it does is ask an already-installed wallet extension to sign a transaction the user reviews and approves themselves.
 - Re-read `firestore.rules` any time you add a new field members can write, and update the matching validation there — a field the rules don't check is a field an attacker can set to anything.
+- `firestore.rules` couldn't be executed against a live Firestore emulator in the environment this was built in (network egress is locked down there) — it was reviewed carefully against Firebase's documented rules syntax instead. **Run `firebase emulators:start` once and exercise sign-up/publish/comment/edit-someone-else's-work locally before relying on these rules in production.**
+
+## Known limitations (be aware of these for a public community site)
+
+- **No spam/rate limiting.** Firestore rules can't easily rate-limit writes; a signed-in member could script hundreds of posts or comments. For now, moderation is manual: as the project owner, you can delete any document from the Firebase console (the console uses admin access and bypasses `firestore.rules`).
+- **No email verification.** Anyone can sign up with any email address without proving they own it. Fine for a low-stakes community; add Firebase's email verification flow if impersonation becomes a problem.
+- **No content reporting/blocking UI.** Members can't flag another member's post or comment from within the site yet.
+- These are reasonable gaps for a first version, not oversights to ignore — revisit them before the community grows large enough that abuse becomes likely.
 
 ---
 
@@ -188,13 +199,24 @@ python3 -m http.server 8000
 - กรอง/ค้นหาผลงาน 12 หมวดหมู่
 - สลับภาษาไทย/อังกฤษได้
 - สมัครสมาชิก (อีเมล หรือ Google) เมื่อตั้งค่า Firebase แล้ว
+- ลืมรหัสผ่าน? มีระบบส่งลิงก์รีเซ็ตทางอีเมล — ไม่บอกด้วยว่าอีเมลนั้นมีสมาชิกอยู่จริงไหม (กันการสืบว่าใครสมัครไว้บ้าง)
 - สมาชิกโพสต์ผลงานและคอมเมนต์กันได้แบบเรียลไทม์
 - เชื่อมต่อ wallet และส่งทิปเป็น ETH (ไม่บังคับ)
 - รองรับ dark mode และมือถือ
 - ข้อความจากผู้ใช้ทุกจุดผ่านการ escape HTML ก่อน render (ป้องกัน XSS) — แต่การควบคุมสิทธิ์จริงอยู่ที่ `firestore.rules`
+- ปุ่มที่ยิง request ทุกตัว (สมัคร/เข้าสู่ระบบ/โพสต์/คอมเมนต์/บันทึกโปรไฟล์/ส่งทิป) จะปิดตัวเองระหว่างรอผลลัพธ์ กันไม่ให้กดซ้ำจนโพสต์/คอมเมนต์ซ้ำ
 
 ## ข้อควรระวังด้านความปลอดภัย
 
-- อย่าเชื่อการตรวจสอบฝั่ง client ใน `db.js` เพียงอย่างเดียว มันมีไว้เพื่อ UX เท่านั้น `firestore.rules` คือสิ่งที่ป้องกัน client ที่ประสงค์ร้ายจริง ๆ
+- อย่าเชื่อการตรวจสอบฝั่ง client ใน `db.js` เพียงอย่างเดียว มันมีไว้เพื่อ UX เท่านั้น `firestore.rules` คือสิ่งที่ป้องกัน client ที่ประสงค์ร้ายจริง ๆ และตอนนี้ validate เหมือนกันทั้งตอน create และ update แล้ว (เดิมเช็คแค่ตอน create ทำให้เจ้าของผลงานแก้ข้อมูลตัวเองให้ผิดรูปแบบภายหลังได้)
+- ทุกฟิลด์ที่สมาชิกเขียนได้ผ่านการตรวจใน `firestore.rules` รวมถึงฟิลด์ `link` — ต้องเป็น `http(s)://…` หรือว่างเท่านั้น ถ้าไม่เช็ค จะมีคนตั้งเป็น `javascript:...` แล้วฝังโค้ดอันตรายที่รันตอนคนอื่นกดลิงก์ "ดูผลงานฉบับเต็ม" ได้ (stored XSS)
 - เว็บนี้ไม่เห็นและไม่เก็บ private key หรือ seed phrase ของใครเลย ทำได้แค่ขอให้ wallet extension ที่ติดตั้งอยู่แล้วเซ็นธุรกรรมที่ผู้ใช้ตรวจสอบและกดยืนยันเอง
 - ทุกครั้งที่เพิ่มฟิลด์ใหม่ที่สมาชิกเขียนได้ ต้องกลับไปอัปเดต `firestore.rules` ให้ตรวจสอบฟิลด์นั้นด้วย — ฟิลด์ที่ rules ไม่เช็ค คือช่องโหว่ที่ผู้ไม่หวังดีตั้งค่าอะไรก็ได้
+- `firestore.rules` รันทดสอบจริงผ่าน Firestore emulator ในสภาพแวดล้อมที่พัฒนานี้ไม่ได้ (เน็ตออกถูกบล็อก) ตรวจสอบอย่างละเอียดตาม syntax ที่ Firebase เอกสารไว้แทน — **รัน `firebase emulators:start` แล้วลองสมัคร/โพสต์/คอมเมนต์/พยายามแก้ผลงานคนอื่นดูก่อนใช้งานจริง**
+
+## ข้อจำกัดที่ควรรู้ (สำหรับเว็บชุมชนสาธารณะ)
+
+- **ยังไม่มีการจำกัดสแปม** สมาชิกที่ล็อกอินแล้วเขียนสคริปต์โพสต์/คอมเมนต์รัว ๆ ได้ ตอนนี้ต้องจัดการเองผ่าน Firebase console (เจ้าของโปรเจกต์ลบเอกสารไหนก็ได้ เพราะ console ใช้สิทธิ์ admin ข้าม `firestore.rules`)
+- **ยังไม่มีการยืนยันอีเมล** ใครก็สมัครด้วยอีเมลไหนก็ได้โดยไม่ต้องพิสูจน์ว่าเป็นเจ้าของจริง
+- **ยังไม่มีปุ่มรายงาน/บล็อกเนื้อหา** ในตัวเว็บ
+- ข้อจำกัดพวกนี้คือของที่รู้ตัวว่ายังไม่ทำ ไม่ใช่สิ่งที่มองข้าม ควรกลับมาทำเพิ่มก่อนที่ชุมชนจะโตจนมีความเสี่ยงเรื่องการใช้งานในทางที่ผิด

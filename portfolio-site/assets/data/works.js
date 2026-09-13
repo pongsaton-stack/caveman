@@ -12,7 +12,7 @@ export const AI_WORKS = [
     tool: "Claude",
     description: "First-pass draft for the product newsletter, edited and shipped.",
     date: "2026-08-10",
-    link: "#",
+    link: "",
     thumbnail: "📝"
   },
   {
@@ -22,7 +22,7 @@ export const AI_WORKS = [
     tool: "GitHub Copilot",
     description: "Small React app for tracking personal expenses, scaffolded and refined.",
     date: "2026-08-15",
-    link: "#",
+    link: "",
     thumbnail: "💻"
   },
   {
@@ -32,7 +32,7 @@ export const AI_WORKS = [
     tool: "Midjourney",
     description: "Cyberpunk cityscape at dusk, generated for a game concept board.",
     date: "2026-08-02",
-    link: "#",
+    link: "",
     thumbnail: "🌆"
   },
   {
@@ -42,7 +42,7 @@ export const AI_WORKS = [
     tool: "Runway",
     description: "15-second teaser clip for a product launch announcement.",
     date: "2026-08-20",
-    link: "#",
+    link: "",
     thumbnail: "🎬"
   },
   {
@@ -52,7 +52,7 @@ export const AI_WORKS = [
     tool: "Suno",
     description: "Instrumental lo-fi track made for a study playlist.",
     date: "2026-08-25",
-    link: "#",
+    link: "",
     thumbnail: "🎵"
   },
   {
@@ -62,7 +62,7 @@ export const AI_WORKS = [
     tool: "ElevenLabs",
     description: "AI-generated voiceover narration for a travel vlog edit.",
     date: "2026-09-08",
-    link: "#",
+    link: "",
     thumbnail: "🎙️"
   },
   {
@@ -72,7 +72,7 @@ export const AI_WORKS = [
     tool: "Claude Agent",
     description: "Autonomous agent that pulls data from three tools and drafts the weekly status report.",
     date: "2026-09-10",
-    link: "#",
+    link: "",
     thumbnail: "🤖"
   },
   {
@@ -82,7 +82,7 @@ export const AI_WORKS = [
     tool: "ChatGPT + Python",
     description: "Forecasting model and dashboard flagging customers likely to churn next quarter.",
     date: "2026-09-03",
-    link: "#",
+    link: "",
     thumbnail: "📊"
   },
   {
@@ -92,7 +92,7 @@ export const AI_WORKS = [
     tool: "Perplexity",
     description: "Deep-research summary comparing five competitors, sourced and fact-checked.",
     date: "2026-08-28",
-    link: "#",
+    link: "",
     thumbnail: "🔍"
   },
   {
@@ -102,7 +102,7 @@ export const AI_WORKS = [
     tool: "Claude",
     description: "Flags risky clauses and summarizes vendor contracts before legal sign-off.",
     date: "2026-08-30",
-    link: "#",
+    link: "",
     thumbnail: "💼"
   },
   {
@@ -112,7 +112,7 @@ export const AI_WORKS = [
     tool: "AlphaFold",
     description: "Predicted 3D structure used as a starting point for a lab research question.",
     date: "2026-07-20",
-    link: "#",
+    link: "",
     thumbnail: "🧬"
   },
   {
@@ -122,7 +122,7 @@ export const AI_WORKS = [
     tool: "Stable Diffusion",
     description: "Set of five stylized portrait studies exploring lighting.",
     date: "2026-09-01",
-    link: "#",
+    link: "",
     thumbnail: "🖼️"
   },
   {
@@ -132,7 +132,7 @@ export const AI_WORKS = [
     tool: "Meshy",
     description: "3D asset pack and level layout sketches generated for an indie game prototype.",
     date: "2026-09-06",
-    link: "#",
+    link: "",
     thumbnail: "🎨"
   },
   {
@@ -142,7 +142,7 @@ export const AI_WORKS = [
     tool: "Claude",
     description: "Generates practice quizzes adapted to a student's weak topics from past results.",
     date: "2026-09-09",
-    link: "#",
+    link: "",
     thumbnail: "🎓"
   }
 ];

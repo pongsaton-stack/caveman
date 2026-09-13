@@ -31,6 +31,7 @@ export async function initAuth() {
     signInWithPopup: authMod.signInWithPopup,
     GoogleAuthProvider: authMod.GoogleAuthProvider,
     updateProfile: authMod.updateProfile,
+    sendPasswordResetEmail: authMod.sendPasswordResetEmail,
     signOut: authMod.signOut
   };
 
@@ -75,6 +76,12 @@ export async function signInWithGoogle() {
   const provider = new api.GoogleAuthProvider();
   const cred = await api.signInWithPopup(api.auth, provider);
   return cred.user;
+}
+
+export async function sendPasswordReset(email) {
+  const api = await initAuth();
+  if (!api) throw new Error("demo-mode");
+  await api.sendPasswordResetEmail(api.auth, email);
 }
 
 export async function signOutUser() {
