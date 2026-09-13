@@ -33,7 +33,8 @@ export const AI_WORKS = [
     description: "Cyberpunk cityscape at dusk, generated for a game concept board.",
     date: "2026-08-02",
     link: "",
-    thumbnail: "🌆"
+    thumbnail: "🌆",
+    tags: ["cyberpunk", "concept-art"]
   },
   {
     id: 4,
@@ -123,7 +124,8 @@ export const AI_WORKS = [
     description: "Set of five stylized portrait studies exploring lighting.",
     date: "2026-09-01",
     link: "",
-    thumbnail: "🖼️"
+    thumbnail: "🖼️",
+    tags: ["portrait", "lighting-study", "sdxl"]
   },
   {
     id: 13,

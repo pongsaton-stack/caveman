@@ -53,6 +53,13 @@
         <div class="search-wrap">
           <input type="search" id="searchInput" data-i18n-placeholder="searchPlaceholder" aria-label="Search works" />
         </div>
+        <label class="sort-wrap">
+          <span data-i18n="sortLabel"></span>
+          <select id="sortSelect">
+            <option value="newest" data-i18n="sortNewest"></option>
+            <option value="oldest" data-i18n="sortOldest"></option>
+          </select>
+        </label>
         <button class="btn btn-primary" id="submitWorkBtn" type="button" data-i18n="submitWork">+ Share work</button>
       </div>
     </section>
@@ -73,8 +80,10 @@
       <h2 id="modalTitle"></h2>
       <p class="modal-tool" id="modalTool"></p>
       <p id="modalDescription"></p>
+      <div id="modalTags" class="modal-tags"></div>
       <p class="modal-date" id="modalDate"></p>
       <a class="modal-link" id="modalLink" href="#" target="_blank" rel="noopener noreferrer" data-i18n="viewFull" hidden></a>
+      <button class="report-link" id="reportWorkBtn" type="button" data-i18n="reportWork"></button>
 
       <div id="modalSupport" class="support-box" hidden>
         <p class="support-label" data-i18n="supportCreator"></p>
@@ -169,6 +178,10 @@
           <span data-i18n="thumbnailLabel"></span>
           <input type="text" id="submitThumbnailInput" maxlength="8" placeholder="✨" />
         </label>
+        <label class="field">
+          <span data-i18n="tagsLabel"></span>
+          <input type="text" id="submitTagsInput" placeholder="lora, portrait, sdxl" />
+        </label>
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" id="submitCancelBtn" data-i18n="cancelButton"></button>
           <button type="submit" class="btn btn-primary" id="submitWorkSubmitBtn" data-i18n="submitButton"></button>
@@ -199,6 +212,31 @@
         </div>
         <button type="submit" class="btn btn-primary" id="profileSaveBtn" data-i18n="saveProfile"></button>
         <p class="save-status" id="profileSaveStatus" role="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Report modal -->
+  <div class="modal-overlay" id="reportOverlay" hidden>
+    <div class="modal modal-narrow" role="dialog" aria-modal="true">
+      <button class="modal-close" id="reportClose" aria-label="Close">✕</button>
+      <h2 data-i18n="reportTitle"></h2>
+      <form id="reportForm" class="form-stack">
+        <label class="field">
+          <span data-i18n="reportReasonLabel"></span>
+          <select id="reportReasonInput" required>
+            <option value="spam" data-i18n="reportReasonSpam"></option>
+            <option value="inappropriate" data-i18n="reportReasonInappropriate"></option>
+            <option value="illegal" data-i18n="reportReasonIllegal"></option>
+            <option value="other" data-i18n="reportReasonOther"></option>
+          </select>
+        </label>
+        <label class="field">
+          <span data-i18n="reportNoteLabel"></span>
+          <textarea id="reportNoteInput" rows="2" maxlength="300"></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary" id="reportSubmitBtn" data-i18n="reportSubmit"></button>
+        <p class="save-status" id="reportStatus" role="status"></p>
       </form>
     </div>
   </div>

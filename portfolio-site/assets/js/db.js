@@ -18,8 +18,27 @@ const LIMITS = {
   description: 500,
   comment: 500,
   bio: 300,
-  displayName: 60
+  displayName: 60,
+  tag: 24,
+  reportNote: 300
 };
+
+const MAX_TAGS = 5;
+
+export const VALID_REPORT_REASONS = ["spam", "inappropriate", "illegal", "other"];
+
+// "landscape, cyberpunk , ,ART" -> ["landscape", "cyberpunk", "art"], capped
+// and de-duplicated. Matches the shape firestore.rules expects (a list of
+// at most 5 items) — kept in sync with MAX_TAGS there.
+export function parseTags(rawInput) {
+  const seen = new Set();
+  for (const piece of String(rawInput || "").split(",")) {
+    const tag = clampText(piece.trim().toLowerCase(), LIMITS.tag);
+    if (tag) seen.add(tag);
+    if (seen.size >= MAX_TAGS) break;
+  }
+  return [...seen];
+}
 
 let fsApi = null;
 
@@ -53,6 +72,7 @@ export async function submitWork(user, work) {
     description: clampText(String(work.description || "").trim(), LIMITS.description),
     link: work.link ? String(work.link).trim() : "",
     thumbnail: clampText(String(work.thumbnail || "✨").trim(), 8),
+    tags: parseTags(work.tags),
     ownerId: uid,
     ownerName: clampText(user.displayName || "Anonymous", LIMITS.displayName),
     ownerWalletAddress: isValidEthAddress(work.ownerWalletAddress) ? work.ownerWalletAddress : "",
@@ -114,6 +134,37 @@ export async function subscribeComments(workId, onChange, onError) {
     (snap) => onChange(snap.docs.map((d) => ({ id: d.id, ...d.data() }))),
     onError
   );
+}
+
+// Files a report for moderation. Deliberately write-only from the client's
+// side (see firestore.rules) — nobody can read reports back through the
+// app, including the reporter; the site owner reviews them from the
+// Firebase console. commentId is omitted entirely for a work-level report
+// rather than sent empty, since the rules only require it when reporting
+// a comment.
+export async function reportContent(user, { targetType, workId, commentId, reason, note }) {
+  const { db, mod } = (await getFirestore()) || {};
+  if (!db) throw new Error("demo-mode");
+  const uid = requireAuthUid(user);
+
+  if (!["work", "comment"].includes(targetType)) throw new Error("invalid-target-type");
+  if (!VALID_REPORT_REASONS.includes(reason)) throw new Error("invalid-reason");
+  if (!workId) throw new Error("work-id-required");
+
+  const report = {
+    targetType,
+    workId,
+    reason,
+    note: clampText(String(note || "").trim(), LIMITS.reportNote),
+    reporterId: uid,
+    createdAt: mod.serverTimestamp()
+  };
+  if (targetType === "comment") {
+    if (!commentId) throw new Error("comment-id-required");
+    report.commentId = commentId;
+  }
+
+  await mod.addDoc(mod.collection(db, "reports"), report);
 }
 
 export async function getUserProfile(uid) {

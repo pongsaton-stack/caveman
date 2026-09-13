@@ -67,7 +67,9 @@ service cloud.firestore {
           && isNonEmptyString(request.resource.data.ownerName, 60)
           && request.resource.data.thumbnail is string && request.resource.data.thumbnail.size() <= 8
           && isHttpUrlOrEmpty(request.resource.data.link)
-          && isEthAddressOrEmpty(request.resource.data.ownerWalletAddress);
+          && isEthAddressOrEmpty(request.resource.data.ownerWalletAddress)
+          && request.resource.data.tags is list
+          && request.resource.data.tags.size() <= 5;
       }
 
       allow create: if isSignedIn() && isValidWork();
@@ -92,6 +94,23 @@ service cloud.firestore {
         allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
         allow update: if false;
       }
+    }
+
+    // reports/{reportId} — write-only from the app's point of view: any
+    // signed-in member can file one, nobody can read, edit or delete
+    // through the client SDK (not even their own). The site owner reviews
+    // these from the Firebase console, which uses admin access and
+    // bypasses these rules entirely — that's the intended moderation path
+    // for now (see README "Known limitations").
+    match /reports/{reportId} {
+      allow read, update, delete: if false;
+      allow create: if isSignedIn()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.targetType in ['work', 'comment']
+        && isNonEmptyString(request.resource.data.workId, 200)
+        && (request.resource.data.targetType == 'work' || isNonEmptyString(request.resource.data.commentId, 200))
+        && request.resource.data.reason in ['spam', 'inappropriate', 'illegal', 'other']
+        && request.resource.data.note is string && request.resource.data.note.size() <= 300;
     }
   }
 }

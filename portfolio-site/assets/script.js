@@ -10,7 +10,16 @@ import {
   sendPasswordReset,
   signOutUser
 } from "./js/auth.js";
-import { subscribeWorks, submitWork, subscribeComments, addComment, getUserProfile, saveUserProfile } from "./js/db.js";
+import {
+  subscribeWorks,
+  submitWork,
+  subscribeComments,
+  addComment,
+  getUserProfile,
+  saveUserProfile,
+  parseTags,
+  reportContent
+} from "./js/db.js";
 import {
   hasInjectedWallet,
   connectWallet,
@@ -29,6 +38,8 @@ const $ = (id) => document.getElementById(id);
 let allWorks = [];
 let activeCategory = "all";
 let searchTerm = "";
+let sortOrder = "newest"; // "newest" | "oldest"
+let reportTarget = null; // { targetType, workId, commentId? }
 let openWork = null; // the work object shown in the detail modal
 let commentsUnsub = null;
 let commentsGeneration = 0; // guards against a stale async subscription outliving its modal
@@ -41,6 +52,7 @@ const els = {
   demoBanner: $("demoBanner"),
   filters: $("filters"),
   searchInput: $("searchInput"),
+  sortSelect: $("sortSelect"),
   submitWorkBtn: $("submitWorkBtn"),
   resultsCount: $("resultsCount"),
   grid: $("worksGrid"),
@@ -53,8 +65,10 @@ const els = {
   modalTitle: $("modalTitle"),
   modalTool: $("modalTool"),
   modalDescription: $("modalDescription"),
+  modalTags: $("modalTags"),
   modalDate: $("modalDate"),
   modalLink: $("modalLink"),
+  reportWorkBtn: $("reportWorkBtn"),
   modalSupport: $("modalSupport"),
   tipAmount: $("tipAmount"),
   tipSendBtn: $("tipSendBtn"),
@@ -89,6 +103,7 @@ const els = {
   submitDescriptionInput: $("submitDescriptionInput"),
   submitLinkInput: $("submitLinkInput"),
   submitThumbnailInput: $("submitThumbnailInput"),
+  submitTagsInput: $("submitTagsInput"),
   submitCancelBtn: $("submitCancelBtn"),
 
   profileOverlay: $("profileOverlay"),
@@ -100,7 +115,15 @@ const els = {
   walletStatus: $("walletStatus"),
   connectWalletBtn: $("connectWalletBtn"),
   profileSaveBtn: $("profileSaveBtn"),
-  profileSaveStatus: $("profileSaveStatus")
+  profileSaveStatus: $("profileSaveStatus"),
+
+  reportOverlay: $("reportOverlay"),
+  reportClose: $("reportClose"),
+  reportForm: $("reportForm"),
+  reportReasonInput: $("reportReasonInput"),
+  reportNoteInput: $("reportNoteInput"),
+  reportSubmitBtn: $("reportSubmitBtn"),
+  reportStatus: $("reportStatus")
 };
 
 // Disables a button (with a lightweight "…" state) for the duration of an
@@ -169,23 +192,43 @@ function matchesFilters(work) {
   const categoryOk = activeCategory === "all" || work.category === activeCategory;
   if (!categoryOk) return false;
   if (!searchTerm) return true;
-  const haystack = `${work.title} ${work.tool} ${work.description}`.toLowerCase();
+  const tagsText = (work.tags || []).join(" ");
+  const haystack = `${work.title} ${work.tool} ${work.description} ${tagsText}`.toLowerCase();
   return haystack.includes(searchTerm);
 }
 
+// Firestore Timestamp, an ISO date string (demo data), or null (a
+// server-timestamp write not yet echoed back) all need to sort sanely
+// against each other — treat "not resolved yet" as newest so a just-
+// published work doesn't briefly sink to the bottom of the list.
+function sortMillis(work) {
+  const value = work.createdAt ?? work.date;
+  if (value == null) return Date.now();
+  if (value.toDate) return value.toDate().getTime();
+  const parsed = new Date(value).getTime();
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 function renderGrid() {
-  const works = allWorks.filter(matchesFilters);
+  const works = allWorks.filter(matchesFilters).sort((a, b) => {
+    const diff = sortMillis(a) - sortMillis(b);
+    return sortOrder === "oldest" ? diff : -diff;
+  });
   els.grid.innerHTML = "";
 
   works.forEach((work) => {
     const card = document.createElement("button");
     card.className = "card";
     card.type = "button";
+    const tagsHtml = (work.tags || [])
+      .map((tag) => `<span class="pill-tag">#${escapeHtml(tag)}</span>`)
+      .join("");
     card.innerHTML = `
       <div class="card-thumb">${escapeHtml(work.thumbnail || "✨")}</div>
       <span class="tag">${escapeHtml(t(`cat_${work.category}`))}</span>
       <h3>${escapeHtml(work.title)}</h3>
       <p>${escapeHtml(work.description || "")}</p>
+      ${tagsHtml ? `<div class="card-tags">${tagsHtml}</div>` : ""}
       <div class="card-meta">
         <span>${escapeHtml(work.tool || "")}${work.ownerName ? ` · ${escapeHtml(work.ownerName)}` : ""}</span>
         <span>${escapeHtml(formatDate(work.createdAt ?? work.date))}</span>
@@ -198,6 +241,11 @@ function renderGrid() {
   els.emptyState.hidden = works.length !== 0;
   els.resultsCount.textContent = t("resultsCount", { n: works.length });
 }
+
+els.sortSelect.addEventListener("change", (e) => {
+  sortOrder = e.target.value;
+  renderGrid();
+});
 
 els.filters.querySelectorAll(".filter-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -229,7 +277,11 @@ function openWorkModal(work, { keepScroll = false } = {}) {
   els.modalTitle.textContent = work.title;
   els.modalTool.textContent = `${t("madeWith")} ${work.tool || ""}`;
   els.modalDescription.textContent = work.description || "";
+  els.modalTags.innerHTML = (work.tags || [])
+    .map((tag) => `<span class="pill-tag">#${escapeHtml(tag)}</span>`)
+    .join("");
   els.modalDate.textContent = formatDate(work.createdAt ?? work.date);
+  els.reportWorkBtn.hidden = !isRealWork(work);
 
   // Re-validate even though the write path and Firestore rules already
   // require http(s) — a stale document from before the rules were
@@ -298,6 +350,7 @@ async function renderComments(work) {
         (c) => `
         <div class="comment">
           <span class="comment-author">${escapeHtml(c.authorName || "Anonymous")}</span>
+          <button type="button" class="comment-report-btn" data-comment-id="${escapeHtml(c.id)}">${escapeHtml(t("reportComment"))}</button>
           <p class="comment-text">${escapeHtml(c.text)}</p>
         </div>`
       )
@@ -326,6 +379,56 @@ els.commentSendBtn.addEventListener("click", async () => {
       els.commentInput.value = "";
     } catch (err) {
       console.error("addComment failed", err);
+    }
+  });
+});
+
+// -------------------------------------------------------------- reporting ---
+function openReportModal(targetType, workId, commentId) {
+  if (!getCurrentUser()) return openAuthModal("signin");
+  reportTarget = { targetType, workId, commentId };
+  els.reportForm.reset();
+  els.reportStatus.textContent = "";
+  els.reportOverlay.hidden = false;
+}
+
+function closeReportModal() {
+  els.reportOverlay.hidden = true;
+  reportTarget = null;
+}
+
+els.reportWorkBtn.addEventListener("click", () => {
+  if (!openWork) return;
+  openReportModal("work", openWork.id);
+});
+
+els.commentsList.addEventListener("click", (e) => {
+  const btn = e.target.closest(".comment-report-btn");
+  if (!btn || !openWork) return;
+  openReportModal("comment", openWork.id, btn.dataset.commentId);
+});
+
+els.reportClose.addEventListener("click", closeReportModal);
+els.reportOverlay.addEventListener("click", (e) => {
+  if (e.target === els.reportOverlay) closeReportModal();
+});
+
+els.reportForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const user = getCurrentUser();
+  if (!user || !reportTarget) return;
+  await withLoading(els.reportSubmitBtn, async () => {
+    try {
+      await reportContent(user, {
+        ...reportTarget,
+        reason: els.reportReasonInput.value,
+        note: els.reportNoteInput.value
+      });
+      els.reportStatus.textContent = t("reportSuccess");
+      setTimeout(closeReportModal, 1200);
+    } catch (err) {
+      console.error("reportContent failed", err);
+      els.reportStatus.textContent = t("authErrGeneric");
     }
   });
 });
@@ -565,6 +668,7 @@ els.submitForm.addEventListener("submit", async (e) => {
         description: els.submitDescriptionInput.value,
         link: els.submitLinkInput.value,
         thumbnail: els.submitThumbnailInput.value || "✨",
+        tags: els.submitTagsInput.value,
         ownerWalletAddress: getWalletState().address || ""
       });
       closeSubmitModal();
@@ -631,7 +735,8 @@ els.profileForm.addEventListener("submit", async (e) => {
 // ------------------------------------------------------------- keyboard ---
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
-  if (!els.modalOverlay.hidden) closeWorkModal();
+  if (!els.reportOverlay.hidden) closeReportModal();
+  else if (!els.modalOverlay.hidden) closeWorkModal();
   if (!els.authOverlay.hidden) closeAuthModal();
   if (!els.submitOverlay.hidden) closeSubmitModal();
   if (!els.profileOverlay.hidden) closeProfileModal();

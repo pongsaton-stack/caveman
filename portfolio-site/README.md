@@ -68,6 +68,7 @@ Edit [`assets/data/works.js`](./assets/data/works.js) — a plain array, each it
 | `date` | `YYYY-MM-DD` |
 | `link` | Link to the full work |
 | `thumbnail` | An emoji (swap for an image URL with a small CSS/JS change) |
+| `tags` | Optional array of short strings, up to 5, e.g. `["cyberpunk", "sdxl"]` |
 
 This file is only used in demo mode — once Firebase is configured, real member-submitted works from Firestore take over automatically and this file is ignored.
 
@@ -101,10 +102,18 @@ portfolio-site/
 - Member sign-up/sign-in (email+password or Google), once Firebase is configured
 - Forgot-password flow (email reset link) — doesn't reveal whether an email is registered, to prevent account enumeration
 - Members can publish their own work and comment on others' — realtime updates
+- Optional tags per work (up to 5), searched alongside title/tool/description — added after looking at how Civitai/OpenArt users complained search and filtering degrade once a community's content grows past a handful of broad categories
+- Sort browsing by newest or oldest
+- A "🚩 Report" button on every work and every comment files a report for the site owner to review from the Firebase console — added specifically because weak moderation tooling is the single most common complaint about Civitai, the largest platform in this space
 - Optional wallet-connect and creator tipping in ETH
 - Dark mode follows system setting; fully responsive down to phone width
 - All user-generated text is HTML-escaped before rendering (see `render-utils.js`) — the real access control lives in `firestore.rules`, not in the client code
-- Buttons that trigger a network request (sign up/in, publish, comment, save profile, send tip) disable themselves while pending, so a slow connection or an impatient double-click can't create duplicate posts/comments
+- Buttons that trigger a network request (sign up/in, publish, comment, save profile, send tip, report) disable themselves while pending, so a slow connection or an impatient double-click can't create duplicate posts/comments
+
+## Ideas looked at and deliberately not built yet
+
+- **WalletConnect (mobile wallet support).** Right now wallet-connect only works with a browser extension (MetaMask and friends), which shuts out most mobile visitors — a real gap for a "global community." Adding it properly needs a free project ID from [WalletConnect Cloud](https://cloud.reown.com) (the same kind of one-time setup as Firebase above), so it's scoped as a follow-up rather than half-wired with a placeholder that can't be tested end-to-end here.
+- **"Most discussed" sort.** Doing this right means a denormalized comment-count on each work, kept in sync via a Cloud Function trigger on comment create/delete — trying to fake it with a client-side increment plus a security rule is a well-known way to end up with an insecure or racy counter, so it's left out rather than shipped half-safe.
 
 ## Security notes
 
@@ -118,7 +127,7 @@ portfolio-site/
 
 - **No spam/rate limiting.** Firestore rules can't easily rate-limit writes; a signed-in member could script hundreds of posts or comments. For now, moderation is manual: as the project owner, you can delete any document from the Firebase console (the console uses admin access and bypasses `firestore.rules`).
 - **No email verification.** Anyone can sign up with any email address without proving they own it. Fine for a low-stakes community; add Firebase's email verification flow if impersonation becomes a problem.
-- **No content reporting/blocking UI.** Members can't flag another member's post or comment from within the site yet.
+- **Reports go into a write-only collection.** The in-app "Report" button files a report, but nothing in the app reads reports back — by design, so a member can't see who reported what. The site owner reviews `reports` from the Firebase console and acts manually (delete the offending work/comment, or ban a user via Authentication). There's no in-app admin queue yet.
 - These are reasonable gaps for a first version, not oversights to ignore — revisit them before the community grows large enough that abuse becomes likely.
 
 ---
@@ -189,6 +198,7 @@ python3 -m http.server 8000
 | `date` | รูปแบบ `YYYY-MM-DD` |
 | `link` | ลิงก์ไปดูผลงานฉบับเต็ม |
 | `thumbnail` | อีโมจิ |
+| `tags` | array ของคำสั้น ๆ ไม่บังคับ สูงสุด 5 อัน เช่น `["cyberpunk", "sdxl"]` |
 
 ## โครงสร้างไฟล์
 
@@ -201,10 +211,18 @@ python3 -m http.server 8000
 - สมัครสมาชิก (อีเมล หรือ Google) เมื่อตั้งค่า Firebase แล้ว
 - ลืมรหัสผ่าน? มีระบบส่งลิงก์รีเซ็ตทางอีเมล — ไม่บอกด้วยว่าอีเมลนั้นมีสมาชิกอยู่จริงไหม (กันการสืบว่าใครสมัครไว้บ้าง)
 - สมาชิกโพสต์ผลงานและคอมเมนต์กันได้แบบเรียลไทม์
+- ใส่แท็กให้ผลงานได้ (สูงสุด 5 แท็ก) ค้นหาได้ทั้งจากชื่อ/เครื่องมือ/คำอธิบาย/แท็ก — เพิ่มมาเพราะไปอ่านรีวิว Civitai/OpenArt แล้วพบว่าปัญหาที่คนบ่นบ่อยสุดคือค้นหา/filter แย่เมื่อผลงานเยอะขึ้น หมวดใหญ่ 12 อันอย่างเดียวไม่พอ
+- เรียงลำดับผลงานได้ (ใหม่สุด/เก่าสุด)
+- ปุ่ม "🚩 รายงาน" ที่ทุกผลงานและทุกคอมเมนต์ ส่งรายงานให้เจ้าของเว็บไปดูใน Firebase console — เพิ่มมาเพราะการโมเดอเรตอ่อนคือปัญหาที่คนบ่น Civitai (แพลตฟอร์มใหญ่สุดในสายนี้) มากที่สุด
 - เชื่อมต่อ wallet และส่งทิปเป็น ETH (ไม่บังคับ)
 - รองรับ dark mode และมือถือ
 - ข้อความจากผู้ใช้ทุกจุดผ่านการ escape HTML ก่อน render (ป้องกัน XSS) — แต่การควบคุมสิทธิ์จริงอยู่ที่ `firestore.rules`
-- ปุ่มที่ยิง request ทุกตัว (สมัคร/เข้าสู่ระบบ/โพสต์/คอมเมนต์/บันทึกโปรไฟล์/ส่งทิป) จะปิดตัวเองระหว่างรอผลลัพธ์ กันไม่ให้กดซ้ำจนโพสต์/คอมเมนต์ซ้ำ
+- ปุ่มที่ยิง request ทุกตัว (สมัคร/เข้าสู่ระบบ/โพสต์/คอมเมนต์/บันทึกโปรไฟล์/ส่งทิป/รายงาน) จะปิดตัวเองระหว่างรอผลลัพธ์ กันไม่ให้กดซ้ำจนโพสต์/คอมเมนต์ซ้ำ
+
+## แนวคิดที่พิจารณาแล้วแต่ยังไม่ทำ
+
+- **WalletConnect (รองรับ wallet มือถือ)** ตอนนี้เชื่อมต่อ wallet ได้แค่ผ่าน browser extension (MetaMask ฯลฯ) ซึ่งปิดกั้นคนใช้มือถือส่วนใหญ่ — เป็นช่องโหว่จริงสำหรับ "ชุมชนทั่วโลก" การทำให้ถูกต้องต้องมี project ID ฟรีจาก [WalletConnect Cloud](https://cloud.reown.com) (ตั้งค่าครั้งเดียวคล้าย Firebase) จึงเก็บไว้เป็นงานต่อยอด แทนที่จะใส่โค้ดครึ่งๆ กลางๆ ที่ทดสอบจบไม่ได้ในเซสชันนี้
+- **เรียงตาม "คุยเยอะสุด"** ทำให้ถูกต้องต้องมีตัวนับคอมเมนต์แบบ denormalize ที่ sync ผ่าน Cloud Function ตอนสร้าง/ลบคอมเมนต์ — ถ้าทำแบบลวกๆ ด้วยการ increment ฝั่ง client + security rule เฉยๆ มักจบที่ตัวนับไม่ปลอดภัยหรือมี race condition จึงยังไม่ใส่ฟีเจอร์นี้ดีกว่าใส่แบบไม่ปลอดภัย
 
 ## ข้อควรระวังด้านความปลอดภัย
 
@@ -218,5 +236,5 @@ python3 -m http.server 8000
 
 - **ยังไม่มีการจำกัดสแปม** สมาชิกที่ล็อกอินแล้วเขียนสคริปต์โพสต์/คอมเมนต์รัว ๆ ได้ ตอนนี้ต้องจัดการเองผ่าน Firebase console (เจ้าของโปรเจกต์ลบเอกสารไหนก็ได้ เพราะ console ใช้สิทธิ์ admin ข้าม `firestore.rules`)
 - **ยังไม่มีการยืนยันอีเมล** ใครก็สมัครด้วยอีเมลไหนก็ได้โดยไม่ต้องพิสูจน์ว่าเป็นเจ้าของจริง
-- **ยังไม่มีปุ่มรายงาน/บล็อกเนื้อหา** ในตัวเว็บ
+- **รายงานเป็น write-only** ปุ่ม "รายงาน" ในเว็บส่งรายงานได้ แต่ตัวเว็บเองอ่านรายงานกลับไม่ได้เลย (ตั้งใจออกแบบแบบนี้ กันไม่ให้สมาชิกเห็นว่าใครรายงานอะไร) เจ้าของเว็บต้องเข้าไปดูใน Firebase console เอง แล้วจัดการเอง (ลบผลงาน/คอมเมนต์ หรือแบนผู้ใช้ผ่าน Authentication) ยังไม่มีหน้า admin queue ในตัวเว็บ
 - ข้อจำกัดพวกนี้คือของที่รู้ตัวว่ายังไม่ทำ ไม่ใช่สิ่งที่มองข้าม ควรกลับมาทำเพิ่มก่อนที่ชุมชนจะโตจนมีความเสี่ยงเรื่องการใช้งานในทางที่ผิด
