@@ -1,0 +1,75 @@
+rules_version = '2';
+
+// Deploy with: firebase deploy --only firestore:rules
+// (requires the Firebase CLI and a firebase.json pointing at this file —
+// see README.md "Turning on membership" for the full setup).
+//
+// These rules are the ACTUAL security boundary for this app. The
+// client-side checks in assets/js/db.js are only there for a fast, friendly
+// UI — never trust them; a hostile client can call Firestore directly and
+// skip every one of them. Everything that matters is enforced here.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isNonEmptyString(value, maxLen) {
+      return value is string && value.size() > 0 && value.size() <= maxLen;
+    }
+
+    function isEthAddressOrEmpty(value) {
+      return value == '' || value.matches('^0x[a-fA-F0-9]{40}$');
+    }
+
+    // users/{uid} — public profile, only the owner may write it.
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isOwner(userId)
+        && isNonEmptyString(request.resource.data.displayName, 60)
+        && request.resource.data.bio is string
+        && request.resource.data.bio.size() <= 300
+        && isEthAddressOrEmpty(request.resource.data.walletAddress);
+      allow delete: if isOwner(userId);
+    }
+
+    // works/{workId} — public read; only signed-in users may create; only
+    // the original owner may edit or delete their own work.
+    match /works/{workId} {
+      allow read: if true;
+
+      allow create: if isSignedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && isNonEmptyString(request.resource.data.title, 120)
+        && request.resource.data.category in [
+             'writing', 'code', 'image', 'video', 'audio', 'agent',
+             'data', 'research', 'business', 'science', 'design', 'education'
+           ]
+        && request.resource.data.tool is string && request.resource.data.tool.size() <= 60
+        && request.resource.data.description is string && request.resource.data.description.size() <= 500
+        && isNonEmptyString(request.resource.data.ownerName, 60)
+        && request.resource.data.thumbnail is string && request.resource.data.thumbnail.size() <= 8
+        && isEthAddressOrEmpty(request.resource.data.ownerWalletAddress);
+
+      allow update, delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+
+      // comments/{commentId} — public read; only signed-in users may post;
+      // no editing another member's comment. Deleting your own is allowed
+      // for basic moderation of your own posts.
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+          && request.resource.data.authorId == request.auth.uid
+          && isNonEmptyString(request.resource.data.text, 500)
+          && isNonEmptyString(request.resource.data.authorName, 60);
+        allow delete: if isSignedIn() && resource.data.authorId == request.auth.uid;
+        allow update: if false;
+      }
+    }
+  }
+}

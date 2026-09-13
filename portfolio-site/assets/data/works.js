@@ -1,9 +1,10 @@
-// Sample data — edit this array to add, remove, or change portfolio items.
-// Each work needs: id, title, category, tool, description, date, link, thumbnail (emoji or image URL).
+// Demo/fallback data shown when no Firebase backend is configured (see
+// README "Turning on membership"). Once Firebase is connected, real
+// member-submitted works from Firestore replace this list automatically.
 //
 // Valid categories:
 // writing, code, image, video, audio, agent, data, research, business, science, design, education
-const AI_WORKS = [
+export const AI_WORKS = [
   {
     id: 1,
     title: "Weekly Newsletter Draft",

@@ -27,6 +27,14 @@
   box-sizing: border-box;
 }
 
+/* Any later rule that sets display on an element (e.g. .comment-form {
+   display: flex }) would otherwise silently defeat el.hidden = true, since
+   the UA's [hidden] rule loses the cascade to a later same-specificity
+   selector. Keep this near the top so hidden always wins. */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -323,4 +331,284 @@ a {
   background: var(--accent-soft);
   padding: 2px 6px;
   border-radius: 6px;
+}
+
+/* Header actions (lang toggle + auth area) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lang-toggle {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-area {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent);
+}
+
+.btn-ghost {
+  background: transparent;
+}
+
+.btn-google {
+  width: 100%;
+  margin-top: 10px;
+  background: #fff;
+  color: #1e1b16;
+  border-color: var(--border);
+}
+
+.link-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Demo mode banner */
+.demo-banner {
+  background: var(--accent-soft);
+  color: var(--accent);
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 10px 16px;
+}
+
+/* Controls row: search + submit button */
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Forms */
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.field input,
+.field select,
+.field textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.auth-error {
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.save-status {
+  min-height: 1.2em;
+  font-size: 0.82rem;
+  color: var(--accent);
+  margin: 0;
+}
+
+.modal-narrow {
+  max-width: 380px;
+}
+
+/* Support / wallet tipping box inside work modal */
+.support-box {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--accent-soft);
+  border-radius: 12px;
+}
+
+.support-label {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--accent);
+}
+
+.support-row {
+  display: flex;
+  gap: 8px;
+}
+
+.support-row input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.wallet-warning {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+.tip-status {
+  font-size: 0.82rem;
+  color: var(--accent);
+  min-height: 1.2em;
+  margin: 6px 0 0;
+}
+
+.wallet-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wallet-box input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+.wallet-status {
+  font-size: 0.8rem;
+  color: var(--accent);
+  min-height: 1.1em;
+}
+
+/* Comments */
+.comments-section {
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.comments-section h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}
+
+.comment {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.comment-author {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.comment-text {
+  margin: 2px 0 0;
+  font-size: 0.88rem;
+}
+
+.no-comments {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.comment-form {
+  display: flex;
+  gap: 8px;
+}
+
+.comment-form textarea {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  resize: vertical;
 }
