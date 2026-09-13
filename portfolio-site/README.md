@@ -42,8 +42,26 @@ This is a one-time setup the site owner does. Nothing here is secret — Firebas
    ```
    `firestore.rules` in this folder is the rules file (`firebase.json` already points to it). **Read it before deploying** — it's short and documents exactly what each rule allows.
 7. Reload the site — the demo banner disappears and Sign in/Sign up start working.
+8. **(Recommended) Turn on App Check** so only this actual site — not a bot or a script calling your Firestore/Auth APIs directly — can write data: get a reCAPTCHA v3 site key at [google.com/recaptcha/admin](https://www.google.com/recaptcha/admin), register your domain, paste the key into `appCheckSiteKey` in `assets/js/firebase-config.js`, then in Firebase console go to **App Check** and enforce it for Firestore and Authentication.
 
 If you skip this, the site still works fine for browsing; members just can't sign up yet.
+
+## External attack surface — what this is and isn't protected against
+
+Since you asked directly: here's an honest rundown rather than a blanket "yes."
+
+**Covered:**
+- **XSS (cross-site scripting).** Every piece of user-generated content (titles, descriptions, comments, tags, names) goes through `escapeHtml()` before it's ever put into the page (`render-utils.js`). The one field that becomes a real link (`link`) is validated as `http(s)://` only, both when it's written (`firestore.rules`) and again right before it's used as an `<a href>` (`script.js`) — so it can never become a `javascript:` URI.
+- **Unauthorized data writes.** `firestore.rules` is the real boundary: it's what actually runs on Google's servers and decides whether a write is allowed, independent of anything the browser sends. Ownership checks, field types, and length limits are enforced there, not just in the client.
+- **A Content-Security-Policy** (see the `<meta>` tag in `index.html`) restricts scripts to this site plus the two CDNs it actually uses (`gstatic.com` for Firebase, `cdnjs.cloudflare.com` for the wallet library), blocks browser plugins (`object-src 'none'`), and blocks a classic escalation trick (`<base>` tag hijacking, via `base-uri 'self'`).
+- **Wallet safety.** The site never receives or stores a private key or seed phrase — every transaction is built here but must be approved inside the user's own wallet extension.
+- **Password-reset/enumeration.** The forgot-password flow gives an identical response whether or not the email is registered, so it can't be used to find out who has an account.
+
+**Gaps that are real and worth knowing about:**
+- **No Firebase App Check by default** (see the setup step above) — without it, someone who reads this open-source code can call your Firestore project's API directly with their own script, skipping this web app (and its buttons-disable-while-pending protections) entirely. `firestore.rules` still applies either way, but App Check is what stops that traffic from reaching your project at all. It's optional here because it needs its own external site key, same as Firebase itself.
+- **No rate limiting.** Even with App Check on, a signed-in member can still call Firestore quickly and repeatedly through the app. See "Known limitations" below.
+- **Clickjacking.** GitHub Pages can't set the `X-Frame-Options` / `frame-ancestors` HTTP headers this needs — only a real header works, `<meta>` can't deliver it (browsers ignore it there). If you move hosting to something that lets you set response headers (Cloudflare Pages, Netlify, Vercel, a reverse proxy in front of GitHub Pages), add `frame-ancestors 'self'` there.
+- **No Subresource Integrity (SRI) on the CDN-loaded libraries.** Both Firebase's SDK and the wallet library (`ethers.js`) load from CDNs pinned to an exact version, which is the standard, Firebase-documented way to do it — but without an SRI hash, a compromise of that CDN could theoretically serve altered code. Couldn't add a verified SRI hash for `ethers.js` from this environment (the network access needed to fetch it was blocked) — if you want this hardened further, visit [cdnjs.com/libraries/ethers](https://cdnjs.com/libraries/ethers), copy the `integrity` value it provides for the exact version pinned in `assets/js/wallet.js`, and add it to the `<script>` tag created there.
 
 ## Wallet connect / tipping (optional, involves real money)
 
@@ -172,8 +190,26 @@ python3 -m http.server 8000
    firebase deploy --only firestore:rules
    ```
 7. รีเฟรชเว็บ — banner โหมดสาธิตจะหายไป สมัครสมาชิก/เข้าสู่ระบบใช้งานได้
+8. **(แนะนำ) เปิด App Check** เพื่อให้มีแค่เว็บนี้จริงๆ เท่านั้น (ไม่ใช่บอทหรือสคริปต์ที่ยิงตรงไปที่ Firestore/Auth API) เขียนข้อมูลได้: ไปขอ reCAPTCHA v3 site key ที่ [google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) ลงทะเบียนโดเมนเว็บคุณ แล้วเอา key ไปใส่ที่ `appCheckSiteKey` ใน `assets/js/firebase-config.js` จากนั้นไปที่ Firebase console → **App Check** แล้วเปิด enforce สำหรับ Firestore และ Authentication
 
 ถ้ายังไม่ตั้งค่า เว็บก็ยังดูผลงานได้ปกติ แค่สมัครสมาชิกไม่ได้เท่านั้น
+
+## ป้องกันการโจมตีจากภายนอกได้แค่ไหน
+
+เพราะมีคนถามตรงๆ เลยขอตอบตรงๆ แทนคำว่า "ป้องกันแล้ว" เฉยๆ:
+
+**ป้องกันแล้ว:**
+- **XSS (แทรกโค้ดอันตราย)** — เนื้อหาจากผู้ใช้ทุกจุด (ชื่อผลงาน คำอธิบาย คอมเมนต์ แท็ก ชื่อผู้ใช้) ผ่าน `escapeHtml()` ก่อน render ทุกครั้ง (`render-utils.js`) ส่วนฟิลด์ `link` ที่กลายเป็นลิงก์จริง ก็ถูกบังคับให้เป็น `http(s)://` เท่านั้น ทั้งตอนเขียน (`firestore.rules`) และเช็คซ้ำอีกทีก่อนใช้เป็น `<a href>` (`script.js`) — ทำให้ไม่มีทางกลายเป็น `javascript:` URI ได้
+- **การเขียนข้อมูลโดยไม่ได้รับอนุญาต** — `firestore.rules` คือด่านจริงที่รันบนเซิร์ฟเวอร์ Google ตัดสินว่าเขียนได้ไหม โดยไม่ขึ้นกับสิ่งที่เบราว์เซอร์ส่งมาเลย ตรวจทั้งเจ้าของ ชนิดข้อมูล และความยาว
+- **Content-Security-Policy** (ดู `<meta>` tag ใน `index.html`) จำกัดให้โหลดสคริปต์ได้แค่จากเว็บนี้กับ CDN 2 ที่ที่ใช้จริง (gstatic.com สำหรับ Firebase, cdnjs.cloudflare.com สำหรับ wallet library) บล็อก plugin เบราว์เซอร์ และบล็อกเทคนิคแฮ็กแบบ `<base>` tag hijacking
+- **ความปลอดภัยของ wallet** — เว็บไม่เห็นและไม่เก็บ private key/seed phrase เลย ทุกธุรกรรมต้องได้รับการอนุมัติจาก wallet extension ของผู้ใช้เอง
+- **กันการสืบอีเมล** — ฟอร์มลืมรหัสผ่านตอบเหมือนกันไม่ว่าอีเมลนั้นจะมีบัญชีจริงหรือไม่ เอาไปสืบว่าใครสมัครไว้บ้างไม่ได้
+
+**ช่องโหว่ที่ยังมีอยู่จริง ควรรู้ไว้:**
+- **ยังไม่เปิด Firebase App Check โดยดีฟอลต์** (ดูขั้นตอนตั้งค่าด้านบน) — ถ้าไม่เปิด ใครก็ตามที่อ่านโค้ด open-source นี้แล้วเขียนสคริปต์ยิงตรงไปที่ Firestore API ของโปรเจกต์คุณเอง ก็ข้ามเว็บนี้ไปได้เลย (รวมถึงข้ามการป้องกันกดซ้ำที่ทำไว้ในปุ่มต่างๆ ด้วย) `firestore.rules` ยังใช้ได้อยู่เหมือนเดิม แต่ App Check คือสิ่งที่กันไม่ให้ทราฟฟิกแบบนั้นเข้าถึงโปรเจกต์คุณได้เลยตั้งแต่ต้น ที่ยังไม่บังคับเพราะต้องมี site key จากภายนอกเหมือน Firebase เอง
+- **ยังไม่มี rate limiting** — ต่อให้เปิด App Check แล้ว สมาชิกที่ล็อกอินถูกต้องก็ยังยิง Firestore ผ่านเว็บรัวๆ ได้อยู่ดี (ดูหัวข้อ "ข้อจำกัดที่ควรรู้" ด้านล่าง)
+- **Clickjacking** — GitHub Pages ตั้งค่า header `X-Frame-Options`/`frame-ancestors` ที่ต้องใช้ป้องกันเรื่องนี้ไม่ได้ ต้องเป็น HTTP header จริงเท่านั้น ใส่ผ่าน `<meta>` ไม่ได้ (เบราว์เซอร์เมิน) ถ้าย้ายไป host ที่ตั้งค่า response header ได้ (Cloudflare Pages, Netlify, Vercel, หรือ reverse proxy หน้า GitHub Pages) ค่อยเพิ่ม `frame-ancestors 'self'` ตรงนั้น
+- **ไม่มี Subresource Integrity (SRI)** บน library ที่โหลดจาก CDN — ทั้ง Firebase SDK และ wallet library (`ethers.js`) โหลดจาก CDN ที่ pin เวอร์ชันตายตัว (วิธีมาตรฐานที่ Firebase เองแนะนำ) แต่ถ้าไม่มี SRI hash แล้ว CDN นั้นโดนแฮ็ก โค้ดที่เปลี่ยนไปก็ยังรันได้ในทางทฤษฎี ใส่ SRI hash ที่ verify แล้วให้ `ethers.js` ไม่ได้จากในเซสชันที่พัฒนานี้ (เน็ตที่ต้องใช้ดึงค่านี้ถูกบล็อก) — ถ้าอยากป้องกันเพิ่ม ไปที่ [cdnjs.com/libraries/ethers](https://cdnjs.com/libraries/ethers) copy ค่า `integrity` ของเวอร์ชันที่ pin ไว้ใน `assets/js/wallet.js` มาใส่ที่ `<script>` tag ตรงนั้น
 
 ## เชื่อมต่อ Wallet / การสนับสนุน (เกี่ยวข้องกับเงินจริง)
 

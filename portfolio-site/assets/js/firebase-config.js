@@ -21,3 +21,16 @@ export function isFirebaseConfigured() {
       !firebaseConfig.projectId.startsWith("YOUR_")
   );
 }
+
+// Optional: Firebase App Check with reCAPTCHA v3. This is what actually
+// stops a bot or a script from hitting your Firestore/Auth APIs directly
+// (bypassing this web app entirely) — get a site key from
+// https://www.google.com/recaptcha/admin (choose reCAPTCHA v3), register
+// this site's domain there, then also turn on enforcement for Firestore
+// and Authentication in Firebase console > App Check. Leave blank to skip;
+// the site works fine without it, just without this extra bot-abuse layer.
+export const appCheckSiteKey = "";
+
+export function isAppCheckConfigured() {
+  return Boolean(appCheckSiteKey);
+}

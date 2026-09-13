@@ -6,6 +6,27 @@
   <title>AI Works Portfolio — global AI works community</title>
   <meta name="description" content="Community site for sharing and discussing works made with AI — images, video, writing, code, and more, from creators around the world." />
   <link rel="icon" href="data:," />
+  <!--
+    Locks down where scripts/connections/styles can come from. GitHub
+    Pages can't set custom HTTP response headers, so this is delivered as
+    a <meta> tag instead — that means `frame-ancestors` and `X-Frame-Options`
+    CANNOT be set this way (browsers only honor frame-ancestors as a real
+    header, per spec, and silently ignore it — or print a console warning —
+    from <meta>), so this page has no clickjacking protection until it's
+    hosted somewhere that can set real HTTP response headers. Everything
+    below IS fully enforced even via <meta>. See README "External attack
+    surface" for what this does and doesn't cover.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://www.gstatic.com https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline';
+    connect-src 'self' https://*.googleapis.com;
+    img-src 'self' data:;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+  " />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
