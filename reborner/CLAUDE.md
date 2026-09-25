@@ -4,7 +4,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 เจ้าของ: Pongsaton — **สื่อสารภาษาไทย** · ชอบเห็นตัวเลขจริง · ต้องการความตรงไปตรงมาเรื่องความไม่แน่นอน
 
 ## แหล่งความจริง
-- `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) และ **บทเรียน 28 ข้อ (หมวด 11) อ่านก่อนแก้อะไรก็ตาม**
+- `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) และ **บทเรียน 29 ข้อ (หมวด 11) อ่านก่อนแก้อะไรก็ตาม**
 - `data/*.csv` + `data/map_ashfield.txt` — ข้อมูลเกมทั้งหมด (`monsters_workbook.xlsx` เป็นเอกสารออกแบบ ค่าอาจเก่ากว่า CSV)
 
 ## โครงสร้าง
@@ -68,3 +68,12 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - LP/permadeath ของมอนร่วมทีมยังไม่ต่อเนื่องข้ามศึก
 - ธาตุไฟ/น้ำแข็ง/แสง/มืด ยังไม่มีท่าไหนใช้ (สายเวทย์ยังไม่พอร์ต) — อย่าจูนมอนที่อ่อนแอต่อธาตุเหล่านี้
 - `HERO_ANIMS` ใน Overworld.gd อาจจับคู่ทิศผิด · ฟอนต์ไทยอาจต้องตั้งเอง
+
+## สำเนาใน Google Drive — ซิงก์ทุกครั้งที่ไฟล์เปลี่ยน
+Pongsaton อนุญาตแล้ว: ไฟล์ไหนในโปรเจกต์ถูกแก้ ให้อัปโหลดทับใน Drive ได้เลยไม่ต้องถาม
+- โฟลเดอร์ `The Reborner` id `1d3YPhEXP4x86I_VTVzksScbSog-GZDFJ` · โครงเดียวกับ repo
+  core `1ivuWP8GZGVi7FPg75dxQl2Adsr0A8pgk` · world `1y7M-SLPV2_urDsoFhyNRei7zoSEd_BWH` · data `1mq4yyiJJMGjAINJJKJSL1Ruotxe6BsVF`
+  docs `1atuceU4o6LrYQ8n_kKrVf0VsGKJQBy36` · scenes `1s1sLb00yvq3WhwVY5yQwXrrTEAqOBOYj` · assets/sprites_hero `18ftQRAhD4I9U8DClNAvSavJ03KR1KYdr`
+- เครื่องมือ Drive แก้เนื้อหาไฟล์เดิมไม่ได้ → "ทับ" = สร้างไฟล์ใหม่ชื่อเดิมในโฟลเดอร์เดิม แล้ว trash ไฟล์เก่า
+- ต้องตั้ง `disableConversionToGoogleType: true` เสมอ (ไม่งั้นกลายเป็น Google Docs) · เทียบ `fileSize` กับ `wc -c` ทุกไฟล์
+- ไม่อัปโหลด `.uid` / `.import` ของ PNG / `.godot/` (Godot สร้างใหม่เอง)
