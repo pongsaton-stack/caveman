@@ -40,7 +40,7 @@ func max_sp() -> int:
 func make_hero() -> Actor:
 	var a := Actor.new()
 	a.id = "hero"
-	a.name = "Riona"
+	a.name = "Rion"
 	a.side = "ally"
 	a.is_hero = true
 	a.tier = prof

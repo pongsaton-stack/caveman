@@ -189,7 +189,7 @@ func make_party() -> Array[Actor]:
 func make_hero(prof: int, weapon: int = WEAPON_BASE) -> Actor:
 	var h := Actor.new()
 	h.id = "hero"
-	h.name = "Riona"
+	h.name = "Rion"
 	h.side = "ally"
 	h.is_hero = true
 	h.tier = prof

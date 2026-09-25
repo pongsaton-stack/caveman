@@ -25,7 +25,7 @@ func _ready() -> void:
 
 	var hero := Actor.new()
 	hero.id = "hero"
-	hero.name = "Riona"
+	hero.name = "Rion"
 	hero.side = "ally"
 	hero.is_hero = true
 	hero.tier = HERO_PROF
