@@ -3,7 +3,7 @@
 class_name MapData
 extends RefCounted
 
-const TERRAIN := "#~.,R"   # ตัวอักษรที่เป็นพื้นที่ นอกจากนี้คือจุดเกิดศัตรู
+const TERRAIN := "#~.,RS"  # ตัวอักษรที่เป็นพื้นที่ นอกจากนี้คือจุดเกิดศัตรู (S = ร้านค้า)
 const BLOCKED := "#~"      # เดินผ่านไม่ได้
 
 var rows: Array[String] = []

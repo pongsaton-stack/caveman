@@ -176,11 +176,11 @@ func make_party() -> Array[Actor]:
 		m.name = str(spec["n"])
 		m.side = "ally"
 		m.is_hero = false
-		m.lp = 3
+		m.lp = Formulas.LP_MAX
 		m.loyalty = 3   # rank 3 = ยิงคอมโบกับตัวเอกได้ (GDD 5.4)
 		# มอนร่วมทีมแข็งกว่าตัวป่าเล็กน้อย และ "ไม่" สเกลตามความชำนาญตัวเอก
 		# (GDD 5.1 — มอนคือค่าคงที่ ตัวเอกคือตัวแปร)
-		m.max_hp = int(m.max_hp * 1.6)
+		m.max_hp = int(m.max_hp * Formulas.COMPANION_HP_MULT)
 		m.hp = m.max_hp
 		m.telegraph = {}
 		out.append(m)

@@ -218,6 +218,8 @@ func _fill_side(box: VBoxContainer, list: Array, allies: bool) -> void:
 		var row := VBoxContainer.new()
 		row.add_theme_constant_override("separation", 0)
 		var name_line := a.name
+		if allies and not a.is_hero and a.lp > 0:
+			name_line += " " + UiKit.lp_dots(a.lp)
 		if a.down:
 			name_line += "  (ล้ม)"
 		if not a.telegraph.is_empty():

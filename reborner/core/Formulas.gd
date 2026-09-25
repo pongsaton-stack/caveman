@@ -29,6 +29,14 @@ const TEL_STATUS_BONUS := 1.5  # ท่าเด่นลงสถานะแ�
 const INTERRUPT_AV  := 1.4     # ขัดสำเร็จ -> AV ศัตรู x ค่านี้
 const AMBUSH_MULT   := 0.4     # ลอบตี: AV ฝ่ายที่ได้เปรียบ x ค่านี้ (ห้าม 0 — บทเรียน 11.17)
 
+# ── ขั้น 4 สัปดาห์ 3: มอนร่วมทีม · LP · ความเชื่อใจ (GDD 3.6 / 5.4 / 9.3) ──
+const COMPANION_HP_MULT := 1.6 # มอนร่วมทีมแข็งกว่าตัวป่าเล็กน้อย ไม่สเกลตามตัวเอก (GDD 5.1)
+const LP_MAX        := 3       # LP 3 → 2 → 1 → หายถาวร
+const LP_REGEN_RESTS := 3      # LP ฟื้น 1 ทุก 3 จุดพัก (GDD 9.3 "2-3" · 11.8 ห้ามฟื้นทุกจุดพัก)
+const TRUST_BATTLES := 4       # ความเชื่อใจ +1 ทุก 4 ศึกที่อยู่ในทีม
+const TRUST_CLEAN_COOLDOWN := 3 # +1 เมื่อจบศึกไม่ล้ม ได้ครั้งเดียวต่อ 3 ศึก
+const TRUST_MAX     := 5       # rank 5 = วิวัฒนาการ (v2)
+
 static func av(spd: float) -> float:
 	return AV_NUM / maxf(spd, 1.0)
 

@@ -3,6 +3,7 @@
 # ⚠ ไฟล์นี้ต้องไม่มี class_name — เป็นสคริปต์ติด Node ไม่ใช่คลาส
 #
 # ศึกเปิด BattleScreen ให้ผู้เล่นกดเอง — ใช้ Battle ตัวเดียวกับ Sim (สัปดาห์ 2)
+# มอนร่วมทีมมาจาก ps.party (LP · ความเชื่อใจ) · Esc = เมนู · ช่อง S = ร้านค้า (สัปดาห์ 3)
 extends Node2D
 
 const TILE := 24
@@ -27,12 +28,16 @@ const TILE_COLORS := {
 	"#": Color("4a4038"),
 	"~": Color("3d6a7a"),
 	"R": Color("c9a24a"),
+	"S": Color("5c8a7a"),
 }
 
 var by_id: Dictionary = {}
 var encounters: Dictionary = {}
 var chests: Dictionary = {}        # symbol -> row จาก chests.csv
 var chest_nodes: Dictionary = {}   # "x,y" -> Node2D
+var slot_rows: Array = []          # data/party_slots.csv
+var companion_rows: Array = []     # data/companions.csv
+var item_rows: Array = []          # data/items.csv
 var techs := TechDb.new()
 var map: MapData
 var ps := PlayerState.new()
@@ -42,6 +47,7 @@ var rng := RandomNumberGenerator.new()
 var hero_node: Node2D
 var hero_sprite: AnimatedSprite2D
 var hud: Label
+var hud2: Label
 var panel: ColorRect
 var panel_label: Label
 
@@ -57,6 +63,9 @@ func _ready() -> void:
 		encounters[str(r["symbol"])] = r
 	for r in CsvDb.load_csv("res://data/chests.csv"):
 		chests[str(r["symbol"])] = r
+	slot_rows = CsvDb.load_csv("res://data/party_slots.csv")
+	companion_rows = CsvDb.load_csv("res://data/companions.csv")
+	item_rows = CsvDb.load_csv("res://data/items.csv")
 	map = MapData.load_map(MAP_PATH)
 	if map == null or by_id.is_empty() or techs.all.is_empty():
 		push_error("โหลดข้อมูลไม่ครบ — ตรวจโฟลเดอร์ data/")
@@ -64,12 +73,18 @@ func _ready() -> void:
 	var loaded := SaveGame.load_into(ps)
 	if not loaded:
 		ps.init_new(techs, map.start)
+	# เซฟเก่า (v1) ไม่มีปาร์ตี้/ร้าน — ตั้งให้ครั้งเดียว
+	ps.seed_party(companion_rows)
+	if ps.shop_stock.is_empty():
+		for r in item_rows:
+			ps.shop_stock[str(r["item_id"])] = int(r["stock"])
 	# เซฟเก่าอาจชี้ไปช่องที่แผนที่เปลี่ยนไปแล้ว
 	if not map.walkable(ps.cell):
 		ps.cell = map.start
 		ps.rest_cell = map.start
 	_build_hero()
 	_spawn_chests()
+	_label_shops()
 	_spawn_enemies()
 	_build_ui()
 	queue_redraw()
@@ -282,6 +297,42 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F9:
 		SaveGame.clear()
 		_show("ลบเซฟแล้ว — ปิดแล้วเปิดใหม่เพื่อเริ่มต้น", 1.5)
+	elif event.is_action_pressed("ui_cancel") and not busy:
+		get_viewport().set_input_as_handled()
+		_open_menu()
+
+# ── เมนู / ร้านค้า ─────────────────────────────────────────────
+func _open_menu() -> void:
+	busy = true
+	var m := MenuScreen.new()
+	m.setup(ps, techs, item_rows, _monster_slots())
+	m.closed.connect(_on_screen_closed)
+	add_child(m)
+
+func _open_shop() -> void:
+	busy = true
+	var s := ShopScreen.new()
+	s.setup(ps, item_rows)
+	s.closed.connect(_on_screen_closed)
+	add_child(s)
+
+func _on_screen_closed() -> void:
+	SaveGame.save(ps)
+	busy = false
+	_update_hud()
+
+func _label_shops() -> void:
+	for y in map.h:
+		for x in map.w:
+			if map.tile(Vector2i(x, y)) == "S":
+				var l := Label.new()
+				l.text = "ร้าน"
+				l.add_theme_font_size_override("font_size", 6)
+				l.add_theme_color_override("font_outline_color", Color.BLACK)
+				l.add_theme_constant_override("outline_size", 2)
+				l.position = Vector2(x * TILE + 2, y * TILE + 6)
+				l.z_index = 1
+				add_child(l)
 
 func _try_move(dir: Vector2i) -> void:
 	_play_anim(dir)
@@ -310,28 +361,21 @@ func _on_move_done() -> void:
 		_open_chest(key)
 	elif map.tile(ps.cell) == "R":
 		_rest()
+	elif map.tile(ps.cell) == "S":
+		_open_shop()
 
 func _rest() -> void:
-	ps.rest()
+	var lp_msg := ps.rest()
 	var ok := SaveGame.save(ps)
 	_spawn_enemies()
-	_show("จุดพัก — HP/SP เต็ม · ศัตรูฟื้นคืน · %s" % ("บันทึกเกมแล้ว" if ok else "บันทึกไม่สำเร็จ!"), 1.6)
+	var msg := "จุดพัก — HP/SP เต็ม · ศัตรูฟื้นคืน · %s" % ("บันทึกเกมแล้ว" if ok else "บันทึกไม่สำเร็จ!")
+	if lp_msg != "":
+		msg += "\n" + lp_msg
+	_show(msg, 1.8)
 
 # ── การต่อสู้ ─────────────────────────────────────────────────
-func _make_party() -> Array[Actor]:
-	var out: Array[Actor] = []
-	for spec in [{"n": "หนอนหินร่วมทาง", "id": "M03"}, {"n": "ค้างคาวร่วมทาง", "id": "M06"}]:
-		if not by_id.has(spec["id"]):
-			continue
-		var m := Actor.from_csv(by_id[spec["id"]])
-		m.name = str(spec["n"])
-		m.side = "ally"
-		m.lp = 3
-		m.loyalty = 3
-		m.max_hp = int(m.max_hp * 1.6)
-		m.hp = m.max_hp
-		out.append(m)
-	return out
+func _monster_slots() -> int:
+	return PlayerState.monster_slots_for(ps.ec, slot_rows)
 
 func _encounter(e: WorldEnemy, ambush: String) -> void:
 	busy = true
@@ -357,7 +401,8 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	b.ambush = ambush
 	var hero := ps.make_hero()
 	b.actors.append(hero)
-	for m in _make_party():
+	var comps := ps.make_companions(by_id, _monster_slots())
+	for m in comps:
 		b.actors.append(m)
 	var max_tier := 0
 	for r in rows:
@@ -384,7 +429,9 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		ps.sp = mini(ps.max_sp(), ps.sp + int(ps.max_sp() * Formulas.SP_RESTORE))
 		if e.is_boss:
 			ps.defeated.append(PlayerState.key_of(e.home))
-			SaveGame.save(ps)
+			# จบบอส = จบเควสหลัก 1 เควส (STORY_DRAFT ฉากที่ 7) · EC เพิ่มจากตรงนี้จนกว่าจะมีระบบเควส
+			ps.ec += 1
+			lines.append("…%s  (EC %d)" % ["หนึ่ง" if ps.ec == 1 else str(ps.ec), ps.ec])
 		_remove_enemy(e)
 		lines.append("%sชนะ %s · %.0f AV" % ["★ ชนะบอส! " if e.is_boss else "", e.label_text, res["time"]])
 		lines.append("ความชำนาญ %d → %d · เงิน +%d · HP %d/%d" % [prof_before, ps.prof, loot, ps.hp, ps.max_hp()])
@@ -400,8 +447,11 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		ps.rest()
 		hero_node.position = _cell_center(ps.cell)
 		lines.append("แพ้ %s — เสียเงิน %d · กลับจุดพัก" % [e.label_text, lost])
+	for n in ps.after_battle(comps):
+		lines.append(n)
+	SaveGame.save(ps)
 	_refresh_enemy_colors()
-	_show("\n".join(lines), 2.8)
+	_show("\n".join(lines), 2.8 + 0.4 * maxi(0, lines.size() - 3))
 
 func _remove_enemy(e: WorldEnemy) -> void:
 	enemies.erase(e)
@@ -415,8 +465,12 @@ func _build_ui() -> void:
 	hud.position = Vector2(4, 2)
 	_style(hud, 8)
 	layer.add_child(hud)
+	hud2 = Label.new()
+	hud2.position = Vector2(4, 13)
+	_style(hud2, 6)
+	layer.add_child(hud2)
 	var hint := Label.new()
-	hint.text = "ลูกศร เดิน · เข้าหาด้านหลังศัตรู = ลอบตี · ช่องสีทอง = จุดพัก/บันทึก · ต่อสู้: ลูกศรเลือก Enter ยืนยัน · F9 ลบเซฟ"
+	hint.text = "ลูกศร เดิน · Esc เมนู · ช่องทอง = จุดพัก · ช่องเขียวอมฟ้า = ร้าน · ต่อสู้: Enter ยืนยัน · F9 ลบเซฟ"
 	hint.position = Vector2(4, 202)
 	_style(hint, 6)
 	layer.add_child(hint)
@@ -444,6 +498,11 @@ func _update_hud() -> void:
 		return
 	hud.text = "ความชำนาญ %d · %s (%d) · เงิน %d · HP %d/%d · SP %d/%d · ท่า %d" % [
 		ps.prof, ps.weapon_name, ps.weapon_base, ps.gold, ps.hp, ps.max_hp(), ps.sp, ps.max_sp(), ps.learned.size()]
+	if hud2 != null:
+		var parts: Array[String] = []
+		for m in ps.party:
+			parts.append("%s %s" % [m["name"], UiKit.lp_dots(int(m["lp"]))])
+		hud2.text = "EC %d · มอน: %s" % [ps.ec, " · ".join(parts) if not parts.is_empty() else "ไม่มี"]
 
 func _show(msg: String, secs: float) -> void:
 	busy = true

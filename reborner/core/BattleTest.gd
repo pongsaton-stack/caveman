@@ -48,7 +48,7 @@ func _ready() -> void:
 		m.name = str(spec["n"])
 		m.side = "ally"
 		m.loyalty = 3
-		m.max_hp = int(m.max_hp * 1.6)
+		m.max_hp = int(m.max_hp * Formulas.COMPANION_HP_MULT)
 		m.hp = m.max_hp
 		b.actors.append(m)
 
