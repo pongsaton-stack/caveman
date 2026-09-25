@@ -8,7 +8,8 @@ const BATTLES := 200
 const WEAPON_BASE := 30
 const SCHOOL := "คม"          # สายอาวุธของตัวเอกในการทดสอบ
 const STEER := "เขี้ยว"        # กิ่งที่อาวุธชี้ทาง
-const VERSION := "ขั้น 4 สัปดาห์ 1 · แผนที่ + ลอบตี + บอสนับจากธง"
+const VERSION := "ขั้น 4 สัปดาห์ 1 · + บอส B1 ใน Sim"
+const BOSS_PROFS := [16, 20, 22]   # จุดที่เส้นทางแผนที่ออกแบบให้ถึงบอส (README)
 
 var by_id: Dictionary = {}
 var techs := TechDb.new()
@@ -35,6 +36,7 @@ func _ready() -> void:
 	sweep("M03", "หนอนหิน",    [10, 15, 20])
 	sweep("M15", "หมาป่าคู่",  [15, 20, 25], 2)
 	sweep("M29", "โกลเลมสลัก", [25, 30, 35, 45])
+	boss_sweep()
 
 	tech_progression()
 
@@ -65,7 +67,7 @@ func sweep(mid: String, label: String, profs: Array, count: int = 1) -> void:
 			   r["fills"], r["combos"], r["tels"], r["ints"], r["status"], r["guard_rate"] * 100.0])
 	print("")
 
-func batch(mid: String, prof: int, count: int) -> Dictionary:
+func batch(mid: String, prof: int, count: int, weapon: int = WEAPON_BASE) -> Dictionary:
 	var wins := 0
 	var tot := {"rounds": 0, "time": 0.0, "dealt": 0, "taken": 0, "glimmers": 0,
 		"tech_uses": 0, "statuses": 0, "guards": 0, "fills": 0,
@@ -73,7 +75,7 @@ func batch(mid: String, prof: int, count: int) -> Dictionary:
 	for i in BATTLES:
 		var b := Battle.new()
 		b.techs = techs
-		b.actors.append(make_hero(prof))
+		b.actors.append(make_hero(prof, weapon))
 		for m in make_party():
 			b.actors.append(m)
 		for j in count:
@@ -99,6 +101,34 @@ func batch(mid: String, prof: int, count: int) -> Dictionary:
 		"status": tot["statuses"] / n,
 		"guard_rate": float(tot["guards"]) / maxf(float(tot["rounds"]), 1.0),
 	}
+
+## บอสบนแมพ — ตัวบอสมาจาก encounters.csv (boss=1) · อาวุธมาจากของที่ผู้เล่นมีจริงบนแมพ
+## มีดทำครัว = อาวุธเริ่มต้นใน PlayerState · อาวุธใหม่ = ของในหีบ chests.csv
+## บอสไม่ถูกตบทิ้งเด็ดขาด จึงไม่เช็ค is_swat (GDD 11.28)
+func boss_sweep() -> void:
+	var boss_ids: Array[String] = []
+	for r in CsvDb.load_csv("res://data/encounters.csv"):
+		if str(r.get("boss", "0")) == "1":
+			boss_ids.append(str(r["monster_ids"]))
+	var weapons: Array[Dictionary] = []
+	var start := PlayerState.new()
+	weapons.append({"name": start.weapon_name, "base": start.weapon_base})
+	for r in CsvDb.load_csv("res://data/chests.csv"):
+		weapons.append({"name": str(r["label"]), "base": int(r["weapon_base"])})
+	for mid in boss_ids:
+		if not by_id.has(mid):
+			push_warning("ไม่พบ %s" % mid)
+			continue
+		print("── บอส %s (%s tier %d) x1 ──" % [by_id[mid]["name_th"], mid, int(by_id[mid]["tier"])])
+		for w in weapons:
+			print("  อาวุธ: %s (ค่า %d)" % [w["name"], w["base"]])
+			print("  prof   ชนะ  เวลา AV  ออก/เข้า  ประกาย%  Insight เต็ม  คอมโบ  เปิดท่า  ขัด  สถานะ  ตั้งรับ%")
+			for p in BOSS_PROFS:
+				var r := batch(mid, p, 1, int(w["base"]))
+				print("  %4d  %3d%%  %6.0f   %6.2f   %6.2f%%     %5.2f     %5.2f   %5.2f  %5.2f  %5.2f   %5.1f%%"
+					% [p, int(r["win"] * 100.0), r["time"], r["ratio"], r["glim_rate"] * 100.0,
+					   r["fills"], r["combos"], r["tels"], r["ints"], r["status"], r["guard_rate"] * 100.0])
+		print("  เป้า: อาวุธ 28 prof 16/20/22 ~55/84/91% · มีดทำครัวชนะแค่ 2-10% (ประตูอาวุธ)\n")
 
 ## ตัวเอกสู้ต่อเนื่องหลายศึก — ดูว่าต้นไม้ท่าคลี่ออกยังไง
 func tech_progression() -> void:
@@ -156,7 +186,7 @@ func make_party() -> Array[Actor]:
 		out.append(m)
 	return out
 
-func make_hero(prof: int) -> Actor:
+func make_hero(prof: int, weapon: int = WEAPON_BASE) -> Actor:
 	var h := Actor.new()
 	h.id = "hero"
 	h.name = "Riona"
@@ -167,7 +197,7 @@ func make_hero(prof: int) -> Actor:
 	h.hp = h.max_hp
 	h.max_sp = Formulas.hero_sp(prof, 0)
 	h.sp = h.max_sp
-	h.atk = Formulas.hero_atk(prof, WEAPON_BASE)
+	h.atk = Formulas.hero_atk(prof, weapon)
 	h.def_val = Formulas.hero_def(prof)
 	h.spd = 120
 	h.school = SCHOOL
