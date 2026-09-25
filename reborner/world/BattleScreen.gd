@@ -160,7 +160,7 @@ func _ask_target(needs_pick: bool) -> void:
 		btn.pressed.connect(_on_target.bind(f))
 		if first == null:
 			first = btn
-	var back := _add_button("← ย้อนกลับ")
+	var back := _add_button("ย้อนกลับ")
 	back.pressed.connect(_show_commands)
 	first.grab_focus()
 
