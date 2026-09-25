@@ -67,7 +67,16 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - ช่องปาร์ตี้ตาม EC ยังไม่ทำ — Sim/แผนที่ใช้มอนร่วมทีม 2 ตัวตายตัว (หนอนหิน M03 + ค้างคาว M06 · ความเชื่อใจ 3 · HP x1.6)
 - LP/permadeath ของมอนร่วมทีมยังไม่ต่อเนื่องข้ามศึก
 - ธาตุไฟ/น้ำแข็ง/แสง/มืด ยังไม่มีท่าไหนใช้ (สายเวทย์ยังไม่พอร์ต) — อย่าจูนมอนที่อ่อนแอต่อธาตุเหล่านี้
-- `HERO_ANIMS` ใน Overworld.gd อาจจับคู่ทิศผิด · ฟอนต์ไทยอาจต้องตั้งเอง
+- `HERO_ANIMS` ใน Overworld.gd อาจจับคู่ทิศผิด
+
+## เล่นผ่านเว็บ
+- ลิงก์: https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan (Artifact ส่วนตัว · แชร์ผ่านเมนู Share ของหน้า)
+- จอฐาน 384x216 ขยาย canvas_items · ฟอนต์ `assets/fonts/game_font.tres` = Sarabun (ไทย+ละติน) + fallback สัญลักษณ์ ★◆▼✂✋⚠ → 🎁 (ตัดเฉพาะอักษรที่ใช้ · OFL)
+  ใช้ข้อความสัญลักษณ์ใหม่ในเกม → ต้องเพิ่มอักษรนั้นเข้า subset ไม่งั้นเป็นกล่องบนเว็บ
+- สร้างใหม่: ต้องมี export template `web_nothreads_release.zip` ของ 4.7.1 ใน `~/.local/share/godot/export_templates/4.7.1.stable/`
+  `<godot> --headless --path . --export-release "Web" <out>/index.html` → `gzip -9 index.wasm` แล้วตั้งชื่อ `index.wasm.gz.wasm` · `index.pck` → `index.pck.wasm`
+  (ที่โฮสต์รับแค่ชนิดไฟล์มาตรฐานและไฟล์ละ ≤15MB) · หน้าเว็บคือ `tools/web/reborner.html` ซึ่งดัก fetch แปลงชื่อกลับ + ปุ่มลูกศรบนจอสัมผัส
+  เผยแพร่ทับลิงก์เดิมด้วย Artifact `url` ข้างบน
 
 ## สำเนาใน Google Drive — ซิงก์ทุกครั้งที่ไฟล์เปลี่ยน
 Pongsaton อนุญาตแล้ว: ไฟล์ไหนในโปรเจกต์ถูกแก้ ให้อัปโหลดทับใน Drive ได้เลยไม่ต้องถาม
