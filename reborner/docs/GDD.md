@@ -645,6 +645,8 @@ enemy_tier | unlocks_char | sets_world_flag
 
 **ผู้ที่นับเหตุการณ์** — ตัวตนของมันคือ Event Counter เอง ยิ่ง EC สูงยิ่งแรง
 
+> ร่างตัวตน Riona + ฉากเปิดเรื่อง + ผู้ที่นับ: `docs/STORY_DRAFT.md` (ร่าง · ยังไม่ล็อก)
+
 ---
 
 ## 9. เศรษฐกิจ

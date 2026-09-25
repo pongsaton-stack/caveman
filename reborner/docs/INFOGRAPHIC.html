@@ -1,0 +1,545 @@
+<title>REBORNER ผู้เกิดซ้ำ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600&family=Pridi:wght@400;600&family=Sarabun:wght@400;600&display=swap">
+<style>
+/* ใช้พาเลตต์ของเกมเอง (Overworld.gd TILE_COLORS + หน้าเว็บ) · ธีมเดียว มืดแบบเถ้า ตั้งใจ */
+:root {
+  color-scheme: dark;
+  --ash: #15130f;
+  --ash-2: #1d1a15;
+  --ash-3: #2a251e;
+  --line: #3a3329;
+  --cream: #e8d9b5;
+  --muted: #a89b80;
+  --ember: #c9a24a;
+  --ember-hot: #e0b95a;
+  --grass: #6b7d4a;
+  --water: #3d6a7a;
+  --dirt: #8a7a5c;
+  --rock: #4a4038;
+  --rust: #9a5b3c;
+  --blood: #b5553f;
+  --display: 'Pridi', 'Sarabun', Georgia, serif;
+  --body: 'Sarabun', 'Noto Sans Thai', 'Leelawadee UI', Tahoma, sans-serif;
+  --hud: 'Chakra Petch', 'Sarabun', ui-monospace, monospace;
+}
+html { background: var(--ash); }
+body {
+  background: var(--ash);
+  color: var(--cream);
+  font: 16px/1.65 var(--body);
+  padding-inline: 16px;
+  padding-block: 0 48px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 56px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; text-wrap: balance; line-height: 1.25; }
+h2 { font-size: clamp(1.5rem, 3.4vw, 2rem); }
+h3 { font-size: 1.15rem; }
+p { margin: 0; }
+.label {
+  font: 600 0.75rem/1.2 var(--hud);
+  letter-spacing: 0.12em;
+  color: var(--ember);
+  text-transform: uppercase;
+}
+.sec { display: grid; gap: 20px; }
+.sec > header { display: grid; gap: 6px; max-width: 60ch; }
+.sec > header p { color: var(--muted); }
+.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+.num { font-family: var(--hud); font-variant-numeric: tabular-nums; }
+.draft {
+  display: inline-block; font: 600 0.72rem/1 var(--hud); letter-spacing: 0.08em;
+  color: var(--ash); background: var(--ember); padding: 5px 8px; border-radius: 3px;
+}
+
+/* ── hero ── */
+.hero {
+  display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
+  padding-block: 48px 8px;
+}
+.hero-sprite { position: relative; width: 192px; height: 192px; }
+.hero-sprite::before {
+  content: ""; position: absolute; inset: 22% 8% -4%;
+  background: radial-gradient(closest-side, rgba(201,162,74,0.42), rgba(201,162,74,0) 70%);
+}
+.hero-sprite img { position: relative; width: 192px; height: 192px; }
+.hero h1 {
+  font-family: var(--hud); font-weight: 600; letter-spacing: 0.18em;
+  font-size: clamp(2.6rem, 8vw, 4.6rem); line-height: 1; color: var(--cream);
+}
+.hero .sub { font: 400 clamp(1.1rem, 2.6vw, 1.45rem)/1.4 var(--display); color: var(--ember); margin-top: 8px; }
+.hero .pitch { max-width: 56ch; margin-top: 16px; font-size: 1.05rem; }
+.hero .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; color: var(--muted); font: 500 0.85rem/1.4 var(--hud); }
+
+/* ── Riona ── */
+.riona { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 24px; }
+.card { background: var(--ash-2); border: 1px solid var(--line); border-radius: 6px; padding: 22px; display: grid; gap: 16px; align-content: start; }
+.stats { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 0.95rem; }
+.stats dt { color: var(--muted); font: 500 0.82rem/1.9 var(--hud); }
+.stats dd { margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px; font-size: 0.9rem; color: var(--cream); background: var(--ash-3); }
+.theme-line {
+  font: 400 clamp(1.25rem, 3vw, 1.6rem)/1.45 var(--display); color: var(--cream);
+  border-left: 3px solid var(--ember); padding-left: 16px;
+}
+.wantneed { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.wantneed div { display: grid; gap: 4px; }
+
+/* ── mechanic ↔ story ── */
+.map-rows { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.mrow { display: grid; grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1.25fr); gap: 12px; align-items: baseline; padding-block: 12px; border-bottom: 1px solid var(--line); }
+.mrow .mech { color: var(--muted); font-size: 0.95rem; }
+.mrow .mech .num { color: var(--ember); font-size: 0.8rem; margin-left: 6px; }
+.mrow .arrow { color: var(--ember); font-family: var(--hud); text-align: center; }
+
+/* ── world ── */
+.regions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.region { display: grid; gap: 10px; padding: 18px; border-radius: 6px; background: var(--ash-2); border: 1px solid var(--line); border-top-width: 4px; }
+.region:nth-child(1) { border-top-color: var(--grass); }
+.region:nth-child(2) { border-top-color: var(--dirt); }
+.region:nth-child(3) { border-top-color: var(--water); }
+.region .who { color: var(--muted); font-size: 0.9rem; }
+.region .boss { font-family: var(--display); font-size: 1.05rem; }
+.relics { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; color: var(--muted); font-size: 0.95rem; }
+.relics b { color: var(--cream); font-weight: 600; }
+.scale { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.scale .bar { flex: 1 1 200px; height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--dirt), var(--rust) 55%, var(--blood)); }
+
+/* ── EC timeline ── */
+.svgbox { overflow-x: auto; }
+.svgbox svg { display: block; width: 100%; min-width: 640px; height: auto; }
+.question {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
+}
+.question > div { background: var(--ash-2); border: 1px solid var(--line); border-radius: 6px; padding: 18px; display: grid; gap: 6px; }
+.question .res { font: 600 0.85rem/1.4 var(--hud); color: var(--blood); }
+
+/* ── opening map ── */
+.opening { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px; align-items: start; }
+.mapbox { position: relative; width: 100%; aspect-ratio: 40 / 24; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+.mapbox canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center;
+  font: 600 0.8rem/1 var(--hud); color: var(--ash);
+  background: var(--cream); box-shadow: 0 0 0 2px var(--ash), 0 0 12px rgba(224,185,90,0.7);
+}
+.pin.boss { background: var(--blood); color: var(--cream); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font: 500 0.78rem/1.4 var(--hud); color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+.beats { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.beats li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding-block: 9px; border-bottom: 1px solid var(--line); }
+.beats .n { font: 600 0.85rem/1.6 var(--hud); color: var(--ember); }
+.beats .t { font-size: 0.93rem; }
+.beats .t b { font-weight: 600; }
+.beats .t .m { display: block; color: var(--muted); font-size: 0.82rem; }
+.beats li.ev .n { color: var(--muted); }
+.quote { font-family: var(--display); color: var(--ember-hot); }
+
+/* ── systems ── */
+.systems { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.sys { display: grid; gap: 10px; align-content: start; padding: 18px; border-radius: 6px; background: var(--ash-2); border: 1px solid var(--line); }
+.sys .big { font: 600 1.7rem/1.1 var(--hud); color: var(--ember); font-variant-numeric: tabular-nums; }
+.sys p { font-size: 0.93rem; color: var(--muted); }
+.formula { font: 500 0.82rem/1.5 var(--hud); color: var(--cream); background: var(--ash); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; overflow-wrap: anywhere; }
+.bars { display: grid; gap: 6px; }
+.brow { display: grid; grid-template-columns: 7.5em 1fr 3.2em; gap: 8px; align-items: center; font-size: 0.82rem; }
+.brow .track { height: 8px; background: var(--ash); border-radius: 2px; overflow: hidden; }
+.brow .fill { height: 100%; background: var(--ember); }
+.brow .fill.weak { background: var(--muted); }
+.brow .v { font-family: var(--hud); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── roots / principles / status ── */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.roots { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.roots div { display: grid; grid-template-columns: 9.5em 1fr; gap: 12px; padding-block: 9px; border-bottom: 1px solid var(--line); font-size: 0.93rem; }
+.roots b { font-family: var(--hud); font-weight: 600; color: var(--ember); }
+.principles { margin: 0; padding-left: 1.4em; display: grid; gap: 8px; }
+.principles li::marker { font-family: var(--hud); color: var(--ember); }
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.step { display: grid; gap: 6px; padding: 12px; border-radius: 4px; background: var(--ash-2); border: 1px solid var(--line); font-size: 0.88rem; }
+.step .s { font: 600 0.75rem/1 var(--hud); letter-spacing: 0.06em; }
+.step.done .s { color: var(--grass); }
+.step.now { border-color: var(--ember); }
+.step.now .s { color: var(--ember); }
+.step.todo .s { color: var(--muted); }
+.open-q { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; color: var(--cream); }
+footer { color: var(--muted); font: 500 0.8rem/1.6 var(--hud); border-top: 1px solid var(--line); padding-top: 16px; }
+
+@media (max-width: 820px) {
+  .riona, .opening, .two { grid-template-columns: 1fr; }
+  .systems { grid-template-columns: 1fr 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .hero { grid-template-columns: 1fr; gap: 12px; padding-block-start: 32px; }
+  .hero-sprite, .hero-sprite img { width: 128px; height: 128px; }
+  .regions, .systems, .question, .wantneed { grid-template-columns: 1fr; }
+  .mrow { grid-template-columns: 1fr; gap: 2px; }
+  .mrow .arrow { display: none; }
+  .roots div { grid-template-columns: 1fr; gap: 0; }
+  .pin { width: 18px; height: 18px; font-size: 0.66rem; }
+}
+</style>
+
+<div class="wrap">
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-sprite"><img class="px" src="data:image/png;base64,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" alt="Riona เฟรมยืนนิ่งจากเกม ขนาดจริง 48x48 พิกเซล"></div>
+  <div>
+    <span class="label">JRPG · Godot 4.7.1 · พิกเซล 2D โทนจิบลิ</span>
+    <h1>REBORNER</h1>
+    <p class="sub">ผู้เกิดซ้ำ</p>
+    <p class="pitch">ตัวเอกคนเดียวที่เริ่มจากไม่มีอะไรเลย เรียนรู้ท่าใหม่กลางสนามรบจากการเอาชีวิตรอด และเก็บมอนสเตอร์มาร่วมทาง ในโลกที่เสื่อมสภาพลงตามการกระทำของผู้เล่นเอง</p>
+    <div class="meta"><span>เป้า v1 8-12 ชม.</span><span>มอน 45 + บอส 5</span><span>3 ภูมิภาค</span><span>4 ตอนจบ</span><span>ไม่มีเลเวล</span></div>
+  </div>
+</section>
+
+<!-- ── RIONA ── -->
+<section class="sec">
+  <header>
+    <span class="label">ตัวเอก <span class="draft">ร่าง</span></span>
+    <h2>Riona คนจากโลกเก่าที่กลับมาได้ทุกครั้ง</h2>
+  </header>
+  <div class="riona">
+    <div class="card">
+      <dl class="stats">
+        <dt>มาจาก</dt><dd>โลกเก่า ก่อนอารยธรรมล่ม · ผ่านไปกี่ร้อยปีไม่มีใครรู้</dd>
+        <dt>อาชีพเดิม</dt><dd>ผู้ช่วยครัวร้านอาหารเล็กๆ ไม่ใช่นักรบ</dd>
+        <dt>อาวุธแรก</dt><dd>มีดทำครัวของตัวเอง <span class="num">(ค่า 14)</span></dd>
+        <dt>เริ่มเกม</dt><dd><span class="num">ความชำนาญ 8 · 600g</span> · สายคม กิ่งเขี้ยว</dd>
+        <dt>หน้าตา</dt><dd>ผมน้ำตาลยุ่ง เชิ้ตขาว เสื้อกั๊กเขียวอมฟ้า</dd>
+      </dl>
+      <div class="chips">
+        <span class="chip">ช่างสังเกต พูดน้อย</span>
+        <span class="chip">มือจำได้ก่อนหัว</span>
+        <span class="chip">ขำแห้งๆ กับของโลกเก่า</span>
+        <span class="chip">กลัวการผูกพัน</span>
+      </div>
+    </div>
+    <div class="card">
+      <p class="theme-line">เธอกลับมาได้เสมอ<br>แต่คนที่เดินข้างเธอไม่ได้</p>
+      <div class="wantneed">
+        <div><span class="label">สิ่งที่ต้องการ</span><p>รู้ว่าทำไมตัวเองถึงกลับมา และได้กลับบ้าน ซึ่งไม่มีอยู่แล้ว</p></div>
+        <div><span class="label">สิ่งที่ต้องรู้</span><p>การเกิดซ้ำไม่ใช่ของขวัญ มันคือเครื่องมือของบางอย่างที่กำลังนับ</p></div>
+      </div>
+      <p style="color:var(--muted);font-size:0.93rem">สมุดบันทึกคือสมุดของ Riona เอง หน้าแรกเธอเขียนชื่อตัวเองไว้กันลืม ท่าที่ประกายได้ ท่ามอนที่อ่านได้ และเควสที่รับไว้ ถูกจดด้วยลายมือเธอ</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── MECHANIC ↔ STORY ── -->
+<section class="sec">
+  <header>
+    <span class="label">กลไกที่มีอยู่แล้ว → เรื่องที่อธิบายมัน</span>
+    <h2>ไม่มีกลไกใหม่ เรื่องแค่ให้เหตุผลกับของที่มี</h2>
+  </header>
+  <div class="map-rows">
+    <div class="mrow"><span class="mech">ตัวเอกล้ม → กลับจุดพักล่าสุด<span class="num">GDD 3.6</span></span><span class="arrow">→</span><span>ร่างสลายเป็นเถ้า แล้วฟื้นที่ <b>เตาเถ้า</b> ถ่านที่ไม่มีฟืนแต่ไม่เคยดับ</span></div>
+    <div class="mrow"><span class="mech">เสียเงินครึ่งหนึ่ง<span class="num">3.6</span></span><span class="arrow">→</span><span>ของที่พกอยู่ครึ่งหนึ่งหล่นหายไปกับร่างเดิม</span></div>
+    <div class="mrow"><span class="mech">ตัวเอกไม่มี LP · มอน LP หมด = หายถาวร<span class="num">3.6</span></span><span class="arrow">→</span><span>มีแต่เธอที่เกิดซ้ำได้ เพื่อนร่วมทางไม่ได้</span></div>
+    <div class="mrow"><span class="mech">ไม่มีเลเวล · เริ่มจากศูนย์<span class="num">4.1</span></span><span class="arrow">→</span><span>การเกิดใหม่ล้างความเคยชินของร่างกาย เหลือแค่ความจำ</span></div>
+    <div class="mrow"><span class="mech">ประกายเกิดจากอันตราย · ได้คนเดียวในเกม<span class="num">4.3 · 5.1</span></span><span class="arrow">→</span><span>เสี้ยววินาทีที่ร่างกายจำความตายได้ แล้วขยับเองก่อนหัวคิด</span></div>
+    <div class="mrow"><span class="mech">ของโลกเก่าใช้เป็นอาวุธ<span class="num">GDD 1</span></span><span class="arrow">→</span><span>คนโลกใหม่บูชาที่เย็บกระดาษเป็นเครื่องราง เธอรู้ว่ามันคืออะไร</span></div>
+    <div class="mrow"><span class="mech">NG+ ยกความชำนาญ 50% + เห็นวันหมดอายุทุกเควส<span class="num">8.4</span></span><span class="arrow">→</span><span>เกิดซ้ำอีกรอบ สมุดจากชาติก่อนจำทุกเหตุการณ์ไว้ ลายมือเธอเอง</span></div>
+  </div>
+</section>
+
+<!-- ── WORLD ── -->
+<section class="sec">
+  <header>
+    <span class="label">ฉากหลัง</span>
+    <h2>โลกที่ล่มไปแล้ว และคนที่สร้างดาบกับเวทย์ขึ้นใหม่</h2>
+    <p>เศษซากสมัยใหม่กระจายอยู่ในซากเมือง อาวุธจึงมีตั้งแต่ดินสอถึงเขี้ยวมังกร และกระสุนหายาก</p>
+  </header>
+  <div class="relics">
+    <b>อาวุธ</b>
+    <div class="scale"><span>ดินสอ · มีดทำครัว</span><span class="bar" aria-hidden="true"></span><span>ไม้เบสบอล · ปืน/โดรน (v2) · เขี้ยวมังกร</span></div>
+  </div>
+  <div class="regions">
+    <div class="region">
+      <span class="label" style="color:var(--grass)">ภูมิภาค 1</span>
+      <h3>ที่ราบเถ้า</h3>
+      <p class="who">สไลม์เถ้า หนูท่อ หนอนหิน ค้างคาวเงา หมาป่าคู่ … <span class="num">15 สายพันธุ์</span></p>
+      <p class="boss">บอส: ราชาหนอนเถ้า</p>
+    </div>
+    <div class="region">
+      <span class="label" style="color:var(--dirt)">ภูมิภาค 2</span>
+      <h3>เมืองใต้ซาก</h3>
+      <p class="who">ทหารกลไก อัศวินซาก หญิงร่ำไห้ โกลเลมสลัก … <span class="num">15 สายพันธุ์</span></p>
+      <p class="boss">บอส: อัศวินสนิมผู้ไม่ยอมตาย · คณะเงาไร้หน้า</p>
+    </div>
+    <div class="region">
+      <span class="label" style="color:var(--water)">ภูมิภาค 3</span>
+      <h3>ยอดเขาคำสาป</h3>
+      <p class="who">มังกรน้อย แม่มดเถ้า ผู้เผาตำรา เงาของผู้กล้า … <span class="num">15 สายพันธุ์</span></p>
+      <p class="boss">บอส: มังกรใต้พสุธา</p>
+    </div>
+  </div>
+  <p style="color:var(--muted);font-size:0.9rem">ภูมิภาคละ 3 สถานที่ย่อย = แผนที่ 9 ผืน × 4 สภาพตาม EC = 36 สถานที่ จากอาร์ต 9 ชุด · ชื่อมอนและบอสจาก <span class="num">data/monsters.csv</span> · แบ่งบอส 4 ตัวลงภูมิภาคเป็นข้อเสนอ</p>
+</section>
+
+<!-- ── EC TIMELINE ── -->
+<section class="sec">
+  <header>
+    <span class="label">Free Scenario · Event Counter</span>
+    <h2>ทุกความช่วยเหลือถูกนับ</h2>
+    <p>ไม่มีบท มีแต่ตัวนับ จบเควสหลัก 1 เควส = EC +1 และทุกครั้งที่ EC เพิ่ม เสียงหนึ่งนับออกมาบนจอดำ มีแค่ Riona ที่ได้ยิน</p>
+  </header>
+  <div class="svgbox">
+    <svg viewBox="0 0 960 250" role="img" aria-label="เส้นเวลา EC 0 ถึง 20 แบ่ง 4 องก์ พาเลตต์เปลี่ยนจากเขียวเป็นเถ้า พร้อมช่องปาร์ตี้ที่ปลดล็อก">
+      <defs>
+        <linearGradient id="a1" x1="0" x2="1"><stop offset="0" stop-color="#6b7d4a"/><stop offset="1" stop-color="#5f7a55"/></linearGradient>
+        <linearGradient id="a2" x1="0" x2="1"><stop offset="0" stop-color="#6f7656"/><stop offset="1" stop-color="#6d6a52"/></linearGradient>
+        <linearGradient id="a3" x1="0" x2="1"><stop offset="0" stop-color="#6b6250"/><stop offset="1" stop-color="#5b5145"/></linearGradient>
+        <linearGradient id="a4" x1="0" x2="1"><stop offset="0" stop-color="#4a4038"/><stop offset="1" stop-color="#6a4632"/></linearGradient>
+      </defs>
+      <!-- scale: x = 40 + EC * 44 (EC 0..20) -->
+      <text x="40" y="22" fill="#a89b80" font-family="Chakra Petch, sans-serif" font-size="13">พาเลตต์ของแต่ละองก์ (GDD 13)</text>
+      <rect x="40" y="34" width="220" height="64" fill="url(#a1)"/>
+      <rect x="260" y="34" width="264" height="64" fill="url(#a2)"/>
+      <rect x="524" y="34" width="264" height="64" fill="url(#a3)"/>
+      <rect x="788" y="34" width="132" height="64" fill="url(#a4)"/>
+      <circle cx="830" cy="62" r="4" fill="#6b7d4a"/><circle cx="872" cy="80" r="3" fill="#6b7d4a"/>
+      <g font-family="Pridi, serif" font-size="15" fill="#e8d9b5">
+        <text x="52" y="60">องก์ 1</text><text x="272" y="60">องก์ 2</text><text x="536" y="60">องก์ 3</text><text x="800" y="60">ตอนจบ</text>
+      </g>
+      <g font-family="Sarabun, sans-serif" font-size="12.5" fill="#e8d9b5" opacity="0.85">
+        <text x="52" y="82">โลกยังปกติ เขียว ฟ้าใส</text>
+        <text x="272" y="82">รอยแตก สีจืดลง 15%</text>
+        <text x="536" y="82">เทาอมน้ำตาลแทนเขียว</text>
+        <text x="800" y="82">เถ้าและสนิม</text>
+      </g>
+      <!-- axis -->
+      <line x1="40" y1="112" x2="920" y2="112" stroke="#3a3329" stroke-width="2"/>
+      <g stroke="#c9a24a" stroke-width="2">
+        <line x1="40" y1="106" x2="40" y2="118"/><line x1="260" y1="106" x2="260" y2="118"/>
+        <line x1="524" y1="106" x2="524" y2="118"/><line x1="788" y1="106" x2="788" y2="118"/>
+      </g>
+      <g font-family="Chakra Petch, sans-serif" font-size="13" fill="#c9a24a" text-anchor="middle">
+        <text x="40" y="136">EC 0</text><text x="260" y="136">5</text><text x="524" y="136">11</text><text x="788" y="136">17</text><text x="920" y="136" text-anchor="end">20</text>
+      </g>
+      <!-- party slots GDD 5.5 -->
+      <text x="40" y="170" fill="#a89b80" font-family="Chakra Petch, sans-serif" font-size="13">ช่องปาร์ตี้ (GDD 5.5)</text>
+      <g font-family="Chakra Petch, sans-serif" font-size="13" text-anchor="middle">
+        <rect x="30" y="182" width="20" height="20" rx="3" fill="#e8d9b5"/><text x="40" y="222" fill="#e8d9b5">1</text>
+        <rect x="118" y="182" width="20" height="20" rx="3" fill="#e8d9b5"/><text x="128" y="222" fill="#e8d9b5">2</text>
+        <rect x="294" y="182" width="20" height="20" rx="3" fill="#e8d9b5"/><text x="304" y="222" fill="#e8d9b5">3</text>
+        <rect x="514" y="182" width="20" height="20" rx="3" fill="#e8d9b5"/><text x="524" y="222" fill="#e8d9b5">4</text>
+        <rect x="734" y="182" width="20" height="20" rx="3" fill="#e8d9b5"/><text x="744" y="222" fill="#e8d9b5">5</text>
+      </g>
+      <g font-family="Sarabun, sans-serif" font-size="12" fill="#a89b80">
+        <text x="40" y="242" text-anchor="middle">คนเดียว</text>
+        <text x="128" y="242" text-anchor="middle">มอนตัวแรก</text>
+        <text x="744" y="242" text-anchor="middle">ครบทีม</text>
+      </g>
+      <!-- final boss -->
+      <text x="920" y="176" text-anchor="end" font-family="Pridi, serif" font-size="15" fill="#b5553f">บอสสุดท้าย: ผู้ที่นับเหตุการณ์</text>
+      <text x="920" y="196" text-anchor="end" font-family="Sarabun, sans-serif" font-size="12" fill="#a89b80">ยิ่ง EC สูงยิ่งแรง</text>
+    </svg>
+  </div>
+  <div class="question">
+    <div>
+      <h3>ช่วย</h3>
+      <p>จบเควสหลัก คนรอด แต่ EC เพิ่ม และศัตรูทั้งโลกแข็งขึ้นตาม EC ไม่ใช่ตามผู้เล่น</p>
+      <span class="res">โลกเสื่อมเร็วขึ้น · บอสสุดท้ายแรงขึ้น</span>
+    </div>
+    <div>
+      <h3>ไม่ช่วย</h3>
+      <p>ปล่อยเควสไว้เกิน <span class="num">ec_max</span> เควสหมดอายุ และโลกเปลี่ยนถาวร</p>
+      <span class="res">หมู่บ้านถูกทำลาย</span>
+    </div>
+  </div>
+  <p style="color:var(--muted);font-size:0.93rem">เควสหลัก <span class="num">24</span> · รอบหนึ่งเห็นราว <span class="num">14</span> · 4 ตอนจบ = สายที่เลือก × มอนที่รับมา × EC ตอนเข้าตอนจบ · องก์ 3 Riona รู้ว่าผู้ที่นับคือผู้ที่ปลุกเธอขึ้นมา <span class="draft">ร่าง</span></p>
+</section>
+
+<!-- ── OPENING ── -->
+<section class="sec">
+  <header>
+    <span class="label">ฉากเปิดเรื่อง · ทุ่งเถ้า 40×24 <span class="draft">ร่าง</span></span>
+    <h2>30-40 นาทีแรก บนแผนที่ที่มีอยู่แล้ว</h2>
+    <p>แผนที่ด้านล่างวาดจาก <span class="num">data/map_ashfield.txt</span> จริง ไม่ต้องเพิ่มศัตรูหรือหีบ Riona อยู่คนเดียวตลอดฉากนี้</p>
+  </header>
+  <div class="opening">
+    <div>
+      <div class="mapbox" id="mapbox"><canvas id="map" width="400" height="240" aria-label="แผนที่ทุ่งเถ้า"></canvas></div>
+      <div class="legend">
+        <span><i style="background:#8a7a5c"></i>ดินเถ้า</span>
+        <span><i style="background:#6b7d4a"></i>หญ้า</span>
+        <span><i style="background:#3d6a7a"></i>น้ำ</span>
+        <span><i style="background:#4a4038"></i>หิน</span>
+        <span><i style="background:#c9a24a"></i>เตาเถ้า (จุดพัก)</span>
+        <span><i style="background:#b5553f;border-radius:50%"></i>ศัตรู</span>
+      </div>
+    </div>
+    <ol class="beats">
+      <li><span class="n">0</span><span class="t">จอดำ เสียงหนึ่งพูด <span class="quote">"...ศูนย์"</span><span class="m">EC เริ่มที่ 0 · ปูบอสสุดท้าย</span></span></li>
+      <li><span class="n">1</span><span class="t">ตื่นบนดินเถ้า กำมีดทำครัวแน่น <span class="quote">"...นี่ไม่ใช่ห้องครัว"</span><span class="m">การเดิน</span></span></li>
+      <li><span class="n">2</span><span class="t">เตาเถ้าแรก ถ่านไม่มีฟืนแต่ไม่ดับ เขียนชื่อตัวเองลงสมุด<span class="m">จุดพัก · เซฟ · สมุดบันทึก</span></span></li>
+      <li><span class="n">3</span><span class="t">ศึกแรก สไลม์เถ้าแยกร่างเมื่อโดนตีเดี่ยว<span class="m">ลอบตีจากด้านหลัง · คุณค่าของ AoE</span></span></li>
+      <li><span class="n">4</span><span class="t">หนอนหินในหญ้า แข็งกว่าตัว หลบได้<span class="m">การหลบศึกคือทักษะ</span></span></li>
+      <li class="ev"><span class="n">◇</span><span class="t">ประกายครั้งแรก เกิดเมื่อไหร่ก็ได้ <span class="quote">"มือจำได้ก่อนหัว"</span><span class="m">ประกาย · Insight</span></span></li>
+      <li class="ev"><span class="n">◇</span><span class="t">ล้มครั้งแรก ฟื้นที่เตา เงินหายครึ่ง <span class="quote">"...อีกแล้วเหรอ"</span><span class="m">เบาะแสแรกว่าเธอเคยตายมาก่อน</span></span></li>
+      <li><span class="n">5</span><span class="t">หีบ: ไม้เบสบอลอลูมิเนียม เธอรู้ทันทีว่ามันคืออะไร<span class="m">อาวุธใหม่ ค่า 28 · ผู้เล่นรู้ว่าเธอมาจากโลกเก่า</span></span></li>
+      <li><span class="n">6</span><span class="t">เตาเถ้าที่สอง ใครสร้างเตาพวกนี้?<span class="m">จุดพักก่อนบอส</span></span></li>
+      <li><span class="n">7</span><span class="t">ราชาหนอนเถ้า ชนะแล้วจอดำ <span class="quote">"...หนึ่ง"</span> หญ้ารอบทุ่งเหี่ยวลง<span class="m">บอส · EC +1 · โลกเปลี่ยนตาม EC</span></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ── SYSTEMS ── -->
+<section class="sec">
+  <header>
+    <span class="label">ระบบหลัก · ตัวเลขวัดจริงจาก Sim</span>
+    <h2>เรียนรู้จากอันตราย ไม่ใช่จากการทำซ้ำ</h2>
+  </header>
+  <div class="systems">
+    <div class="sys">
+      <span class="label">ไม่มีเลเวล</span>
+      <span class="big">ความชำนาญ</span>
+      <p>โตเฉพาะเมื่อสู้กับศัตรูที่แข็งพอ ศัตรูอ่อนกว่า 10 ขั้นถูกตบทิ้งบนแมพ ไม่ได้อะไรเลย</p>
+      <div class="formula">HP = 100 + Prof × 1.4</div>
+    </div>
+    <div class="sys">
+      <span class="label">ประกาย · Glimmer</span>
+      <span class="big">6 สาย 42 ท่า</span>
+      <p>เรียนท่าใหม่กลางศึก Insight เต็มเมื่อไหร่ ท่าถัดไปประกายแน่นอน</p>
+      <div class="formula">HP ต่ำกว่า 15% +11 · เพื่อนล้ม +10 · สู้บอส +6</div>
+    </div>
+    <div class="sys">
+      <span class="label">มอนสเตอร์ร่วมทีม</span>
+      <span class="big">LP · ตายถาวร</span>
+      <p>ความเชื่อใจโตจากการสู้ด้วยกัน rank 3 ยิงคอมโบกับ Riona ได้ ไม่ต้องเขียนบทสนทนา</p>
+      <div class="formula">+1 ทุก 4 ศึก · LP ฟื้นทุก 2-3 จุดพัก</div>
+    </div>
+    <div class="sys">
+      <span class="label">อาวุธคือประตู · บอส B1</span>
+      <div class="bars" role="img" aria-label="อัตราชนะบอส B1 ที่ความชำนาญ 20: ไม้เบสบอล 84% มีดทำครัว 20%">
+        <div class="brow"><span>ไม้เบสบอล 28</span><span class="track"><span class="fill" style="width:84%;display:block"></span></span><span class="v">84%</span></div>
+        <div class="brow"><span>มีดทำครัว 14</span><span class="track"><span class="fill weak" style="width:20%;display:block"></span></span><span class="v">~20%</span></div>
+      </div>
+      <p>ชนะบอสที่ความชำนาญ 20 · Sim 200 ศึก × 3 รอบ ใน Godot จริง (GDD 11.29)</p>
+    </div>
+    <div class="sys">
+      <span class="label">เตาเถ้า · จุดพัก</span>
+      <span class="big num">3 ช่วงเวลา</span>
+      <p>ต่อการพัก 1 ครั้ง ใช้อ่านตำรา 1 เล่มต่อช่วง ทั้งเกมพักราว 14 ครั้ง = 42 ช่วง ตำรามี 28 เล่ม</p>
+    </div>
+    <div class="sys">
+      <span class="label">เวทย์ v1</span>
+      <span class="big">White + Black</span>
+      <p>White คือโล่ ไม่ใช่หมอ ไม่มีคาถาเติม HP เลย Black คือดาเมจธาตุ ตำราให้ราก ประกายแตกกิ่ง</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── ROOTS + PRINCIPLES ── -->
+<section class="sec">
+  <div class="two">
+    <div class="sec" style="gap:14px">
+      <span class="label">รากจากเกมที่รัก</span>
+      <div class="roots">
+        <div><b>Romancing SaGa</b><span>ไม่มีเลเวล · ประกาย · LP · Free Scenario</span></div>
+        <div><b>Persona</b><span>เวลาเป็นทรัพยากร · ตีจุดอ่อนได้เปรียบคิว</span></div>
+        <div><b>Chrono Trigger</b><span>เห็นศัตรูบนแมพ · คอมโบ · ที่เดิมเปลี่ยนไปตามเวลา</span></div>
+        <div><b>Final Fantasy</b><span>ไทม์ไลน์คิว · เวทย์เป็นสาย</span></div>
+        <div><b>Dragon Quest</b><span>เก็บมอนเข้าทีม · ตายแล้วเสียเงินครึ่ง · โทนอบอุ่น</span></div>
+      </div>
+    </div>
+    <div class="sec" style="gap:14px">
+      <span class="label">หลักที่ยึดตลอดทั้งเกม</span>
+      <ol class="principles">
+        <li>ทุกกลไกต้องแตะกลไกที่มีอยู่แล้ว ห้ามมีระบบลอย</li>
+        <li>การเรียนรู้มาจากอันตราย ไม่ใช่จากการทำซ้ำ</li>
+        <li>เชื่อเลขที่วัดได้ มากกว่าเลขที่คำนวณ</li>
+        <li>การป้องกันซื้อได้ การแก้ไขซื้อไม่ได้</li>
+        <li>ปรับทีละตัวแปร สองตัวพร้อมกันจะทวีคูณกันเสมอ</li>
+      </ol>
+      <p style="color:var(--muted);font-size:0.93rem">ทำไมโทนจิบลิ: ยิ่งองก์แรกสวยและอบอุ่นเท่าไหร่ การเสื่อมสภาพยิ่งเจ็บเท่านั้น</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATUS ── -->
+<section class="sec">
+  <header>
+    <span class="label">สถานะ · 25 ก.ย. 2026</span>
+    <h2>ระบบต่อสู้ครบ ต่อไปคือหน้าจอที่ผู้เล่นกดเอง</h2>
+  </header>
+  <div class="steps">
+    <div class="step done"><span class="s">✓ ขั้น 1</span>รวบเอกสารดีไซน์</div>
+    <div class="step done"><span class="s">✓ ขั้น 2</span>Godot + ข้อมูล CSV</div>
+    <div class="step done"><span class="s">✓ ขั้น 3</span>ระบบต่อสู้ครบใน Godot</div>
+    <div class="step now"><span class="s">ขั้น 4 · 1/4</span>แผนที่ เซฟ หีบ บอส · เล่นบนเว็บได้</div>
+    <div class="step todo"><span class="s">ขั้น 5</span>Vertical slice ให้คนนอกเล่น 30-40 นาที</div>
+  </div>
+  <div class="two">
+    <div class="sec" style="gap:10px">
+      <span class="label">ถัดไป</span>
+      <p>สัปดาห์ 2: หน้าจอต่อสู้ที่ผู้เล่นกดเอง · สัปดาห์ 3: เมนู ร้านค้า ความเชื่อใจ ช่องปาร์ตี้ · สัปดาห์ 4: สมุดบันทึก และกล่องบทพูดสำหรับฉากเปิด</p>
+    </div>
+    <div class="sec" style="gap:10px">
+      <span class="label">รอ Pongsaton ตัดสินเรื่องเนื้อเรื่อง</span>
+      <ol class="open-q">
+        <li>Riona มาจากโลกเก่าจริง หรือเป็นคนโลกใหม่ที่แค่เกิดซ้ำได้</li>
+        <li>ผู้ที่นับเป็นผู้ปลุก Riona จริง หรือแค่ใช้ประโยชน์จากเธอ</li>
+        <li>อาชีพเดิมผู้ช่วยครัว ผูกกับมีดทำครัว โอเคไหม</li>
+        <li>NPC ร่วมทาง ปิ่น (เด็กเก็บของเก่า) กับยายขี้เถ้า (คนเฝ้าเตา) ชื่อชั่วคราว</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>ที่มา: docs/GDD.md · docs/STORY_DRAFT.md · data/*.csv · docs/SIM_REPORT_2026-09-25.md · ส่วนที่ติดป้าย "ร่าง" ยังไม่ล็อก</footer>
+</div>
+
+<script>
+(function () {
+  const MAP = "; REBORNER · ภูมิภาค 1 ทุ่งเถ้า · 40x24\n; # หิน  ~ น้ำ  . ดินเถ้า  , หญ้า  R จุดพัก  H จุดเริ่ม\n; ตัวอื่น = จุดเกิดศัตรู ดู data/encounters.csv\n; ตัวพิมพ์เล็ก a-z = หีบสมบัติ ดู data/chests.csv\n########################################\n#...........,,,,....~~..,,,,,....,,,,,,#\n#.R.........,,,,....~~..,,,,,....,,,,,,#\n#..H........,,,,....~~...........,,,,,,#\n#.......1...........~~...3.............#\n#..............2....~~.................#\n#...,,,,,...........~~............4....#\n#...,,,,,.##........~~....##...........#\n#...,,,,,............................a.#\n#......................................#\n#.....1.............~~........3........#\n#................##.~~.............##..#\n#..........1.....#..~~..,,,,,..........#\n#.,,,,,.............~~..,,,,,..........#\n#.,,,,,.............~~..,,,,,..........#\n#.,,,,,.....2.......~~.................#\n#.,,,,,................................#\n#........,,,,,,...........4....#########\n#........,,,,,,................#......##\n#........,,,,,,..2.....##......#......##\n#.....#..,,,,,,.............R......B..##\n#........,,,,,,................#......##\n#..............................#########\n########################################\n";
+  const COLORS = { '.': '#8a7a5c', ',': '#6b7d4a', '#': '#4a4038', '~': '#3d6a7a', 'R': '#c9a24a' };
+  const rows = MAP.split('\n').filter((l) => l.length && l[0] !== ';');
+  const H = rows.length, W = rows[0].length;
+  const cv = document.getElementById('map');
+  const S = 10;
+  cv.width = W * S; cv.height = H * S;
+  const g = cv.getContext('2d');
+  const found = {};
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const c = rows[y][x] || '#';
+      (found[c] = found[c] || []).push([x, y]);
+      g.fillStyle = COLORS[c] || COLORS['.'];
+      g.fillRect(x * S, y * S, S, S);
+      if (c === ',') { g.fillStyle = '#7d9057'; g.fillRect(x * S + 2, y * S + 3, 2, 3); g.fillRect(x * S + 6, y * S + 5, 2, 3); }
+      if (c === '~') { g.fillStyle = '#4f8193'; g.fillRect(x * S + 1, y * S + 4, 6, 1); }
+      if (c === 'R') { g.fillStyle = '#e0b95a'; g.fillRect(x * S + 3, y * S + 3, 4, 4); }
+      if (/[1-9]/.test(c)) { g.fillStyle = '#b5553f'; g.beginPath(); g.arc(x * S + S / 2, y * S + S / 2, 3, 0, 7); g.fill(); }
+      if (c === 'B') { g.fillStyle = '#b5553f'; g.fillRect(x * S + 1, y * S + 1, S - 2, S - 2); }
+      if (/[a-z]/.test(c)) { g.fillStyle = '#e0b95a'; g.fillRect(x * S + 2, y * S + 3, 6, 5); g.fillStyle = '#6a4632'; g.fillRect(x * S + 2, y * S + 5, 6, 1); }
+      if (c === 'H') { g.fillStyle = '#e8d9b5'; g.fillRect(x * S + 3, y * S + 2, 4, 6); }
+    }
+  }
+  const box = document.getElementById('mapbox');
+  function pin(label, xy, cls) {
+    if (!xy) return;
+    const p = document.createElement('span');
+    p.className = 'pin' + (cls ? ' ' + cls : '');
+    p.textContent = label;
+    p.style.left = ((xy[0] + 0.5) / W * 100) + '%';
+    p.style.top = ((xy[1] + 0.5) / H * 100) + '%';
+    box.appendChild(p);
+  }
+  const rest = (found['R'] || []).slice().sort((a, b) => a[1] - b[1]);
+  const h=(found['H']||[])[0]; pin('1', h && [h[0]+0.9, h[1]+0.6]);
+  pin('2', rest[0] && [rest[0][0]-0.4, rest[0][1]-0.6]);
+  pin('3', (found['1'] || [])[0]);
+  pin('4', (found['2'] || [])[0]);
+  pin('5', (found['a'] || [])[0]);
+  pin('6', rest[rest.length - 1]);
+  pin('7', (found['B'] || [])[0], 'boss');
+})();
+</script>
