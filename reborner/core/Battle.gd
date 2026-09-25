@@ -35,6 +35,7 @@ var interrupts := 0
 
 func _log(s: String) -> void:
 	if verbose: print(s)
+	if capture: log_lines.append(s)
 
 func allies() -> Array:
 	return actors.filter(func(a): return a.side == "ally" and not a.down)
@@ -83,7 +84,26 @@ func _gain_insight(a: Actor, amount: float, why: String) -> void:
 		a.insight = Insight.THRESHOLD + (a.insight - Insight.THRESHOLD) * Insight.CARRY
 		_log("    ◆ Insight เต็ม (%s) — ท่าถัดไปประกายแน่นอน" % why)
 
+# ── ลูปเทิร์น (แตกเป็นขั้น) ─────────────────────────────────
+# run() = begin() + วนลูป is_over() → next_turn() → auto_act()
+# หน้าจอต่อสู้ใช้ขั้นเดียวกันทุกตัว ต่างแค่เทิร์นตัวเอกเรียก player_act() แทน auto_act()
+# ห้ามเขียนลูปเทิร์นที่อื่น (GDD 11.15) — Sim กับหน้าจอต่อสู้ต้องเดินผ่านโค้ดชุดนี้เท่านั้น
+
+var current: Actor = null   # ตัวที่ถึงคิวอยู่ตอนนี้ (หลัง next_turn)
+var capture := false        # เก็บบรรทัดบันทึกไว้ให้ UI อ่าน
+var log_lines: Array[String] = []
+
 func run() -> Dictionary:
+	begin()
+	while not is_over():
+		var cur := next_turn()
+		if cur == null:
+			continue
+		auto_act(cur)
+	return _result()
+
+## เตรียมศึก — ตั้ง AV เริ่มต้นและผลของการลอบตี
+func begin() -> void:
 	for a in actors:
 		a.reset_av()
 	# ลอบตี — ฝ่ายที่ได้เปรียบเริ่มด้วย AV x0.4 (ได้เปรียบ แต่ไม่ใช่คำพิพากษา)
@@ -92,48 +112,105 @@ func run() -> Dictionary:
 			if a.side == ambush:
 				a.av *= Formulas.AMBUSH_MULT
 		_log("  ◆ %s" % ("ลอบตีสำเร็จ — AV ฝ่ายเรา x0.4" if ambush == "ally" else "ถูกลอบตี — AV ศัตรู x0.4"))
-	while rounds < max_rounds:
-		if foes().is_empty():
-			won = true; _log("  → ชนะใน %d รอบ" % rounds); break
-		var h := hero()
-		if h != null and h.down:
-			won = false; _log("  → แพ้ (ตัวเอกล้ม)"); break
-		if allies().is_empty():
-			won = false; _log("  → แพ้"); break
 
-		var alive := actors.filter(func(a): return not a.down)
-		var min_av: float = alive.map(func(a): return a.av).min()
-		time_elapsed += min_av
-		for a in alive:
-			a.av -= min_av
-		alive.sort_custom(func(x, y): return x.av < y.av)
-		var cur: Actor = alive[0]
-		rounds += 1
+## จบศึกหรือยัง — ตั้งค่า won ตอนจบ
+func is_over() -> bool:
+	if rounds >= max_rounds:
+		return true
+	if foes().is_empty():
+		won = true; _log("  → ชนะใน %d รอบ" % rounds); return true
+	var h := hero()
+	if h != null and h.down:
+		won = false; _log("  → แพ้ (ตัวเอกล้ม)"); return true
+	if allies().is_empty():
+		won = false; _log("  → แพ้"); return true
+	return false
 
-		# ศัตรูที่กำลังจะถึงคิว (ช่อง 2-4) มีโอกาสเปิดเผยท่าเด่น
-		_set_telegraphs()
+## เดินเวลาไปถึงตัวถัดไป คืนตัวที่ต้องทำแอ็กชัน
+## คืน null ถ้าเทิร์นนี้ถูกข้าม (ล้มจากสถานะ / ไม่มีเป้าหมาย) — ให้เรียก is_over() แล้วเดินต่อ
+func next_turn() -> Actor:
+	current = null
+	var h := hero()
+	var alive := actors.filter(func(a): return not a.down)
+	var min_av: float = alive.map(func(a): return a.av).min()
+	time_elapsed += min_av
+	for a in alive:
+		a.av -= min_av
+	alive.sort_custom(func(x, y): return x.av < y.av)
+	var cur: Actor = alive[0]
+	rounds += 1
 
-		# นับถอยหลังล็อก Insight ตอนถึงเทิร์นของตัวเอก
-		if cur.is_hero and cur.insight_lock > 0:
-			cur.insight_lock -= 1
+	# ศัตรูที่กำลังจะถึงคิว (ช่อง 2-4) มีโอกาสเปิดเผยท่าเด่น
+	_set_telegraphs()
 
-		# อยู่ในอันตราย = สะสม Insight (นับที่เทิร์นของศัตรู)
-		if cur.side == "foe" and h != null:
-			# บอสนับจากธง is_boss — ราชาหนอนเถ้า tier 20 ก็เป็นบอส (บทเรียน 11.28)
-			if cur.is_boss or cur.tier >= Insight.BOSS_TIER:
-				_gain_insight(h, Insight.FIGHTING_BOSS, "สู้บอส")
-			elif cur.tier >= h.tier:
-				_gain_insight(h, Insight.STRONGER_FOE, "ศัตรูแข็งกว่า")
+	# นับถอยหลังล็อก Insight ตอนถึงเทิร์นของตัวเอก
+	if cur.is_hero and cur.insight_lock > 0:
+		cur.insight_lock -= 1
 
-		# สถานะทำงานตอนเริ่มเทิร์นของตัวที่ติด ไม่ใช่ทุกรอบ
-		if _tick_status_damage(cur):
-			continue
+	# อยู่ในอันตราย = สะสม Insight (นับที่เทิร์นของศัตรู)
+	if cur.side == "foe" and h != null:
+		# บอสนับจากธง is_boss — ราชาหนอนเถ้า tier 20 ก็เป็นบอส (บทเรียน 11.28)
+		if cur.is_boss or cur.tier >= Insight.BOSS_TIER:
+			_gain_insight(h, Insight.FIGHTING_BOSS, "สู้บอส")
+		elif cur.tier >= h.tier:
+			_gain_insight(h, Insight.STRONGER_FOE, "ศัตรูแข็งกว่า")
 
-		var pool := foes() if cur.side == "ally" else allies()
-		if pool.is_empty(): continue
-		var target: Actor = _pick_target(cur, pool)
-		_take_turn(cur, target)
-	return _result()
+	# สถานะทำงานตอนเริ่มเทิร์นของตัวที่ติด ไม่ใช่ทุกรอบ
+	if _tick_status_damage(cur):
+		return null
+	var pool := foes() if cur.side == "ally" else allies()
+	if pool.is_empty():
+		return null
+	current = cur
+	return cur
+
+## ให้ AI ทำแอ็กชันแทน (ศัตรู มอนร่วมทีม และตัวเอกใน Sim)
+func auto_act(cur: Actor) -> void:
+	var pool := foes() if cur.side == "ally" else allies()
+	var target: Actor = _pick_target(cur, pool)
+	_take_turn(cur, target)
+
+## ท่าที่ตัวเอกกดได้ตอนนี้ — ผนึกเหลือเฉพาะท่าที่ไม่เสีย SP · SP ไม่พอก็กดไม่ได้
+func hero_options(cur: Actor) -> Array[Tech]:
+	var pool := _hero_pool(cur)
+	var out: Array[Tech] = []
+	for t in pool:
+		if t.is_attack() and (t.sp == 0 or t.sp <= cur.sp):
+			out.append(t)
+	return out
+
+## คู่คอมโบที่ใช้ได้ตอนนี้ (null = ยิงคอมโบไม่ได้)
+func combo_partner_for(cur: Actor) -> Actor:
+	if cur.has_status(Status.SEALED):
+		return null
+	return _combo_partner(cur)
+
+## ผู้เล่นสั่งตัวเอก — action = {"kind": "tech"|"guard"|"combo", "tech": Tech, "target": Actor}
+## กฎเดียวกับ AI ทุกข้อ ต่างแค่ใครเป็นคนเลือก
+func player_act(action: Dictionary) -> void:
+	var cur := current
+	if cur == null or not cur.is_hero:
+		return
+	var kind := str(action.get("kind", "tech"))
+	if kind == "guard":
+		cur.guarding = false
+		_do_guard(cur)
+		return
+	var target: Actor = action.get("target")
+	if target == null or target.down:
+		var pool := foes()
+		if pool.is_empty():
+			return
+		target = _pick_target(cur, pool)
+	cur.guarding = false
+	target = _confuse_retarget(cur, target)
+	if kind == "combo":
+		var partner := combo_partner_for(cur)
+		if partner != null:
+			var tech0: Tech = action.get("tech")
+			_do_combo(cur, partner, target, tech0.element if tech0 != null else "ฟัน")
+			return
+	_execute(cur, target, action.get("tech"))
 
 ## ฝ่ายเราเล็งศัตรูที่เปิดท่าไว้ก่อน (แข่งขัดจังหวะ) ไม่งั้นเล็ง HP ต่ำสุด
 func _pick_target(cur: Actor, pool: Array) -> Actor:
@@ -259,24 +336,11 @@ func _take_turn(cur: Actor, target: Actor) -> void:
 	if cur.side == "foe" and _check_interrupt(cur):
 		return
 
-	# สับสน — มีโอกาสตีพวกเดียวกัน
-	if cur.has_status(Status.CONFUSED) and randf() < 0.35:
-		var own := allies() if cur.side == "ally" else foes()
-		own = own.filter(func(a): return a != cur)
-		if not own.is_empty():
-			target = own[randi() % own.size()]
-			_log("    %s สับสน — ตีพวกเดียวกัน" % cur.name)
+	target = _confuse_retarget(cur, target)
 
 	var tech: Tech = null
 	if cur.is_hero and techs != null:
-		# ผนึก — ใช้ได้เฉพาะท่าที่ไม่เสีย SP
-		var pool := usable(cur)
-		if cur.has_status(Status.SEALED):
-			var free_pool := pool.filter(func(t): return t.sp == 0)
-			# ถ้าผนึกจนไม่เหลือท่าเลย ต้องเหลือท่ารากไว้เสมอ
-			# ไม่งั้น Ai.choose คืน null แล้วตกไปใช้ท่าพื้นฐานซึ่งไม่โรลประกาย
-			if not free_pool.is_empty():
-				pool = free_pool
+		var pool := _hero_pool(cur)
 		var insight_full := cur.insight >= Insight.THRESHOLD
 		# Insight เต็มแล้วห้ามตั้งรับ — ต้องยิงท่าออกไปเพื่อให้ประกายเกิด
 		if not insight_full and Ai.should_guard(cur, allies(), foes()):
@@ -290,6 +354,32 @@ func _take_turn(cur: Actor, target: Actor) -> void:
 				var el := tech.element if tech != null else "ฟัน"
 				_do_combo(cur, partner, target, el)
 				return
+	_execute(cur, target, tech)
+
+## สับสน — มีโอกาสตีพวกเดียวกัน
+func _confuse_retarget(cur: Actor, target: Actor) -> Actor:
+	if cur.has_status(Status.CONFUSED) and randf() < 0.35:
+		var own := allies() if cur.side == "ally" else foes()
+		own = own.filter(func(a): return a != cur)
+		if not own.is_empty():
+			target = own[randi() % own.size()]
+			_log("    %s สับสน — ตีพวกเดียวกัน" % cur.name)
+	return target
+
+## ท่าที่ตัวเอกมีสิทธิ์ใช้ตอนนี้ — ผนึกเหลือเฉพาะท่าไม่เสีย SP
+func _hero_pool(cur: Actor) -> Array[Tech]:
+	# ผนึก — ใช้ได้เฉพาะท่าที่ไม่เสีย SP
+	var pool := usable(cur)
+	if cur.has_status(Status.SEALED):
+		var free_pool := pool.filter(func(t): return t.sp == 0)
+		# ถ้าผนึกจนไม่เหลือท่าเลย ต้องเหลือท่ารากไว้เสมอ
+		# ไม่งั้น Ai.choose คืน null แล้วตกไปใช้ท่าพื้นฐานซึ่งไม่โรลประกาย
+		if not free_pool.is_empty():
+			pool = free_pool
+	return pool
+
+## ลงมือจริง — ท่าเด่นที่เปิดไว้ · ประกาย · SP · ดาเมจ · AV (AI และผู้เล่นใช้ร่วมกัน)
+func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 	if tech == null:
 		tech = _basic_tech(cur)
 
@@ -447,6 +537,10 @@ func _signature_tech(a: Actor) -> Tech:
 	t.power = Formulas.TEL_POWER
 	t.status_chance = minf(1.0, a.basic_status_chance * Formulas.TEL_STATUS_BONUS)
 	return t
+
+## ผลศึก (ใช้หลัง is_over() คืน true)
+func result() -> Dictionary:
+	return _result()
 
 func _result() -> Dictionary:
 	return {

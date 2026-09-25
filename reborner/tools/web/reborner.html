@@ -96,6 +96,13 @@ html, body { height: 100%; background-color: #0e0d0b; }
 #dpad button:active, #dpad button.on { background: rgba(201, 162, 74, 0.55); }
 #dpad button:focus-visible { outline: 2px solid #c9a24a; }
 #dpad .up { grid-area: 1 / 2; } #dpad .left { grid-area: 2 / 1; } #dpad .right { grid-area: 2 / 3; } #dpad .down { grid-area: 3 / 2; }
+#pads-right { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: none; gap: 8px; z-index: 2; user-select: none; -webkit-user-select: none; touch-action: none; }
+@media (pointer: coarse) { #pads-right { display: flex; } }
+#pads-right button { width: 60px; height: 60px; border-radius: 50%; background: rgba(201, 162, 74, 0.28); color: #e8d9b5;
+  border: 1px solid rgba(232, 217, 181, 0.45); font: 600 15px/1 system-ui, sans-serif; padding: 0; touch-action: none; }
+#pads-right button.back { width: 48px; height: 48px; align-self: flex-end; background: rgba(232, 217, 181, 0.12); font-size: 13px; }
+#pads-right button.on { background: rgba(201, 162, 74, 0.6); }
 </style>
 		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
@@ -111,6 +118,10 @@ html, body { height: 100%; background-color: #0e0d0b; }
 			<button class="left" data-key="ArrowLeft" data-code="37" aria-label="ซ้าย">◀</button>
 			<button class="right" data-key="ArrowRight" data-code="39" aria-label="ขวา">▶</button>
 			<button class="down" data-key="ArrowDown" data-code="40" aria-label="ลง">▼</button>
+		</div>
+		<div id="pads-right" aria-label="ปุ่มยืนยัน">
+			<button class="back" data-key="Escape" data-code="27" aria-label="ย้อนกลับ">กลับ</button>
+			<button class="ok" data-key="Enter" data-code="13" aria-label="ยืนยัน">ตกลง</button>
 		</div>
 		<noscript>
 			Your browser does not support JavaScript.
@@ -149,7 +160,7 @@ html, body { height: 100%; background-color: #0e0d0b; }
 </script>
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":183060,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":196920,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -262,7 +273,7 @@ const engine = new Engine(GODOT_CONFIG);
 		const ev = new KeyboardEvent(type, { key: key, code: key, keyCode: code, which: code, bubbles: true, cancelable: true });
 		canvas.dispatchEvent(ev);
 	}
-	document.querySelectorAll('#dpad button').forEach((btn) => {
+	document.querySelectorAll('#dpad button, #pads-right button').forEach((btn) => {
 		const down = (e) => { e.preventDefault(); if (!btn.classList.contains('on')) { btn.classList.add('on'); send('keydown', btn); } };
 		const up = (e) => { e.preventDefault(); if (btn.classList.contains('on')) { btn.classList.remove('on'); send('keyup', btn); } };
 		btn.addEventListener('pointerdown', down);

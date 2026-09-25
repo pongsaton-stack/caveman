@@ -1,9 +1,8 @@
-# world/Overworld.gd — ฉากแผนที่หลัก (ขั้นที่ 4 สัปดาห์ 1)
+# world/Overworld.gd — ฉากแผนที่หลัก (ขั้นที่ 4 สัปดาห์ 1-2)
 # วิธีใช้: Node2D เปล่า + สคริปต์นี้ → บันทึกเป็น scenes/overworld.tscn → ตั้งเป็น Main Scene → F5
 # ⚠ ไฟล์นี้ต้องไม่มี class_name — เป็นสคริปต์ติด Node ไม่ใช่คลาส
 #
-# สัปดาห์นี้ศึกยังเล่นอัตโนมัติด้วย AI (Battle ตัวเดียวกับ Sim)
-# สัปดาห์ 2 จะเปลี่ยนเป็นหน้าจอต่อสู้ที่ผู้เล่นกดเอง — โดยใช้ Battle ตัวเดิม
+# ศึกเปิด BattleScreen ให้ผู้เล่นกดเอง — ใช้ Battle ตัวเดียวกับ Sim (สัปดาห์ 2)
 extends Node2D
 
 const TILE := 24
@@ -366,7 +365,11 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		b.actors.append(f)
 		max_tier = maxi(max_tier, f.tier)
 	var prof_before := ps.prof
-	var res := b.run()
+	var screen := BattleScreen.new()
+	var amb_txt := {"ally": " · ลอบตีสำเร็จ", "foe": " · ถูกลอบตี"}
+	screen.setup(b, "%s%s%s" % ["บอส: " if e.is_boss else "", e.label_text, amb_txt.get(ambush, "")])
+	add_child(screen)
+	var res: Dictionary = await screen.finished
 
 	var lines: Array[String] = []
 	if ambush == "ally":
@@ -413,7 +416,7 @@ func _build_ui() -> void:
 	_style(hud, 8)
 	layer.add_child(hud)
 	var hint := Label.new()
-	hint.text = "ลูกศร เดิน · เข้าหาด้านหลังศัตรู = ลอบตี · ช่องสีทอง = จุดพัก/บันทึก · F9 ลบเซฟ"
+	hint.text = "ลูกศร เดิน · เข้าหาด้านหลังศัตรู = ลอบตี · ช่องสีทอง = จุดพัก/บันทึก · ต่อสู้: ลูกศรเลือก Enter ยืนยัน · F9 ลบเซฟ"
 	hint.position = Vector2(4, 202)
 	_style(hint, 6)
 	layer.add_child(hint)
