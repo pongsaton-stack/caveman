@@ -5,3 +5,7 @@
 
 # Byte-exact fixture committed with CRLF on purpose — never convert.
 engine/evals/fixtures/terminal_session.txt -text
+
+# cmd.exe mis-parses labels/goto in LF-only batch files — keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
