@@ -11,14 +11,15 @@ const MOVE_TIME := 0.12
 const ENEMY_STEP := 0.9
 const CHASE_RANGE := 4
 const MAP_PATH := "res://data/map_ashfield.txt"
-const SPRITE_DIR := "res://assets/sprites/hero"
+const SPRITE_DIR := "res://assets/sprites/rion"
 
 # ชื่อไฟล์เฟรมตัวเอกต่อทิศ — ถ้าทิศไหนดูผิด แก้ชื่อไฟล์ตรงนี้ได้เลย
+# Rion ผมแดง 64x64 จาก PixelLab (generate-8-rotations-v3) · *_step = ยกตัว 1px แทนท่าเดินจนกว่าจะมีแอนิเมชันจริง
 const HERO_ANIMS := {
-	"down":  ["idle", "walk_cycle_idle"],
-	"up":    ["walk_up_1", "walk_up_2"],
-	"left":  ["walk_left"],
-	"right": ["walk_right"],
+	"down":  ["south", "south_step"],
+	"up":    ["north", "north_step"],
+	"left":  ["west", "west_step"],
+	"right": ["east", "east_step"],
 }
 
 # พาเลตต์องก์ 1 โทนจิบลิ (GDD 13) — องก์ถัดไปเปลี่ยนด้วย color grading ไม่ใช่วาดใหม่
@@ -124,7 +125,7 @@ func _build_hero() -> void:
 	if found > 0:
 		hero_sprite = AnimatedSprite2D.new()
 		hero_sprite.sprite_frames = frames
-		hero_sprite.offset = Vector2(0, -10)   # เท้า (y=46 ในเฟรม 48) ตรงขอบล่างช่อง
+		hero_sprite.offset = Vector2(0, -14)   # เท้า (y=58 ในเฟรม 64) ตรงขอบล่างช่อง
 		hero_sprite.animation = "down"
 		hero_node.add_child(hero_sprite)
 	else:
