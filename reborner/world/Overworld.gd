@@ -362,6 +362,7 @@ func _spawn_enemies() -> void:
 		for mid in e.group:
 			e.tier = maxi(e.tier, int(by_id[mid]["tier"]))
 		e.position = _cell_center(e.cell)
+		e.load_sprite()
 		add_child(e)
 		e.set_danger(ps.prof)
 		enemies.append(e)
@@ -416,7 +417,7 @@ func _enemies_step() -> void:
 		var dir := _enemy_dir(e)
 		if dir == Vector2i.ZERO:
 			continue
-		e.facing = dir
+		e.set_facing(dir)
 		e.queue_redraw()
 		var nxt := e.cell + dir
 		if nxt == ps.cell:
