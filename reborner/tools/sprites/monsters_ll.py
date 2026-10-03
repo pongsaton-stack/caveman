@@ -3,6 +3,7 @@
 #   → ตัดจากชีต lastlight_01.png โดยตรง (แบบเดียวกับ Rion/หมา) แล้วเก็บงาน/ลงสี — ไม่วาดจากรูปทรงเรขาคณิตอีก
 #   M01 สไลม์เถ้า : ตัดสไลม์ในชีต (48x38 พอดีช่อง S) · 2 แบบ: green = สีต้นแบบ · ash = ลงสีเถ้า คงตา/ปาก/ประกาย
 #   M15 หมาป่าคู่ : ชีตไม่มีหมาป่า → ใช้หมาคู่หู (dog_lastlight_draft) ลงสีเทาน้ำตาล วางสองตัว ตัวหลังหูพับ
+#   M03/M06 (ร่าง → monsters_ll_draft/): หนอน = สไลม์ย่อลงสีอุ่น + หินมอสจากชีต · ค้างคาว = หัวหมามุมหน้า + ปีกวาดใหม่
 # ศัตรูอยู่ซ้ายของจอสู้ → หันขวา · ไม่ใช้เครดิต PixelLab
 # รัน: <python+Pillow> tools/sprites/monsters_ll.py [out_dir]
 import colorsys, os, sys
@@ -109,14 +110,159 @@ def wolf_pair(hop=0):
 	cv.alpha_composite(wolf('east'), (14, 14 - hop))                       # ตัวหน้า
 	return cv
 
+# ── M06 ค้างคาวเงา ───────────────────────────────────────────
+# ชีตไม่มีค้างคาว → หัวกลมหูแหลมจากหมามุมหน้า (dog south แถว 2-22) ลงสีเทาเข้ม ตาอำพัน เขี้ยวเล็ก + ปีกหนังวาดใหม่
+BAT = {'412C1E': '1C1A19', '2F1B10': '1C1A19', '150F0D': '141312', '21160F': '1C1A19', '714022': '2E2C2A',
+	'B25F3C': '3A3735', 'DA7B42': '4A4642', 'E39253': '5C5751', 'E1B684': '5C5751', 'D2BD9A': '5C5751',
+	'8A7460': '6E6860', '825335': '4A4642', '523624': '2A2826', '3E2214': '2A2826', '4D2A17': '2A2826'}
+WING = [h2c(h) for h in ('3E342C', '5A4A3E', '6F5D4D')]   # เงา · กลาง · สว่าง (น้ำตาลเทา ตามสเปก)
+EYE = (h2c('B37A55'), h2c('D6966A'))                      # อำพัน + ประกาย
+
+def _poly_fill(px, pts, col, W=48):
+	ys = [y for _, y in pts]
+	for y in range(min(ys), max(ys) + 1):
+		xs = []
+		for i in range(len(pts)):
+			(x0, y0), (x1, y1) = pts[i], pts[(i + 1) % len(pts)]
+			if (y0 <= y < y1) or (y1 <= y < y0):
+				xs.append(x0 + (y - y0) * (x1 - x0) / (y1 - y0))
+		xs.sort()
+		for j in range(0, len(xs) - 1, 2):
+			for x in range(int(round(xs[j])), int(round(xs[j + 1])) + 1):
+				if 0 <= x < W and 0 <= y < W:
+					px[x, y] = col
+
+def _line(px, a, b, col):
+	(x0, y0), (x1, y1) = a, b
+	n = max(abs(x1 - x0), abs(y1 - y0), 1)
+	for i in range(n + 1):
+		px[round(x0 + (x1 - x0) * i / n), round(y0 + (y1 - y0) * i / n)] = col
+
+def bat(flap=0):
+	"""ค้างคาวตัวกลม ปีกกางสมมาตร · flap = idle เฟรม 2 (ปีกยกขึ้น 3px ตัวลอยขึ้น 1px)"""
+	head = Image.open(DOG + 'south.png').convert('RGBA').crop((5, 2, 31, 23))
+	hp = head.load()
+	for y in range(head.height):
+		for x in range(head.width):
+			if hp[x, y][3]:
+				hp[x, y] = h2c(BAT['%02X%02X%02X' % hp[x, y][:3]]) + (255,)
+	# หัวกลม: ตัดเป็นวงรี (ครอปตรง ๆ ติดลำตัวหมา → ทรงสี่เหลี่ยม) · หูเหนือแถว 7 เก็บไว้
+	for y in range(head.height):
+		for x in range(head.width):
+			nx, ny = (x + 0.5 - 13) / 11.5, (y + 0.5 - 12.5) / 8.5
+			if hp[x, y][3] and y >= 7 and nx * nx + ny * ny > 1:
+				hp[x, y] = (0, 0, 0, 0)
+	# ปากกระบอกเล็กสีอ่อน + จมูก (หน้าเทาเรียบทั้งหน้า — ลายขาวของหมาทำให้ดูเป็นแรคคูน)
+	for y in range(16, 21):
+		for x in range(9, 18):
+			nx, ny = (x + 0.5 - 13.5) / 4.5, (y + 0.5 - 18.5) / 2.6
+			if nx * nx + ny * ny <= 1 and hp[x, y][3]:
+				hp[x, y] = h2c('8E877C') + (255,)
+	for x in (12, 13, 14):
+		hp[x, 17] = h2c('1C1A19') + (255,)
+	# ตาวาว: วงอำพัน 3x3 รูม่านตาเข้ม ประกายมุมซ้ายบน
+	for ex in (7, 16):
+		for dx in (0, 1, 2):
+			for dy in (11, 12, 13):
+				hp[ex + dx, dy] = EYE[0] + (255,)
+		hp[ex + 1, 12] = h2c('21160F') + (255,)
+		hp[ex, 11] = h2c('E6E2D6') + (255,)
+	# เขี้ยวคู่ใต้จมูก
+	for fx in (12, 14):
+		hp[fx, 20] = h2c('E6E2D6') + (255,)
+	cv = Image.new('RGBA', (48, 48), (0, 0, 0, 0)); cp = cv.load()
+	dy = -flap
+	lift = 3 * flap
+	for side in (-1, 1):
+		def P(x, y, k=0):   # x วัดจากกลางตัว · k = ยกตามแรงกระพือ (ปลายปีกยกมากสุด)
+			return (24 + side * x, y + dy - k)
+		sh, top, tip = P(7, 24), P(10, 14, lift), P(23, 10, lift)
+		scallop = [P(22, 22, lift // 2), P(18, 19, lift // 2), P(15, 26), P(11, 23), P(8, 29)]
+		pts = [sh, top, tip] + scallop
+		_poly_fill(cp, pts, WING[1] + (255,))
+		_poly_fill(cp, [sh, top, P(14, 15, lift), P(11, 23)], WING[2] + (255,))    # แผ่นปีกใกล้ตัวรับแสง
+		for f in (scallop[0], scallop[2], scallop[4]):                            # ก้านนิ้ว
+			_line(cp, top, f, WING[0] + (255,))
+		_line(cp, top, tip, WING[0] + (255,))
+	cv.alpha_composite(head, (11, 9 + dy))
+	for fx in (21, 26):                                                         # เท้าเล็กห้อย
+		cp[fx, 31 + dy] = h2c('2A2826') + (255,); cp[fx, 32 + dy] = h2c('1C1A19') + (255,)
+	return hue_outline(cv)
+
+# ── M03 หนอนหิน ──────────────────────────────────────────────
+# ชีตไม่มีหนอน → ปล้องตัว = สไลม์ในชีตย่อส่วน ลงสีผิวอุ่น (หัวมีหน้า ปล้องอื่นลบหน้า) · เปลือก = ก้อนหินมีมอสจาก Nature & Props
+SKIN = [h2c(h) for h in ('523624', '9A6038', 'B37A55', 'D6966A', 'D4B08A', 'E8D2AE')]
+STONE = [h2c(h) for h in ('21160F', '523624', '6C5947', '8A7460', 'A2927B')]
+ROCK_BOX = (1215, 530, 1262, 580)
+
+def _shrink(im, w):
+	h = round(im.height * w / im.width)
+	r = im.resize((w, h), Image.LANCZOS); p = r.load()
+	for y in range(h):
+		for x in range(w):
+			p[x, y] = p[x, y][:3] + (255,) if p[x, y][3] > 110 else (0, 0, 0, 0)
+	return r
+
+def _warm(im, kind, face=True):
+	"""สไลม์เขียว → ผิวน้ำตาลอ่อน · face=False ลบตา/ปาก/ประกาย (ปล้องลำตัว)"""
+	im = im.copy(); p = im.load()
+	for y in range(im.height):
+		for x in range(im.width):
+			c = p[x, y]
+			if not c[3]:
+				continue
+			h, s, v = hsv(c)
+			if 0.12 < h < 0.6 and s > 0.12:
+				L = 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
+				p[x, y] = SKIN[min(len(SKIN) - 1, int(L / 256 * len(SKIN) * 1.1))] + (255,)
+			elif not face and kind.get((x, y)) in ('dark', 'mouth', 'shine'):
+				p[x, y] = SKIN[3] + (255,)
+	return im
+
+def _stone(im):
+	"""หินเทาอมฟ้า → หินโทนอุ่นตามสเปก · มอสเขียวเก็บไว้"""
+	im = im.copy(); p = im.load()
+	for y in range(im.height):
+		for x in range(im.width):
+			c = p[x, y]
+			if not c[3]:
+				continue
+			h, s, v = hsv(c)
+			if 0.18 < h < 0.45 and s > 0.3:
+				continue
+			L = 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
+			p[x, y] = STONE[min(4, int(L / 256 * 5 * 1.15))] + (255,)
+	return im
+
+def stone_worm(wiggle=0):
+	"""หนอนอ้วนหันขวา: หาง(กรวด) → ปล้อง 2 → หัวมีหน้า · หิน 3 แผ่นบนหลัง · wiggle = idle เฟรม 2 (หัวเงยขึ้น 1px)"""
+	g, kind, _ = slime_parts()
+	rock = cut(ROCK_BOX, tol=60, shadow=True, fringe=1)
+	head = _shrink(_warm(g, kind), 28)
+	mid = _shrink(_warm(g, kind, False), 21)
+	tail = _shrink(_warm(g, kind, False), 15)
+	cv = Image.new('RGBA', (48, 48), (0, 0, 0, 0))
+	cv.alpha_composite(tail, (2, 45 - tail.height))
+	cv.alpha_composite(mid, (9, 46 - mid.height))
+	for w, x, y in ((10, 2, 27), (13, 9, 21), (14, 17, 17)):   # แผ่นหินเรียงจากหางมาหาคอ ยกสูงให้เห็นปล้องข้างล่าง
+		cv.alpha_composite(_stone(_shrink(rock, w)), (x, y))
+	cv.alpha_composite(head, (19, 46 - head.height - wiggle))
+	cv.alpha_composite(_stone(_shrink(rock, 7)), (0, 39))      # ก้อนหินปลายหาง
+	return hue_outline(cv)
+
 if __name__ == '__main__':
 	out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'assets/sprites/monsters_ll/')
 	os.makedirs(out, exist_ok=True)
-	g, kind, m = slime_parts()
-	a = slime_ash(g, kind, m)
-	for name, im in (('M01_green', g), ('M01_ash', a)):
-		place(im, 48).save(os.path.join(out, name + '.png'))
-		place(squash(im), 48).save(os.path.join(out, name + '_idle1.png'))
+	g, kind, m = slime_parts()   # kwan เลือกสีเขียวตามต้นแบบ (3 ต.ค.) · slime_ash() เก็บไว้เผื่อเทียบ
+	place(g, 48).save(os.path.join(out, 'M01.png'))
+	place(squash(g), 48).save(os.path.join(out, 'M01_idle1.png'))
 	wolf_pair().save(os.path.join(out, 'M15.png'))
 	wolf_pair(1).save(os.path.join(out, 'M15_idle1.png'))
+	# ร่างที่ kwan ยังไม่อนุมัติ → โฟลเดอร์ draft (เกมโหลดเฉพาะ monsters_ll/ อัตโนมัติ — ห้ามเข้าเกมก่อนอนุมัติ)
+	draft = out.rstrip('/') + '_draft/'
+	os.makedirs(draft, exist_ok=True)
+	stone_worm().save(os.path.join(draft, 'M03.png'))
+	stone_worm(1).save(os.path.join(draft, 'M03_idle1.png'))
+	bat().save(os.path.join(draft, 'M06.png'))
+	bat(1).save(os.path.join(draft, 'M06_idle1.png'))
 	print('ok ->', out)
