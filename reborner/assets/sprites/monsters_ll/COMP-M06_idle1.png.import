@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b4pq42vsljytq"
-path="res://.godot/imported/COMP-M06_idle1.png-67305218c87d3870d6065d2708dbacee.ctex"
+uid="uid://cen8sh637lghn"
+path="res://.godot/imported/COMP-M06_idle1.png-eafefc7e32c8177d698a9107c0bf5d2d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/monsters_ll_draft/COMP-M06_idle1.png"
-dest_files=["res://.godot/imported/COMP-M06_idle1.png-67305218c87d3870d6065d2708dbacee.ctex"]
+source_file="res://assets/sprites/monsters_ll/COMP-M06_idle1.png"
+dest_files=["res://.godot/imported/COMP-M06_idle1.png-eafefc7e32c8177d698a9107c0bf5d2d.ctex"]
 
 [params]
 

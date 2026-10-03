@@ -3,7 +3,7 @@
 #   → ตัดจากชีต lastlight_01.png โดยตรง (แบบเดียวกับ Rion/หมา) แล้วเก็บงาน/ลงสี — ไม่วาดจากรูปทรงเรขาคณิตอีก
 #   M01 สไลม์เถ้า : ตัดสไลม์ในชีต (48x38 พอดีช่อง S) · 2 แบบ: green = สีต้นแบบ · ash = ลงสีเถ้า คงตา/ปาก/ประกาย
 #   M15 หมาป่าคู่ : ชีตไม่มีหมาป่า → ใช้หมาคู่หู (dog_lastlight_draft) ลงสีเทาน้ำตาล วางสองตัว ตัวหลังหูพับ
-#   M03/M06 (อนุมัติแล้ว) · COMP-M03/COMP-M06 (ร่าง → monsters_ll_draft/): หนอน = สไลม์ย่อลงสีอุ่น + หินมอสจากชีต · ค้างคาว = หัวหมามุมหน้า + ปีกวาดใหม่
+#   M03/M06 + COMP-M03/COMP-M06 (อนุมัติแล้ว): หนอน = สไลม์ย่อลงสีอุ่น + หินมอสจากชีต · ค้างคาว = หัวหมามุมหน้า + ปีกวาดใหม่
 # ศัตรูอยู่ซ้ายของจอสู้ → หันขวา · ไม่ใช้เครดิต PixelLab
 # รัน: <python+Pillow> tools/sprites/monsters_ll.py [out_dir]
 import colorsys, os, sys
@@ -279,6 +279,81 @@ def stone_worm(wiggle=0, friend=False):
 			p[lx + dx, ly + dy] = LEAF[c] + (255,)
 	return hue_outline(cv)
 
+# ── B1 ราชาหนอนเถ้า (L 96x96 บอส) ─────────────────────────────
+# ตระกูลเดียวกับหนอนหิน: ปล้อง = สไลม์ในชีต ลงสีเถ้าถ่าน · เกราะ = หินก้อนใหญ่จากชีต ลงสีถ่าน · มงกุฎหนาม/เขี้ยว/ตานับสิบ วาดเพิ่ม
+ASH_FLESH = [h2c(h) for h in ('150F0D', '2A2420', '3E3530', '4D2A17', '6F4B33', '8A7460')]
+CHAR = [h2c(h) for h in ('150F0D', '262321', '383A37', '55524D', '76726A')]
+EMBER = (h2c('E06A3C'), h2c('F2C08A'), h2c('7A1E14'))
+ROCK_BIG_BOX = (1160, 520, 1220, 580)
+
+def _recolor(im, ramp, keep_moss=False, gain=1.1):
+	im = im.copy(); p = im.load()
+	for y in range(im.height):
+		for x in range(im.width):
+			c = p[x, y]
+			if not c[3]:
+				continue
+			if keep_moss:
+				h, s_, v = hsv(c)
+				if 0.18 < h < 0.45 and s_ > 0.3:
+					continue
+			L = 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2]
+			p[x, y] = ramp[min(len(ramp) - 1, int(L / 256 * len(ramp) * gain))] + (255,)
+	return im
+
+def worm_king(wave=0):
+	"""ราชาหนอนเถ้าหันขวา ยกหัว · wave = idle เฟรม 2 (ปล้องกลางยกขึ้น 1px เป็นคลื่น)"""
+	g, kind, _ = slime_parts()
+	body = g.copy(); bp = body.load()
+	from collections import Counter
+	main = Counter(bp[k][:3] for k, v in kind.items() if v == 'body').most_common(1)[0][0]
+	for k, v in kind.items():                      # ลบหน้าสไลม์ทั้งบริเวณ (ราชามีตานับสิบแทน)
+		if v in ('dark', 'mouth', 'shine'):
+			for dx in (-1, 0, 1):
+				for dy in (-1, 0, 1):
+					q = (k[0] + dx, k[1] + dy)
+					if 0 <= q[0] < body.width and 0 <= q[1] < body.height and bp[q][3] and kind.get(q) != 'body' or q == k:
+						bp[q] = main + (255,)
+	flesh = _recolor(body, ASH_FLESH)
+	rock = cut(ROCK_BIG_BOX, tol=60, shadow=True, fringe=1)
+	cv = Image.new('RGBA', (96, 96), (0, 0, 0, 0))
+	segs = ((26, 2, 93, 0), (32, 14, 92, 1), (38, 28, 90, 0), (42, 42, 84, 1))   # (กว้าง, x, ขอบล่าง, ยกตอนคลื่น)
+	for w, x, bottom, up in segs:
+		sg = _shrink(flesh, w)
+		cv.alpha_composite(sg, (x, bottom - sg.height - up * wave))
+	for (w, x, y, up) in ((16, 5, 66, 0), (20, 16, 60, 1), (24, 30, 52, 0), (26, 44, 44, 1)):   # เกราะถ่านบนหลังแต่ละปล้อง
+		cv.alpha_composite(_recolor(_shrink(rock, w), CHAR), (x, y - up * wave))
+	head = flesh.copy()
+	hx, hy = 46, 22
+	cv.alpha_composite(head, (hx, hy))
+	p = cv.load()
+	def put(x, y, c):
+		if 0 <= x < 96 and 0 <= y < 96:
+			p[x, y] = c + (255,)
+	# มงกุฎหนามเถ้า 5 ซี่บนหัว
+	for i, (tx, th) in enumerate(((56, 9), (62, 13), (69, 15), (76, 12), (82, 8))):
+		base = hy + 6 + abs(i - 2)
+		for k in range(th):
+			half = max(0, (th - k) // 4)
+			for dx in range(-half, half + 1):
+				put(tx + dx, base - k, CHAR[1] if dx < 0 else CHAR[3] if k > th - 3 else CHAR[2])
+	# ตานับสิบ เรียงสองโค้งข้างหัว (เรืองแดง)
+	for ex, ey in ((58, 35), (63, 32), (68, 31), (73, 32), (78, 35), (61, 41), (66, 39), (71, 39), (76, 41), (81, 43)):
+		for dx in (-1, 0, 1, 2):          # เบ้าเข้มรอบตา
+			for dy in (-1, 0, 1, 2):
+				put(ex + dx, ey + dy, CHAR[0])
+		put(ex, ey, EMBER[1]); put(ex + 1, ey, EMBER[0]); put(ex, ey + 1, EMBER[0]); put(ex + 1, ey + 1, EMBER[2])
+	# เขี้ยวคู่ใหญ่โค้งลง + น้ำลายข้น
+	for fx in (78, 87):                  # เขี้ยวคู่ใหญ่ โคนหนา 4px เรียวลง โค้งเข้า
+		for k in range(14):
+			w = 4 if k < 4 else 3 if k < 8 else 2 if k < 11 else 1
+			x = fx + (k // 5)
+			for dx in range(w):
+				put(x + dx, 49 + k, h2c('E6E2D6') if dx < w - 1 else h2c('A2927B'))
+		for k in range(3):
+			put(fx + 3, 64 + k, h2c('A7B5A0'))   # น้ำลายข้นหยด
+	return hue_outline(cv)
+
 if __name__ == '__main__':
 	out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'assets/sprites/monsters_ll/')
 	os.makedirs(out, exist_ok=True)
@@ -292,10 +367,13 @@ if __name__ == '__main__':
 	stone_worm(1).save(os.path.join(out, 'M03_idle1.png'))
 	bat().save(os.path.join(out, 'M06.png'))
 	bat(1).save(os.path.join(out, 'M06_idle1.png'))
-	draft = out.rstrip('/') + '_draft/'   # เกมโหลด monsters_ll/ อัตโนมัติ — ร่างห้ามเข้าเกมก่อนอนุมัติ
+	stone_worm(friend=True).save(os.path.join(out, 'COMP-M03.png'))     # COMP อนุมัติ 3 ต.ค.
+	stone_worm(1, friend=True).save(os.path.join(out, 'COMP-M03_idle1.png'))
+	bat(friend=True).save(os.path.join(out, 'COMP-M06.png'))
+	bat(1, friend=True).save(os.path.join(out, 'COMP-M06_idle1.png'))
+	# ร่างที่ยังไม่อนุมัติ → monsters_ll_draft/ (เกมโหลด monsters_ll/ อัตโนมัติ — ร่างห้ามเข้าเกมก่อนอนุมัติ)
+	draft = out.rstrip('/') + '_draft/'
 	os.makedirs(draft, exist_ok=True)
-	stone_worm(friend=True).save(os.path.join(draft, 'COMP-M03.png'))
-	stone_worm(1, friend=True).save(os.path.join(draft, 'COMP-M03_idle1.png'))
-	bat(friend=True).save(os.path.join(draft, 'COMP-M06.png'))
-	bat(1, friend=True).save(os.path.join(draft, 'COMP-M06_idle1.png'))
+	worm_king().save(os.path.join(draft, 'B1.png'))
+	worm_king(1).save(os.path.join(draft, 'B1_idle1.png'))
 	print('ok ->', out)
