@@ -48,6 +48,11 @@ var rng := RandomNumberGenerator.new()
 
 var hero_node: Node2D
 var hero_sprite: AnimatedSprite2D
+# หมาคู่หู (Last Light) เดินตามหลังหนึ่งช่อง — ประดับเท่านั้น ไม่ชนศัตรู ไม่เข้าศึก
+const DOG_DIR := "res://assets/sprites/dog_lastlight_draft"
+var dog_node: Node2D
+var dog_sprite: AnimatedSprite2D
+var dog_cell := Vector2i.ZERO
 var hud: Label
 var hud2: Label
 var panel: ColorRect
@@ -85,6 +90,7 @@ func _ready() -> void:
 		ps.cell = map.start
 		ps.rest_cell = map.start
 	_build_hero()
+	_build_dog()
 	_spawn_chests()
 	_label_shops()
 	_spawn_enemies()
@@ -145,6 +151,58 @@ func _build_hero() -> void:
 	cam.position_smoothing_enabled = true
 	hero_node.add_child(cam)
 	cam.make_current()
+
+func _build_dog() -> void:
+	var frames := SpriteFrames.new()
+	var found := 0
+	for anim in ["down", "up", "left", "right"]:
+		var base: String = {"down": "south", "up": "north", "left": "west", "right": "east"}[anim]
+		frames.add_animation(anim)
+		frames.set_animation_speed(anim, 6.0)
+		frames.set_animation_loop(anim, true)
+		for fname in [base, base + "_step"]:
+			var p := "%s/%s.png" % [DOG_DIR, fname]
+			if ResourceLoader.exists(p):
+				frames.add_frame(anim, load(p))
+				found += 1
+	if found == 0:
+		return
+	dog_node = Node2D.new()
+	dog_node.z_index = 1
+	add_child(dog_node)
+	dog_sprite = AnimatedSprite2D.new()
+	dog_sprite.sprite_frames = frames
+	dog_sprite.offset = Vector2(0, -4)   # เท้า (y=32 ในเฟรม 34) ตรงขอบล่างช่อง
+	dog_sprite.animation = "down"
+	dog_node.add_child(dog_sprite)
+	_dog_snap()
+
+## วางหมาที่ช่องตัวเอก (เริ่มเกม · โหลดเซฟ · แพ้แล้วกลับจุดพัก)
+func _dog_snap() -> void:
+	if dog_node == null:
+		return
+	dog_cell = ps.cell
+	dog_node.position = _cell_center(dog_cell)
+
+## หมาเดินไปช่องที่ตัวเอกเพิ่งออกมา
+func _dog_follow(to: Vector2i) -> void:
+	if dog_node == null or to == dog_cell:
+		return
+	var d := to - dog_cell
+	var a := "down"
+	if d.y < 0:
+		a = "up"
+	elif d.x < 0:
+		a = "left"
+	elif d.x > 0:
+		a = "right"
+	dog_cell = to
+	dog_sprite.play(a)
+	var tw := create_tween()
+	tw.tween_property(dog_node, "position", _cell_center(to), MOVE_TIME)
+	tw.finished.connect(func():
+		dog_sprite.stop()
+		dog_sprite.frame = 0)
 
 func _play_anim(dir: Vector2i) -> void:
 	if hero_sprite == null:
@@ -348,7 +406,9 @@ func _try_move(dir: Vector2i) -> void:
 		_encounter(e, amb)
 		return
 	busy = true
+	var prev := ps.cell
 	ps.cell = nxt
+	_dog_follow(prev)
 	var tw := create_tween()
 	tw.tween_property(hero_node, "position", _cell_center(nxt), MOVE_TIME)
 	tw.finished.connect(_on_move_done)
@@ -448,6 +508,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		ps.cell = ps.rest_cell
 		ps.rest()
 		hero_node.position = _cell_center(ps.cell)
+		_dog_snap()
 		lines.append("แพ้ %s — เสียเงิน %d · กลับจุดพัก" % [e.label_text, lost])
 	for n in ps.after_battle(comps):
 		lines.append(n)
