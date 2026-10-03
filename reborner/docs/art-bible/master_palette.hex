@@ -1,6 +1,7 @@
 ; REBORNER master palette — canon 2026-10-02 · art bible 01
 ; ตามภาพ master_palette.png: แสดง 30 ช่อง (#B37A55 ซ้ำใน SKIN/HAIR = 29 สีไม่ซ้ำ) · อ้าง 41 สี แต่อีก 11 สีไม่ระบุในต้นทาง
-; TEAL = สีอิ่มตัวเดียว ใช้กับ Rion + UI ที่ active เท่านั้น
+; TEAL = สีอิ่มตัว ใช้กับ Rion + UI ที่ active เท่านั้น · BLUE = Rion เท่านั้น · ORANGE = หมาเท่านั้น
+; รวม 37 สีไม่ซ้ำ จาก 41 · เหลือว่าง 4
 ; SKIN
 653A21
 9A6038
@@ -31,9 +32,19 @@ D2BD9A
 146E77
 306E76
 3C5253
-; SHADOW (#000000 ขัดกับกฎ "ห้ามเติมสี #000" — รอคำตัดสิน)
+; SHADOW (#000000 ใช้ได้ — ตัดสิน 3 ต.ค. 2026)
 000000
 150F0D
 21160F
 383A37
 3E2214
+; เพิ่ม 3 ต.ค. 2026 (ใช้ช่องว่าง 8 จาก 11) — BLUE (Rion cap + denim · sampled from lastlight_01)
+395472
+4C6880
+507895
+7A8993
+; ORANGE (dog fur · sampled from lastlight_01)
+B25F3C
+DA7B42
+E39253
+E1B684
