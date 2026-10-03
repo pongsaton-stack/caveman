@@ -37,6 +37,11 @@ const TRUST_BATTLES := 4       # ความเชื่อใจ +1 ทุก 
 const TRUST_CLEAN_COOLDOWN := 3 # +1 เมื่อจบศึกไม่ล้ม ได้ครั้งเดียวต่อ 3 ศึก
 const TRUST_MAX     := 5       # rank 5 = วิวัฒนาการ (v2)
 
+## จับตา (GDD 5.2) — ตัวเอกเสียเทิร์นจ้องศัตรู ได้ความเข้าใจท่าเด่นให้ทีม
+## +2 ตาม GDD · น้ำหนักเท่าแอ็กชันปกติ (1.0) — แลกเทมโปกับการรับมอน · AI ไม่ใช้ จึงไม่กระทบ Sim
+const WATCH_POINTS := 2
+const WATCH_WEIGHT := 1.0
+
 static func av(spd: float) -> float:
 	return AV_NUM / maxf(spd, 1.0)
 

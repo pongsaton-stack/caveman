@@ -40,6 +40,7 @@ var chest_nodes: Dictionary = {}   # "x,y" -> Node2D
 var slot_rows: Array = []          # data/party_slots.csv
 var companion_rows: Array = []     # data/companions.csv
 var item_rows: Array = []          # data/items.csv
+var recruit_rows := {}             # data/recruits.csv — มอนที่รับเข้าทีมได้ (GDD 5.2/5.3)
 var techs := TechDb.new()
 var map: MapData
 var ps := PlayerState.new()
@@ -73,6 +74,7 @@ func _ready() -> void:
 	slot_rows = CsvDb.load_csv("res://data/party_slots.csv")
 	companion_rows = CsvDb.load_csv("res://data/companions.csv")
 	item_rows = CsvDb.load_csv("res://data/items.csv")
+	recruit_rows = CsvDb.index_by(CsvDb.load_csv("res://data/recruits.csv"), "monster_id")
 	map = MapData.load_map(MAP_PATH)
 	if map == null or by_id.is_empty() or techs.all.is_empty():
 		push_error("โหลดข้อมูลไม่ครบ — ตรวจโฟลเดอร์ data/")
@@ -152,6 +154,27 @@ func _build_hero() -> void:
 	hero_node.add_child(cam)
 	cam.make_current()
 
+## ชนะแล้วเข้าใจท่าเด่นครบ → ถามทีละสายพันธุ์ว่ารับเข้าทีมไหม (GDD 5.2)
+func _offer_recruits(ids: Array) -> Array[String]:
+	var notes: Array[String] = []
+	for id in ids:
+		if not recruit_rows.has(str(id)) or not by_id.has(str(id)):
+			continue
+		var row: Dictionary = recruit_rows[str(id)]
+		var slots := _monster_slots()
+		var used := 0
+		for m in ps.active_members(slots):
+			used += PlayerState.slot_cost(m)
+		var screen := RecruitScreen.new()
+		screen.setup(str(row["name"]), str(by_id[str(id)]["signature_tech"]), int(row["slots"]), used + int(row["slots"]) > slots)
+		add_child(screen)
+		var ok: bool = await screen.decided
+		if ok:
+			var nm := ps.recruit(row)
+			var bench := not ps.active_members(slots).has(ps._member(nm))
+			notes.append("◇ %s เข้าทีมแล้ว%s" % [nm, " (สำรอง)" if bench else ""])
+	return notes
+
 func _build_dog() -> void:
 	var frames := SpriteFrames.new()
 	var found := 0
@@ -181,7 +204,13 @@ func _build_dog() -> void:
 func _dog_snap() -> void:
 	if dog_node == null:
 		return
+	# ยืนข้างตัวเอก (ช่องเดินได้ช่องแรก) — ไม่ทับกันจนหมาหายหลังตัวเอก
 	dog_cell = ps.cell
+	for d in [Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]:
+		var c: Vector2i = ps.cell + d
+		if map.walkable(c) and _enemy_at(c) == null:
+			dog_cell = c
+			break
 	dog_node.position = _cell_center(dog_cell)
 
 ## หมาเดินไปช่องที่ตัวเอกเพิ่งออกมา
@@ -512,6 +541,9 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		lines.append("แพ้ %s — เสียเงิน %d · กลับจุดพัก" % [e.label_text, lost])
 	for n in ps.after_battle(comps):
 		lines.append(n)
+	if res["won"]:
+		for n in await _offer_recruits(res.get("understood", [])):
+			lines.append(n)
 	SaveGame.save(ps)
 	_refresh_enemy_colors()
 	_show("\n".join(lines), 2.8 + 0.4 * maxi(0, lines.size() - 3))

@@ -54,7 +54,10 @@ func _render() -> void:
 	left.add_child(UiKit.label("Rion · ความชำนาญ %d" % ps.prof, 8, UiKit.C_TEXT))
 	left.add_child(UiKit.label("%s (ค่าอาวุธ %d)" % [ps.weapon_name, ps.weapon_base], 7, UiKit.C_MUTED))
 	left.add_child(UiKit.label("HP %d/%d · SP %d/%d · เงิน %d" % [ps.hp, ps.max_hp(), ps.sp, ps.max_sp(), ps.gold], 7, UiKit.C_TEXT))
-	left.add_child(UiKit.label("EC %d · ช่องมอน %d/%d" % [ps.ec, mini(ps.party.size(), slots), slots], 7, UiKit.C_MUTED))
+	var used := 0
+	for m in ps.active_members(slots):
+		used += PlayerState.slot_cost(m)
+	left.add_child(UiKit.label("EC %d · ช่องมอน %d/%d" % [ps.ec, used, slots], 7, UiKit.C_MUTED))
 	left.add_child(UiKit.label("ท่าที่เรียนแล้ว %d" % ps.learned.size(), 7, UiKit.C_GOLD))
 	var tech_text := UiKit.label(" · ".join(ps.learned), 7, UiKit.C_TEXT)
 	tech_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -70,10 +73,13 @@ func _render() -> void:
 	right.add_child(UiKit.label("มอนร่วมทีม", 8, UiKit.C_TEXT))
 	if ps.party.is_empty():
 		right.add_child(UiKit.label("— ไม่มี —", 7, UiKit.C_MUTED))
+	var active := ps.active_members(slots)
 	for i in ps.party.size():
 		var m: Dictionary = ps.party[i]
 		var lp := int(m["lp"])
-		var bench := "  (สำรอง)" if i >= slots else ""
+		var bench := "  (สำรอง)" if not active.has(m) else ""
+		if PlayerState.slot_cost(m) > 1:
+			bench += "  [%d ช่อง]" % PlayerState.slot_cost(m)
 		var col := UiKit.C_BAD if lp == 1 else UiKit.C_TEXT
 		right.add_child(UiKit.label("%s  LP %s%s" % [m["name"], UiKit.lp_dots(lp), bench], 7, col))
 		var sub := "เชื่อใจ %d/%d · สู้ด้วยกัน %d ศึก" % [m["loyalty"], Formulas.TRUST_MAX, m["battles"]]
@@ -107,10 +113,33 @@ func _show_actions() -> void:
 		btn.focus_entered.connect(func(): _info.text = str(r["note"]).split("·")[0].strip_edges())
 		if first == null and not btn.disabled:
 			first = btn
+	if ps.party.size() > 1:
+		var arrange := _add(UiKit.button("จัดทีม", 123))
+		arrange.pressed.connect(_pick_front)
+		arrange.focus_entered.connect(func(): _info.text = "เลือกมอนขึ้นหัวทีม — ตัวหัวทีมได้ลงสนามก่อน ที่เกินช่องไปสำรอง")
 	var close := _add(UiKit.button("ปิด", 123))
 	close.pressed.connect(_close)
 	if first == null:
 		first = close
+	first.grab_focus()
+
+func _pick_front() -> void:
+	_clear_menu()
+	_picking_lp = true
+	_info.text = "ให้ใครขึ้นหัวทีม?"
+	var first: Button = null
+	for m in ps.party:
+		var nm := str(m["name"])
+		var btn := _add(UiKit.button("%s %s" % [nm, UiKit.lp_dots(int(m["lp"]))], 123))
+		btn.pressed.connect(func():
+			ps.move_to_front(nm)
+			_info.text = "%s ขึ้นหัวทีมแล้ว" % nm
+			_render()
+			_show_actions())
+		if first == null:
+			first = btn
+	var back := _add(UiKit.button("ย้อนกลับ", 123))
+	back.pressed.connect(_show_actions)
 	first.grab_focus()
 
 func _on_item(r: Dictionary) -> void:

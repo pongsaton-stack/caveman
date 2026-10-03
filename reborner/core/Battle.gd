@@ -32,6 +32,11 @@ var status_deaths := 0
 var combos := 0
 var telegraphs := 0
 var interrupts := 0
+# ความเข้าใจท่าเด่นของศัตรู (GDD 5.2) — นับต่อสายพันธุ์ · บันทึกอย่างเดียว ไม่แตะการสุ่ม
+var understanding := {}          # monster_id → แต้ม
+var _understand_need := {}       # monster_id → แต้มที่ต้องได้
+var _understand_boss := {}       # monster_id → true ถ้าเป็นบอส
+var _understand_viewers := {}    # monster_id → Array[Actor] ผู้ที่เห็นท่า (บอสต้องมีคนเห็นยืนอยู่ตอนจบ)
 
 func _log(s: String) -> void:
 	if verbose: print(s)
@@ -185,7 +190,7 @@ func combo_partner_for(cur: Actor) -> Actor:
 		return null
 	return _combo_partner(cur)
 
-## ผู้เล่นสั่งตัวเอก — action = {"kind": "tech"|"guard"|"combo", "tech": Tech, "target": Actor}
+## ผู้เล่นสั่งตัวเอก — action = {"kind": "tech"|"guard"|"combo"|"watch", "tech": Tech, "target": Actor}
 ## กฎเดียวกับ AI ทุกข้อ ต่างแค่ใครเป็นคนเลือก
 func player_act(action: Dictionary) -> void:
 	var cur := current
@@ -195,6 +200,10 @@ func player_act(action: Dictionary) -> void:
 	if kind == "guard":
 		cur.guarding = false
 		_do_guard(cur)
+		return
+	if kind == "watch":
+		cur.guarding = false
+		_do_watch(cur, action.get("target"))
 		return
 	var target: Actor = action.get("target")
 	if target == null or target.down:
@@ -318,6 +327,23 @@ func _apply_status(tgt: Actor, key: String, base: float) -> void:
 	_log("    %s ติด%s %d เทิร์น" % [tgt.name, key, Status.DURATION])
 	if tgt.is_hero:
 		_gain_insight(tgt, Insight.GOT_STATUS, "ติดสถานะ")
+
+## จับตา — เสียเทิร์นจ้องท่าเด่นของศัตรู ได้ความเข้าใจ +2 ให้ทีม (GDD 5.2)
+func _do_watch(a: Actor, target: Actor) -> void:
+	if target == null or target.down or target.side != "foe":
+		var pool := foes()
+		if pool.is_empty():
+			return
+		target = pool[0]
+	_add_understanding(target, a, Formulas.WATCH_POINTS)
+	a.av += Formulas.av(a.spd) * Formulas.WATCH_WEIGHT
+	_log("  รอบ %2d  %s จับตา %s — อ่านท่า %s (%d/%d)" % [rounds, a.name, target.name, target.signature,
+		understanding[target.id], _understand_need[target.id]])
+
+## ความเข้าใจตอนนี้ของสายพันธุ์นี้ — [แต้ม, ที่ต้องได้]
+func understanding_of(f: Actor) -> Array[int]:
+	var out: Array[int] = [int(understanding.get(f.id, 0)), maxi(1, f.comprehension)]
+	return out
 
 ## ตั้งรับ — 4 หน้าที่ในแอ็กชันเดียว แต่เสมอตัวทางเทมโป (GDD 3.3)
 func _do_guard(a: Actor) -> void:
@@ -490,6 +516,9 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 		elif ratio < Insight.ALLY_HURT_RATIO:
 			_gain_insight(hero(), Insight.ALLY_HURT, "เพื่อนเจ็บหนัก")
 
+	if src.side == "foe" and tgt.side == "ally" and tech.name == src.signature and src.id != "":
+		_note_understanding(src, tgt)
+
 	if tech.status != "" and tgt.hp > 0:
 		_apply_status(tgt, tech.status, tech.status_chance)
 
@@ -538,6 +567,38 @@ func _signature_tech(a: Actor) -> Tech:
 	t.status_chance = minf(1.0, a.basic_status_chance * Formulas.TEL_STATUS_BONUS)
 	return t
 
+## โดนท่าเด่น +1 · ตั้งรับใส่ท่านั้น +2 (GDD 5.2) — ท่าที่ถูกขัดจังหวะไม่เคยลงมือ จึงไม่ได้ความเข้าใจ
+func _note_understanding(src: Actor, viewer: Actor) -> void:
+	var pts := 2 if viewer.guarding else 1
+	_add_understanding(src, viewer, pts)
+	_log("    ◇ เข้าใจท่า %s ของ %s +%d (%d/%d)" % [src.signature, src.name, pts,
+		understanding[src.id], _understand_need[src.id]])
+
+func _add_understanding(src: Actor, viewer: Actor, pts: int) -> void:
+	understanding[src.id] = int(understanding.get(src.id, 0)) + pts
+	_understand_need[src.id] = maxi(1, src.comprehension)
+	_understand_boss[src.id] = src.is_boss
+	if not _understand_viewers.has(src.id):
+		_understand_viewers[src.id] = []
+	if not _understand_viewers[src.id].has(viewer):
+		_understand_viewers[src.id].append(viewer)
+
+## สายพันธุ์ที่เข้าใจครบแล้ว — บอสต้องมีผู้เห็นท่ายังยืนอยู่ตอนจบศึก
+func understood() -> Array[String]:
+	var out: Array[String] = []
+	for id in understanding.keys():
+		if int(understanding[id]) < int(_understand_need.get(id, 1)):
+			continue
+		if bool(_understand_boss.get(id, false)):
+			var standing := false
+			for v in _understand_viewers.get(id, []):
+				if not v.down:
+					standing = true
+			if not standing:
+				continue
+		out.append(str(id))
+	return out
+
 ## ผลศึก (ใช้หลัง is_over() คืน true)
 func result() -> Dictionary:
 	return _result()
@@ -552,4 +613,5 @@ func _result() -> Dictionary:
 		"statuses": statuses_applied, "guards": guards, "status_deaths": status_deaths,
 		"combos": combos, "telegraphs": telegraphs, "interrupts": interrupts,
 		"ambush": ambush,
+		"understanding": understanding.duplicate(), "understood": understood(),
 	}

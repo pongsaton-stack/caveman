@@ -128,6 +128,9 @@ func _show_commands() -> void:
 	var g := _add_button("ตั้งรับ")
 	g.pressed.connect(_on_guard)
 	g.focus_entered.connect(_hint.bind("ตั้งรับ: ลดดาเมจ 50% · สลัดสถานะ 1 เทิร์น · ท่าถัดไปเบาลงครึ่ง"))
+	var w := _add_button("จับตา")
+	w.pressed.connect(_on_watch)
+	w.focus_entered.connect(_hint.bind("จับตา: เสียเทิร์น · เข้าใจท่าเด่นศัตรู +%d · ครบแล้วชนะ = รับเข้าทีมได้" % Formulas.WATCH_POINTS))
 	if first != null:
 		first.grab_focus()
 
@@ -143,6 +146,10 @@ func _on_combo() -> void:
 func _on_guard() -> void:
 	_commit({"kind": "guard"})
 
+func _on_watch() -> void:
+	_pending = {"kind": "watch"}
+	_ask_target(true)
+
 func _ask_target(needs_pick: bool) -> void:
 	var fs := b.foes()
 	if not needs_pick or fs.size() <= 1:
@@ -156,6 +163,9 @@ func _ask_target(needs_pick: bool) -> void:
 	var first: Button = null
 	for f in fs:
 		var tel := "  ▼" if not f.telegraph.is_empty() else ""
+		if str(_pending.get("kind")) == "watch":
+			var u := b.understanding_of(f)
+			tel = "  ◇ %d/%d" % [u[0], u[1]]
 		var btn := _add_button("%s %d/%d%s" % [f.name, f.hp, f.max_hp, tel])
 		btn.pressed.connect(_on_target.bind(f))
 		if first == null:
@@ -224,6 +234,10 @@ func _fill_side(box: VBoxContainer, list: Array, allies: bool) -> void:
 			name_line += "  (ล้ม)"
 		if not a.telegraph.is_empty():
 			name_line += "  ▼ " + str(a.telegraph["name"])
+		if not allies:
+			var u := b.understanding_of(a)
+			if u[0] > 0:
+				name_line += "  ◇%d/%d" % [mini(u[0], u[1]), u[1]]
 		if not a.statuses.is_empty():
 			name_line += "  [" + ", ".join(a.statuses.keys()) + "]"
 		var head := _label("%s   %d/%d" % [name_line, a.hp, a.max_hp], 7, C_MUTED if a.down else C_TEXT)

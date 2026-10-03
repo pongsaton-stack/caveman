@@ -24,6 +24,7 @@ var insight_lock: int = 0        # รอบที่เหลือก่อน
 var down: bool = false
 var telegraph: Dictionary = {}   # {name, dmg} — ท่าที่เปิดไว้ในคิว
 var signature: String = ""      # ชื่อท่าเด่นของมอน (ใช้ตอนเปิดท่า)
+var comprehension: int = 3       # ความเข้าใจที่ต้องสะสมจากท่าเด่นนี้ (คอลัมน์ comprehension · GDD 5.2)
 var loyalty: int = 0             # ความเชื่อใจ (มอนร่วมทีม) — rank 3 ยิงคอมโบได้
 var hits: int = 0                # นับครั้งที่ถูกตี ใช้วัด 'ครั้งที่ต้องตี'
 var sp: int = 0
@@ -92,6 +93,7 @@ static func from_csv(row_data: Dictionary) -> Actor:
 	a.sp = 30; a.max_sp = 30
 	a.basic_element = "ทุบ"
 	a.signature = str(row_data.get("signature_tech", "ท่าเด่น"))
+	a.comprehension = int(row_data.get("comprehension", 3))
 	a.is_boss = int(row_data.get("is_boss", 0)) == 1
 	a.basic_status = str(row_data.get("status", ""))
 	a.basic_status_chance = float(row_data.get("status_chance", 0.0))

@@ -108,7 +108,7 @@ func seed_party(rows: Array) -> void:
 	party.clear()
 	for r in rows:
 		party.append({"id": str(r["monster_id"]), "name": str(r["name"]), "lp": int(r["lp"]),
-			"loyalty": int(r["loyalty"]), "battles": 0, "clean_cd": 0})
+			"loyalty": int(r["loyalty"]), "battles": 0, "clean_cd": 0, "slots": 1})
 		if not met_species.has(str(r["monster_id"])):
 			met_species.append(str(r["monster_id"]))
 
@@ -120,13 +120,50 @@ static func monster_slots_for(ec_now: int, rows: Array) -> int:
 			n = maxi(n, int(r["monster_slots"]))
 	return n
 
+## รับมอนเข้าทีม (GDD 5.2) — ทีมเต็มก็รับได้ ตัวที่เกินช่องไปนั่งสำรอง · คืนชื่อที่ได้
+func recruit(row: Dictionary) -> String:
+	var base := str(row["name"])
+	var nm := base
+	var n := 2
+	while not _member(nm).is_empty() or lost.has(nm):
+		nm = "%s %d" % [base, n]
+		n += 1
+	party.append({"id": str(row["monster_id"]), "name": nm, "lp": Formulas.LP_MAX,
+		"loyalty": int(row["loyalty"]), "battles": 0, "clean_cd": 0, "slots": int(row["slots"])})
+	if not met_species.has(str(row["monster_id"])):
+		met_species.append(str(row["monster_id"]))
+	return nm
+
+static func slot_cost(m: Dictionary) -> int:
+	return maxi(1, int(m.get("slots", 1)))
+
+## ตัวที่ได้ลงสนาม (ตามลำดับในทีม · ใส่ได้เท่าที่ช่องพอ · บอสกิน 2 ช่อง) — ที่เหลือคือสำรอง
+func active_members(slots: int) -> Array:
+	var out: Array = []
+	var used := 0
+	for m in party:
+		if int(m["lp"]) <= 0:
+			continue
+		var c := slot_cost(m)
+		if used + c > slots:
+			continue
+		used += c
+		out.append(m)
+	return out
+
+## ย้ายมอนขึ้นหัวทีม (ได้ลงสนามก่อน)
+func move_to_front(name: String) -> void:
+	var m := _member(name)
+	if m.is_empty():
+		return
+	party.erase(m)
+	party.push_front(m)
+
 ## มอนที่ลงสนาม — ตามลำดับในทีม ไม่เกินจำนวนช่อง
 func make_companions(by_id: Dictionary, slots: int) -> Array[Actor]:
 	var out: Array[Actor] = []
-	for m in party:
-		if out.size() >= slots:
-			break
-		if int(m["lp"]) <= 0 or not by_id.has(str(m["id"])):
+	for m in active_members(slots):
+		if not by_id.has(str(m["id"])):
 			continue
 		var a := Actor.from_csv(by_id[str(m["id"])])
 		a.name = str(m["name"])
@@ -251,7 +288,8 @@ func from_dict(d: Dictionary) -> void:
 	for m in d.get("party", []):
 		var md: Dictionary = m
 		party.append({"id": str(md.get("id", "")), "name": str(md.get("name", "")), "lp": int(md.get("lp", 0)),
-			"loyalty": int(md.get("loyalty", 0)), "battles": int(md.get("battles", 0)), "clean_cd": int(md.get("clean_cd", 0))})
+			"loyalty": int(md.get("loyalty", 0)), "battles": int(md.get("battles", 0)), "clean_cd": int(md.get("clean_cd", 0)),
+			"slots": int(md.get("slots", 1))})
 	party_seeded = bool(d.get("party_seeded", false))
 	lost.clear()
 	for n in d.get("lost", []):
