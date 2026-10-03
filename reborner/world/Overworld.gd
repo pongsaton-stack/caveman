@@ -93,6 +93,7 @@ func _ready() -> void:
 		ps.rest_cell = map.start
 	_build_hero()
 	_build_dog()
+	_build_drops()
 	_spawn_chests()
 	_label_shops()
 	_spawn_enemies()
@@ -153,6 +154,57 @@ func _build_hero() -> void:
 	cam.position_smoothing_enabled = true
 	hero_node.add_child(cam)
 	cam.make_current()
+
+## ── ของดรอป (กฎ UX ข้อ 3 ของ kwan) ──
+## มอนตาย → ไอคอนตรงจุดทันที · เดินทับเก็บ · ของ/โอกาสจากคอลัมน์ drop / drop_rate
+var drop_nodes := {}   # key_of(ช่อง) -> Label
+
+func _drop_loot(e: WorldEnemy, rows: Array) -> void:
+	var got: Array = []
+	for r in rows:
+		var name := str(r.get("drop", ""))
+		if name != "" and rng.randf() * 100.0 < float(r.get("drop_rate", 0)):
+			got.append(name)
+	if got.is_empty():
+		return
+	var key := PlayerState.key_of(e.cell)
+	var arr: Array = ps.ground_drops.get(key, [])
+	arr.append_array(got)
+	ps.ground_drops[key] = arr
+	_place_drop_icon(e.cell)
+
+func _place_drop_icon(c: Vector2i) -> void:
+	var key := PlayerState.key_of(c)
+	if drop_nodes.has(key):
+		return
+	var l := Label.new()
+	l.text = "🎁"
+	_style(l, 10)
+	l.position = Vector2(c.x * TILE + 4, c.y * TILE + 2)
+	l.z_index = 1
+	add_child(l)
+	drop_nodes[key] = l
+
+func _build_drops() -> void:
+	for key in ps.ground_drops.keys():
+		var parts := str(key).split(",")
+		if parts.size() == 2:
+			_place_drop_icon(Vector2i(int(parts[0]), int(parts[1])))
+
+func _pick_up_drops() -> bool:
+	var key := PlayerState.key_of(ps.cell)
+	if not ps.ground_drops.has(key):
+		return false
+	var names: Array = ps.ground_drops[key]
+	for n in names:
+		ps.materials[str(n)] = int(ps.materials.get(str(n), 0)) + 1
+	ps.ground_drops.erase(key)
+	if drop_nodes.has(key):
+		drop_nodes[key].queue_free()
+		drop_nodes.erase(key)
+	SaveGame.save(ps)
+	_show("🎁 เก็บ " + " · ".join(names), 1.4)
+	return true
 
 ## ชนะแล้วเข้าใจท่าเด่นครบ → ถามทีละสายพันธุ์ว่ารับเข้าทีมไหม (GDD 5.2)
 func _offer_recruits(ids: Array) -> Array[String]:
@@ -447,6 +499,8 @@ func _on_move_done() -> void:
 	if hero_sprite != null:
 		hero_sprite.stop()
 		hero_sprite.frame = 0
+	if _pick_up_drops():
+		return
 	var key := PlayerState.key_of(ps.cell)
 	if chest_nodes.has(key):
 		_open_chest(key)
@@ -503,9 +557,10 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	var prof_before := ps.prof
 	var screen := BattleScreen.new()
 	var amb_txt := {"ally": " · ลอบตีสำเร็จ", "foe": " · ถูกลอบตี"}
-	screen.setup(b, "%s%s%s" % ["บอส: " if e.is_boss else "", e.label_text, amb_txt.get(ambush, "")])
+	screen.setup(b, "%s%s%s" % ["บอส: " if e.is_boss else "", e.label_text, amb_txt.get(ambush, "")], ps.auto_battle)
 	add_child(screen)
 	var res: Dictionary = await screen.finished
+	ps.auto_battle = bool(res.get("auto", ps.auto_battle))
 
 	var lines: Array[String] = []
 	if ambush == "ally":
@@ -523,6 +578,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 			# จบบอส = จบเควสหลัก 1 เควส (STORY_DRAFT ฉากที่ 7) · EC เพิ่มจากตรงนี้จนกว่าจะมีระบบเควส
 			ps.ec += 1
 			lines.append("…%s  (EC %d)" % ["หนึ่ง" if ps.ec == 1 else str(ps.ec), ps.ec])
+		_drop_loot(e, rows)
 		_remove_enemy(e)
 		lines.append("%sชนะ %s · %.0f AV" % ["★ ชนะบอส! " if e.is_boss else "", e.label_text, res["time"]])
 		lines.append("ความชำนาญ %d → %d · เงิน +%d · HP %d/%d" % [prof_before, ps.prof, loot, ps.hp, ps.max_hp()])
@@ -571,13 +627,13 @@ func _build_ui() -> void:
 	layer.add_child(hint)
 	panel = ColorRect.new()
 	panel.color = Color(0.05, 0.06, 0.08, 0.85)
-	panel.position = Vector2(32, 64)
-	panel.size = Vector2(320, 88)
+	panel.position = Vector2(32, 84)
+	panel.size = Vector2(320, 44)   # 2 บรรทัด (กฎ UX ข้อ 5)
 	panel.visible = false
 	layer.add_child(panel)
 	panel_label = Label.new()
-	panel_label.position = Vector2(8, 6)
-	panel_label.size = Vector2(304, 76)
+	panel_label.position = Vector2(8, 5)
+	panel_label.size = Vector2(304, 34)
 	panel_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_style(panel_label, 8)
 	panel.add_child(panel_label)
@@ -599,17 +655,36 @@ func _update_hud() -> void:
 			parts.append("%s %s" % [m["name"], UiKit.lp_dots(int(m["lp"]))])
 		hud2.text = "EC %d · มอน: %s" % [ps.ec, " · ".join(parts) if not parts.is_empty() else "ไม่มี"]
 
+## กฎ UX ข้อ 5 ของ kwan: กล่องข้อความละไม่เกิน 2 บรรทัด — ข้อความยาวแบ่งเป็นหน้าละ 2 บรรทัด เล่นต่อกันเอง
+const SHOW_LINES := 2
+const SHOW_PAGE_MIN := 1.2
+var _pages: Array[String] = []
+var _page_secs := 0.0
+
 func _show(msg: String, secs: float) -> void:
 	busy = true
 	_update_hud()
 	if panel == null:
 		busy = false
 		return
-	panel_label.text = msg
+	var lines := msg.split("\n")
+	var pages: Array[String] = []
+	for i in range(0, lines.size(), SHOW_LINES):
+		pages.append("\n".join(lines.slice(i, i + SHOW_LINES)))
+	_pages.clear()
+	_pages.append_array(pages)
+	_page_secs = maxf(SHOW_PAGE_MIN, secs / float(pages.size()))
+	_next_page()
+
+func _next_page() -> void:
+	panel_label.text = _pages.pop_front()
 	panel.visible = true
-	get_tree().create_timer(secs).timeout.connect(_hide_panel, CONNECT_ONE_SHOT)
+	get_tree().create_timer(_page_secs).timeout.connect(_hide_panel, CONNECT_ONE_SHOT)
 
 func _hide_panel() -> void:
+	if not _pages.is_empty():
+		_next_page()
+		return
 	panel.visible = false
 	busy = false
 	_update_hud()

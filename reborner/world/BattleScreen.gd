@@ -10,7 +10,7 @@ signal finished(result: Dictionary)
 var step_delay := 0.55       # วินาทีต่อเทิร์นของตัวที่ไม่ใช่ผู้เล่น (เทสต์ตั้งให้เร็วได้)
 var end_delay := 1.2
 const QUEUE_SLOTS := 8          # GDD 3.1 — UI ต้องแสดงคิวล่วงหน้า 8 ช่อง
-const LOG_LINES := 4
+const LOG_LINES := 2   # กฎ UX ข้อ 5 ของ kwan: กล่องข้อความละไม่เกิน 2 บรรทัด
 const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
 
 # พาเลตต์เดียวกับแผนที่องก์ 1
@@ -45,10 +45,14 @@ var _log_shown := 0
 var _recent: Array[String] = []
 var _pending: Dictionary = {}
 var _choosing_target := false
+var auto := true                # กฎ UX ข้อ 1: สู้อัตโนมัติเปิดตั้งแต่เริ่ม · สลับด้วยปุ่มมุมขวาบนหรือ Esc
+var _waiting_player := false
+var _auto_btn: Button
 
-func setup(battle: Battle, label: String) -> void:
+func setup(battle: Battle, label: String, auto_on: bool = true) -> void:
 	b = battle
 	title = label
+	auto = auto_on
 
 func _ready() -> void:
 	layer = 10
@@ -59,6 +63,8 @@ func _ready() -> void:
 	hero = b.hero()
 	_flush_log()
 	_refresh()
+	if auto:
+		_info_label.text = "สู้อัตโนมัติ — Esc/กลับ หรือปุ่มมุมขวาบน = สั่งเอง"
 	_advance()
 
 # ── ลำดับเทิร์น ───────────────────────────────────────────────
@@ -70,7 +76,9 @@ func _advance() -> void:
 			_clear_menu()
 			_info_label.text = "ชนะ!" if b.won else "แพ้…"
 			await get_tree().create_timer(end_delay).timeout
-			finished.emit(b.result())
+			var r := b.result()
+			r["auto"] = auto
+			finished.emit(r)
 			queue_free()
 			return
 		var cur := b.next_turn()
@@ -79,8 +87,9 @@ func _advance() -> void:
 			_flush_log()
 			await get_tree().create_timer(step_delay).timeout
 			continue
-		if cur.is_hero:
+		if cur.is_hero and not auto:
 			_flush_log()
+			_waiting_player = true
 			_show_commands()
 			return
 		b.auto_act(cur)
@@ -89,6 +98,7 @@ func _advance() -> void:
 		await get_tree().create_timer(step_delay).timeout
 
 func _commit(action: Dictionary) -> void:
+	_waiting_player = false
 	_clear_menu()
 	_choosing_target = false
 	if _hero_tex != null and _tex_cast != null and str(action.get("kind")) != "guard":
@@ -183,6 +193,31 @@ func _unhandled_input(event: InputEvent) -> void:
 	if _choosing_target and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_show_commands()
+	elif event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		_toggle_auto()
+
+## สลับอัตโนมัติ/สั่งเอง — เปิดอัตโนมัติตอนเมนูรออยู่ = ให้ AI เล่นเทิร์นนี้แทนทันที
+func _toggle_auto() -> void:
+	auto = not auto
+	_update_auto_btn()
+	if auto and _waiting_player:
+		_waiting_player = false
+		_choosing_target = false
+		_clear_menu()
+		b.auto_act(hero)
+		_flush_log()
+		_refresh()
+		await get_tree().create_timer(step_delay).timeout
+		_advance()
+	elif not auto and not _waiting_player:
+		_info_label.text = "สั่งเอง — รอเทิร์นของ %s" % hero.name
+	elif auto:
+		_info_label.text = "สู้อัตโนมัติ — Esc/กลับ หรือปุ่มมุมขวาบน = สั่งเอง"
+
+func _update_auto_btn() -> void:
+	if _auto_btn != null:
+		_auto_btn.text = "อัตโนมัติ: %s" % ("เปิด" if auto else "ปิด")
 
 func _describe(t: Tech) -> void:
 	if t == null:
@@ -276,6 +311,13 @@ func _build() -> void:
 	var head := _label(title, 7, C_GOLD)
 	head.position = Vector2(4, 1)
 	root.add_child(head)
+
+	_auto_btn = UiKit.button("", 82)
+	_auto_btn.position = Vector2(298, 0)
+	_auto_btn.focus_mode = Control.FOCUS_NONE   # ไม่แย่งโฟกัสจากเมนูคำสั่ง
+	_auto_btn.pressed.connect(_toggle_auto)
+	root.add_child(_auto_btn)
+	_update_auto_btn()
 
 	_queue_box = HBoxContainer.new()
 	_queue_box.position = Vector2(4, 12)

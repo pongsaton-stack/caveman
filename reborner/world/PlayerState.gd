@@ -29,6 +29,9 @@ var rest_count := 0                   # จุดพักที่นับแ�
 var fought_since_rest := false        # พักซ้ำโดยไม่สู้เลยไม่นับ (กันเดินวนจุดพักฟื้น LP)
 var items: Dictionary = {}            # item_id -> จำนวน
 var shop_stock: Dictionary = {}       # item_id -> ที่เหลือในร้าน (ภูมิภาคนี้)
+var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: สู้อัตโนมัติเปิดตั้งแต่เริ่ม สลับได้
+var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
+var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
 
 func init_new(techs: TechDb, start: Vector2i) -> void:
 	learned.clear()
@@ -259,6 +262,7 @@ func to_dict() -> Dictionary:
 		"party": party.duplicate(true), "party_seeded": party_seeded, "lost": lost.duplicate(),
 		"met_species": met_species.duplicate(), "rest_count": rest_count,
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
+		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true),
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -303,6 +307,18 @@ func from_dict(d: Dictionary) -> void:
 	var it: Dictionary = d.get("items", {})
 	for k in it.keys():
 		items[str(k)] = int(it[k])
+	auto_battle = bool(d.get("auto_battle", true))
+	materials.clear()
+	var mt: Dictionary = d.get("materials", {})
+	for k in mt:
+		materials[str(k)] = int(mt[k])
+	ground_drops.clear()
+	var gd: Dictionary = d.get("ground_drops", {})
+	for k in gd:
+		var arr: Array = []
+		for n in gd[k]:
+			arr.append(str(n))
+		ground_drops[str(k)] = arr
 	shop_stock.clear()
 	var st: Dictionary = d.get("shop_stock", {})
 	for k in st.keys():

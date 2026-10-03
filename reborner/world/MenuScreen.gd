@@ -63,6 +63,14 @@ func _render() -> void:
 	tech_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tech_text.custom_minimum_size = Vector2(186, 0)
 	left.add_child(tech_text)
+	if not ps.materials.is_empty():
+		var mats: Array = []
+		for k in ps.materials.keys():
+			mats.append("%s x%d" % [k, ps.materials[k]])
+		var mt := UiKit.label("วัสดุ: " + " · ".join(mats), 6, UiKit.C_MUTED)
+		mt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		mt.custom_minimum_size = Vector2(186, 0)
+		left.add_child(mt)
 
 	# ── ขวา: มอนร่วมทีม ──
 	var right := VBoxContainer.new()
