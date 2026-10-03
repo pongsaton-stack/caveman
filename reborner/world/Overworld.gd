@@ -7,7 +7,9 @@
 extends Node2D
 
 const TILE := 24
-const MOVE_TIME := 0.12
+const MOVE_TIME := 0.15
+# ท่าเดิน: ก้าว 1 ครั้ง (2 เฟรม) ต่อ 1 ช่อง → รอบละ 2 ช่อง · เล่นต่อเนื่องข้ามช่อง หยุดเมื่อปล่อยปุ่ม
+const WALK_FPS := 2.0 / MOVE_TIME
 const ENEMY_STEP := 0.9
 const CHASE_RANGE := 4
 const MAP_PATH := "res://data/map_ashfield.txt"
@@ -15,14 +17,13 @@ const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
 
 # ชื่อไฟล์เฟรมตัวเอกต่อทิศ — ถ้าทิศไหนดูผิด แก้ชื่อไฟล์ตรงนี้ได้เลย
 # Rion ตามต้นแบบ Last Light (ตัดจาก docs/art-bible/lastlight_01.png · หมวกน้ำเงิน) 64x64 · ร่าง รอ kwan อนุมัติ
-# เดิน 4 เฟรม/ทิศ (w0 = ยืน · w1 ก้าว · w2 ผ่าน · w3 ก้าวอีกข้าง) สร้างจาก tools/sprites/rion_anim.py · ร่าง รอ kwan อนุมัติ
+# เดิน 4 เฟรม/ทิศ (w0 = ยืน · w1 ก้าว · w2 ผ่าน · w3 ก้าวอีกข้าง) สร้างจาก tools/sprites/rion_anim.py · หมาใช้ชุดเดียวกัน
 const HERO_ANIMS := {
 	"down":  ["south_w0", "south_w1", "south_w2", "south_w3"],
 	"up":    ["north_w0", "north_w1", "north_w2", "north_w3"],
 	"left":  ["west_w0", "west_w1", "west_w2", "west_w3"],
 	"right": ["east_w0", "east_w1", "east_w2", "east_w3"],
 }
-const HERO_WALK_FPS := 8.0
 
 # พาเลตต์องก์ 1 โทนจิบลิ (GDD 13) — องก์ถัดไปเปลี่ยนด้วย color grading ไม่ใช่วาดใหม่
 const TILE_COLORS := {
@@ -54,6 +55,7 @@ var hero_sprite: AnimatedSprite2D
 const DOG_DIR := "res://assets/sprites/dog_lastlight_draft"
 var dog_node: Node2D
 var dog_sprite: AnimatedSprite2D
+var _moving := false   # กำลังเลื่อนช่อง (busy จากการเดิน ไม่ใช่จากเมนู)
 var dog_cell := Vector2i.ZERO
 var hud: Label
 var hud2: Label
@@ -126,7 +128,7 @@ func _build_hero() -> void:
 	var found := 0
 	for anim in HERO_ANIMS.keys():
 		frames.add_animation(anim)
-		frames.set_animation_speed(anim, HERO_WALK_FPS)
+		frames.set_animation_speed(anim, WALK_FPS)
 		frames.set_animation_loop(anim, true)
 		for fname in HERO_ANIMS[anim]:
 			var p := "%s/%s.png" % [SPRITE_DIR, fname]
@@ -234,9 +236,9 @@ func _build_dog() -> void:
 	for anim in ["down", "up", "left", "right"]:
 		var base: String = {"down": "south", "up": "north", "left": "west", "right": "east"}[anim]
 		frames.add_animation(anim)
-		frames.set_animation_speed(anim, 6.0)
+		frames.set_animation_speed(anim, WALK_FPS)
 		frames.set_animation_loop(anim, true)
-		for fname in [base, base + "_step"]:
+		for fname in ["%s_w0" % base, "%s_w1" % base, "%s_w2" % base, "%s_w3" % base]:
 			var p := "%s/%s.png" % [DOG_DIR, fname]
 			if ResourceLoader.exists(p):
 				frames.add_frame(anim, load(p))
@@ -279,14 +281,35 @@ func _dog_follow(to: Vector2i) -> void:
 	elif d.x > 0:
 		a = "right"
 	dog_cell = to
-	dog_sprite.play(a)
+	_walk(dog_sprite, a, true)
 	var tw := create_tween()
 	tw.tween_property(dog_node, "position", _cell_center(to), MOVE_TIME)
-	tw.finished.connect(func():
-		dog_sprite.stop()
-		dog_sprite.frame = 0)
 
-func _play_anim(dir: Vector2i) -> void:
+## เล่นท่าเดินต่อจากเฟรมเดิม (ไม่รีเซ็ตทุกช่อง) · เริ่มจากยืน → เข้าเฟรมก้าวทันที · moving=false = หันหน้าเฉยๆ
+func _walk(spr: AnimatedSprite2D, a: String, moving: bool) -> void:
+	if spr == null or spr.sprite_frames.get_frame_count(a) == 0:
+		return
+	if not moving:
+		spr.stop()
+		spr.animation = a
+		spr.frame = 0
+		return
+	if spr.is_playing():
+		if spr.animation != a:
+			var f := spr.frame
+			spr.play(a)
+			spr.frame = f
+		return
+	spr.play(a)
+	spr.frame = 1
+
+func _stop_walk() -> void:
+	for spr in [hero_sprite, dog_sprite]:
+		if spr != null and spr.is_playing():
+			spr.stop()
+			spr.frame = 0
+
+func _play_anim(dir: Vector2i, moving := true) -> void:
 	if hero_sprite == null:
 		return
 	var a := "down"
@@ -296,8 +319,7 @@ func _play_anim(dir: Vector2i) -> void:
 		a = "left"
 	elif dir == Vector2i.RIGHT:
 		a = "right"
-	if hero_sprite.sprite_frames.get_frame_count(a) > 0:
-		hero_sprite.play(a)
+	_walk(hero_sprite, a, moving)
 
 # ── ศัตรูบนแมพ ─────────────────────────────────────────────────
 func _spawn_enemies() -> void:
@@ -416,6 +438,8 @@ func _refresh_enemy_colors() -> void:
 # ── อินพุต ────────────────────────────────────────────────────
 func _process(delta: float) -> void:
 	if busy or map == null:
+		if not _moving:
+			_stop_walk()   # เมนู/หีบ/ศึก/ร้าน = ยืนนิ่ง
 		return
 	enemy_clock += delta
 	if enemy_clock >= ENEMY_STEP:
@@ -434,6 +458,8 @@ func _process(delta: float) -> void:
 		dir = Vector2i.RIGHT
 	if dir != Vector2i.ZERO:
 		_try_move(dir)
+	else:
+		_stop_walk()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F9:
@@ -477,17 +503,21 @@ func _label_shops() -> void:
 				add_child(l)
 
 func _try_move(dir: Vector2i) -> void:
-	_play_anim(dir)
 	var nxt := ps.cell + dir
 	if not map.walkable(nxt):
+		_play_anim(dir, false)   # ชนกำแพง = หันหน้า ไม่ย่ำอยู่กับที่
+		_stop_walk()
 		return
 	var e := _enemy_at(nxt)
+	_play_anim(dir, e == null)
 	if e != null:
+		_stop_walk()
 		# เดินชนจากด้านหลัง (ทิศเดียวกับที่มันหัน) = ลอบตีสำเร็จ
 		var amb := "ally" if dir == e.facing else ""
 		_encounter(e, amb)
 		return
 	busy = true
+	_moving = true
 	var prev := ps.cell
 	ps.cell = nxt
 	_dog_follow(prev)
@@ -497,9 +527,7 @@ func _try_move(dir: Vector2i) -> void:
 
 func _on_move_done() -> void:
 	busy = false
-	if hero_sprite != null:
-		hero_sprite.stop()
-		hero_sprite.frame = 0
+	_moving = false
 	if _pick_up_drops():
 		return
 	var key := PlayerState.key_of(ps.cell)
@@ -525,6 +553,7 @@ func _monster_slots() -> int:
 
 func _encounter(e: WorldEnemy, ambush: String) -> void:
 	busy = true
+	_stop_walk()
 	var rows: Array = []
 	for mid in e.group:
 		rows.append(by_id[mid])

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dq4h84jwwkafy"
-path="res://.godot/imported/west_step.png-28e4eb8c3faf20b0aeec00c1de5a5a8a.ctex"
+uid="uid://dqssvtg8xirb1"
+path="res://.godot/imported/west_w3.png-09a2c3b834971a542ee867c916e0ab5f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/dog_lastlight_draft/west_step.png"
-dest_files=["res://.godot/imported/west_step.png-28e4eb8c3faf20b0aeec00c1de5a5a8a.ctex"]
+source_file="res://assets/sprites/dog_lastlight_draft/west_w3.png"
+dest_files=["res://.godot/imported/west_w3.png-09a2c3b834971a542ee867c916e0ab5f.ctex"]
 
 [params]
 

@@ -1,56 +1,63 @@
 from PIL import Image
 SRC='/home/user/caveman/reborner/assets/sprites/rion_lastlight_draft/'
 HIP=54           # แถวที่ขาเริ่ม (ใต้กางเกงขาสั้น)
-def load(n): return Image.open(SRC+n+'.png').convert('RGBA')
-def blank(): return Image.new('RGBA',(64,64),(0,0,0,0))
+DOG='/home/user/caveman/reborner/assets/sprites/dog_lastlight_draft/'
+SIZE=[64]        # ขนาดเฟรมปัจจุบัน (Rion 64 · หมา 34) — load() ตั้งให้
+def load(n, src=None):
+    im=Image.open((src or SRC)+n+'.png').convert('RGBA'); SIZE[0]=im.size[0]; return im
+def blank(): return Image.new('RGBA',(SIZE[0],SIZE[0]),(0,0,0,0))
 def region(im, fn):
     """copy only pixels where fn(x,y) true"""
-    out=blank(); s=im.load(); d=out.load()
-    for y in range(64):
-        for x in range(64):
+    out=blank(); s=im.load(); d=out.load(); N=SIZE[0]
+    for y in range(N):
+        for x in range(N):
             if s[x,y][3] and fn(x,y): d[x,y]=s[x,y]
     return out
 def paste(dst, src, dx=0, dy=0):
-    s=src.load(); d=dst.load()
-    for y in range(64):
-        for x in range(64):
+    s=src.load(); d=dst.load(); N=SIZE[0]
+    for y in range(N):
+        for x in range(N):
             if s[x,y][3]:
                 X,Y=x+dx,y+dy
-                if 0<=X<64 and 0<=Y<64: d[X,Y]=s[x,y]
+                if 0<=X<N and 0<=Y<N: d[X,Y]=s[x,y]
     return dst
 def shear(src, k, y0=HIP, y1=63):
     """เลื่อนแต่ละแถวตามระยะจากสะโพก: dx = round(k*(y-y0)/(y1-y0))"""
-    out=blank(); s=src.load(); d=out.load()
-    for y in range(64):
+    out=blank(); s=src.load(); d=out.load(); N=SIZE[0]
+    for y in range(N):
         dx=0 if y<y0 else round(k*(y-y0)/(y1-y0))
-        for x in range(64):
-            if s[x,y][3] and 0<=x+dx<64: d[x+dx,y]=s[x,y]
+        for x in range(N):
+            if s[x,y][3] and 0<=x+dx<N: d[x+dx,y]=s[x,y]
     return out
 
-def walk_frontback(n, split=32):
+def bob(dst, body, hip):
+    """ตัวลอย 1px โดยไม่เหลือช่องว่างเหนือขา: วางแถวล่างสุดของตัวซ้ำที่ตำแหน่งเดิม"""
+    paste(dst, region(body, lambda x,y: y==hip-1))
+    paste(dst, body, 0, -1)
+    return dst
+
+def walk_frontback(n, split=32, lift=3):
     im=load(n)
     upper=region(im, lambda x,y: y<HIP)
     legL=region(im, lambda x,y: y>=HIP and x<split)
     legR=region(im, lambda x,y: y>=HIP and x>=split)
     f=[]
     f.append(im.copy())                                                     # contact
-    a=blank(); paste(a,legR); paste(a,legL,0,-2); paste(a,upper,0,-1); f.append(a)   # ซ้ายยก + ตัวลอย
+    a=blank(); paste(a,legR); paste(a,legL,0,-lift); bob(a,upper,HIP); f.append(a)   # ซ้ายยก + ตัวลอย
     f.append(im.copy())
-    b=blank(); paste(b,legL); paste(b,legR,0,-2); paste(b,upper,0,-1); f.append(b)   # ขวายก
+    b=blank(); paste(b,legL); paste(b,legR,0,-lift); bob(b,upper,HIP); f.append(b)   # ขวายก
     return f
 
-def walk_side(n, facing_left=True, split=30, k=3):
+def walk_side(n, facing_left=True, split=30, k=4):
     im=load(n)
     upper=region(im, lambda x,y: y<HIP)
     front=region(im, lambda x,y: y>=HIP and (x<split if facing_left else x>=split))
     back =region(im, lambda x,y: y>=HIP and (x>=split if facing_left else x<split))
     fw=-k if facing_left else k
-    f=[]
-    a=blank(); paste(a,shear(back,-fw)); paste(a,shear(front,fw)); paste(a,upper); f.append(a)          # ก้าว: หน้าออกหน้า หลังไปหลัง
-    p=blank(); paste(p,back); paste(p,front); paste(p,upper,0,-1); f.append(p)                          # ผ่าน + ลอย
-    c=blank(); paste(c,shear(front,-fw)); paste(c,shear(back,fw)); paste(c,upper); f.append(c)          # ก้าวสลับ
-    q=blank(); paste(q,front); paste(q,back); paste(q,upper,0,-1); f.append(q)
-    return f
+    a=blank(); paste(a,shear(back,-fw)); paste(a,shear(front,fw)); paste(a,upper)          # ก้าว: หน้าออกหน้า หลังไปหลัง
+    p=blank(); paste(p,back); paste(p,front); bob(p,upper,HIP)                             # ผ่าน + ลอย
+    c=blank(); paste(c,shear(front,-fw)); paste(c,shear(back,fw)); paste(c,upper)          # ก้าวสลับ
+    return [im.copy(), a, p, c]                                                            # w0 = ยืน (ค้างตอนหยุด)
 
 import math
 KNIFE_BLADE=[(167,181,160),(210,189,154)]   # #A7B5A0 #D2BD9A (CLOTH พาเลตต์)
@@ -147,6 +154,33 @@ def ko_west():
     paste(b, lying, 0, 62-bb[3]+1)               # วางลงพื้น (y≈62 เท่าเท้าท่ายืน)
     return [a, b]
 
+# ── หมา 34x34: ขาเริ่มแถว DOG_HIP ─────────────────────────────
+DOG_HIP=28
+def dog_walk_side(n, facing_left=True, split=17, k=2):
+    """วิ่งเหยาะ: คู่ขาหน้า/หลังแยกตาม x · ยืน → ก้าวกาง → ผ่าน(ตัวลอย) → ก้าวหุบ"""
+    im=load(n, DOG)
+    body=region(im, lambda x,y: y<DOG_HIP)
+    front=region(im, lambda x,y: y>=DOG_HIP and (x<split if facing_left else x>=split))
+    back =region(im, lambda x,y: y>=DOG_HIP and (x>=split if facing_left else x<split))
+    fw=-k if facing_left else k
+    sh=lambda src,kk: shear(src,kk,DOG_HIP,32)
+    a=blank(); paste(a,sh(back,-fw)); paste(a,sh(front,fw)); paste(a,body)       # กาง: หน้าเหยียดไปหน้า หลังถีบไปหลัง
+    p=blank(); paste(p,back,0,-1); paste(p,front); bob(p,body,DOG_HIP)             # ผ่าน: ตัวลอย ขาหลังยก
+    c=blank(); paste(c,sh(front,-fw)); paste(c,sh(back,fw)); paste(c,body)       # หุบ: ขาเข้าใต้ตัว
+    return [im.copy(), a, p, c]                                                  # w0 = ยืน
+
+def dog_walk_frontback(n, split, hip=24):
+    """หน้า/หลัง: ยกขาซ้าย/ขวาสลับ 2px + ตัวลอย 1px"""
+    im=load(n, DOG)
+    body=region(im, lambda x,y: y<hip)
+    L=region(im, lambda x,y: y>=hip and x<split)
+    R=region(im, lambda x,y: y>=hip and x>=split)
+    f=[im.copy()]
+    a=blank(); paste(a,R); paste(a,L,0,-2); bob(a,body,hip); f.append(a)
+    f.append(im.copy())
+    b=blank(); paste(b,L); paste(b,R,0,-2); bob(b,body,hip); f.append(b)
+    return f
+
 if __name__ == '__main__':
     import sys
     out = sys.argv[1] if len(sys.argv) > 1 else SRC
@@ -159,3 +193,10 @@ if __name__ == '__main__':
     for i, im in enumerate(ko_west()): sets['west_k%d' % i] = im
     for k, im in sets.items(): im.save(out + k + '.png')
     print(len(sets), 'frames ->', out)
+    dout = sys.argv[2] if len(sys.argv) > 2 else DOG
+    dsets = {}
+    for n, fr in (('south', dog_walk_frontback('south', 16)), ('north', dog_walk_frontback('north', 18)),
+                  ('west', dog_walk_side('west', True)), ('east', dog_walk_side('east', False))):
+        for i, im in enumerate(fr): dsets['%s_w%d' % (n, i)] = im
+    for k, im in dsets.items(): im.save(dout + k + '.png')
+    print(len(dsets), 'dog frames ->', dout)

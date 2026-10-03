@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1moldhf20ujg"
-path="res://.godot/imported/south_step.png-c74b35feeb7d7f9ad853efc09a00b9ec.ctex"
+uid="uid://cls02n3xw4vdq"
+path="res://.godot/imported/south_w3.png-2d70fcbd6b26055b83b15f3b1c3ca973.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/dog_lastlight_draft/south_step.png"
-dest_files=["res://.godot/imported/south_step.png-c74b35feeb7d7f9ad853efc09a00b9ec.ctex"]
+source_file="res://assets/sprites/dog_lastlight_draft/south_w3.png"
+dest_files=["res://.godot/imported/south_w3.png-2d70fcbd6b26055b83b15f3b1c3ca973.ctex"]
 
 [params]
 
