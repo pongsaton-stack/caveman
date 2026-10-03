@@ -9,25 +9,32 @@
 - มอน: `assets/sprites/monsters_ll/{M01,M03,M06,M15,B1}.png`
 - ฉาก/สไตล์: `docs/art-bible/lastlight_01.png` · ภาพจอสู้ `docs/art-bible/previews/battle_boss.png`
 
-## กฎกลาง (วางหัวทุก prompt)
+## กฎกลาง (วางหัวทุก prompt) — ฉบับแก้ 3 ต.ค. หลังรอบ 2
+รอบ 2 ได้รูปทรงเรขาคณิตล้วน (placeholder) เพราะ (1) กฎเดิมบังคับ "พิกเซล 1:1 ขนาดเป๊ะ" ตัวเจนภาพทำไม่ได้ เลยหันไปเขียนโค้ดวาดกล่อง (2) ไม่ได้แนบรูปอ้างอิง
+ฉบับนี้: **ให้วาดภาพใหญ่สวยเต็มที่** แล้วฝั่งเรา (Claude) ตัด/ย่อ/ลดสีเอง — แบบเดียวกับที่ทำจากชีต Last Light ได้ผลแล้ว
+ขนาดในแต่ละ prompt ด้านล่าง = ขนาดปลายทางในเกม (ใช้บอกสัดส่วน) ไม่ต้องส่งมาขนาดนั้น
+
 ```
-STRICT OUTPUT RULES — follow exactly:
-1. True native pixel art. 1 art pixel = 1 image pixel. No anti-aliasing, no blur, no painterly or noisy texture, no upscaling.
-2. Background: flat solid magenta #FF00FF. NO parchment, NO paper texture, NO decorative frame, NO labels, NO text, NO title, NO watermark.
-3. Fixed grid: every asset sits alone inside its own cell of the stated size. Nothing may cross a cell border. No gap lines between cells.
-4. Outline: 1px dark, hue-shifted toward the object's own shadow color. NEVER a white or light halo/rim/glow around the sprite.
-5. Light comes from the top-left. Shading in 2–3 flat steps per material.
-6. Style: modern 16-bit JRPG, cute, warm, Studio-Ghibli mood, post-apocalyptic world being reclaimed by nature.
-7. Palette — use only these hex colors (plus #FF00FF background):
-   653A21 9A6038 B37A55 D6966A D4B08A 2F1B10 4D2A17 714022 92552D 342013 523624 6F4B33 825335 A2927B
-   412C1E 6C5947 8A7460 A7B5A0 D2BD9A 050708 13545C 146E77 306E76 3C5253 000000 150F0D 21160F 383A37 3E2214
-   Blue 395472 4C6880 507895 7A8993 = Rion only. Orange B25F3C DA7B42 E39253 E1B684 = dog only. Teal = allies/UI only.
-8. Export one PNG per sheet, exactly the pixel size stated. Do not resize after drawing.
+OUTPUT RULES — follow exactly:
+1. Draw real illustrated pixel-art sprites (modern 16-bit JRPG look). Do NOT draw placeholder shapes, boxes or code-generated geometry.
+   Large canvas is fine and preferred (e.g. 1024–2048 px). Chunky visible pixels, crisp edges, no blur.
+2. Background: flat solid magenta #FF00FF everywhere outside the sprites. NO parchment, NO paper texture, NO decorative frame,
+   NO labels, NO text, NO title, NO watermark, NO ground shadow blobs that touch other sprites.
+3. Layout: a clear grid in the order listed. Leave a wide empty gap (at least 1/4 cell) between every sprite. Nothing touches or overlaps.
+   All sprites in one sheet share ONE scale (same pixel size), and the same baseline per row.
+4. Outline: dark, hue-shifted toward each object's shadow color. NEVER a white or light halo/rim/glow around a sprite.
+5. Light from the top-left. 2–3 flat shading steps per material.
+6. Mood: cute, warm, Studio-Ghibli, post-apocalyptic world being reclaimed by nature. Earthy muted colors
+   (reference palette: 653A21 9A6038 B37A55 D4B08A 4D2A17 714022 523624 6F4B33 A2927B 6C5947 8A7460 A7B5A0 D2BD9A 146E77 383A37 21160F).
+7. If reference images are attached, copy those designs EXACTLY (shape, colors, outfit). Never redesign an attached character.
+8. One PNG per sheet. Keep each file under 10 MB.
 ```
+
+**ต้องแนบรูปอ้างอิงในแชตเดียวกับ prompt ทุกครั้ง** (prompt 4, 5, 7 ห้ามส่งถ้าไม่มีรูปแนบ)
 
 ## 1) ไทล์แผนที่ 24x24 (สำคัญสุด — แมพตอนนี้ยังเป็นช่องสีเรียบ)
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 Top-down 3/4 RPG overworld tileset. Cell size 24x24 px. Sheet 8 columns x 6 rows = 192x144 px.
 Row 1: grass A, grass B, grass C (small variations), tall grass, flowers, dirt A, dirt B, ash ground (grey-brown, cracked).
 Row 2: road straight horizontal, straight vertical, cross, T-north, T-south, T-east, T-west, road end.
@@ -40,7 +47,7 @@ Every tile must tile seamlessly with its neighbours of the same type.
 
 ## 2) ของบนแผนที่ (ต้นไม้ หิน หีบ จุดพัก ของดรอป)
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 Top-down 3/4 overworld objects, same style as the attached reference sheet. Sheet 8 columns x 2 rows of 24x48 px cells = 192x96 px.
 Each object stands at the BOTTOM-CENTER of its cell (its base touches the cell's bottom edge).
 Row 1: pine tree, round bush with berries, mossy boulder, wooden fence horizontal, wooden fence vertical, street lamp (lit), wooden crate, barrel.
@@ -49,7 +56,7 @@ Row 2: treasure chest closed, treasure chest open, campfire rest point frame 1, 
 
 ## 3) อาคาร
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 Top-down 3/4 buildings for the overworld, base on a 24px tile grid. Sheet 4 columns x 2 rows of 72x72 px cells = 288x144 px.
 Each building's footprint is 3x2 tiles (72x48) at the bottom of its cell; roof may use the upper space.
 Row 1: patchwork-awning shop stall (counter with jars and herbs), small house with lit window, repair workshop with wrench sign, clinic with red cross.
@@ -58,7 +65,7 @@ Row 2: canvas tent, wooden water tower, rusty generator with sparks, collapsed r
 
 ## 4) ท่าต่อสู้ของมอน 5 ตัวที่อยู่ในเกม (แนบรูปอ้างอิงทุกตัว — ห้ามออกแบบใหม่)
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 Battle animation frames for the 5 attached monster sprites. Keep each design EXACTLY as the reference (same shapes, colors, size). Side view, facing RIGHT (toward the party).
 Sheet: 7 columns per row. Columns = idle 1, idle 2, attack wind-up, attack strike, attack recover, hit (recoil + flinch), down (defeated, lying flat).
 Row 1 — M01 Ash Slime, 48x48 cells: idle = slow wobble squash-stretch; attack = squash low, then body-slam forward with a stretch, then wobble back; down = melted puddle.
@@ -71,7 +78,7 @@ Rows 1–4 sheet width 336 px. Deliver rows 1–4 as one 336x192 PNG and row 5 a
 
 ## 5) หมาคู่หูเข้าศึก (แนบรูปหมา — สีส้ม ไม่มีผ้าพันคอ)
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 Battle frames for the attached companion dog. Keep the exact design: small orange shiba-like dog, cream muzzle and belly, NO scarf, NO collar.
 Side view facing LEFT. Cell 48x48 px, dog about 34 px tall, standing at the bottom-center of each cell.
 One row, 8 cells = 384x48 px: idle 1, idle 2 (tail wag), run, attack wind-up (crouch), attack bite lunge, attack recover, hit (yelp recoil), down (lying, eyes closed).
@@ -79,7 +86,7 @@ One row, 8 cells = 384x48 px: idle 1, idle 2 (tail wag), run, attack wind-up (cr
 
 ## 6) UI kit + ไอคอนของ
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 JRPG UI kit, warm wood-and-brass frame style matching the attached references, but drawn as clean native pixel art.
 Sheet 192x96 px on #FF00FF:
 - Window frame for 9-slice: 24x24 px, corners exactly 8x8, edges repeat cleanly, dark fill using palette 150F0D or 21160F.
@@ -91,7 +98,7 @@ Sheet 192x96 px on #FF00FF:
 
 ## 7) ภาพหน้าตัวละครในกล่องบทพูด
 ```
-[STRICT OUTPUT RULES]
+[OUTPUT RULES]
 Dialogue portraits, bust shot facing slightly right, 64x64 px cells, one row = 448x64 px.
 Rion (attached reference: blue cap with goggles, brown hair, beige shirt, blue denim, leather backpack; NOT a brown cap):
 neutral, happy, surprised, determined, sad.
