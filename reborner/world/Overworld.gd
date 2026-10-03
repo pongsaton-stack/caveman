@@ -588,20 +588,20 @@ func _open_menu() -> void:
 ## ห้องทดลองท่า (kwan อยากเล่นไม้ตายเอง 3 ต.ค.): ตัวเอกชั่วคราวรู้ทุกท่าในสาย · ความชำนาญ = req_prof สูงสุดของสาย (จาก techs.csv)
 ## ศัตรู = มอนที่มีอยู่จริงใน PRACTICE_FOES · ไม่เรียก absorb / ไม่ให้เงิน / ไม่แตะเซฟ — จบแล้วทุกอย่างเหมือนก่อนเข้า
 const PRACTICE_FOES := ["M01", "M01", "M15"]
-func _start_practice() -> void:
+func _start_practice(school: String) -> void:
 	busy = true
 	var tmp := PlayerState.new()
-	tmp.school = ps.school
-	tmp.steer = ps.steer
+	tmp.school = school
+	tmp.steer = ps.steer if school == ps.school else ""
 	tmp.weapon_base = ps.weapon_base
 	tmp.prof = ps.prof
 	for t in techs.all:
-		if t.school == ps.school:
+		if t.school == school:
 			tmp.prof = maxi(tmp.prof, t.req_prof)
 	tmp.init_new(techs, ps.cell)
 	tmp.learned.clear()
 	for t in techs.all:
-		if t.school == ps.school:
+		if t.school == school:
 			tmp.learned.append(t.name)
 	var b := Battle.new()
 	b.techs = techs
@@ -612,7 +612,7 @@ func _start_practice() -> void:
 		if by_id.has(id):
 			b.actors.append(Actor.from_csv(by_id[id]))
 	var screen := BattleScreen.new()
-	screen.setup(b, "ทดลองท่า (ไม่บันทึกผล)", false)
+	screen.setup(b, "ทดลองท่า สาย%s (ไม่บันทึกผล)" % school, false)
 	add_child(screen)
 	await screen.finished
 	busy = false

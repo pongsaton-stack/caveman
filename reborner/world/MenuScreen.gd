@@ -4,7 +4,7 @@ class_name MenuScreen
 extends CanvasLayer
 
 signal closed
-signal practice     # ห้องทดลองท่า — Overworld เปิดศึกทดลอง (ไม่บันทึกผล)
+signal practice(school: String)     # ห้องทดลองท่า — Overworld เปิดศึกทดลองสายที่เลือก (ไม่บันทึกผล)
 
 var ps: PlayerState
 var techs: TechDb
@@ -127,14 +127,33 @@ func _show_actions() -> void:
 		arrange.pressed.connect(_pick_front)
 		arrange.focus_entered.connect(func(): _info.text = "เลือกมอนขึ้นหัวทีม — ตัวหัวทีมได้ลงสนามก่อน ที่เกินช่องไปสำรอง")
 	var lab := _add(UiKit.button("ทดลองท่า", 123))
-	lab.pressed.connect(func():
-		practice.emit()
-		queue_free())
+	lab.pressed.connect(_pick_practice_school)
 	lab.focus_entered.connect(func(): _info.text = "ศึกทดลอง: Rion ใช้ได้ทุกท่าในสาย รวมไม้ตาย · ผลไม่บันทึก")
 	var close := _add(UiKit.button("ปิด", 123))
 	close.pressed.connect(_close)
 	if first == null:
 		first = close
+	first.grab_focus()
+
+## ห้องทดลอง: เลือกสายจาก techs.csv (ทุกสายที่มีในข้อมูล) · Esc = กลับเมนูหลัก
+func _pick_practice_school() -> void:
+	_clear_menu()
+	_picking_lp = true   # ให้ Esc กลับหน้าเมนูหลัก (กลไกเดียวกับตอนเลือกมอนใช้ไอเท็ม)
+	_info.text = "เลือกสายอาวุธที่จะทดลอง — ใช้ได้ทุกท่าในสาย รวมไม้ตาย · ผลไม่บันทึก"
+	var first: Button = null
+	for sc in techs.schools():
+		var n := 0
+		for t in techs.all:
+			if t.school == sc:
+				n += 1
+		var btn := _add(UiKit.button("%s (%d ท่า)" % [sc, n], 123))
+		btn.pressed.connect(func():
+			practice.emit(sc)
+			queue_free())
+		if first == null or sc == ps.school:
+			first = btn
+	var back := _add(UiKit.button("กลับ", 123))
+	back.pressed.connect(_show_actions)
 	first.grab_focus()
 
 func _pick_front() -> void:
