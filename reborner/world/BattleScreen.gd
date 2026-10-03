@@ -25,6 +25,10 @@ const C_HP_LOW := Color("b5553f")
 const C_SP := Color("3d6a7a")
 const C_FOE := Color("9a4a3a")
 const C_ALLY := Color("4f6a44")
+# เวที (ตัดสิน 3 ต.ค. 2026): พื้นมืดทำให้มอนโทนดินจมหาย → ฟ้า/พื้นสว่างจากพาเลตต์ master (CLOTH A7B5A0 · SKIN D4B08A)
+const C_STAGE_SKY := Color("a7b5a0")
+const C_STAGE_GROUND := Color("d4b08a")
+const C_STAGE_LINE := Color("a2927b")
 
 const SCOPE_TH := {"single": "เดี่ยว", "row": "ทั้งแถว", "column": "คอลัมน์", "all": "ทั้งหมด", "self": "ตัวเอง"}
 
@@ -364,6 +368,19 @@ func _build() -> void:
 	bg.color = C_BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(bg)
+	for r in [[Rect2(0, 24, 384, 58), C_STAGE_SKY], [Rect2(0, 82, 384, 21), C_STAGE_GROUND], [Rect2(0, 82, 384, 1), C_STAGE_LINE]]:
+		var st := ColorRect.new()
+		st.position = r[0].position
+		st.size = r[0].size
+		st.color = r[1]
+		root.add_child(st)
+	# แผงเข้มรองตัวหนังสือบนเวทีสว่าง (ตัวหนังสือสีครีมอ่านไม่ออกบนพื้นสว่าง)
+	for r in [Rect2(2, 26, 168, 76), Rect2(234, 26, 148, 76)]:
+		var pn := Panel.new()
+		pn.add_theme_stylebox_override("panel", UiKit.box(Color(C_PANEL, 0.88), C_LINE))
+		pn.position = r.position
+		pn.size = r.size
+		root.add_child(pn)
 
 	var head := _label(title, 7, C_GOLD)
 	head.position = Vector2(4, 1)

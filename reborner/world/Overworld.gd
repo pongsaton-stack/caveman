@@ -8,6 +8,7 @@ extends Node2D
 
 const TILE := 24
 const MOVE_TIME := 0.15
+const CAM_TOP_PAD := 40
 # ท่าเดิน: ก้าว 1 ครั้ง (2 เฟรม) ต่อ 1 ช่อง → รอบละ 2 ช่อง · เล่นต่อเนื่องข้ามช่อง หยุดเมื่อปล่อยปุ่ม
 const WALK_FPS := 2.0 / MOVE_TIME
 const ENEMY_STEP := 0.9
@@ -151,7 +152,9 @@ func _build_hero() -> void:
 	hero_node.position = _cell_center(ps.cell)
 	var cam := Camera2D.new()
 	cam.limit_left = 0
-	cam.limit_top = 0
+	# ตัวเอกสูง 64px ยื่นเหนือช่องราว 38px → ยืนแถวบนแล้วหัวหลุดจอ · ให้กล้องเลื่อนเหนือแมพได้ แล้วระบายส่วนนั้นเป็นสีกำแพง
+	cam.limit_top = -CAM_TOP_PAD
+	RenderingServer.set_default_clear_color(TILE_COLORS["#"])
 	cam.limit_right = map.w * TILE
 	cam.limit_bottom = map.h * TILE
 	cam.position_smoothing_enabled = true
