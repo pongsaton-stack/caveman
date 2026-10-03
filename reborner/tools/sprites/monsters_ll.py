@@ -3,7 +3,7 @@
 #   → ตัดจากชีต lastlight_01.png โดยตรง (แบบเดียวกับ Rion/หมา) แล้วเก็บงาน/ลงสี — ไม่วาดจากรูปทรงเรขาคณิตอีก
 #   M01 สไลม์เถ้า : ตัดสไลม์ในชีต (48x38 พอดีช่อง S) · 2 แบบ: green = สีต้นแบบ · ash = ลงสีเถ้า คงตา/ปาก/ประกาย
 #   M15 หมาป่าคู่ : ชีตไม่มีหมาป่า → ใช้หมาคู่หู (dog_lastlight_draft) ลงสีเทาน้ำตาล วางสองตัว ตัวหลังหูพับ
-#   M03/M06 (ร่าง → monsters_ll_draft/): หนอน = สไลม์ย่อลงสีอุ่น + หินมอสจากชีต · ค้างคาว = หัวหมามุมหน้า + ปีกวาดใหม่
+#   M03/M06 (อนุมัติแล้ว) · COMP-M03/COMP-M06 (ร่าง → monsters_ll_draft/): หนอน = สไลม์ย่อลงสีอุ่น + หินมอสจากชีต · ค้างคาว = หัวหมามุมหน้า + ปีกวาดใหม่
 # ศัตรูอยู่ซ้ายของจอสู้ → หันขวา · ไม่ใช้เครดิต PixelLab
 # รัน: <python+Pillow> tools/sprites/monsters_ll.py [out_dir]
 import colorsys, os, sys
@@ -138,7 +138,7 @@ def _line(px, a, b, col):
 	for i in range(n + 1):
 		px[round(x0 + (x1 - x0) * i / n), round(y0 + (y1 - y0) * i / n)] = col
 
-def bat(flap=0):
+def bat(flap=0, friend=False):
 	"""ค้างคาวตัวกลม ปีกกางสมมาตร · flap = idle เฟรม 2 (ปีกยกขึ้น 3px ตัวลอยขึ้น 1px)"""
 	head = Image.open(DOG + 'south.png').convert('RGBA').crop((5, 2, 31, 23))
 	hp = head.load()
@@ -184,6 +184,14 @@ def bat(flap=0):
 		for f in (scallop[0], scallop[2], scallop[4]):                            # ก้านนิ้ว
 			_line(cp, top, f, WING[0] + (255,))
 		_line(cp, top, tip, WING[0] + (255,))
+	if friend:   # COMP-M06: ปลอกคอหนังใต้คาง + จี้ทีล
+		for y, c in ((17, '9A6038'), (18, '6F4B33')):
+			for x in range(5, 22):
+				if hp[x, y][3]:
+					hp[x, y] = h2c(c) + (255,)
+		for x, y, c in ((12, 19, 0), (13, 19, 0), (14, 19, 1), (12, 20, 1), (13, 20, 0), (14, 20, 1), (13, 18, 0)):
+			hp[x, y] = TEAL[c] + (255,)
+		hp[12, 19] = h2c('3C8A92') + (255,)
 	cv.alpha_composite(head, (11, 9 + dy))
 	for fx in (21, 26):                                                         # เท้าเล็กห้อย
 		cp[fx, 31 + dy] = h2c('2A2826') + (255,); cp[fx, 32 + dy] = h2c('1C1A19') + (255,)
@@ -234,7 +242,10 @@ def _stone(im):
 			p[x, y] = STONE[min(4, int(L / 256 * 5 * 1.15))] + (255,)
 	return im
 
-def stone_worm(wiggle=0):
+TEAL = (h2c('146E77'), h2c('13545C'))   # สเปก COMP: ผ้าพันคอ/ปลอกคอสีทีล = เครื่องหมายเพื่อนร่วมทาง
+LEAF = (h2c('6F8F3A'), h2c('4F6B2A'))
+
+def stone_worm(wiggle=0, friend=False):
 	"""หนอนอ้วนหันขวา: หาง(กรวด) → ปล้อง 2 → หัวมีหน้า · หิน 3 แผ่นบนหลัง · wiggle = idle เฟรม 2 (หัวเงยขึ้น 1px)"""
 	g, kind, _ = slime_parts()
 	rock = cut(ROCK_BOX, tol=60, shadow=True, fringe=1)
@@ -246,8 +257,26 @@ def stone_worm(wiggle=0):
 	cv.alpha_composite(mid, (9, 46 - mid.height))
 	for w, x, y in ((10, 2, 27), (13, 9, 21), (14, 17, 17)):   # แผ่นหินเรียงจากหางมาหาคอ ยกสูงให้เห็นปล้องข้างล่าง
 		cv.alpha_composite(_stone(_shrink(rock, w)), (x, y))
-	cv.alpha_composite(head, (19, 46 - head.height - wiggle))
+	hy = 46 - head.height - wiggle
+	cv.alpha_composite(head, (19, hy))
 	cv.alpha_composite(_stone(_shrink(rock, 7)), (0, 39))      # ก้อนหินปลายหาง
+	if friend:   # COMP-M03: ผ้าพันคอทีลโค้งตามขอบหัวด้านคอ + ชายผ้าปลิวไปหลัง · ใบไม้บนหัว
+		p = cv.load()
+		hp_ = head.load()
+		for y in range(hy + 5, 46):
+			row = [x for x in range(head.width) if 0 <= y - hy < head.height and hp_[x, y - hy][3]]
+			if not row:
+				continue
+			x0 = 19 + row[0]
+			for k, c in ((0, TEAL[1]), (1, TEAL[0]), (2, TEAL[0])):
+				p[x0 + k, y] = c + (255,)
+			if y == hy + 5:
+				p[x0 + 1, y] = h2c('3C8A92') + (255,)     # ประกายผ้า
+		for x, y in ((16, 37), (17, 37), (15, 38), (16, 38), (17, 38), (14, 39), (15, 39), (13, 40)):   # ชายผ้า
+			p[x, y] = TEAL[0] + (255,)
+		lx, ly = 32, hy - 1
+		for dx, dy, c in ((1, -4, 0), (2, -4, 0), (0, -3, 0), (1, -3, 0), (2, -3, 1), (3, -3, 0), (1, -2, 1), (2, -2, 0), (1, -1, 1), (1, 0, 1)):
+			p[lx + dx, ly + dy] = LEAF[c] + (255,)
 	return hue_outline(cv)
 
 if __name__ == '__main__':
@@ -258,11 +287,15 @@ if __name__ == '__main__':
 	place(squash(g), 48).save(os.path.join(out, 'M01_idle1.png'))
 	wolf_pair().save(os.path.join(out, 'M15.png'))
 	wolf_pair(1).save(os.path.join(out, 'M15_idle1.png'))
-	# ร่างที่ kwan ยังไม่อนุมัติ → โฟลเดอร์ draft (เกมโหลดเฉพาะ monsters_ll/ อัตโนมัติ — ห้ามเข้าเกมก่อนอนุมัติ)
-	draft = out.rstrip('/') + '_draft/'
+	# M03/M06 kwan อนุมัติ 3 ต.ค. · COMP-* = เวอร์ชันเพื่อนร่วมทาง (จอสู้หา COMP-<id> ก่อน) — ร่าง ยังไม่อนุมัติ → โฟลเดอร์ draft
+	stone_worm().save(os.path.join(out, 'M03.png'))
+	stone_worm(1).save(os.path.join(out, 'M03_idle1.png'))
+	bat().save(os.path.join(out, 'M06.png'))
+	bat(1).save(os.path.join(out, 'M06_idle1.png'))
+	draft = out.rstrip('/') + '_draft/'   # เกมโหลด monsters_ll/ อัตโนมัติ — ร่างห้ามเข้าเกมก่อนอนุมัติ
 	os.makedirs(draft, exist_ok=True)
-	stone_worm().save(os.path.join(draft, 'M03.png'))
-	stone_worm(1).save(os.path.join(draft, 'M03_idle1.png'))
-	bat().save(os.path.join(draft, 'M06.png'))
-	bat(1).save(os.path.join(draft, 'M06_idle1.png'))
+	stone_worm(friend=True).save(os.path.join(draft, 'COMP-M03.png'))
+	stone_worm(1, friend=True).save(os.path.join(draft, 'COMP-M03_idle1.png'))
+	bat(friend=True).save(os.path.join(draft, 'COMP-M06.png'))
+	bat(1, friend=True).save(os.path.join(draft, 'COMP-M06_idle1.png'))
 	print('ok ->', out)

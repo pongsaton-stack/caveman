@@ -51,7 +51,9 @@ var _tex_ko: Array[Texture2D] = []       # west_k0..k1: ทรุดเข่า
 var _hero_hp_seen := -1
 const HERO_X := 222                       # ตัวเอกยืนขวาของเวที ชิดแผงปาร์ตี้
 const FOE_SPRITE_DIR := "res://assets/sprites/monsters_ll"
-const FOE_AREA := Vector2(100, 214)       # ช่วง x ที่ศัตรูยืน (ระหว่างแผงศัตรูกับตัวเอก)
+const FOE_AREA := Vector2(100, 178)       # ช่วง x ที่ศัตรูยืน (ระหว่างแผงศัตรูกับมอนฝั่งเรา)
+# มอนฝั่งเรายืนหน้า-ซ้ายของ Rion (หันซ้าย = พลิกรูป) · ช่อง 1 พื้น · ช่อง 2 ลอยสูง (ค้างคาวบินได้ ไม่บังกัน)
+const ALLY_SLOTS := [Vector2(176, 102), Vector2(186, 78)]
 const STAGE_FEET_Y := 100.0               # เท้าแตะพื้นทราย
 const FOE_IDLE_SEC := 0.45
 var _foe_rects: Dictionary = {}           # Actor → TextureRect
@@ -430,6 +432,7 @@ func _build() -> void:
 	root.add_child(_hero_tex)
 
 	_build_foe_sprites(root)
+	_build_ally_sprites(root)
 
 	_foe_box = VBoxContainer.new()
 	_foe_box.position = Vector2(4, 28)
@@ -556,6 +559,33 @@ func _build_foe_sprites(root: Control) -> void:
 		r.position = Vector2(x, STAGE_FEET_Y - tex.get_size().y - (6.0 if i % 2 == 1 else 0.0))
 		root.add_child(r)
 		_foe_rects[a] = r
+		_foe_frames[a] = frames
+
+## มอนฝั่งเรา: COMP-<id> (เวอร์ชันเพื่อน) ก่อน · ไม่มีก็ใช้รูปศัตรู <id> · พลิกหันซ้ายเข้าหาศัตรู
+func _build_ally_sprites(root: Control) -> void:
+	var allies: Array = b.actors.filter(func(a): return a.side == "ally" and not a.is_hero)
+	for i in mini(allies.size(), ALLY_SLOTS.size()):
+		var a: Actor = allies[i]
+		var frames: Array = []
+		for base in ["COMP-" + a.id, a.id]:
+			for suffix in ["", "_idle1"]:
+				var path := "%s/%s%s.png" % [FOE_SPRITE_DIR, base, suffix]
+				if ResourceLoader.exists(path):
+					frames.append(load(path))
+			if not frames.is_empty():
+				break
+		if frames.is_empty():
+			continue
+		var tex: Texture2D = frames[0]
+		var r := TextureRect.new()
+		r.texture = tex
+		r.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		r.flip_h = true
+		r.size = tex.get_size()
+		var slot: Vector2 = ALLY_SLOTS[i]
+		r.position = Vector2(slot.x, slot.y - tex.get_size().y)
+		root.add_child(r)
+		_foe_rects[a] = r       # ใช้ลูป idle/จางตอนล้ม ชุดเดียวกับศัตรู
 		_foe_frames[a] = frames
 
 func _process(delta: float) -> void:
