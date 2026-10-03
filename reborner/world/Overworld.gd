@@ -582,7 +582,42 @@ func _open_menu() -> void:
 	var m := MenuScreen.new()
 	m.setup(ps, techs, item_rows, _monster_slots())
 	m.closed.connect(_on_screen_closed)
+	m.practice.connect(_start_practice)
 	add_child(m)
+
+## ห้องทดลองท่า (kwan อยากเล่นไม้ตายเอง 3 ต.ค.): ตัวเอกชั่วคราวรู้ทุกท่าในสาย · ความชำนาญ = req_prof สูงสุดของสาย (จาก techs.csv)
+## ศัตรู = มอนที่มีอยู่จริงใน PRACTICE_FOES · ไม่เรียก absorb / ไม่ให้เงิน / ไม่แตะเซฟ — จบแล้วทุกอย่างเหมือนก่อนเข้า
+const PRACTICE_FOES := ["M01", "M01", "M15"]
+func _start_practice() -> void:
+	busy = true
+	var tmp := PlayerState.new()
+	tmp.school = ps.school
+	tmp.steer = ps.steer
+	tmp.weapon_base = ps.weapon_base
+	tmp.prof = ps.prof
+	for t in techs.all:
+		if t.school == ps.school:
+			tmp.prof = maxi(tmp.prof, t.req_prof)
+	tmp.init_new(techs, ps.cell)
+	tmp.learned.clear()
+	for t in techs.all:
+		if t.school == ps.school:
+			tmp.learned.append(t.name)
+	var b := Battle.new()
+	b.techs = techs
+	b.actors.append(tmp.make_hero())
+	for m in ps.make_companions(by_id, _monster_slots()):
+		b.actors.append(m)
+	for id in PRACTICE_FOES:
+		if by_id.has(id):
+			b.actors.append(Actor.from_csv(by_id[id]))
+	var screen := BattleScreen.new()
+	screen.setup(b, "ทดลองท่า (ไม่บันทึกผล)", false)
+	add_child(screen)
+	await screen.finished
+	busy = false
+	_update_hud()
+	_show("จบศึกทดลอง — ไม่บันทึกผล ทุกอย่างเหมือนเดิม", 1.5)
 
 func _open_shop() -> void:
 	busy = true

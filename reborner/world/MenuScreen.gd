@@ -4,6 +4,7 @@ class_name MenuScreen
 extends CanvasLayer
 
 signal closed
+signal practice     # ห้องทดลองท่า — Overworld เปิดศึกทดลอง (ไม่บันทึกผล)
 
 var ps: PlayerState
 var techs: TechDb
@@ -125,6 +126,11 @@ func _show_actions() -> void:
 		var arrange := _add(UiKit.button("จัดทีม", 123))
 		arrange.pressed.connect(_pick_front)
 		arrange.focus_entered.connect(func(): _info.text = "เลือกมอนขึ้นหัวทีม — ตัวหัวทีมได้ลงสนามก่อน ที่เกินช่องไปสำรอง")
+	var lab := _add(UiKit.button("ทดลองท่า", 123))
+	lab.pressed.connect(func():
+		practice.emit()
+		queue_free())
+	lab.focus_entered.connect(func(): _info.text = "ศึกทดลอง: Rion ใช้ได้ทุกท่าในสาย รวมไม้ตาย · ผลไม่บันทึก")
 	var close := _add(UiKit.button("ปิด", 123))
 	close.pressed.connect(_close)
 	if first == null:
