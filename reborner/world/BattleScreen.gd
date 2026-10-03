@@ -704,11 +704,8 @@ func _ultimate_intro(e: Dictionary, evs: Array) -> void:
 		var p := _actor_point(ev.get("tgt"))
 		if p != Vector2.INF and not ev.has("dot"):
 			pts.append(p)
-	if t.scope != "single" and pts.size() > 0:
-		var c := Vector2.ZERO
-		for p in pts:
-			c += p
-		_fx_wheel(c / pts.size(), FX_COLOR.get(e["school"], FX_DEFAULT))
+	if pts.size() > 0:
+		_fx_signature(t, pts, _actor_point(e.get("src")), FX_COLOR.get(e["school"], FX_DEFAULT))
 
 func _shake(n: CanvasItem, amp: float, sec: float) -> void:
 	if n == null or not ("position" in n):
@@ -717,6 +714,177 @@ func _shake(n: CanvasItem, amp: float, sec: float) -> void:
 	var tw := create_tween()
 	tw.tween_method(func(t: float): n.position = base + Vector2(sin(t * 60.0), cos(t * 47.0)) * amp * (1.0 - t), 0.0, 1.0, sec)
 	tw.tween_callback(func(): n.position = base)
+
+## ภาพเฉพาะของไม้ตายแต่ละสาย (kwan 3 ต.ค.) · เลือกตามสาย + ขอบเขตท่าใน techs.csv · ภาพล้วน ไม่แตะค่าเกม
+func _fx_signature(t: Tech, pts: Array, from: Vector2, col: Color) -> void:
+	var c := Vector2.ZERO
+	for p in pts:
+		c += p
+	c /= pts.size()
+	match t.school:
+		"คม":
+			if t.scope == "single": _fx_cross(pts[0], col)
+			else: _fx_wheel(c, col)
+		"ทุบ": _fx_quake(pts, col)
+		"แทง": _fx_lance(from, pts, col)
+		"ยิง":
+			if t.scope == "single": _fx_reticle(pts[0], col)
+			else: _fx_rain(pts, col)
+		"กล": _fx_gears(pts, col)
+		"มือเปล่า": _fx_shockwaves(pts[0], col, t.hits)
+		_: _fx_wheel(c, col)
+
+## คม เดี่ยว: กากบาทใบคมใหญ่สองเส้นขีดทีละเส้น
+func _fx_cross(at: Vector2, col: Color) -> void:
+	for k in 2:
+		var d := Vector2(1, -1) if k == 0 else Vector2(1, 1)
+		var root := Node2D.new()
+		root.position = at
+		_fx_root().add_child(root)
+		for layer in [[col.darkened(0.4), 8.0], [col, 5.0], [Color.WHITE, 1.5]]:
+			root.add_child(_line(PackedVector2Array([-d * 26.0, d * 26.0]), layer[0], layer[1]))
+		root.scale = Vector2(0.05, 0.05)
+		var tw := create_tween()
+		tw.tween_interval(0.12 * k)
+		tw.tween_property(root, "scale", Vector2.ONE, 0.1)
+		tw.tween_interval(0.35)
+		tw.tween_property(root, "modulate:a", 0.0, 0.25)
+		tw.tween_callback(root.queue_free)
+
+## ทุบ: รอยแตกหยักวิ่งไปตามพื้นใต้ตัวเป้า + เศษหินพุ่งขึ้น
+func _fx_quake(pts: Array, col: Color) -> void:
+	var y := STAGE_FEET_Y - 2.0
+	var x0: float = pts[0].x
+	var x1: float = pts[0].x
+	for p in pts:
+		x0 = minf(x0, p.x); x1 = maxf(x1, p.x)
+	x0 -= 28.0; x1 += 28.0
+	var crack := PackedVector2Array()
+	var x := x0
+	var up := true
+	while x <= x1:
+		crack.append(Vector2(x, y + (-3.0 if up else 3.0)))
+		x += 7.0
+		up = not up
+	for layer in [[Color(0.12, 0.07, 0.04), 4.0], [col, 1.5]]:
+		var l := _line(crack, layer[0], layer[1])
+		l.modulate.a = 0.0
+		_fx_root().add_child(l)
+		var tw := create_tween()
+		tw.tween_property(l, "modulate:a", 1.0, 0.08)
+		tw.tween_interval(0.6)
+		tw.tween_property(l, "modulate:a", 0.0, 0.3)
+		tw.tween_callback(l.queue_free)
+	for p in pts:
+		for i in 6:
+			var bit := ColorRect.new()
+			bit.color = col.darkened(0.2 + 0.1 * (i % 3))
+			bit.size = Vector2(4, 4)
+			bit.position = Vector2(p.x - 12.0 + i * 5.0, y - 2.0)
+			_fx_root().add_child(bit)
+			var tw := create_tween()
+			tw.tween_property(bit, "position:y", y - 18.0 - (i % 3) * 8.0, 0.25).set_ease(Tween.EASE_OUT)
+			tw.tween_property(bit, "position:y", y, 0.25).set_ease(Tween.EASE_IN)
+			tw.tween_callback(bit.queue_free)
+
+## แทง: ลำแสงหอกจากผู้ใช้พุ่งทะลุทุกตัวในแนว
+func _fx_lance(from: Vector2, pts: Array, col: Color) -> void:
+	var far: Vector2 = pts[0]
+	for p in pts:
+		if absf(p.x - from.x) > absf(far.x - from.x): far = p
+	var start := from if from != Vector2.INF else far + Vector2(60, 0)
+	var dir := (far - start).normalized()
+	var end := far + dir * 30.0
+	var beam := Node2D.new()
+	_fx_root().add_child(beam)
+	for layer in [[col.darkened(0.3), 10.0], [col, 6.0], [Color.WHITE, 2.0]]:
+		beam.add_child(_line(PackedVector2Array([start, end]), layer[0], layer[1]))
+	var head := Polygon2D.new()
+	var nrm := Vector2(-dir.y, dir.x)
+	head.polygon = PackedVector2Array([end + dir * 12.0, end + nrm * 8.0, end - nrm * 8.0])
+	head.color = Color.WHITE
+	beam.add_child(head)
+	beam.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(beam, "modulate:a", 1.0, 0.06)
+	tw.tween_interval(0.4)
+	tw.tween_property(beam, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(beam.queue_free)
+
+## ยิง หมู่: ห่ากระสุนตกจากฟ้าลงตัวเป้าทุกตัว
+func _fx_rain(pts: Array, col: Color) -> void:
+	var i := 0
+	for p in pts:
+		for k in 5:
+			var drop := _line(PackedVector2Array([Vector2.ZERO, Vector2(-3, 10)]), col.lightened(0.3), 2.5)
+			var target: Vector2 = p + Vector2(-14.0 + k * 7.0, -6.0 + (k % 2) * 8.0)
+			drop.position = target + Vector2(12, -70)
+			drop.modulate.a = 0.0
+			_fx_root().add_child(drop)
+			var tw := create_tween()
+			tw.tween_interval(0.05 * (i % 7))
+			tw.tween_property(drop, "modulate:a", 1.0, 0.01)
+			tw.tween_property(drop, "position", target, 0.18).set_ease(Tween.EASE_IN)
+			tw.tween_callback(func():
+				drop.queue_free()
+				_fx_claw(target, col, Vector2.INF))
+			i += 1
+
+## ยิง เดี่ยว: เป้าเล็งหดเข้าหาตัวเป้า แล้ววาบ
+func _fx_reticle(at: Vector2, col: Color) -> void:
+	var r := Node2D.new()
+	r.position = at
+	_fx_root().add_child(r)
+	var circle := PackedVector2Array()
+	for i in 25:
+		circle.append(Vector2(cos(TAU * i / 24.0), sin(TAU * i / 24.0)) * 14.0)
+	r.add_child(_line(circle, col, 2.0))
+	for d in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
+		r.add_child(_line(PackedVector2Array([d * 8.0, d * 20.0]), col, 2.0))
+	r.scale = Vector2(2.2, 2.2)
+	var tw := create_tween()
+	tw.tween_property(r, "scale", Vector2.ONE, 0.25).set_ease(Tween.EASE_OUT)
+	tw.tween_callback(func(): _fx_burst(at, col))
+	tw.tween_property(r, "modulate:a", 0.0, 0.3)
+	tw.tween_callback(r.queue_free)
+
+## กล: เฟืองสองตัวหมุนสวนกันรอบตัวเป้า
+func _fx_gears(pts: Array, col: Color) -> void:
+	for p in pts:
+		for k in 2:
+			var g := Node2D.new()
+			g.position = p + Vector2(-10.0 + k * 20.0, -8.0 + k * 14.0)
+			_fx_root().add_child(g)
+			var teeth := PackedVector2Array()
+			var n := 10
+			for i in n * 2 + 1:
+				var rad := 12.0 if i % 2 == 0 else 8.5
+				teeth.append(Vector2(cos(PI * i / n), sin(PI * i / n)) * rad * (1.0 - 0.3 * k))
+			g.add_child(_line(teeth, col.darkened(0.4), 4.0))
+			g.add_child(_line(teeth, col, 2.0))
+			g.scale = Vector2(0.3, 0.3)
+			var tw := create_tween().set_parallel()
+			tw.tween_property(g, "scale", Vector2.ONE, 0.15)
+			tw.tween_property(g, "rotation", TAU * (1.0 if k == 0 else -1.0), 0.8)
+			tw.tween_property(g, "modulate:a", 0.0, 0.25).set_delay(0.55)
+			tw.chain().tween_callback(g.queue_free)
+
+## มือเปล่า: วงแรงกระแทกซ้อนตามจำนวนครั้งที่ตี (hits ใน techs.csv)
+func _fx_shockwaves(at: Vector2, col: Color, hits: int) -> void:
+	for k in maxi(hits, 2):
+		var pts := PackedVector2Array()
+		for i in 17:
+			pts.append(Vector2(cos(TAU * i / 16.0), sin(TAU * i / 16.0)) * 8.0)
+		var ring := _line(pts, Color.WHITE if k % 2 == 0 else col, 3.0)
+		ring.position = at + Vector2(((k * 7) % 15) - 7, ((k * 11) % 13) - 6)   # เลื่อนแบบคงที่ ไม่ใช้ randf (ห้ามแตะ RNG ของศึก)
+		ring.modulate.a = 0.0
+		_fx_root().add_child(ring)
+		var tw := create_tween()
+		tw.tween_interval(0.07 * k)
+		tw.tween_property(ring, "modulate:a", 1.0, 0.01)
+		tw.parallel().tween_property(ring, "scale", Vector2(2.6, 2.6), 0.22)
+		tw.tween_property(ring, "modulate:a", 0.0, 0.12)
+		tw.tween_callback(ring.queue_free)
 
 ## วงล้อ: ใบคม 6 ใบเรียงเป็นวง หมุน 1 รอบพร้อมขยาย แล้วจาง
 func _fx_wheel(at: Vector2, col: Color) -> void:
