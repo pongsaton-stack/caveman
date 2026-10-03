@@ -630,10 +630,15 @@ func _play_events() -> void:
 	b.events.clear()
 	if evs.is_empty() or step_delay <= 0.0:
 		return
+	var ult := false
 	for e in evs:
 		if e.has("tech"):
+			ult = _is_ultimate(e)
 			_show_banner(e)
+			if ult:
+				_ultimate_intro(e, evs)
 			break
+	var nth := 0     # ตัวเลขหลายตัวในครั้งเดียว (ท่าหมู่/ไม้ตาย) → เหลื่อมขึ้นทีละแถว ไม่ทับกัน
 	for e in evs:
 		var to := _actor_point(e["tgt"])
 		if to == Vector2.INF:
@@ -649,8 +654,11 @@ func _play_events() -> void:
 			"ทุบ": _fx_crush(to, col)
 			"ยิง": _fx_shoot(from, to, col)
 			_: _fx_claw(to, col, from)
+		if ult:
+			_fx_burst(to, col)
 		_hit_flash(e["tgt"])
-		_float_number(to, ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
+		nth += 1
+		_float_number(to + Vector2(0, 11 * ((nth - 1) % 3)), ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
 
 ## จุดกลางตัวบนเวที (Vector2.INF = ตัวนี้ไม่มีรูปบนเวที)
 func _actor_point(a) -> Vector2:
@@ -663,6 +671,91 @@ func _actor_point(a) -> Vector2:
 		return r.position + r.size * Vector2(0.5, 0.55)
 	return Vector2.INF
 
+## ไม้ตาย = ท่าขั้นปลายของต้นไม้ (req_prof ≥ ULT_PROF ใน techs.csv) · ใช้เลือกเอฟเฟกต์เท่านั้น ไม่แตะค่าเกม
+const ULT_PROF := 40
+const NUMBER_TOP_Y := 40.0      # ใต้ป้ายชื่อท่า (y 24-40)
+var _dim: ColorRect
+
+func _is_ultimate(e: Dictionary) -> bool:
+	if b.techs == null:
+		return false
+	var t: Tech = b.techs.get_tech(str(e["tech"]))
+	return t != null and t.req_prof >= ULT_PROF
+
+## ไม้ตาย: จอมืดลง · จอสั่น · ท่ากวาดทั้งหมด (scope all) = วงล้อคมหมุนรอบกลุ่มศัตรู
+func _ultimate_intro(e: Dictionary, evs: Array) -> void:
+	if _dim == null:
+		_dim = ColorRect.new()
+		_dim.color = Color(0.05, 0.03, 0.08)
+		_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_fx_root().add_child(_dim)
+	_fx_root().move_child(_dim, 0)
+	_dim.modulate.a = 0.0
+	var tw := create_tween()
+	tw.tween_property(_dim, "modulate:a", 0.55, 0.12)
+	tw.tween_interval(0.7)
+	tw.tween_property(_dim, "modulate:a", 0.0, 0.35)
+	_fx_root().move_child(_banner, -1)
+	_shake(get_child(0), 3.0, 0.35)
+	var t: Tech = b.techs.get_tech(str(e["tech"]))
+	var pts: Array = []
+	for ev in evs:
+		var p := _actor_point(ev.get("tgt"))
+		if p != Vector2.INF and not ev.has("dot"):
+			pts.append(p)
+	if t.scope != "single" and pts.size() > 0:
+		var c := Vector2.ZERO
+		for p in pts:
+			c += p
+		_fx_wheel(c / pts.size(), FX_COLOR.get(e["school"], FX_DEFAULT))
+
+func _shake(n: CanvasItem, amp: float, sec: float) -> void:
+	if n == null or not ("position" in n):
+		return
+	var base: Vector2 = n.position
+	var tw := create_tween()
+	tw.tween_method(func(t: float): n.position = base + Vector2(sin(t * 60.0), cos(t * 47.0)) * amp * (1.0 - t), 0.0, 1.0, sec)
+	tw.tween_callback(func(): n.position = base)
+
+## วงล้อ: ใบคม 6 ใบเรียงเป็นวง หมุน 1 รอบพร้อมขยาย แล้วจาง
+func _fx_wheel(at: Vector2, col: Color) -> void:
+	var wheel := Node2D.new()
+	wheel.position = at
+	wheel.scale = Vector2(0.4, 0.4)
+	_fx_root().add_child(wheel)
+	for k in 6:
+		for layer in [[col.darkened(0.4), 7.0], [col, 4.5], [Color(1, 1, 1, 0.95), 1.5]]:
+			var pts := PackedVector2Array()
+			for i in 7:
+				var ang := TAU * k / 6.0 + deg_to_rad(i * 7.0)
+				var r := 40.0 - i * 1.5
+				pts.append(Vector2(cos(ang), sin(ang) * 0.75) * r)
+			wheel.add_child(_line(pts, layer[0], layer[1]))
+	var tw := create_tween().set_parallel()
+	tw.tween_property(wheel, "rotation", TAU, 0.7).set_ease(Tween.EASE_OUT)
+	tw.tween_property(wheel, "scale", Vector2(1.15, 1.15), 0.5).set_ease(Tween.EASE_OUT)
+	tw.tween_property(wheel, "modulate:a", 0.0, 0.3).set_delay(0.55)
+	tw.chain().tween_callback(wheel.queue_free)
+
+## ไม้ตาย: วงแสงขาว + ประกายแฉกใหญ่ที่ตัวเป้าทุกตัว
+func _fx_burst(at: Vector2, col: Color) -> void:
+	var pts := PackedVector2Array()
+	for i in 17:
+		var ang := TAU * i / 16.0
+		pts.append(Vector2(cos(ang), sin(ang)) * 10.0)
+	var ring := _line(pts, Color(1, 1, 1, 0.9), 3.0)
+	ring.position = at
+	_fx_root().add_child(ring)
+	_fade_free(ring, 2.8)
+	for k in 4:
+		var ang := PI / 4.0 * k
+		var ray := _line(PackedVector2Array([Vector2.ZERO, Vector2(cos(ang), sin(ang)) * 18.0]), col.lightened(0.4), 3.0)
+		ray.add_child(_line(PackedVector2Array([Vector2.ZERO, -Vector2(cos(ang), sin(ang)) * 18.0]), col.lightened(0.4), 3.0))
+		ray.position = at
+		_fx_root().add_child(ray)
+		_fade_free(ray, 1.8)
+
 func _show_banner(e: Dictionary) -> void:
 	if _banner == null:
 		_banner = _label("", 11, C_TEXT)
@@ -674,7 +767,11 @@ func _show_banner(e: Dictionary) -> void:
 		_fx_root().add_child(_banner)
 	var src = e.get("src")
 	var who: String = src.name if src != null else ""
-	if e["glimmer"]:
+	_banner.add_theme_font_size_override("font_size", 14 if _is_ultimate(e) else 11)
+	if _is_ultimate(e):
+		_banner.text = "◆ ไม้ตาย! %s · %s" % [who, e["tech"]]
+		_banner.add_theme_color_override("font_color", Color("ffd27a"))
+	elif e["glimmer"]:
 		_banner.text = "★ ประกาย! %s · %s" % [who, e["tech"]]
 		_banner.add_theme_color_override("font_color", Color("f2c94c"))
 	else:
@@ -796,7 +893,7 @@ func _hit_flash(a) -> void:
 	if not n.has_meta("fx_base"):
 		n.set_meta("fx_base", n.position)
 	var base: Vector2 = n.get_meta("fx_base")
-	var old = n.get_meta("fx_tw", null)
+	var old = n.get_meta("fx_tw") if n.has_meta("fx_tw") else null   # get_meta(k, null) ยังพ่น error ใน 4.7
 	if old != null and old.is_valid():
 		old.kill()
 	n.position = base
@@ -812,6 +909,7 @@ func _float_number(at: Vector2, text: String, col: Color) -> void:
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 3)
 	l.position = at + Vector2(-10, -30)
+	l.position.y = maxf(l.position.y, NUMBER_TOP_Y)   # ตัวบนแถวลอย (ค้างคาว) → ตัวเลขไม่หลุดขึ้นไปทับแถบคิว/ป้ายท่า
 	_fx_root().add_child(l)
 	var tw := create_tween().set_parallel()
 	tw.tween_property(l, "position:y", l.position.y - 16.0, 0.5).set_ease(Tween.EASE_OUT)
