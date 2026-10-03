@@ -1,0 +1,574 @@
+<title>animation test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Sarabun:wght@400;600;700&display=swap">
+<style>
+/* ห้องทดสอบท่าขยับของ REBORNER — หน้าตาเดียวกับ UI ในเกม (แผงไม้เข้ม ตัวอักษรครีม ทอง) จึงเลือกโทนมืดโทนเดียว
+   ผัง: เวที (canvas ความละเอียดเกม) ซ้าย · แผงคุมขวา · มือถือเรียงลง */
+:root{
+	--bg:#15130f;        /* C_BG ในเกม */
+	--panel:#1d1a15;     /* C_PANEL */
+	--line:#3a3329;      /* C_LINE */
+	--text:#e8d9b5;      /* C_TEXT */
+	--muted:#a89b80;     /* C_MUTED */
+	--gold:#c9a24a;      /* C_GOLD */
+	--foe:#c46a54;
+	--good:#8fae5c;
+	--f-display:"Chakra Petch","Sarabun",system-ui,sans-serif;
+	--f-body:"Sarabun",system-ui,sans-serif;
+	color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 var(--f-body);padding-inline:16px;padding-block:14px 28px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:14px}
+@media(min-width:920px){.wrap{grid-template-columns:minmax(0,7fr) minmax(320px,5fr);align-items:start}.stagecol{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}}
+header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+h1{font:700 22px/1.2 var(--f-display);margin:0;letter-spacing:.02em}
+header p{margin:0;color:var(--muted);font-size:13px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:12px}
+.stagecol{display:grid;gap:10px;min-width:0}
+#stage{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid var(--line);background:#000}
+.read{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted)}
+.read b{color:var(--text);font-weight:600}
+.read .path{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);word-break:break-all}
+.transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{background:#26221b;border:1px solid var(--line);border-radius:3px;padding:5px 10px;font-size:13px;min-height:32px}
+.btn:hover{border-color:var(--muted)}
+.btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:#2b2519}
+.seg{display:inline-flex;gap:0}
+.seg .btn{border-radius:0}
+.seg .btn:first-child{border-radius:3px 0 0 3px}
+.seg .btn:last-child{border-radius:0 3px 3px 0}
+.seg .btn+.btn{border-left:0}
+.lbl{font-size:12px;color:var(--muted);letter-spacing:.04em;margin:0 0 6px}
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.strip button{flex:0 0 auto;display:grid;justify-items:center;gap:2px;background:#26221b;border:1px solid var(--line);border-radius:3px;padding:4px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.strip button[aria-current="true"]{border-color:var(--gold);color:var(--gold)}
+.strip canvas{width:48px;height:48px;image-rendering:pixelated;background:#2e2a22}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs .btn{font:600 14px var(--f-display);padding:6px 14px}
+.side{display:grid;gap:12px;min-width:0}
+.clips{display:grid;gap:10px}
+.cgroup h3{font:600 14px var(--f-display);margin:0 0 6px;color:var(--gold)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.cgrid .btn{text-align:left;font-size:13px;line-height:1.3}
+.cgrid .btn small{display:block;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.schools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tlist{display:grid;gap:6px}
+.tech{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;background:#26221b;border:1px solid var(--line);border-radius:3px;padding:7px 9px}
+.tech:hover{border-color:var(--muted)}
+.tech[aria-pressed="true"]{border-color:var(--gold)}
+.tech .nm{font-weight:700;font-size:14px}
+.tech .nm .ult{color:var(--gold);font-size:12px;margin-left:4px}
+.tech .dmg{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.tech .dmg.weak{color:#ffe08a}.tech .dmg.res{color:var(--muted)}
+.tech .meta{grid-column:1/-1;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.foes{display:flex;flex-wrap:wrap;gap:6px}
+.stat{font-size:12px;color:var(--muted);margin-top:8px;font-variant-numeric:tabular-nums}
+.stat b{color:var(--text)}
+.row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.row label{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+input[type=range]{accent-color:var(--gold);width:140px}
+select{background:#26221b;color:var(--text);border:1px solid var(--line);border-radius:3px;padding:4px 6px;font:inherit;font-size:13px}
+.note{font-size:12px;color:var(--muted);margin:8px 0 0;line-height:1.6}
+.note code{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--text)}
+footer{grid-column:1/-1;font-size:12px;color:var(--muted);line-height:1.7}
+footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+@media(prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+
+<div class="wrap">
+	<header>
+		<h1>animation test</h1>
+		<p>ท่าขยับและสกิลจากเกม REBORNER ปัจจุบัน · สไปรต์ ท่า ค่ามอน และสูตรดาเมจอ่านจากไฟล์เกมตอนสร้างหน้า</p>
+	</header>
+
+	<div class="stagecol">
+		<div class="box read" aria-live="polite">
+			<span>ท่า: <b id="rdClip">—</b></span>
+			<span>เฟรม: <b id="rdFrame">—</b></span>
+			<span>เฟรมละ: <b id="rdMs">—</b></span>
+			<span class="path" id="rdFile"></span>
+		</div>
+		<canvas id="stage" width="240" height="120" aria-label="เวทีทดสอบ"></canvas>
+		<div class="box">
+			<div class="transport">
+				<button class="btn" id="btnPlay" aria-pressed="true">⏸ หยุด</button>
+				<button class="btn" id="btnPrev" aria-label="ย้อนหนึ่งเฟรม">◀</button>
+				<button class="btn" id="btnNext" aria-label="เดินหน้าหนึ่งเฟรม">▶</button>
+				<span class="seg" id="segSpeed" role="group" aria-label="ความเร็ว">
+					<button class="btn" data-v="0.25">0.25×</button><button class="btn" data-v="0.5">0.5×</button><button class="btn" data-v="1" aria-pressed="true">1×</button><button class="btn" data-v="2">2×</button>
+				</span>
+			</div>
+			<div class="transport" style="margin-top:8px">
+				<span class="seg" id="segBg" role="group" aria-label="พื้นหลัง">
+					<button class="btn" data-v="stage" aria-pressed="true">เวทีสู้</button><button class="btn" data-v="checker">ตารางใส</button><button class="btn" data-v="dark">มืด</button><button class="btn" data-v="light">สว่าง</button>
+				</span>
+				<button class="btn" id="btnOnion" aria-pressed="false">เงาเฟรมก่อน</button>
+				<button class="btn" id="btnGrid" aria-pressed="false">ตาราง 8px</button>
+			</div>
+		</div>
+		<div class="box">
+			<p class="lbl">เฟรมของท่านี้ — แตะเพื่อหยุดที่เฟรมนั้น</p>
+			<div class="strip" id="strip"></div>
+		</div>
+	</div>
+
+	<div class="side">
+		<div class="tabs" role="tablist">
+			<button class="btn" role="tab" id="tabClips" aria-pressed="true">ท่าขยับ</button>
+			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
+		</div>
+
+		<section class="box" id="paneClips">
+			<div class="clips" id="clipGroups"></div>
+		</section>
+
+		<section class="box" id="paneSkills" hidden>
+			<p class="lbl">เป้า (ข้อมูลจาก monsters.csv)</p>
+			<div class="foes" id="foePick"></div>
+			<div class="stat" id="foeStat"></div>
+			<div class="row" style="margin-top:10px">
+				<label>จำนวนศัตรู <span class="seg" id="segCount"><button class="btn" data-v="1">1</button><button class="btn" data-v="2">2</button><button class="btn" data-v="3" aria-pressed="true">3</button></span></label>
+			</div>
+			<div class="row" style="margin-top:10px">
+				<label for="prof">ความชำนาญ <input type="range" id="prof" min="0" max="60" value="45"> <b id="profV">45</b></label>
+				<label for="wpn">อาวุธ <select id="wpn"><option value="14">มีดทำครัว (14)</option><option value="28">อาวุธฐาน 28</option></select></label>
+			</div>
+			<div class="stat" id="heroStat"></div>
+			<p class="lbl" style="margin-top:12px">สาย (techs.csv)</p>
+			<div class="schools" id="schoolPick"></div>
+			<div class="tlist" id="techList"></div>
+			<p class="note">ตัวเลขขวาของแต่ละท่า = ดาเมจต่อครั้งต่อเป้าที่เลือก จากสูตรเกม <code>ATK × พลัง/100 × K/(K+DEF×(1−เจาะเกราะ)) × ธาตุ × สุ่ม 0.95–1.05</code>
+			· ATK = <code>20 + ความชำนาญ×1.6 + อาวุธ</code> · ยังไม่รวมตำแหน่งแถว คอมโบ และตั้งรับ · ตัวเลขลอยบนเวที = ค่ากลางของช่วง
+			· ◆ = ไม้ตาย (ต้องมีความชำนาญ ≥ <span id="ultK"></span>) เล่นแบบเดียวกับในเกม: จอมืด จอสั่น ภาพเฉพาะของสาย</p>
+		</section>
+	</div>
+
+	<footer id="foot"></footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const K = DATA.k;
+const IMG = {};
+const cv = document.getElementById('stage');
+const ctx = cv.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+// ── ท่าขยับ (คลิป) — จังหวะจากค่าคงที่ในเกม ──
+const WALK_SEC = K.MOVE_TIME / 2;          // Overworld: WALK_FPS = 2 / MOVE_TIME
+const DIRS = [['south', 'ลง'], ['north', 'ขึ้น'], ['west', 'ซ้าย'], ['east', 'ขวา']];
+const CLIPS = {};
+const GROUPS = [];
+function addClip(group, id, label, frames, sec, opt = {}) {
+	CLIPS[id] = Object.assign({ id, label, frames, sec, loop: true }, opt);
+	let g = GROUPS.find(x => x.name === group);
+	if (!g) GROUPS.push(g = { name: group, ids: [] });
+	g.ids.push(id);
+}
+for (const [d, th] of DIRS) addClip('Rion บนแผนที่', 'rion_walk_' + d, 'เดิน' + th, [0, 1, 2, 3].map(i => `rion/${d}_w${i}`), WALK_SEC);
+addClip('Rion ในศึก', 'rion_stand', 'ยืน', ['rion/west'], 1);
+addClip('Rion ในศึก', 'rion_attack', 'ฟัน', [0, 1, 2, 3].map(i => `rion/west_a${i}`), K.ATTACK_FRAME_SEC);
+addClip('Rion ในศึก', 'rion_hurt', 'โดนตี', ['rion/west_h0', 'rion/west_h1'], K.ATTACK_FRAME_SEC);
+addClip('Rion ในศึก', 'rion_ko', 'ล้ม', ['rion/west_h0', 'rion/west_k0', 'rion/west_k1'], K.ATTACK_FRAME_SEC, { hold: true });
+for (const [d, th] of DIRS) addClip('หมาคู่หู', 'dog_walk_' + d, 'เดิน' + th, [0, 1, 2, 3].map(i => `dog/${d}_w${i}`), WALK_SEC);
+const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
+for (const key of Object.keys(DATA.sprites)) {
+	const m = key.match(/^mon\/(.+?)$/);
+	if (!m || m[1].endsWith('_idle1')) continue;
+	const id = m[1], base = id.replace('COMP-', '');
+	addClip(id.startsWith('COMP-') ? 'มอนฝั่งเรา (COMP)' : 'มอนศัตรู', 'mon_' + id, (monName[base] || base) + ' ' + id, [key, key + '_idle1'], K.FOE_IDLE_SEC);
+}
+
+// ── สถานะผู้ชม ──
+const S = { tab: 'clips', clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
+	foe: 'M01', count: 3, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
+try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || t === 'clips') S.tab = t; } catch (e) {}
+
+// ── วาด ──
+const W = () => cv.width, H = () => cv.height;
+function drawBg() {
+	if (S.bg === 'stage') {
+		ctx.fillStyle = '#a7b5a0'; ctx.fillRect(0, 0, W(), H());
+		const gy = Math.round(H() * 0.62);
+		ctx.fillStyle = '#d4b08a'; ctx.fillRect(0, gy, W(), H() - gy);
+		ctx.fillStyle = '#a2927b'; ctx.fillRect(0, gy, W(), 1);
+	} else if (S.bg === 'checker') {
+		for (let y = 0; y < H(); y += 8) for (let x = 0; x < W(); x += 8) {
+			ctx.fillStyle = ((x + y) / 8) % 2 ? '#8b8f96' : '#b9bdc3'; ctx.fillRect(x, y, 8, 8);
+		}
+	} else {
+		ctx.fillStyle = S.bg === 'dark' ? '#0a0c0f' : '#ecebe7'; ctx.fillRect(0, 0, W(), H());
+	}
+}
+function drawGrid() {
+	ctx.fillStyle = 'rgba(0,255,255,.28)';
+	for (let x = 0; x < W(); x += 8) ctx.fillRect(x, 0, 1, H());
+	for (let y = 0; y < H(); y += 8) ctx.fillRect(0, y, W(), 1);
+}
+function spr(key, x, y, opt = {}) {
+	const im = IMG[key]; if (!im) return;
+	ctx.save();
+	ctx.globalAlpha = opt.alpha ?? 1;
+	if (opt.flip) { ctx.translate(Math.round(x + im.width), Math.round(y)); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); }
+	else ctx.drawImage(im, Math.round(x), Math.round(y));
+	if (opt.flash > 0) {   // สว่างวาบตอนโดนตี (ในเกม self_modulate 2.4 → ขาว)
+		ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, opt.flash);
+		if (opt.flip) ctx.drawImage(im, 0, 0); else ctx.drawImage(im, Math.round(x), Math.round(y));
+	}
+	ctx.restore();
+}
+
+// ── โหมดท่าขยับ ──
+function clipView() {
+	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
+	drawBg();
+	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (S.onion && c.frames.length > 1) {
+		const pk = c.frames[(S.frame - 1 + c.frames.length) % c.frames.length], pim = IMG[pk];
+		if (pim) spr(pk, (96 - pim.width) / 2, 92 - pim.height, { alpha: 0.32 });
+	}
+	if (im) spr(key, (96 - im.width) / 2, 92 - im.height);
+	if (S.grid) drawGrid();
+}
+
+// ── โหมดสกิล: ผังเวทีย่อจากจอสู้ในเกม (ศัตรูซ้าย · Rion ขวา) ──
+const FEET = 104;
+function foeLayout() {
+	const out = [], id = S.foe, im = IMG['mon/' + id];
+	if (!im) return out;
+	const n = id === 'B1' ? 1 : S.count;
+	const xs = n === 1 ? [70] : n === 2 ? [52, 104] : [40, 82, 124];
+	for (let i = 0; i < n; i++) {
+		const x = xs[i] - im.width / 2, y = FEET - im.height - (i % 2 ? 6 : 0);
+		out.push({ i, x, y, w: im.width, h: im.height, pt: { x: x + im.width * 0.5, y: y + im.height * 0.55 } });
+	}
+	return out;
+}
+const HERO = { x: 168, y: FEET - 64 - 2 };
+const heroPt = () => ({ x: HERO.x + 32, y: HERO.y + 34 });
+let idleT = 0, idleF = 0;
+function skillView(dt) {
+	cv.width = 240; cv.height = 120; ctx.imageSmoothingEnabled = false;
+	const sx = S.shake > 0 ? Math.sin(S.shake * 60) * 3 * S.shake / 0.35 : 0;
+	const sy = S.shake > 0 ? Math.cos(S.shake * 47) * 3 * S.shake / 0.35 : 0;
+	ctx.save(); ctx.translate(Math.round(sx), Math.round(sy));
+	drawBg();
+	idleT += dt; if (idleT >= K.FOE_IDLE_SEC) { idleT = 0; idleF = 1 - idleF; }
+	for (const f of foeLayout()) {
+		const key = 'mon/' + S.foe + (idleF ? '_idle1' : '');
+		const fl = S.flash.get('f' + f.i) || 0;
+		spr(IMG[key] ? key : 'mon/' + S.foe, f.x + (fl > 0 ? Math.sin(fl * 40) * 3 * fl : 0), f.y, { flash: fl > 0 ? fl * 1.4 : 0 });
+	}
+	const hf = S.flash.get('hero') || 0;
+	spr(S.heroFrame, HERO.x, HERO.y, { flash: hf });
+	if (S.dim > 0) { ctx.fillStyle = `rgba(13,8,20,${S.dim})`; ctx.fillRect(-4, -4, W() + 8, H() + 8); }
+	for (const e of S.fx) e.draw(Math.min(1, e.t / e.dur), e.t);
+	if (S.grid) drawGrid();
+	ctx.restore();
+}
+
+// ── เอฟเฟกต์ (ย่อขนาดตามจอเกม · เวลาเท่าในเกม) ──
+const FX_SEC = K.FX_SEC;
+const COL = { 'คม': '#ff5a4a', 'แทง': '#7ad0e0', 'ทุบ': '#e39253', 'ยิง': '#f2c08a', 'กล': '#8ad0a0' };
+const COL_DEF = '#ffd0c0';
+function fx(dur, draw, delay = 0) { S.fx.push({ t: -delay, dur, draw: (p, t) => { if (t >= 0) draw(p, t); } }); }
+function line(pts, col, w, a = 1) {
+	ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+	ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); ctx.restore();
+}
+const tr = (pts, at, s = 1, rot = 0) => pts.map(([x, y]) => { const c = Math.cos(rot), n = Math.sin(rot); return [at.x + (x * c - y * n) * s, at.y + (x * n + y * c) * s]; });
+const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = c => Math.round(Math.min(255, Math.max(0, k < 0 ? c * (1 + k) : c + (255 - c) * k))); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; };
+const ring = (r, ry = r, n = 16) => Array.from({ length: n + 1 }, (_, i) => [Math.cos(Math.PI * 2 * i / n) * r, Math.sin(Math.PI * 2 * i / n) * ry]);
+
+function fxSlash(at, col, d) {
+	const arc = r => Array.from({ length: 9 }, (_, i) => { const a = (-70 + i * 20) * Math.PI / 180; return [-Math.cos(a) * d * r, Math.sin(a) * r]; });
+	fx(FX_SEC, p => { const s = 0.7 + 0.9 * p, a = 1 - p * p;
+		line(tr(arc(26), at, s * 0.62), shade(col, -0.4), 9 * 0.62, a); line(tr(arc(26), at, s * 0.62), col, 6 * 0.62, a); line(tr(arc(25), at, s * 0.62), '#fff', 2 * 0.62, a); });
+}
+function fxPierce(at, col, d) {
+	fx(FX_SEC, p => { const x = at.x - 10 * d + 20 * d * Math.min(1, p / 0.6), a = 1 - p * p;
+		line([[x - 26 * d, at.y], [x + 16 * d, at.y]], col, 3.2, a); line([[x - 23 * d, at.y], [x + 15 * d, at.y]], '#fff', 1, a);
+		ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(x + 23 * d, at.y); ctx.lineTo(x + 15 * d, at.y - 4.5); ctx.lineTo(x + 15 * d, at.y + 4.5); ctx.fill(); ctx.restore(); });
+}
+function fxCrush(at, col) {
+	fx(FX_SEC, p => { const a = 1 - p * p; line(tr(ring(9, 5.4), { x: at.x, y: at.y + 7 }, (1 + 2.5 * p) * 0.62), col, 2.5, a);
+		for (let i = 0; i < 8; i++) { const ang = Math.PI + i * Math.PI / 7; ctx.globalAlpha = 1 - p; ctx.fillStyle = shade(col, -0.3);
+			ctx.fillRect(at.x + Math.cos(ang) * 15 * p - 1, at.y + 5 + Math.sin(ang) * 15 * p - 1, 2.5, 2.5); ctx.globalAlpha = 1; } });
+}
+function fxClaw(at, col, d) {
+	fx(FX_SEC, p => { const a = 1 - p * p, s = (1 + 0.3 * p) * 0.62;
+		for (let i = 0; i < 3; i++) line(tr([[-11 * d + (i - 1) * 8, -14], [8 * d + (i - 1) * 8, 14]], at, s), col, 2.2, a);
+		const s2 = (1 + p) * 0.62; line(tr([[-10, 0], [10, 0]], at, s2), '#fff', 1.3, a); line(tr([[0, -10], [0, 10]], at, s2), '#fff', 1.3, a); });
+}
+function fxShoot(from, to, col) {
+	const fly = FX_SEC * 0.5;
+	fx(fly, p => { ctx.fillStyle = col; ctx.fillRect(from.x + (to.x - from.x) * p - 2, from.y + (to.y - from.y) * p - 2, 4, 4); });
+	setTimeoutFx(fly, () => fxClaw(to, col, 1));
+}
+function floatNum(at, text, col, nth) {
+	const y0 = Math.max(at.y - 19 + 7 * (nth % 3), 26);
+	fx(1.1, (p, t) => { const yy = y0 - 10 * Math.min(1, t / 0.5); const a = t < 0.8 ? 1 : 1 - (t - 0.8) / 0.3;
+		ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.font = '700 9px Sarabun, sans-serif'; ctx.textAlign = 'center';
+		ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.strokeStyle = '#000'; ctx.strokeText(text, at.x, yy); ctx.fillStyle = col; ctx.fillText(text, at.x, yy); ctx.restore(); });
+}
+function banner(text, col, big) {
+	fx(1.3, (p, t) => { const a = t < 1 ? 1 : 1 - (t - 1) / 0.3;
+		ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.font = `700 ${big ? 10 : 8}px Sarabun, sans-serif`; ctx.textAlign = 'center';
+		ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.strokeStyle = '#000'; ctx.strokeText(text, W() / 2, 12); ctx.fillStyle = col; ctx.fillText(text, W() / 2, 12); ctx.restore(); });
+}
+function setTimeoutFx(sec, fn) { S.fx.push({ t: 0, dur: sec, draw: () => {}, then: fn }); }
+function hitFlash(key) { S.flash.set(key, 1); }
+
+// ไม้ตาย: ภาพเฉพาะสาย (ตรงกับ _fx_signature ในเกม)
+function sig(t, pts, from, col) {
+	const c = pts.reduce((a, p) => ({ x: a.x + p.x / pts.length, y: a.y + p.y / pts.length }), { x: 0, y: 0 });
+	const single = t.scope === 'single';
+	switch (t.school) {
+		case 'คม': single ? sigCross(pts[0], col) : sigWheel(c, col); break;
+		case 'ทุบ': sigQuake(pts, col); break;
+		case 'แทง': sigLance(from, pts, col); break;
+		case 'ยิง': single ? sigReticle(pts[0], col) : sigRain(pts, col); break;
+		case 'กล': sigGears(pts, col); break;
+		case 'มือเปล่า': sigShock(pts[0], col, +t.hits || 1); break;
+		default: sigWheel(c, col);
+	}
+}
+function sigWheel(at, col) {
+	fx(0.85, (p, t) => { const q = Math.min(1, t / 0.7), rot = Math.PI * 2 * (1 - (1 - q) * (1 - q));
+		const s = (0.4 + 0.75 * Math.min(1, t / 0.5)) * 0.62, a = t < 0.55 ? 1 : 1 - (t - 0.55) / 0.3;
+		for (let k = 0; k < 6; k++) { const pts = Array.from({ length: 7 }, (_, i) => { const ang = Math.PI * 2 * k / 6 + i * 7 * Math.PI / 180, r = 40 - i * 1.5; return [Math.cos(ang) * r, Math.sin(ang) * 0.75 * r]; });
+			line(tr(pts, at, s, rot), shade(col, -0.4), 4.5, a); line(tr(pts, at, s, rot), col, 3, a); line(tr(pts, at, s, rot), '#fff', 1, a); } });
+}
+function sigCross(at, col) {
+	for (let k = 0; k < 2; k++) fx(0.7, (p, t) => { const s = Math.min(1, t / 0.1) * 0.62, a = t < 0.45 ? 1 : 1 - (t - 0.45) / 0.25, d = k ? [1, 1] : [1, -1];
+		const pts = [[-d[0] * 26, -d[1] * 26], [d[0] * 26, d[1] * 26]]; line(tr(pts, at, s), shade(col, -0.4), 5, a); line(tr(pts, at, s), col, 3, a); line(tr(pts, at, s), '#fff', 1, a); }, 0.12 * k);
+}
+function sigQuake(pts, col) {
+	const y = FEET - 2; let x0 = Math.min(...pts.map(p => p.x)) - 18, x1 = Math.max(...pts.map(p => p.x)) + 18;
+	const crack = []; for (let x = x0, up = true; x <= x1; x += 5, up = !up) crack.push([x, y + (up ? -2 : 2)]);
+	fx(1.0, (p, t) => { const a = t < 0.08 ? t / 0.08 : t < 0.68 ? 1 : 1 - (t - 0.68) / 0.3; line(crack, '#1f120a', 3, a); line(crack, col, 1, a); });
+	for (const p0 of pts) for (let i = 0; i < 6; i++) fx(0.5, (p) => { const hgt = 11 + (i % 3) * 5, yy = y - 2 - hgt * Math.sin(Math.PI * p);
+		ctx.fillStyle = shade(col, -0.2 - 0.1 * (i % 3)); ctx.fillRect(p0.x - 8 + i * 3, yy, 2.5, 2.5); });
+}
+function sigLance(from, pts, col) {
+	let far = pts[0]; for (const p of pts) if (Math.abs(p.x - from.x) > Math.abs(far.x - from.x)) far = p;
+	const dx = far.x - from.x, dy = far.y - from.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+	const end = { x: far.x + ux * 19, y: far.y + uy * 19 };
+	fx(0.8, (p, t) => { const a = t < 0.06 ? t / 0.06 : t < 0.46 ? 1 : 1 - (t - 0.46) / 0.3; const seg = [[from.x, from.y], [end.x, end.y]];
+		line(seg, shade(col, -0.3), 6, a); line(seg, col, 3.8, a); line(seg, '#fff', 1.3, a);
+		ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(end.x + ux * 7, end.y + uy * 7); ctx.lineTo(end.x - uy * 5, end.y + ux * 5); ctx.lineTo(end.x + uy * 5, end.y - ux * 5); ctx.fill(); ctx.restore(); });
+}
+function sigRain(pts, col) {
+	let i = 0;
+	for (const p of pts) for (let k = 0; k < 5; k++) { const tgt = { x: p.x - 9 + k * 4.5, y: p.y - 4 + (k % 2) * 5 }, dl = 0.05 * (i++ % 7);
+		fx(0.18, q => line([[tgt.x + 8 * (1 - q) , tgt.y - 44 * (1 - q)], [tgt.x + 8 * (1 - q) - 2, tgt.y - 44 * (1 - q) + 6]], shade(col, 0.3), 1.6), dl);
+		S.fx.push({ t: -dl, dur: 0.18, draw: () => {}, then: () => fxClaw(tgt, col, 1) }); }
+}
+function sigReticle(at, col) {
+	fx(0.6, (p, t) => { const s = t < 0.25 ? 2.2 - 1.2 * (t / 0.25) : 1, a = t < 0.25 ? 1 : 1 - (t - 0.25) / 0.35;
+		line(tr(ring(9, 9, 24), at, s), col, 1.3, a); for (const [x, y] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) line(tr([[x * 5, y * 5], [x * 12, y * 12]], at, s), col, 1.3, a); });
+	S.fx.push({ t: 0, dur: 0.25, draw: () => {}, then: () => burst(at, col) });
+}
+function sigGears(pts, col) {
+	for (const p of pts) for (let k = 0; k < 2; k++) { const at = { x: p.x - 6 + k * 12, y: p.y - 5 + k * 9 }, n = 10;
+		const teeth = Array.from({ length: n * 2 + 1 }, (_, i) => { const r = (i % 2 ? 5.3 : 7.5) * (1 - 0.3 * k); return [Math.cos(Math.PI * i / n) * r, Math.sin(Math.PI * i / n) * r]; });
+		fx(0.8, (q, t) => { const s = Math.min(1, 0.3 + t / 0.15 * 0.7), a = t < 0.55 ? 1 : 1 - (t - 0.55) / 0.25, rot = Math.PI * 2 * q * (k ? -1 : 1);
+			line(tr(teeth, at, s, rot), shade(col, -0.4), 2.6, a); line(tr(teeth, at, s, rot), col, 1.3, a); }); }
+}
+function sigShock(at, col, hits) {
+	for (let k = 0; k < Math.max(hits, 2); k++) { const c = { x: at.x + ((k * 7) % 15) - 7, y: at.y + ((k * 11) % 13) - 6 };
+		fx(0.34, (p, t) => { const s = 1 + 1.6 * Math.min(1, t / 0.22), a = t < 0.22 ? 1 : 1 - (t - 0.22) / 0.12; line(tr(ring(5), c, s), k % 2 ? col : '#fff', 1.9, a); }, 0.07 * k); }
+}
+function burst(at, col) {
+	fx(FX_SEC, p => { const a = 1 - p * p; line(tr(ring(6.2), at, 1 + 1.8 * p), 'rgba(255,255,255,.9)', 1.9, a);
+		for (let k = 0; k < 4; k++) { const ang = Math.PI / 4 * k, r = 11 * (1 + 0.8 * p); line([[at.x - Math.cos(ang) * r, at.y - Math.sin(ang) * r], [at.x + Math.cos(ang) * r, at.y + Math.sin(ang) * r]], shade(col, 0.4), 1.9, a); } });
+}
+
+// ── ดาเมจตามสูตรเกม ──
+const heroAtk = () => Math.round(20 + S.prof * 1.6 + S.wpn);
+function elemMult(m, el) {
+	const has = v => v && v.split(/[\/,·\s]+/).includes(el);
+	if (has(m.immune)) return 0; if (has(m.weak)) return K.WEAK_MULT; if (has(m.resist)) return K.RESIST_MULT; return 1;
+}
+function dmgRange(t, m) {
+	const base = heroAtk() * (+t.power) / 100, mit = K.MIT_K / (K.MIT_K + (+m.def) * (1 - (+t.ignore_def || 0))), e = elemMult(m, t.element);
+	const f = v => Math.max(e > 0 ? 1 : 0, Math.round(base * mit * e * v));
+	return { lo: f(0.95), hi: f(1.05), mid: f(1), e };
+}
+
+// ── เล่นสกิล ──
+function playTech(t) {
+	S.tech = t; S.fx = []; S.flash.clear();
+	const m = DATA.monsters.find(x => x.monster_id === S.foe);
+	const ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
+	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
+	const from = heroPt();
+	banner((ult ? '◆ ไม้ตาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : shade(col, 0.3), ult);
+	if (ult) { S.dimT = 0; S.shake = 0.35; sig(t, tg.map(f => f.pt), from, col); }
+	const r = dmgRange(t, m); let nth = 0;
+	for (let h = 0; h < Math.max(1, +t.hits || 1); h++) for (const f of tg) {
+		const at = f.pt;
+		switch (t.school) { case 'คม': fxSlash(at, col, -1); break; case 'แทง': fxPierce(at, col, -1); break; case 'ทุบ': fxCrush(at, col); break; case 'ยิง': fxShoot(from, at, col); break; default: fxClaw(at, col, -1); }
+		if (ult) burst(at, col);
+		hitFlash('f' + f.i);
+		floatNum(at, r.e === K.WEAK_MULT ? r.mid + '!' : String(r.mid), r.e === K.WEAK_MULT ? '#ffe08a' : '#fff', nth++);
+	}
+	S.seq = { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), i: 0, acc: 0, sec: K.ATTACK_FRAME_SEC, rest: 'rion/west' };
+	S.heroFrame = S.seq.frames[0];
+	setRead(t);
+}
+
+// ── ลูปหลัก ──
+let last = performance.now();
+function tick(now) {
+	const raw = Math.min(0.1, (now - last) / 1000); last = now;
+	const dt = raw * S.speed;
+	if (S.tab === 'clips') {
+		const c = CLIPS[S.clip];
+		if (S.playing && c.frames.length > 1) {
+			S.acc += dt;
+			while (S.acc >= c.sec) { S.acc -= c.sec;
+				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); }
+		}
+		clipView();
+	} else {
+		if (S.playing) {
+			if (S.seq) { S.seq.acc += dt; while (S.seq && S.seq.acc >= S.seq.sec) { S.seq.acc -= S.seq.sec; S.seq.i++;
+				if (S.seq.i >= S.seq.frames.length) { S.heroFrame = S.seq.rest; S.seq = null; } else S.heroFrame = S.seq.frames[S.seq.i]; } }
+			for (const e of S.fx) { e.t += dt; if (e.then && e.t >= e.dur) { const fn = e.then; e.then = null; fn(); } }
+			S.fx = S.fx.filter(e => e.t < e.dur);
+			for (const [k, v] of S.flash) { const nv = v - dt / 0.3; nv <= 0 ? S.flash.delete(k) : S.flash.set(k, nv); }
+			if (S.shake > 0) S.shake = Math.max(0, S.shake - dt);
+			if (S.dimT !== undefined) { S.dimT += dt; const t = S.dimT; S.dim = t < 0.12 ? 0.55 * t / 0.12 : t < 0.82 ? 0.55 : t < 1.17 ? 0.55 * (1 - (t - 0.82) / 0.35) : 0; if (t >= 1.17) S.dimT = undefined; }
+		}
+		skillView(S.playing ? dt : 0);
+	}
+	requestAnimationFrame(tick);
+}
+
+// ── UI ──
+const $ = id => document.getElementById(id);
+function press(group, v) { for (const b of group.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.v === String(v))); }
+function setRead(t) {
+	if (S.tab === 'clips') {
+		const c = CLIPS[S.clip];
+		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
+		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll' }[k.split('/')[0]];
+		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
+	} else {
+		const tt = t || S.tech;
+		$('rdClip').textContent = tt ? 'สกิล · ' + tt.name_th : 'สกิล — เลือกท่าด้านขวา';
+		$('rdFrame').textContent = 'ฟัน 4 เฟรม'; $('rdMs').textContent = Math.round(K.ATTACK_FRAME_SEC * 1000) + ' ms';
+		$('rdFile').textContent = tt ? `techs.csv · ${tt.tech_id} · ${tt.school}${tt.branch ? ' / ' + tt.branch : ''}` : '';
+	}
+}
+function syncFrame() {
+	setRead();
+	for (const b of $('strip').children) b.setAttribute('aria-current', String(+b.dataset.i === S.frame));
+}
+function buildStrip() {
+	const box = $('strip'); box.innerHTML = '';
+	const c = S.tab === 'clips' ? CLIPS[S.clip] : { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), sec: K.ATTACK_FRAME_SEC };
+	c.frames.forEach((k, i) => {
+		const b = document.createElement('button'); b.dataset.i = i; b.type = 'button';
+		const t = document.createElement('canvas'); t.width = 96; t.height = 96; const x = t.getContext('2d'); x.imageSmoothingEnabled = false;
+		const im = IMG[k]; if (im) { const s = Math.min(1, 96 / Math.max(im.width, im.height)) * (im.width <= 48 ? 2 : 1); x.drawImage(im, (96 - im.width * s) / 2, (96 - im.height * s) / 2, im.width * s, im.height * s); }
+		b.append(t, `#${i + 1} · ${Math.round(c.sec * 1000)}ms`);
+		b.addEventListener('click', () => { if (S.tab !== 'clips') return; S.playing = false; updPlay(); S.frame = i; S.acc = 0; syncFrame(); });
+		box.append(b);
+	});
+	syncFrame();
+}
+function buildClips() {
+	const box = $('clipGroups');
+	for (const g of GROUPS) {
+		const sec = document.createElement('div'); sec.className = 'cgroup';
+		sec.innerHTML = `<h3>${g.name}</h3>`;
+		const grid = document.createElement('div'); grid.className = 'cgrid';
+		for (const id of g.ids) {
+			const c = CLIPS[id], b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = id;
+			b.innerHTML = `${c.label}<small>${c.frames.length} เฟรม${c.frames.length > 1 ? ' · ' + Math.round(c.sec * 1000) + ' ms' : ''}</small>`;
+			b.addEventListener('click', () => { S.clip = id; S.frame = 0; S.acc = 0; S.playing = true; updPlay(); press($('clipGroups'), id); buildStrip(); });
+			grid.append(b);
+		}
+		sec.append(grid); box.append(sec);
+	}
+	press(box, S.clip);
+}
+function buildFoes() {
+	const box = $('foePick'); box.innerHTML = '';
+	for (const m of DATA.monsters) {
+		const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = m.monster_id;
+		b.textContent = `${m.name_th} ${m.monster_id}`;
+		b.addEventListener('click', () => { S.foe = m.monster_id; press(box, S.foe); renderStats(); renderTechs(); });
+		box.append(b);
+	}
+	press(box, S.foe);
+}
+function renderStats() {
+	const m = DATA.monsters.find(x => x.monster_id === S.foe);
+	$('foeStat').innerHTML = `HP <b>${m.hp}</b> · ATK <b>${m.atk}</b> · DEF <b>${m.def}</b> · SPD <b>${m.spd}</b> · แพ้ทาง <b>${m.weak || '—'}</b> · ต้านทาน <b>${m.resist || '—'}</b>${m.immune ? ' · ไม่ระคาย <b>' + m.immune + '</b>' : ''}${S.foe === 'B1' ? ' · บอสลงเวทีตัวเดียว' : ''}`;
+	$('heroStat').innerHTML = `Rion ATK <b>${heroAtk()}</b> = 20 + ${S.prof}×1.6 + ${S.wpn}`;
+}
+const SCOPE = { single: 'เดี่ยว', row: 'ทั้งแถว', column: 'ทะลุแนว', all: 'ทุกตัว', self: 'ตัวเอง' };
+function renderTechs() {
+	const schools = [...new Set(DATA.techs.map(t => t.school))];
+	const sp = $('schoolPick');
+	if (!sp.children.length) for (const s of schools) {
+		const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = s;
+		b.textContent = `${s} (${DATA.techs.filter(t => t.school === s).length})`;
+		b.addEventListener('click', () => { S.school = s; press(sp, s); renderTechs(); });
+		sp.append(b);
+	}
+	press(sp, S.school);
+	const m = DATA.monsters.find(x => x.monster_id === S.foe), list = $('techList'); list.innerHTML = '';
+	for (const t of DATA.techs.filter(t => t.school === S.school).sort((a, b) => +a.req_prof - +b.req_prof)) {
+		const r = dmgRange(t, m), ult = +t.req_prof >= K.ULT_PROF, b = document.createElement('button');
+		b.className = 'tech'; b.type = 'button'; b.setAttribute('aria-pressed', String(S.tech === t));
+		const cls = r.e === K.WEAK_MULT ? 'weak' : r.e < 1 ? 'res' : '';
+		const hits = +t.hits > 1 ? ` ×${t.hits}` : '';
+		b.innerHTML = `<span class="nm">${t.name_th}${ult ? '<span class="ult">◆ ไม้ตาย</span>' : ''}</span>
+			<span class="dmg ${cls}">${r.lo}–${r.hi}${hits}${r.e === K.WEAK_MULT ? ' แพ้ทาง' : r.e === 0 ? ' ไม่ระคาย' : r.e < 1 ? ' ต้านทาน' : ''}</span>
+			<span class="meta">ต้องชำนาญ ${t.req_prof} · พลัง ${t.power} · SP ${t.sp} · ${SCOPE[t.scope] || t.scope} · ธาตุ ${t.element}${+t.ignore_def ? ' · เจาะเกราะ ' + Math.round(t.ignore_def * 100) + '%' : ''}${t.note ? ' · ' + t.note : ''}</span>`;
+		b.addEventListener('click', () => { S.playing = true; updPlay(); playTech(t); for (const x of list.children) x.setAttribute('aria-pressed', String(x === b)); });
+		list.append(b);
+	}
+}
+function updPlay() { $('btnPlay').textContent = S.playing ? '⏸ หยุด' : '▶ เล่น'; $('btnPlay').setAttribute('aria-pressed', String(S.playing)); }
+function setTab(t) {
+	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
+	$('tabClips').setAttribute('aria-pressed', String(t === 'clips')); $('tabSkills').setAttribute('aria-pressed', String(t === 'skills'));
+	$('paneClips').hidden = t !== 'clips'; $('paneSkills').hidden = t !== 'skills';
+	buildStrip(); setRead();
+}
+
+function boot() {
+	$('ultK').textContent = K.ULT_PROF;
+	$('btnPlay').onclick = () => { S.playing = !S.playing; updPlay(); };
+	const step = d => { if (S.tab !== 'clips') return; S.playing = false; updPlay(); const n = CLIPS[S.clip].frames.length; S.frame = (S.frame + d + n) % n; syncFrame(); };
+	$('btnPrev').onclick = () => step(-1); $('btnNext').onclick = () => step(1);
+	$('segSpeed').onclick = e => { const v = e.target.dataset.v; if (v) { S.speed = +v; press($('segSpeed'), v); } };
+	$('segBg').onclick = e => { const v = e.target.dataset.v; if (v) { S.bg = v; press($('segBg'), v); } };
+	$('segCount').onclick = e => { const v = e.target.dataset.v; if (v) { S.count = +v; press($('segCount'), v); } };
+	$('btnOnion').onclick = () => { S.onion = !S.onion; $('btnOnion').setAttribute('aria-pressed', String(S.onion)); };
+	$('btnGrid').onclick = () => { S.grid = !S.grid; $('btnGrid').setAttribute('aria-pressed', String(S.grid)); };
+	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills');
+	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
+	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
+	buildClips(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
+		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
+		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ
+		· สร้างใหม่: <code>python3 tools/web/anim_test_build.py out.html</code>`;
+	requestAnimationFrame(tick);
+}
+
+const loads = Object.entries(DATA.sprites).map(([k, src]) => new Promise(res => { const im = new Image(); im.onload = () => { IMG[k] = im; res(); }; im.onerror = res; im.src = src; }));
+Promise.all([...loads, document.fonts ? document.fonts.ready.catch(() => {}) : 0]).then(boot);
+</script>
