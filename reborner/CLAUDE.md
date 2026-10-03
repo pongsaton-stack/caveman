@@ -22,7 +22,8 @@ world/  ฉากแผนที่
   MenuScreen.gd (Esc) · ShopScreen.gd (ช่อง S) · UiKit.gd ชิ้นส่วน UI ร่วม
 data/   monsters.csv techs.csv encounters.csv chests.csv map_ashfield.txt
         party_slots.csv (ช่องมอนตาม EC) · companions.csv (มอนเริ่มต้น) · items.csv (ของในร้าน)
-assets/sprites/hero/  เฟรมตัวเอก 48x48 30 ไฟล์
+assets/sprites/rion_lastlight_draft/  ตัวเอกที่ใช้อยู่ (ตัดจาก Last Light · ร่าง รอ kwan) · hero/ rion/ = แบบเก่าที่เลิกใช้
+docs/art-bible/  lastlight_01-03.png = ต้นแบบศิลป์ (canon) · Rion หมวกน้ำเงิน
 ```
 
 ## กฎที่ห้ามละเมิด
@@ -61,6 +62,8 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - ✅ สัปดาห์ 3: ปาร์ตี้มอนใน `PlayerState.party` (เซฟได้) · LP ล้ม=-1 หมด=หายถาวร · LP ฟื้น 1 ทุก 3 จุดพัก (ต้องสู้ก่อนพักถึงนับ) · ความเชื่อใจ +1 ทุก 4 ศึก/+1 จบไม่ล้ม (คูลดาวน์ 3) · ช่องมอนตาม EC · EC +1 เมื่อชนะบอส · เมนู (Esc) · ร้าน (ช่อง S) ขายยาสมุนไพร/ยาเติมชีวิต สต๊อกจำกัด
   **ตัดสินแล้ว: เริ่มเกมพร้อมมอน 2 ตัว** (GDD 11.30 — คนเดียวชนะภูมิภาค 1 ไม่ได้)
 - ⬜ สัปดาห์ 4: สมุดบันทึก · กล่องบทพูดฉากเปิด · รับมอนเข้าทีม → vertical slice
+
+- ✅ 3 ต.ค. 2026: ตัวเอกเป็นร่าง Last Light (หมวกน้ำเงิน) · จอสู้สลับเป็นศัตรูซ้าย/ปาร์ตี้ขวา (MASTER §5)
 
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)

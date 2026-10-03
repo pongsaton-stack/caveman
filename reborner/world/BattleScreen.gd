@@ -11,7 +11,7 @@ var step_delay := 0.55       # วินาทีต่อเทิร์นข�
 var end_delay := 1.2
 const QUEUE_SLOTS := 8          # GDD 3.1 — UI ต้องแสดงคิวล่วงหน้า 8 ช่อง
 const LOG_LINES := 4
-const SPRITE_DIR := "res://assets/sprites/hero"
+const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
 
 # พาเลตต์เดียวกับแผนที่องก์ 1
 const C_BG := Color("15130f")
@@ -242,8 +242,9 @@ func _fill_side(box: VBoxContainer, list: Array, allies: bool) -> void:
 
 # ── สร้าง UI ─────────────────────────────────────────────────
 func _load_textures() -> void:
-	var p_idle := "%s/idle.png" % SPRITE_DIR
-	var p_cast := "%s/attack_cast.png" % SPRITE_DIR
+	# ปาร์ตี้อยู่ขวา หันซ้ายเข้าหาศัตรู · ยังไม่มีท่าโจมตีจริง ใช้ยกตัว 1px แทน
+	var p_idle := "%s/west.png" % SPRITE_DIR
+	var p_cast := "%s/west_step.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
 	if ResourceLoader.exists(p_cast):
@@ -267,21 +268,22 @@ func _build() -> void:
 	_queue_box.add_theme_constant_override("separation", 2)
 	root.add_child(_queue_box)
 
+	# จอสู้ side-view: ศัตรูซ้าย · ปาร์ตี้ขวา (MASTER §5)
 	_ally_box = VBoxContainer.new()
-	_ally_box.position = Vector2(4, 28)
-	_ally_box.size = Vector2(150, 74)
+	_ally_box.position = Vector2(236, 28)
+	_ally_box.size = Vector2(146, 74)
 	_ally_box.add_theme_constant_override("separation", 3)
 	root.add_child(_ally_box)
 
 	_hero_tex = TextureRect.new()
 	_hero_tex.texture = _tex_idle
-	_hero_tex.position = Vector2(160, 40)
-	_hero_tex.size = Vector2(48, 48)
+	_hero_tex.position = Vector2(170, 34)
+	_hero_tex.size = Vector2(64, 64)
 	_hero_tex.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	root.add_child(_hero_tex)
 
 	_foe_box = VBoxContainer.new()
-	_foe_box.position = Vector2(216, 28)
+	_foe_box.position = Vector2(4, 28)
 	_foe_box.size = Vector2(164, 74)
 	_foe_box.add_theme_constant_override("separation", 3)
 	root.add_child(_foe_box)

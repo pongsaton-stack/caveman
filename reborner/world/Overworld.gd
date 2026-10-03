@@ -11,10 +11,11 @@ const MOVE_TIME := 0.12
 const ENEMY_STEP := 0.9
 const CHASE_RANGE := 4
 const MAP_PATH := "res://data/map_ashfield.txt"
-const SPRITE_DIR := "res://assets/sprites/rion"
+const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
 
 # ชื่อไฟล์เฟรมตัวเอกต่อทิศ — ถ้าทิศไหนดูผิด แก้ชื่อไฟล์ตรงนี้ได้เลย
-# Rion ผมแดง 64x64 จาก PixelLab (generate-8-rotations-v3) · *_step = ยกตัว 1px แทนท่าเดินจนกว่าจะมีแอนิเมชันจริง
+# Rion ตามต้นแบบ Last Light (ตัดจาก docs/art-bible/lastlight_01.png · หมวกน้ำเงิน) 64x64 · ร่าง รอ kwan อนุมัติ
+# *_step = ยกตัว 1px แทนท่าเดินจนกว่าจะมีแอนิเมชันจริง
 const HERO_ANIMS := {
 	"down":  ["south", "south_step"],
 	"up":    ["north", "north_step"],
@@ -125,7 +126,7 @@ func _build_hero() -> void:
 	if found > 0:
 		hero_sprite = AnimatedSprite2D.new()
 		hero_sprite.sprite_frames = frames
-		hero_sprite.offset = Vector2(0, -14)   # เท้า (y=58 ในเฟรม 64) ตรงขอบล่างช่อง
+		hero_sprite.offset = Vector2(0, -18)   # เท้า (y=62 ในเฟรม 64) ตรงขอบล่างช่อง
 		hero_sprite.animation = "down"
 		hero_node.add_child(hero_sprite)
 	else:
