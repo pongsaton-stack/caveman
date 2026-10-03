@@ -55,6 +55,12 @@ static func threat(enemy_tier: float, prof: float) -> float:
 static func is_swat(enemy_tier: float, prof: float) -> bool:
 	return enemy_tier <= prof - SWAT_GAP
 
+## ตบทิ้งบนแมพ (GDD 3.9) — **ปิดอยู่** ตามที่สั่ง 3 ต.ค. 2026 ("ยกเลิกตบมอนก่อน") · มอนอ่อนเข้าศึกตามปกติ
+## กฎความชำนาญ 0 จากมอนที่อ่อนกว่าเกณฑ์ (prof_gain) ยังใช้ is_swat เหมือนเดิม — กันฟาร์มมอนอ่อน
+const MAP_SWAT := false
+static func map_swat(enemy_tier: float, prof: float) -> bool:
+	return MAP_SWAT and is_swat(enemy_tier, prof)
+
 ## ความชำนาญที่ได้ต่อศึก — ห้ามใช้ ceil (GDD 4.1)
 static func prof_gain(enemy_tier: float, prof: float) -> int:
 	if is_swat(enemy_tier, prof):

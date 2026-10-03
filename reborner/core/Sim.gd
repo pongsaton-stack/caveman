@@ -58,7 +58,7 @@ func sweep(mid: String, label: String, profs: Array, count: int = 1) -> void:
 	print("── %s (%s tier %d) x%d ──" % [label, mid, tier, count])
 	print("  prof   ชนะ  เวลา AV  ออก/เข้า  ประกาย%  Insight เต็ม  คอมโบ  เปิดท่า  ขัด  สถานะ  ตั้งรับ%")
 	for p in profs:
-		if Formulas.is_swat(tier, p):
+		if Formulas.map_swat(tier, p):
 			print("  %4d   —      —        —        —          —         —       —      —     —       —   ตบทิ้งบนแมพ" % p)
 			continue
 		var r := batch(mid, p, count)

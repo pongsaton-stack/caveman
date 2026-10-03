@@ -65,7 +65,7 @@ func set_facing(dir: Vector2i) -> void:
 ## สีบอกความอันตรายเทียบกับตัวเอก — ผู้เล่นต้องเห็นก่อนเดินเข้าไป
 ##   เทา = ตบทิ้งได้ · เขียว = ง่าย · เหลือง = สูสี · แดง = อันตราย
 func set_danger(prof: int) -> void:
-	if Formulas.is_swat(tier, prof) and not is_boss:
+	if Formulas.map_swat(tier, prof) and not is_boss:
 		body_color = Color("7a7a7a")
 	elif tier < prof:
 		body_color = Color("5fa88a")

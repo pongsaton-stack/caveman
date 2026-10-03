@@ -433,7 +433,7 @@ func _enemies_step() -> void:
 func _enemy_dir(e: WorldEnemy) -> Vector2i:
 	var d := ps.cell - e.cell
 	# ตัวที่ตบทิ้งได้ไม่ไล่ — ไม่มีเหตุผลจะเสียเวลาผู้เล่น
-	var chase := not Formulas.is_swat(e.tier, ps.prof) and absi(d.x) + absi(d.y) <= CHASE_RANGE
+	var chase := not Formulas.map_swat(e.tier, ps.prof) and absi(d.x) + absi(d.y) <= CHASE_RANGE
 	if chase and rng.randf() < 0.6:
 		if absi(d.x) > absi(d.y):
 			return Vector2i(signi(d.x), 0)
@@ -584,7 +584,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	# บอสไม่ถูกตบทิ้งเด็ดขาด — ศึกบอสคือเนื้อเรื่อง ไม่ใช่มอนขยะ
 	var all_swat := not e.is_boss
 	for r in rows:
-		if not Formulas.is_swat(int(r["tier"]), ps.prof):
+		if not Formulas.map_swat(int(r["tier"]), ps.prof):
 			all_swat = false
 	if all_swat:
 		var coins := 2 * rows.size()
