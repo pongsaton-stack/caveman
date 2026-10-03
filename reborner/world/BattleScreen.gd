@@ -134,6 +134,7 @@ func _commit(action: Dictionary) -> void:
 	_play_events()
 	if kind != "guard" and kind != "watch":
 		await _play_attack()
+	await _await_fx()
 	await get_tree().create_timer(step_delay).timeout
 	_advance()
 
@@ -182,6 +183,7 @@ func _hero_auto_turn() -> void:
 	_play_events()
 	if not hero.guarding:
 		await _play_attack()
+	await _await_fx()
 
 # ── คำสั่งของผู้เล่น ─────────────────────────────────────────
 func _show_commands() -> void:
@@ -631,6 +633,7 @@ func _play_events() -> void:
 	if evs.is_empty() or step_delay <= 0.0:
 		return
 	var ult := false
+	_ult_impact = 0.0
 	for e in evs:
 		if e.has("tech"):
 			ult = _is_ultimate(e)
@@ -640,25 +643,34 @@ func _play_events() -> void:
 			break
 	var nth := 0     # ตัวเลขหลายตัวในครั้งเดียว (ท่าหมู่/ไม้ตาย) → เหลื่อมขึ้นทีละแถว ไม่ทับกัน
 	for e in evs:
-		var to := _actor_point(e["tgt"])
-		if to == Vector2.INF:
+		if _actor_point(e["tgt"]) == Vector2.INF:
 			continue
-		if e.has("dot"):
-			_float_number(to, "%d %s" % [e["dmg"], e["dot"]], Color("c08ad0"))
-			continue
-		var from := _actor_point(e["src"])
-		var col: Color = Color("f2c94c") if e["glimmer"] or str(e["tech"]).begins_with("คอมโบ") else FX_COLOR.get(e["school"], FX_DEFAULT)
-		match str(e["school"]):
-			"คม": _fx_slash(to, col, from)
-			"แทง": _fx_pierce(to, col, from)
-			"ทุบ": _fx_crush(to, col)
-			"ยิง": _fx_shoot(from, to, col)
-			_: _fx_claw(to, col, from)
-		if ult:
-			_fx_burst(to, col)
-		_hit_flash(e["tgt"])
-		nth += 1
-		_float_number(to + Vector2(0, 11 * ((nth - 1) % 3)), ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
+		if not e.has("dot"):
+			nth += 1
+		if ult and _ult_impact > 0.0:   # ไม้ตายแบบมีท่าทาง: ตัวเลข/วาบ ขึ้นตอนกระทบจริง ไม่ใช่ตอนกดท่า
+			get_tree().create_timer(_ult_impact).timeout.connect(_strike_fx.bind(e, ult, nth))
+		else:
+			_strike_fx(e, ult, nth)
+
+func _strike_fx(e: Dictionary, ult: bool, nth: int) -> void:
+	var to := _actor_point(e["tgt"])
+	if to == Vector2.INF:
+		return
+	if e.has("dot"):
+		_float_number(to, "%d %s" % [e["dmg"], e["dot"]], Color("c08ad0"))
+		return
+	var from := _actor_point(e["src"])
+	var col: Color = Color("f2c94c") if e["glimmer"] or str(e["tech"]).begins_with("คอมโบ") else FX_COLOR.get(e["school"], FX_DEFAULT)
+	match str(e["school"]):
+		"คม": _fx_slash(to, col, from)
+		"แทง": _fx_pierce(to, col, from)
+		"ทุบ": _fx_crush(to, col)
+		"ยิง": _fx_shoot(from, to, col)
+		_: _fx_claw(to, col, from)
+	if ult:
+		_fx_burst(to, col)
+	_hit_flash(e["tgt"])
+	_float_number(to + Vector2(0, 11 * ((nth - 1) % 3)), ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
 
 ## จุดกลางตัวบนเวที (Vector2.INF = ตัวนี้ไม่มีรูปบนเวที)
 func _actor_point(a) -> Vector2:
@@ -692,20 +704,262 @@ func _ultimate_intro(e: Dictionary, evs: Array) -> void:
 		_fx_root().add_child(_dim)
 	_fx_root().move_child(_dim, 0)
 	_dim.modulate.a = 0.0
-	var tw := create_tween()
-	tw.tween_property(_dim, "modulate:a", 0.55, 0.12)
-	tw.tween_interval(0.7)
-	tw.tween_property(_dim, "modulate:a", 0.0, 0.35)
 	_fx_root().move_child(_banner, -1)
-	_shake(get_child(0), 3.0, 0.35)
 	var t: Tech = b.techs.get_tech(str(e["tech"]))
 	var pts: Array = []
 	for ev in evs:
 		var p := _actor_point(ev.get("tgt"))
-		if p != Vector2.INF and not ev.has("dot"):
+		if p != Vector2.INF and not ev.has("dot") and not pts.has(p):
 			pts.append(p)
-	if pts.size() > 0:
-		_fx_signature(t, pts, _actor_point(e.get("src")), FX_COLOR.get(e["school"], FX_DEFAULT))
+	var col: Color = FX_COLOR.get(e["school"], FX_DEFAULT)
+	var total := 0.85
+	var src = e.get("src")
+	if pts.size() > 0 and src == hero and _hero_tex != null and CHOREO.has(t.school):
+		var r: Vector2 = call(CHOREO[t.school], pts, col)   # x = จังหวะกระทบ · y = ยาวทั้งท่า
+		_ult_impact = r.x
+		total = r.y
+		_fx_end_ms = Time.get_ticks_msec() + int(total * 1000.0)
+	else:
+		_shake(get_child(0), 3.0, 0.35)
+		if pts.size() > 0:
+			_fx_signature(t, pts, _actor_point(src), col)
+	var tw := create_tween()
+	tw.tween_property(_dim, "modulate:a", 0.55, 0.12)
+	tw.tween_interval(maxf(0.0, total - 0.47))
+	tw.tween_property(_dim, "modulate:a", 0.0, 0.35)
+
+# ── ไม้ตายแบบมีท่าทาง (kwan ส่งภาพแนว "Last Light สกิลไม้ตาย 6 ท่า" 3 ต.ค.) ─────────────
+# Rion ขยับจริง (พุ่ง/กระโดด/เงาตามตัว) + แสงบวก (additive) + ระเบิด/เศษ/จอวาบ · ตัวอย่าง 2 สายก่อน: คม · ทุบ
+# สายที่ยังไม่มีใน CHOREO ใช้ _fx_signature เดิม · ภาพล้วน ไม่แตะค่าเกม/RNG ของศึก
+const CHOREO := {"คม": "_choreo_slash", "ทุบ": "_choreo_crush"}
+var _ult_impact := 0.0     # วินาทีจากกดท่าถึงจังหวะกระทบ (ตัวเลข/วาบรอถึงตอนนี้)
+var _fx_end_ms := 0        # เวลาที่ไม้ตายเล่นจบ — เทิร์นถัดไปรอจนถึงตอนนั้น
+var _add_mat: CanvasItemMaterial
+
+func _await_fx() -> void:
+	var left := (_fx_end_ms - Time.get_ticks_msec()) / 1000.0
+	if left > 0.0 and step_delay > 0.0:
+		await get_tree().create_timer(left).timeout
+
+func _glow(n: CanvasItem) -> CanvasItem:
+	if _add_mat == null:
+		_add_mat = CanvasItemMaterial.new()
+		_add_mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	n.material = _add_mat
+	return n
+
+func _later(sec: float, fn: Callable) -> void:
+	get_tree().create_timer(sec).timeout.connect(fn)
+
+func _center(pts: Array) -> Vector2:
+	var c := Vector2.ZERO
+	for p in pts:
+		c += p
+	return c / pts.size()
+
+## เงาตามตัว (afterimage): สำเนารูป Rion ตอนนั้น ย้อมสี จางหาย
+func _afterimage(col: Color, life: float = 0.3) -> void:
+	if _hero_tex == null:
+		return
+	var g := TextureRect.new()
+	g.texture = _hero_tex.texture
+	g.position = _hero_tex.position
+	g.size = _hero_tex.size
+	g.flip_h = _hero_tex.flip_h
+	g.modulate = Color(col.r, col.g, col.b, 0.55)
+	g.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fx_root().add_child(_glow(g))
+	var tw := create_tween()
+	tw.tween_property(g, "modulate:a", 0.0, life)
+	tw.tween_callback(g.queue_free)
+
+## พา Rion ไปตำแหน่ง to (มุมซ้ายบนของรูป) ใน sec วิ พร้อมทิ้งเงา ghosts ครั้ง
+func _hero_dash(to: Vector2, sec: float, col: Color, ghosts: int) -> void:
+	var tw := create_tween()
+	tw.tween_property(_hero_tex, "position", to, sec).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	for i in ghosts:
+		_later(sec * i / float(maxi(1, ghosts)), _afterimage.bind(col))
+
+func _screen_flash(col: Color, peak: float, sec: float) -> void:
+	var f := ColorRect.new()
+	f.color = col
+	f.set_anchors_preset(Control.PRESET_FULL_RECT)
+	f.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	f.modulate.a = peak
+	_fx_root().add_child(f)
+	var tw := create_tween()
+	tw.tween_property(f, "modulate:a", 0.0, sec)
+	tw.tween_callback(f.queue_free)
+
+## เสี้ยวพระจันทร์ (Polygon2D): ขอบนอก r · ขอบในเลื่อนเข้า → ปลายแหลมสองข้าง · เรืองแสงแบบบวก
+func _crescent(at: Vector2, r: float, rot: float, col: Color, life: float, grow: float = 1.25) -> void:
+	var root := Node2D.new()
+	root.position = at
+	root.rotation = rot
+	_fx_root().add_child(root)
+	for layer in [[col, 1.0, 0.9, 0.42], [col.lerp(Color("ffb347"), 0.6), 0.93, 0.8, 0.26], [Color(1, 0.95, 0.85), 0.86, 0.6, 0.07]]:   # แดง → ส้มไฟ → แกนขาวบาง (แนวภาพ kwan)
+		var poly := PackedVector2Array()
+		var rr: float = r * layer[1]
+		var thick: float = layer[3]   # ความหนาตรงกลางเสี้ยว (สัดส่วนของรัศมี)
+		for i in 13:
+			var a := deg_to_rad(-90.0 + i * 180.0 / 12.0)
+			poly.append(Vector2(cos(a), sin(a)) * rr)
+		for i in range(1, 12):   # ขอบในไม่ซ้ำจุดปลาย (ปลายซ้ำ/ไขว้ = Polygon2D ไม่วาดเลย)
+			var a := deg_to_rad(90.0 - i * 180.0 / 12.0)
+			poly.append(Vector2(cos(a) * rr * (1.0 - 2.0 * thick), sin(a) * rr))   # ขอบใน = วงรีแคบกว่า ปลายบรรจบขอบนอก → เสี้ยวจันทร์
+		var pg := Polygon2D.new()
+		pg.polygon = poly
+		pg.color = Color(layer[0].r, layer[0].g, layer[0].b, layer[2])
+		root.add_child(_glow(pg))
+	root.scale = Vector2(0.55, 0.55)
+	var tw := create_tween().set_parallel()
+	tw.tween_property(root, "scale", Vector2(grow, grow), life).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(root, "rotation", rot + 0.5, life)
+	tw.tween_property(root, "modulate:a", 0.0, life * 0.45).set_delay(life * 0.55)
+	tw.chain().tween_callback(root.queue_free)
+
+## เศษปลิว: สี่เหลี่ยมเล็กพุ่งเป็นวิถีโค้ง (ตกตามแรงโน้มถ่วง) · n ชิ้น · เลื่อนแบบคงที่ ไม่ใช้ randf
+func _debris(at: Vector2, col: Color, n: int, spread: float, up: float, life: float, size: float = 3.0) -> void:
+	for i in n:
+		var bit := ColorRect.new()
+		var k := float(i) / maxf(1.0, n - 1.0)
+		bit.color = col.darkened(0.15 * (i % 3))
+		bit.size = Vector2(size, size) * (0.7 + 0.15 * (i % 3))
+		bit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_fx_root().add_child(bit)
+		var vx := lerpf(-spread, spread, k) + ((i * 37) % 9 - 4)
+		var vy := up * (0.6 + 0.4 * (((i * 53) % 7) / 6.0))
+		var tw := create_tween()
+		tw.tween_method(func(t: float): bit.position = at + Vector2(vx * t, -vy * t + up * 1.6 * t * t), 0.0, 1.0, life)
+		tw.parallel().tween_property(bit, "modulate:a", 0.0, life * 0.4).set_delay(life * 0.6)
+		tw.tween_callback(bit.queue_free)
+
+func _blast(at: Vector2, col: Color, r: float, life: float) -> void:
+	for layer in [[col, 1.0, 0.75], [col.lightened(0.5), 0.6, 0.9], [Color.WHITE, 0.3, 1.0]]:
+		var poly := PackedVector2Array()
+		for i in 20:
+			var a := TAU * i / 20.0
+			var rr: float = r * layer[1] * (1.0 if i % 2 == 0 else 0.78)
+			poly.append(Vector2(cos(a), sin(a) * 0.8) * rr)
+		var pg := Polygon2D.new()
+		pg.polygon = poly
+		pg.color = Color(layer[0].r, layer[0].g, layer[0].b, layer[2])
+		pg.position = at
+		pg.scale = Vector2(0.2, 0.2)
+		_fx_root().add_child(_glow(pg))
+		var tw := create_tween().set_parallel()
+		tw.tween_property(pg, "scale", Vector2.ONE, life * 0.35).set_ease(Tween.EASE_OUT)
+		tw.tween_property(pg, "rotation", 0.4, life)
+		tw.tween_property(pg, "modulate:a", 0.0, life * 0.6).set_delay(life * 0.4)
+		tw.chain().tween_callback(pg.queue_free)
+
+## คม · "พันคมจันทร์": พุ่งเข้าหาศัตรูทิ้งเงา → เสี้ยวจันทร์ 6 สายฟันสลับทิศ → เสี้ยวยักษ์ปิดท้าย + จอวาบ + เศษแดง → กลับที่
+func _choreo_slash(pts: Array, col: Color) -> Vector2:
+	var c := _center(pts)
+	var home := _hero_tex.position
+	var right := c.x
+	for p in pts:
+		right = maxf(right, p.x)
+	_hero_dash(Vector2(right - 6.0, home.y), 0.14, col, 4)
+	for i in 6:
+		var off := Vector2(((i * 13) % 17) - 8, ((i * 7) % 11) - 5)
+		var rot := PI * (0.15 + 0.85 * (i % 2)) + (i - 2.5) * 0.18
+		_later(0.16 + i * 0.075, _crescent.bind(c + off, 20.0 + i * 2.0, rot, col, 0.32))
+		_later(0.16 + i * 0.075, _afterimage.bind(col, 0.22))
+	var fin := 0.16 + 6 * 0.075
+	_later(fin, _crescent.bind(c, 40.0, PI * 0.95, col.lightened(0.15), 0.55, 1.5))
+	_later(fin, _screen_flash.bind(Color(1, 0.85, 0.8), 0.55, 0.22))
+	_later(fin, _shake.bind(get_child(0), 4.0, 0.3))
+	for p in pts:
+		_later(fin, _debris.bind(p, Color("b3262a"), 9, 26.0, 26.0, 0.55, 2.5))
+	_later(fin + 0.3, _hero_dash.bind(home, 0.18, col, 3))
+	return Vector2(fin, fin + 0.55)
+
+## ทุบ · "สากทลายฟ้า": กระโดดสูงเหนือกลุ่มศัตรู → ทุบลง → จอวาบ + คลื่นกระแทก 3 วง + ระเบิดส้ม + หินปลิว + รอยแตก → กระโดดกลับ
+func _choreo_crush(pts: Array, col: Color) -> Vector2:
+	var c := _center(pts)
+	var home := _hero_tex.position
+	var ground := STAGE_FEET_Y
+	var land := Vector2(c.x + 4.0, home.y)    # จุดกึ่งกลาง Rion อยู่ขวาของกลุ่มศัตรู ~36px → ค้อนฟาดลงกลางกลุ่ม
+	var tw := create_tween()
+	tw.tween_property(_hero_tex, "position", Vector2(lerpf(home.x, land.x, 0.6), home.y - 28.0), 0.26).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_interval(0.06)
+	tw.tween_property(_hero_tex, "position", land, 0.09).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_later(0.27, _afterimage.bind(col, 0.25))
+	_later(0.36, _afterimage.bind(col, 0.2))
+	var hit := 0.41
+	var at := Vector2(c.x, ground - 4.0)
+	_later(hit, _screen_flash.bind(Color(1, 0.9, 0.7), 0.7, 0.28))
+	_later(hit, _shake.bind(get_child(0), 6.0, 0.5))
+	_later(hit - 0.12, _hammer.bind(at, col))
+	_later(hit, _blast.bind(at + Vector2(0, -10), col, 34.0, 0.6))
+	for k in 3:
+		_later(hit + k * 0.07, _shock_ring.bind(at, col, 18.0 + k * 10.0, 0.45))
+	_later(hit, _ground_crack.bind(at, 70.0))
+	_later(hit, _debris.bind(at, Color("8a6a4a"), 16, 60.0, 56.0, 0.75, 4.0))
+	_later(hit + 0.05, _debris.bind(at, Color("e8c79a"), 8, 40.0, 40.0, 0.6, 2.0))
+	var back := create_tween()
+	back.tween_interval(hit + 0.45)
+	back.tween_property(_hero_tex, "position", Vector2(lerpf(land.x, home.x, 0.5), home.y - 16.0), 0.12).set_ease(Tween.EASE_OUT)
+	back.tween_property(_hero_tex, "position", home, 0.12).set_ease(Tween.EASE_IN)
+	return Vector2(hit, hit + 0.75)
+
+## ค้อนเรืองแสงขนาดใหญ่ เหวี่ยงจากด้านบนลงกระแทกจุด at (หมุน −110° → 0 ใน 0.12 วิ) ค้างแล้วจาง
+func _hammer(at: Vector2, col: Color) -> void:
+	var pivot := Node2D.new()
+	pivot.position = at + Vector2(30, -6)          # จุดหมุน = มือ Rion ทางขวา
+	pivot.rotation = deg_to_rad(110.0)
+	_fx_root().add_child(pivot)
+	var handle := _line(PackedVector2Array([Vector2.ZERO, Vector2(-30, 0)]), Color("6b4a2e"), 3.0)
+	pivot.add_child(handle)
+	var head := Polygon2D.new()
+	head.polygon = PackedVector2Array([Vector2(-26, -10), Vector2(-42, -10), Vector2(-42, 10), Vector2(-26, 10)])
+	head.color = Color("9a8f86")
+	pivot.add_child(head)
+	var glow := Polygon2D.new()
+	glow.polygon = PackedVector2Array([Vector2(-23, -13), Vector2(-45, -13), Vector2(-45, 13), Vector2(-23, 13)])
+	glow.color = Color(col.r, col.g, col.b, 0.55)
+	pivot.add_child(_glow(glow))
+	var tw := create_tween()
+	tw.tween_property(pivot, "rotation", 0.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_interval(0.3)
+	tw.tween_property(pivot, "modulate:a", 0.0, 0.25)
+	tw.tween_callback(pivot.queue_free)
+
+func _shock_ring(at: Vector2, col: Color, r: float, life: float) -> void:
+	var pts := PackedVector2Array()
+	for i in 33:
+		var a := TAU * i / 32.0
+		pts.append(Vector2(cos(a) * r, sin(a) * r * 0.32))
+	var l := _line(pts, col.lightened(0.3), 3.0)
+	l.position = at
+	l.scale = Vector2(0.3, 0.3)
+	_fx_root().add_child(_glow(l))
+	var tw := create_tween().set_parallel()
+	tw.tween_property(l, "scale", Vector2(1.6, 1.6), life).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "modulate:a", 0.0, life)
+	tw.chain().tween_callback(l.queue_free)
+
+## รอยแตกพื้น: เส้นหยักเข้ม 4 แฉกจากจุดกระแทก ค้าง ~0.8 วิ
+func _ground_crack(at: Vector2, w: float) -> void:
+	var root := Node2D.new()
+	root.position = at
+	_fx_root().add_child(root)
+	for side in [-1.0, 1.0]:
+		for k in 2:
+			var pts := PackedVector2Array([Vector2.ZERO])
+			var x := 0.0
+			var i := 0
+			while x < w * (0.55 + 0.45 * k):
+				x += 6.0
+				i += 1
+				pts.append(Vector2(side * x, (2.0 if i % 2 == 0 else -2.0) + k * 3.0))
+			root.add_child(_line(pts, Color("2a1a10"), 2.5))
+			root.add_child(_glow(_line(pts, Color("e39253"), 1.0)))
+	var tw := create_tween()
+	tw.tween_interval(0.6)
+	tw.tween_property(root, "modulate:a", 0.0, 0.35)
+	tw.tween_callback(root.queue_free)
 
 func _shake(n: CanvasItem, amp: float, sec: float) -> void:
 	if n == null or not ("position" in n):
