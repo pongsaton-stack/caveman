@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ovttxvev36gi"
-path="res://.godot/imported/south_step.png-db9218f20e25b102ba8b44f2118d0a3c.ctex"
+uid="uid://cc4l1qwojmodx"
+path="res://.godot/imported/west_k1.png-01b6d18ff7ba506d46aae6a805de970e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/rion_lastlight_draft/south_step.png"
-dest_files=["res://.godot/imported/south_step.png-db9218f20e25b102ba8b44f2118d0a3c.ctex"]
+source_file="res://assets/sprites/rion_lastlight_draft/west_k1.png"
+dest_files=["res://.godot/imported/west_k1.png-01b6d18ff7ba506d46aae6a805de970e.ctex"]
 
 [params]
 

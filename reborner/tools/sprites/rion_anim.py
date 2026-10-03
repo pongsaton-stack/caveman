@@ -100,3 +100,62 @@ def attack_west():
     d=blank(); paste(d,im,-1,0); knife(d,HAND[0]-1,HAND[1]+1,140,8)
     arc(d,21,44,17,150,215,2,[SLASH[0]]); f.append(d)                                           # คืนท่า: เส้นจาง
     return f
+
+def lean(src, k, y0=HIP, top=10):
+    """เอนตัวช่วงบน: แถวเหนือสะโพกเลื่อน dx = round(k*(y0-y)/(y0-top)) (หัวเลื่อนมากสุด)"""
+    out=blank(); s=src.load(); d=out.load()
+    for y in range(64):
+        dx=0 if y>=y0 else round(k*(y0-y)/(y0-top))
+        for x in range(64):
+            if s[x,y][3] and 0<=x+dx<64: d[x+dx,y]=s[x,y]
+    return out
+
+HIT=[(255,208,192),(255,255,255)]   # VFX แสงกระทบ (ยกเว้นพาเลตต์ตามกฎ)
+def spark(im, cx, cy, r):
+    """ประกายโดนตีรูปกากบาท 4 แฉก"""
+    for i in range(-r, r+1):
+        c=HIT[1] if abs(i)<=1 else HIT[0]
+        px(im,cx+i,cy,c); px(im,cx,cy+i,c)
+    for i in (-1,1):
+        px(im,cx+i*(r-1),cy+i*(r-1),HIT[0]); px(im,cx+i*(r-1),cy-i*(r-1),HIT[0])
+
+def hurt_west():
+    """โดนตีจากซ้าย: h0 ผงะ ตัวกระเด็นขวา เอนหลัง + ประกาย · h1 ตั้งหลักครึ่งทาง"""
+    im=load('west')
+    f=[]
+    a=blank(); paste(a, lean(im, 7), 4, 0); spark(a, 20, 36, 6); spark(a, 15, 27, 3); f.append(a)
+    b=blank(); paste(b, lean(im, 3), 2, 0); f.append(b)
+    return f
+
+def ko_west():
+    """ล้ม: k0 ทรุดเข่า (ช่วงบนลง 4px ขาหด) · k1 นอนหงายหัวไปทางขวา (หมุน 90° ตามเข็ม ไม่บิดพิกเซล)"""
+    im=load('west')
+    upper=region(im, lambda x,y: y<HIP)
+    legs=region(im, lambda x,y: y>=HIP)
+    a=blank()
+    # ขาหด: ทิ้งแถวกลางขา เหลือเท้า + ต้นขา
+    l=legs.load(); d=a.load()
+    for y in range(HIP,64):
+        if HIP+1<=y<HIP+6: continue
+        ny=y if y>=HIP+6 else y+5
+        for x in range(64):
+            if l[x,y][3]: d[x,ny]=l[x,y]
+    paste(a, lean(upper,-3), 0, 5)
+    b=blank()
+    lying=im.rotate(-90, expand=False)          # หัวไปขวา เท้าไปซ้าย
+    bb=lying.getbbox()
+    paste(b, lying, 0, 62-bb[3]+1)               # วางลงพื้น (y≈62 เท่าเท้าท่ายืน)
+    return [a, b]
+
+if __name__ == '__main__':
+    import sys
+    out = sys.argv[1] if len(sys.argv) > 1 else SRC
+    sets = {}
+    for n, fr in (('south', walk_frontback('south')), ('north', walk_frontback('north', 31)),
+                  ('west', walk_side('west', True)), ('east', walk_side('east', False, 34))):
+        for i, im in enumerate(fr): sets['%s_w%d' % (n, i)] = im
+    for i, im in enumerate(attack_west()): sets['west_a%d' % i] = im
+    for i, im in enumerate(hurt_west()): sets['west_h%d' % i] = im
+    for i, im in enumerate(ko_west()): sets['west_k%d' % i] = im
+    for k, im in sets.items(): im.save(out + k + '.png')
+    print(len(sets), 'frames ->', out)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://o5dqocsipauv"
-path="res://.godot/imported/north_step.png-446decb0d8ee5e3902fd7aa7bd2e7890.ctex"
+uid="uid://cdssl7io3pbol"
+path="res://.godot/imported/west_h0.png-d63a0904b17c1b5b104d3373ba31110b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/rion_lastlight_draft/north_step.png"
-dest_files=["res://.godot/imported/north_step.png-446decb0d8ee5e3902fd7aa7bd2e7890.ctex"]
+source_file="res://assets/sprites/rion_lastlight_draft/west_h0.png"
+dest_files=["res://.godot/imported/west_h0.png-d63a0904b17c1b5b104d3373ba31110b.ctex"]
 
 [params]
 

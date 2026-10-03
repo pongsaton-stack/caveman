@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dejk6v6f6mari"
-path="res://.godot/imported/east_step.png-aac95c718b90edc681179b136d3655e1.ctex"
+uid="uid://bbbvmf47nwwbx"
+path="res://.godot/imported/hurt_sheet.png-5306b5ad31e8622bbf0e17f76333a14c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/rion_lastlight_draft/east_step.png"
-dest_files=["res://.godot/imported/east_step.png-aac95c718b90edc681179b136d3655e1.ctex"]
+source_file="res://docs/art-bible/previews/hurt_sheet.png"
+dest_files=["res://.godot/imported/hurt_sheet.png-5306b5ad31e8622bbf0e17f76333a14c.ctex"]
 
 [params]
 

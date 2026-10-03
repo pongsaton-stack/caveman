@@ -42,6 +42,10 @@ var _hero_tex: TextureRect
 var _tex_idle: Texture2D
 var _tex_attack: Array[Texture2D] = []   # west_a0..a3: ง้าง → พุ่ง → ฟันเต็ม → ถอย
 const ATTACK_FRAME_SEC := 0.11
+var _tex_hurt: Array[Texture2D] = []     # west_h0..h1: ผงะ + ประกาย → ตั้งหลัก
+var _tex_ko: Array[Texture2D] = []       # west_k0..k1: ทรุดเข่า → นอนราบ (ค้างไว้จนฟื้น)
+var _hero_hp_seen := -1
+var _hero_down_seen := false
 var _log_shown := 0
 var _recent: Array[String] = []
 var _pending: Dictionary = {}
@@ -62,6 +66,7 @@ func _ready() -> void:
 	b.capture = true
 	b.begin()
 	hero = b.hero()
+	_hero_hp_seen = hero.hp if hero != null else -1
 	_flush_log()
 	_refresh()
 	if auto:
@@ -99,6 +104,7 @@ func _advance() -> void:
 			b.auto_act(cur)
 			_flush_log()
 			_refresh()
+			await _react_hero()
 		await get_tree().create_timer(step_delay).timeout
 
 func _commit(action: Dictionary) -> void:
@@ -123,7 +129,34 @@ func _play_attack() -> void:
 		_hero_tex.texture = t
 		if sec > 0.0:
 			await get_tree().create_timer(sec).timeout
-	_hero_tex.texture = _tex_idle
+	_hero_tex.texture = _rest_tex()
+
+func _rest_tex() -> Texture2D:
+	if hero != null and hero.down and _tex_ko.size() > 0:
+		return _tex_ko[_tex_ko.size() - 1]
+	return _tex_idle
+
+## ตัวอื่นเล่นจบเทิร์น → ดูว่าตัวเอกโดนตี/ล้ม/ฟื้นไหม แล้วเล่นท่าตาม
+func _react_hero() -> void:
+	if _hero_tex == null or hero == null:
+		return
+	var hit := _hero_hp_seen >= 0 and hero.hp < _hero_hp_seen
+	var fell := hero.down and not _hero_down_seen
+	_hero_hp_seen = hero.hp
+	_hero_down_seen = hero.down
+	var sec := minf(ATTACK_FRAME_SEC, step_delay / 4.0)
+	var seq: Array[Texture2D] = []
+	if fell:
+		if _tex_hurt.size() > 0:
+			seq.append(_tex_hurt[0])
+		seq.append_array(_tex_ko)
+	elif hit and not hero.down:
+		seq.append_array(_tex_hurt)
+	for t in seq:
+		_hero_tex.texture = t
+		if sec > 0.0:
+			await get_tree().create_timer(sec).timeout
+	_hero_tex.texture = _rest_tex()
 
 func _hero_auto_turn() -> void:
 	b.auto_act(hero)
@@ -315,6 +348,10 @@ func _load_textures() -> void:
 		var pa := "%s/west_a%d.png" % [SPRITE_DIR, i]
 		if ResourceLoader.exists(pa):
 			_tex_attack.append(load(pa))
+		for pair in [["h", _tex_hurt], ["k", _tex_ko]]:
+			var ph := "%s/west_%s%d.png" % [SPRITE_DIR, pair[0], i]
+			if ResourceLoader.exists(ph):
+				pair[1].append(load(ph))
 	var p_idle := "%s/west.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
