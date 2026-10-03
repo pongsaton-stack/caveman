@@ -96,6 +96,10 @@ func _gain_insight(a: Actor, amount: float, why: String) -> void:
 
 var current: Actor = null   # ตัวที่ถึงคิวอยู่ตอนนี้ (หลัง next_turn)
 var capture := false        # เก็บบรรทัดบันทึกไว้ให้ UI อ่าน
+## เหตุการณ์ให้หน้าจอวาดเอฟเฟกต์ (เก็บเฉพาะตอน capture · ไม่แตะการสุ่ม → ผลศึกเหมือนเดิมทุกไบต์)
+## {src, tgt, tech, school, dmg, weak, glimmer, dot}
+var events: Array = []
+var _fx_glimmer := false    # ท่าที่กำลังตีเป็นท่าประกายไหม (คอมโบก็ส่ง bonus > 1 จึงแยกธงไว้)
 var log_lines: Array[String] = []
 
 func run() -> Dictionary:
@@ -298,10 +302,12 @@ func _tick_status_damage(a: Actor) -> bool:
 		var d := int(round(float(a.max_hp) * Status.dot_of(Status.POISON)))
 		a.hp = maxi(0, a.hp - d)
 		_log("    %s เสีย %d จากพิษ" % [a.name, d])
+		if capture: events.append({"tgt": a, "dmg": d, "dot": "พิษ"})
 	if a.has_status(Status.BLEED) and a.last_hit > 0:
 		var d := int(round(float(a.last_hit) * Status.bleed_of(Status.BLEED)))
 		a.hp = maxi(0, a.hp - d)
 		_log("    %s เสีย %d จากเลือดไหล" % [a.name, d])
+		if capture: events.append({"tgt": a, "dmg": d, "dot": "เลือดไหล"})
 	for k in a.tick_statuses(1):
 		_log("    %s หายจาก%s" % [a.name, k])
 	if a.hp <= 0:
@@ -451,10 +457,12 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 
 	var targets := _resolve_scope(tech, target)
 	var bonus := 1.5 if free else 1.0
+	_fx_glimmer = free
 	for _i in tech.hits:
 		for t in targets:
 			if not t.down:
 				_strike(cur, t, tech, bonus)
+	_fx_glimmer = false
 
 	var wm := 1.0
 	if cur.windup:
@@ -498,6 +506,9 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 
 	_log("  รอบ %2d  %s → %s [%s] : %d (เหลือ %d/%d)%s"
 		% [rounds, src.name, tgt.name, tech.name, dmg, tgt.hp, tgt.max_hp, tag])
+	if capture:
+		events.append({"src": src, "tgt": tgt, "tech": tech.name, "school": tech.school, "dmg": dmg,
+			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer})
 
 	# ฝ่ายเราโดนตี = สะสม Insight
 	# ศัตรูเล็งตัวที่ HP น้อยที่สุด มอนร่วมทีมจึงเป็นแท้งก์และตัวเอกแทบไม่โดน

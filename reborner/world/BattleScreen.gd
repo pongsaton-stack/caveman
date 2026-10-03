@@ -119,6 +119,7 @@ func _advance() -> void:
 			b.auto_act(cur)
 			_flush_log()
 			_refresh()
+			_play_events()
 			await _react_hero()
 		await get_tree().create_timer(step_delay).timeout
 
@@ -130,6 +131,7 @@ func _commit(action: Dictionary) -> void:
 	b.player_act(action)
 	_flush_log()
 	_refresh()
+	_play_events()
 	if kind != "guard" and kind != "watch":
 		await _play_attack()
 	await get_tree().create_timer(step_delay).timeout
@@ -177,6 +179,7 @@ func _hero_auto_turn() -> void:
 	b.auto_act(hero)
 	_flush_log()
 	_refresh()
+	_play_events()
 	if not hero.guarding:
 		await _play_attack()
 
@@ -603,3 +606,193 @@ func _process(delta: float) -> void:
 		var fr: Array = _foe_frames[a]
 		_foe_rects[a].texture = fr[mini(_foe_frame, fr.size() - 1)]
 		_foe_rects[a].modulate = Color(1, 1, 1, 0.3) if a.down else Color.WHITE   # ล้ม = จาง
+
+# ── เอฟเฟกต์สกิล ─────────────────────────────────────────────────
+# อ่าน b.events (เก็บตอน capture) หลังแต่ละการกระทำ: ป้ายชื่อท่า · เอฟเฟกต์ตามสาย · ตัวเลขดาเมจลอย
+# ไม่ await (เล่นขนานกับท่าฟันของ Rion) · เทสต์ที่ตั้ง step_delay = 0 ข้ามทั้งหมด
+const FX_COLOR := {"คม": Color("ff5a4a"), "แทง": Color("7ad0e0"), "ทุบ": Color("e39253"), "ยิง": Color("f2c08a"), "กล": Color("8ad0a0")}
+const FX_DEFAULT := Color("ffd0c0")
+const FX_SEC := 0.28
+var _fx_layer: Control
+var _banner: Label
+var _banner_tw: Tween       # ป้ายใหม่ต้องหยุดการจางของป้ายเก่า (ไม่งั้นป้ายเก่าซ่อนป้ายใหม่ไปด้วย)
+
+func _fx_root() -> Control:
+	if _fx_layer == null:
+		_fx_layer = Control.new()
+		_fx_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		get_child(0).add_child(_fx_layer)   # ลูกตัวสุดท้ายของ root = วาดทับทุกอย่างบนเวที
+	return _fx_layer
+
+func _play_events() -> void:
+	var evs: Array = b.events.duplicate()
+	b.events.clear()
+	if evs.is_empty() or step_delay <= 0.0:
+		return
+	for e in evs:
+		if e.has("tech"):
+			_show_banner(e)
+			break
+	for e in evs:
+		var to := _actor_point(e["tgt"])
+		if to == Vector2.INF:
+			continue
+		if e.has("dot"):
+			_float_number(to, "%d %s" % [e["dmg"], e["dot"]], Color("c08ad0"))
+			continue
+		var from := _actor_point(e["src"])
+		var col: Color = Color("f2c94c") if e["glimmer"] or str(e["tech"]).begins_with("คอมโบ") else FX_COLOR.get(e["school"], FX_DEFAULT)
+		match str(e["school"]):
+			"คม": _fx_slash(to, col, from)
+			"แทง": _fx_pierce(to, col, from)
+			"ทุบ": _fx_crush(to, col)
+			"ยิง": _fx_shoot(from, to, col)
+			_: _fx_claw(to, col, from)
+		_float_number(to, ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
+
+## จุดกลางตัวบนเวที (Vector2.INF = ตัวนี้ไม่มีรูปบนเวที)
+func _actor_point(a) -> Vector2:
+	if a == null:
+		return Vector2.INF
+	if a == hero and _hero_tex != null:
+		return _hero_tex.position + Vector2(32, 34)
+	if _foe_rects.has(a):
+		var r: TextureRect = _foe_rects[a]
+		return r.position + r.size * Vector2(0.5, 0.55)
+	return Vector2.INF
+
+func _show_banner(e: Dictionary) -> void:
+	if _banner == null:
+		_banner = _label("", 8, C_TEXT)
+		_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_banner.position = Vector2(98, 25)
+		_banner.size = Vector2(188, 12)
+		_banner.add_theme_color_override("font_outline_color", Color.BLACK)
+		_banner.add_theme_constant_override("outline_size", 3)
+		_fx_root().add_child(_banner)
+	var src = e.get("src")
+	var who: String = src.name if src != null else ""
+	if e["glimmer"]:
+		_banner.text = "★ ประกาย! %s · %s" % [who, e["tech"]]
+		_banner.add_theme_color_override("font_color", Color("f2c94c"))
+	else:
+		_banner.text = "%s · %s" % [who, e["tech"]]
+		_banner.add_theme_color_override("font_color", FX_COLOR.get(e["school"], FX_DEFAULT).lightened(0.3))
+	if _banner_tw != null and _banner_tw.is_valid():
+		_banner_tw.kill()
+	_banner.modulate = Color.WHITE
+	_banner_tw = create_tween()
+	_banner_tw.tween_interval(0.6)
+	_banner_tw.tween_property(_banner, "modulate:a", 0.0, 0.25)
+
+func _fade_free(n: CanvasItem, grow: float) -> void:
+	var tw := create_tween().set_parallel()
+	tw.tween_property(n, "modulate:a", 0.0, FX_SEC).set_ease(Tween.EASE_IN)
+	if grow != 1.0:
+		tw.tween_property(n, "scale", n.scale * grow, FX_SEC)
+	tw.chain().tween_callback(n.queue_free)
+
+func _line(points: PackedVector2Array, col: Color, w: float) -> Line2D:
+	var l := Line2D.new()
+	l.points = points
+	l.width = w
+	l.default_color = col
+	l.begin_cap_mode = Line2D.LINE_CAP_ROUND
+	l.end_cap_mode = Line2D.LINE_CAP_ROUND
+	return l
+
+func _side(from: Vector2, to: Vector2) -> float:
+	return 1.0 if from == Vector2.INF or from.x <= to.x else -1.0
+
+## คม: ส่วนโค้งฟันสองชั้น (สี + แกนขาว)
+func _fx_slash(at: Vector2, col: Color, from: Vector2) -> void:
+	var d := _side(from, at)
+	for layer in [[col, 4.0, 16.0], [Color(1, 1, 1, 0.9), 1.5, 15.0]]:
+		var pts := PackedVector2Array()
+		for i in 9:
+			var ang := deg_to_rad(-70.0 + i * 20.0)
+			pts.append(Vector2(-cos(ang) * d, sin(ang)) * layer[2])
+		var l := _line(pts, layer[0], layer[1])
+		l.position = at
+		l.scale = Vector2(0.6, 0.6)
+		_fx_root().add_child(l)
+		_fade_free(l, 2.0)
+
+## แทง: เส้นพุ่งทะลุตัวเป้า + หัวลูกศร
+func _fx_pierce(at: Vector2, col: Color, from: Vector2) -> void:
+	var d := _side(from, at)
+	var l := _line(PackedVector2Array([Vector2(-26 * d, 0), Vector2(18 * d, 0)]), col, 3.0)
+	l.position = at - Vector2(10 * d, 0)
+	_fx_root().add_child(l)
+	var head := Polygon2D.new()
+	head.polygon = PackedVector2Array([Vector2(24 * d, 0), Vector2(16 * d, -4), Vector2(16 * d, 4)])
+	head.color = Color.WHITE
+	l.add_child(head)
+	var tw := create_tween()
+	tw.tween_property(l, "position:x", at.x + 10 * d, FX_SEC * 0.6)
+	_fade_free(l, 1.0)
+
+## ทุบ: วงแรงกระแทกขยาย + เศษหินกระเด็น
+func _fx_crush(at: Vector2, col: Color) -> void:
+	var pts := PackedVector2Array()
+	for i in 17:
+		var ang := TAU * i / 16.0
+		pts.append(Vector2(cos(ang), sin(ang) * 0.6) * 6.0)
+	var ring := _line(pts, col, 2.0)
+	ring.position = at + Vector2(0, 10)
+	_fx_root().add_child(ring)
+	_fade_free(ring, 3.5)
+	for i in 5:
+		var bit := ColorRect.new()
+		bit.color = col.darkened(0.3)
+		bit.size = Vector2(2, 2)
+		bit.position = at + Vector2(0, 8)
+		_fx_root().add_child(bit)
+		var dir := Vector2(cos(PI + i * PI / 4.0), sin(PI + i * PI / 4.0)) * 14.0
+		var tw := create_tween().set_parallel()
+		tw.tween_property(bit, "position", bit.position + dir, FX_SEC)
+		tw.tween_property(bit, "modulate:a", 0.0, FX_SEC)
+		tw.chain().tween_callback(bit.queue_free)
+
+## ยิง: กระสุนวิ่งจากผู้ยิงเข้าเป้า แล้วแตกเป็นประกาย
+func _fx_shoot(from: Vector2, to: Vector2, col: Color) -> void:
+	if from == Vector2.INF:
+		_fx_claw(to, col, from)
+		return
+	var shot := ColorRect.new()
+	shot.color = col
+	shot.size = Vector2(3, 3)
+	shot.position = from
+	_fx_root().add_child(shot)
+	var tw := create_tween()
+	tw.tween_property(shot, "position", to, FX_SEC * 0.5)
+	tw.tween_callback(func():
+		shot.queue_free()
+		_fx_claw(to, col, Vector2.INF))
+
+## ท่ามอน/มือเปล่า/อื่นๆ: รอยข่วน 3 เส้น + ประกายกากบาท
+func _fx_claw(at: Vector2, col: Color, from: Vector2) -> void:
+	var d := _side(from, at)
+	for i in 3:
+		var off := Vector2((i - 1) * 5, 0)
+		var l := _line(PackedVector2Array([Vector2(-7 * d, -9) + off, Vector2(5 * d, 9) + off]), col, 2.0)
+		l.position = at
+		_fx_root().add_child(l)
+		_fade_free(l, 1.3)
+	var star := _line(PackedVector2Array([Vector2(-6, 0), Vector2(6, 0)]), Color.WHITE, 1.0)
+	star.add_child(_line(PackedVector2Array([Vector2(0, -6), Vector2(0, 6)]), Color.WHITE, 1.0))
+	star.position = at
+	_fx_root().add_child(star)
+	_fade_free(star, 2.0)
+
+func _float_number(at: Vector2, text: String, col: Color) -> void:
+	var l := _label(text, 9, col)
+	l.add_theme_color_override("font_outline_color", Color.BLACK)
+	l.add_theme_constant_override("outline_size", 3)
+	l.position = at + Vector2(-8, -22)
+	_fx_root().add_child(l)
+	var tw := create_tween().set_parallel()
+	tw.tween_property(l, "position:y", l.position.y - 14.0, 0.6).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "modulate:a", 0.0, 0.3).set_delay(0.35)
+	tw.chain().tween_callback(l.queue_free)
