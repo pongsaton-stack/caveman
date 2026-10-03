@@ -49,6 +49,15 @@ const ATTACK_FRAME_SEC := 0.11
 var _tex_hurt: Array[Texture2D] = []     # west_h0..h1: ผงะ + ประกาย → ตั้งหลัก
 var _tex_ko: Array[Texture2D] = []       # west_k0..k1: ทรุดเข่า → นอนราบ (ค้างไว้จนฟื้น)
 var _hero_hp_seen := -1
+const HERO_X := 222                       # ตัวเอกยืนขวาของเวที ชิดแผงปาร์ตี้
+const FOE_SPRITE_DIR := "res://assets/sprites/monsters_ll"
+const FOE_AREA := Vector2(100, 214)       # ช่วง x ที่ศัตรูยืน (ระหว่างแผงศัตรูกับตัวเอก)
+const STAGE_FEET_Y := 100.0               # เท้าแตะพื้นทราย
+const FOE_IDLE_SEC := 0.45
+var _foe_rects: Dictionary = {}           # Actor → TextureRect
+var _foe_frames: Dictionary = {}          # Actor → Array ของ Texture2D [ยืน, idle]
+var _foe_clock := 0.0
+var _foe_frame := 0
 var _hero_down_seen := false
 var _log_shown := 0
 var _recent: Array[String] = []
@@ -318,31 +327,38 @@ func _fill_side(box: VBoxContainer, list: Array, allies: bool) -> void:
 		var a: Actor = x
 		var row := VBoxContainer.new()
 		row.add_theme_constant_override("separation", 0)
+		# แผงแคบ (ผังแบบ A) → บรรทัดแรก ชื่อ+HP · บรรทัดสองตัวเล็ก: ล้ม/ท่าที่เปิด/ความเข้าใจ/สถานะ
 		var name_line := a.name
 		if allies and not a.is_hero and a.lp > 0:
 			name_line += " " + UiKit.lp_dots(a.lp)
-		if a.down:
-			name_line += "  (ล้ม)"
+		var notes: Array[String] = []
 		if not a.telegraph.is_empty():
-			name_line += "  ▼ " + str(a.telegraph["name"])
+			notes.append("▼ " + str(a.telegraph["name"]))
 		if not allies:
 			var u := b.understanding_of(a)
 			if u[0] > 0:
-				name_line += "  ◇%d/%d" % [mini(u[0], u[1]), u[1]]
+				notes.append("◇%d/%d" % [mini(u[0], u[1]), u[1]])
 		if not a.statuses.is_empty():
-			name_line += "  [" + ", ".join(a.statuses.keys()) + "]"
-		var head := _label("%s   %d/%d" % [name_line, a.hp, a.max_hp], 7, C_MUTED if a.down else C_TEXT)
+			notes.append("[" + ", ".join(a.statuses.keys()) + "]")
+		var hp_txt := "ล้ม" if a.down else "%d/%d" % [a.hp, a.max_hp]
+		var head := _label("%s %s" % [name_line, hp_txt], 6, C_MUTED if a.down else C_TEXT)
 		head.clip_text = true
 		head.custom_minimum_size = Vector2(box.size.x, 0)
 		row.add_child(head)
 		var ratio := float(a.hp) / maxf(float(a.max_hp), 1.0)
 		row.add_child(_bar(ratio, C_HP if ratio > 0.3 else C_HP_LOW, 3))
+		if not notes.is_empty():
+			var nl := _label(" ".join(notes), 6, C_GOLD if not a.telegraph.is_empty() else C_MUTED)
+			nl.clip_text = true
+			nl.custom_minimum_size = Vector2(box.size.x, 0)
+			row.add_child(nl)
 		if allies and a.is_hero:
 			row.add_child(_bar(float(a.sp) / maxf(float(a.max_sp), 1.0), C_SP, 2))
 			var ins := minf(a.insight / Insight.THRESHOLD, 1.0)
 			row.add_child(_bar(ins, C_GOLD, 2))
-			var extra := "SP %d/%d · Insight %d%%%s" % [a.sp, a.max_sp, int(ins * 100.0), "  ◆ ท่าถัดไปประกาย" if ins >= 1.0 else ""]
-			row.add_child(_label(extra, 6, C_MUTED))
+			row.add_child(_label("SP %d/%d · Insight %d%%" % [a.sp, a.max_sp, int(ins * 100.0)], 6, C_MUTED))
+			if ins >= 1.0:
+				row.add_child(_label("◆ ท่าถัดไปประกาย", 6, C_GOLD))
 		box.add_child(row)
 
 # ── สร้าง UI ─────────────────────────────────────────────────
@@ -375,7 +391,7 @@ func _build() -> void:
 		st.color = r[1]
 		root.add_child(st)
 	# แผงเข้มรองตัวหนังสือบนเวทีสว่าง (ตัวหนังสือสีครีมอ่านไม่ออกบนพื้นสว่าง)
-	for r in [Rect2(2, 26, 168, 76), Rect2(234, 26, 148, 76)]:
+	for r in [Rect2(2, 26, 96, 76), Rect2(288, 26, 94, 76)]:
 		var pn := Panel.new()
 		pn.add_theme_stylebox_override("panel", UiKit.box(Color(C_PANEL, 0.88), C_LINE))
 		pn.position = r.position
@@ -400,22 +416,26 @@ func _build() -> void:
 
 	# จอสู้ side-view: ศัตรูซ้าย · ปาร์ตี้ขวา (MASTER §5)
 	_ally_box = VBoxContainer.new()
-	_ally_box.position = Vector2(236, 28)
-	_ally_box.size = Vector2(146, 74)
-	_ally_box.add_theme_constant_override("separation", 3)
+	_ally_box.position = Vector2(290, 28)
+	_ally_box.size = Vector2(90, 74)
+	_ally_box.add_theme_constant_override("separation", 1)
+	_ally_box.clip_contents = true   # ล้นแผงเมื่อไหร่ ตัดทิ้ง ไม่ทับช่อง log
 	root.add_child(_ally_box)
 
 	_hero_tex = TextureRect.new()
 	_hero_tex.texture = _tex_idle
-	_hero_tex.position = Vector2(170, 34)
+	_hero_tex.position = Vector2(HERO_X, 34)
 	_hero_tex.size = Vector2(64, 64)
 	_hero_tex.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	root.add_child(_hero_tex)
 
+	_build_foe_sprites(root)
+
 	_foe_box = VBoxContainer.new()
 	_foe_box.position = Vector2(4, 28)
-	_foe_box.size = Vector2(164, 74)
-	_foe_box.add_theme_constant_override("separation", 3)
+	_foe_box.size = Vector2(92, 74)
+	_foe_box.add_theme_constant_override("separation", 1)
+	_foe_box.clip_contents = true
 	root.add_child(_foe_box)
 
 	var log_bg := ColorRect.new()
@@ -507,3 +527,46 @@ func _label(text: String, size: int, col: Color) -> Label:
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", col)
 	return l
+
+## ศัตรูที่มีรูป (assets/sprites/monsters_ll/<id>.png) ยืนบนเวทีระหว่างแผงศัตรูกับตัวเอก · ตัวที่ไม่มีรูปมีแค่ชื่อในแผง
+func _build_foe_sprites(root: Control) -> void:
+	var foes: Array = b.actors.filter(func(a): return a.side == "foe")
+	var n := foes.size()
+	if n == 0:
+		return
+	var step := (FOE_AREA.y - FOE_AREA.x - 48.0) / maxf(float(n - 1), 1.0)
+	# วาดแถวหลัง (ลำดับคี่ ยืนสูงกว่า) ก่อน ให้แถวหน้าทับ
+	var order: Array = range(n)
+	order.sort_custom(func(i, j): return (i % 2) > (j % 2))
+	for i in order:
+		var a: Actor = foes[i]
+		var frames: Array = []
+		for suffix in ["", "_idle1"]:
+			var path := "%s/%s%s.png" % [FOE_SPRITE_DIR, a.id, suffix]
+			if ResourceLoader.exists(path):
+				frames.append(load(path))
+		if frames.is_empty():
+			continue
+		var tex: Texture2D = frames[0]
+		var r := TextureRect.new()
+		r.texture = tex
+		r.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		r.size = tex.get_size()
+		var x: float = FOE_AREA.x + (step * i if n > 1 else (FOE_AREA.y - FOE_AREA.x - 48.0) / 2.0)
+		r.position = Vector2(x, STAGE_FEET_Y - tex.get_size().y - (6.0 if i % 2 == 1 else 0.0))
+		root.add_child(r)
+		_foe_rects[a] = r
+		_foe_frames[a] = frames
+
+func _process(delta: float) -> void:
+	if _foe_rects.is_empty():
+		return
+	_foe_clock += delta
+	if _foe_clock < FOE_IDLE_SEC:
+		return
+	_foe_clock = 0.0
+	_foe_frame = 1 - _foe_frame
+	for a in _foe_rects:
+		var fr: Array = _foe_frames[a]
+		_foe_rects[a].texture = fr[mini(_foe_frame, fr.size() - 1)]
+		_foe_rects[a].modulate = Color(1, 1, 1, 0.3) if a.down else Color.WHITE   # ล้ม = จาง
