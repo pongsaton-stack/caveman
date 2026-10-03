@@ -612,7 +612,7 @@ func _process(delta: float) -> void:
 # ไม่ await (เล่นขนานกับท่าฟันของ Rion) · เทสต์ที่ตั้ง step_delay = 0 ข้ามทั้งหมด
 const FX_COLOR := {"คม": Color("ff5a4a"), "แทง": Color("7ad0e0"), "ทุบ": Color("e39253"), "ยิง": Color("f2c08a"), "กล": Color("8ad0a0")}
 const FX_DEFAULT := Color("ffd0c0")
-const FX_SEC := 0.28
+const FX_SEC := 0.5          # kwan 3 ต.ค.: "ใหญ่/ชัดขึ้น" (เดิม 0.28)
 var _fx_layer: Control
 var _banner: Label
 var _banner_tw: Tween       # ป้ายใหม่ต้องหยุดการจางของป้ายเก่า (ไม่งั้นป้ายเก่าซ่อนป้ายใหม่ไปด้วย)
@@ -649,6 +649,7 @@ func _play_events() -> void:
 			"ทุบ": _fx_crush(to, col)
 			"ยิง": _fx_shoot(from, to, col)
 			_: _fx_claw(to, col, from)
+		_hit_flash(e["tgt"])
 		_float_number(to, ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
 
 ## จุดกลางตัวบนเวที (Vector2.INF = ตัวนี้ไม่มีรูปบนเวที)
@@ -664,10 +665,10 @@ func _actor_point(a) -> Vector2:
 
 func _show_banner(e: Dictionary) -> void:
 	if _banner == null:
-		_banner = _label("", 8, C_TEXT)
+		_banner = _label("", 11, C_TEXT)
 		_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_banner.position = Vector2(98, 25)
-		_banner.size = Vector2(188, 12)
+		_banner.position = Vector2(98, 24)
+		_banner.size = Vector2(188, 16)
 		_banner.add_theme_color_override("font_outline_color", Color.BLACK)
 		_banner.add_theme_constant_override("outline_size", 3)
 		_fx_root().add_child(_banner)
@@ -683,8 +684,8 @@ func _show_banner(e: Dictionary) -> void:
 		_banner_tw.kill()
 	_banner.modulate = Color.WHITE
 	_banner_tw = create_tween()
-	_banner_tw.tween_interval(0.6)
-	_banner_tw.tween_property(_banner, "modulate:a", 0.0, 0.25)
+	_banner_tw.tween_interval(1.0)
+	_banner_tw.tween_property(_banner, "modulate:a", 0.0, 0.3)
 
 func _fade_free(n: CanvasItem, grow: float) -> void:
 	var tw := create_tween().set_parallel()
@@ -708,25 +709,26 @@ func _side(from: Vector2, to: Vector2) -> float:
 ## คม: ส่วนโค้งฟันสองชั้น (สี + แกนขาว)
 func _fx_slash(at: Vector2, col: Color, from: Vector2) -> void:
 	var d := _side(from, at)
-	for layer in [[col, 4.0, 16.0], [Color(1, 1, 1, 0.9), 1.5, 15.0]]:
+	for layer in [[col.darkened(0.4), 9.0, 26.0], [col, 6.0, 26.0], [Color(1, 1, 1, 0.95), 2.0, 25.0]]:
 		var pts := PackedVector2Array()
 		for i in 9:
 			var ang := deg_to_rad(-70.0 + i * 20.0)
 			pts.append(Vector2(-cos(ang) * d, sin(ang)) * layer[2])
 		var l := _line(pts, layer[0], layer[1])
 		l.position = at
-		l.scale = Vector2(0.6, 0.6)
+		l.scale = Vector2(0.7, 0.7)
 		_fx_root().add_child(l)
-		_fade_free(l, 2.0)
+		_fade_free(l, 1.6)
 
 ## แทง: เส้นพุ่งทะลุตัวเป้า + หัวลูกศร
 func _fx_pierce(at: Vector2, col: Color, from: Vector2) -> void:
 	var d := _side(from, at)
-	var l := _line(PackedVector2Array([Vector2(-26 * d, 0), Vector2(18 * d, 0)]), col, 3.0)
+	var l := _line(PackedVector2Array([Vector2(-40 * d, 0), Vector2(26 * d, 0)]), col, 5.0)
+	l.add_child(_line(PackedVector2Array([Vector2(-36 * d, 0), Vector2(24 * d, 0)]), Color.WHITE, 1.5))
 	l.position = at - Vector2(10 * d, 0)
 	_fx_root().add_child(l)
 	var head := Polygon2D.new()
-	head.polygon = PackedVector2Array([Vector2(24 * d, 0), Vector2(16 * d, -4), Vector2(16 * d, 4)])
+	head.polygon = PackedVector2Array([Vector2(36 * d, 0), Vector2(24 * d, -7), Vector2(24 * d, 7)])
 	head.color = Color.WHITE
 	l.add_child(head)
 	var tw := create_tween()
@@ -738,18 +740,18 @@ func _fx_crush(at: Vector2, col: Color) -> void:
 	var pts := PackedVector2Array()
 	for i in 17:
 		var ang := TAU * i / 16.0
-		pts.append(Vector2(cos(ang), sin(ang) * 0.6) * 6.0)
-	var ring := _line(pts, col, 2.0)
+		pts.append(Vector2(cos(ang), sin(ang) * 0.6) * 9.0)
+	var ring := _line(pts, col, 4.0)
 	ring.position = at + Vector2(0, 10)
 	_fx_root().add_child(ring)
 	_fade_free(ring, 3.5)
-	for i in 5:
+	for i in 8:
 		var bit := ColorRect.new()
 		bit.color = col.darkened(0.3)
-		bit.size = Vector2(2, 2)
+		bit.size = Vector2(4, 4)
 		bit.position = at + Vector2(0, 8)
 		_fx_root().add_child(bit)
-		var dir := Vector2(cos(PI + i * PI / 4.0), sin(PI + i * PI / 4.0)) * 14.0
+		var dir := Vector2(cos(PI + i * PI / 7.0), sin(PI + i * PI / 7.0)) * 24.0
 		var tw := create_tween().set_parallel()
 		tw.tween_property(bit, "position", bit.position + dir, FX_SEC)
 		tw.tween_property(bit, "modulate:a", 0.0, FX_SEC)
@@ -762,11 +764,11 @@ func _fx_shoot(from: Vector2, to: Vector2, col: Color) -> void:
 		return
 	var shot := ColorRect.new()
 	shot.color = col
-	shot.size = Vector2(3, 3)
-	shot.position = from
+	shot.size = Vector2(6, 6)
+	shot.position = from - Vector2(3, 3)
 	_fx_root().add_child(shot)
 	var tw := create_tween()
-	tw.tween_property(shot, "position", to, FX_SEC * 0.5)
+	tw.tween_property(shot, "position", to - Vector2(3, 3), FX_SEC * 0.5)
 	tw.tween_callback(func():
 		shot.queue_free()
 		_fx_claw(to, col, Vector2.INF))
@@ -775,24 +777,43 @@ func _fx_shoot(from: Vector2, to: Vector2, col: Color) -> void:
 func _fx_claw(at: Vector2, col: Color, from: Vector2) -> void:
 	var d := _side(from, at)
 	for i in 3:
-		var off := Vector2((i - 1) * 5, 0)
-		var l := _line(PackedVector2Array([Vector2(-7 * d, -9) + off, Vector2(5 * d, 9) + off]), col, 2.0)
+		var off := Vector2((i - 1) * 8, 0)
+		var l := _line(PackedVector2Array([Vector2(-11 * d, -14) + off, Vector2(8 * d, 14) + off]), col, 3.5)
 		l.position = at
 		_fx_root().add_child(l)
 		_fade_free(l, 1.3)
-	var star := _line(PackedVector2Array([Vector2(-6, 0), Vector2(6, 0)]), Color.WHITE, 1.0)
-	star.add_child(_line(PackedVector2Array([Vector2(0, -6), Vector2(0, 6)]), Color.WHITE, 1.0))
+	var star := _line(PackedVector2Array([Vector2(-10, 0), Vector2(10, 0)]), Color.WHITE, 2.0)
+	star.add_child(_line(PackedVector2Array([Vector2(0, -10), Vector2(0, 10)]), Color.WHITE, 2.0))
 	star.position = at
 	_fx_root().add_child(star)
 	_fade_free(star, 2.0)
 
+## ตัวที่โดน: สว่างวาบ + สั่น (ใช้ self_modulate ไม่ชนกับ modulate ที่ _process ใช้ทำตัวล้มให้จาง)
+func _hit_flash(a) -> void:
+	var n: Control = _hero_tex if a == hero else _foe_rects.get(a)
+	if n == null:
+		return
+	if not n.has_meta("fx_base"):
+		n.set_meta("fx_base", n.position)
+	var base: Vector2 = n.get_meta("fx_base")
+	var old = n.get_meta("fx_tw", null)
+	if old != null and old.is_valid():
+		old.kill()
+	n.position = base
+	n.self_modulate = Color(2.4, 2.4, 2.4)
+	var tw := create_tween()
+	n.set_meta("fx_tw", tw)
+	tw.tween_property(n, "self_modulate", Color.WHITE, 0.25)
+	tw.parallel().tween_method(func(t: float): n.position = base + Vector2(sin(t * 40.0) * 3.0 * (1.0 - t), 0), 0.0, 1.0, 0.3)
+	tw.tween_callback(func(): n.position = base)
+
 func _float_number(at: Vector2, text: String, col: Color) -> void:
-	var l := _label(text, 9, col)
+	var l := _label(text, 13, col)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 3)
-	l.position = at + Vector2(-8, -22)
+	l.position = at + Vector2(-10, -30)
 	_fx_root().add_child(l)
 	var tw := create_tween().set_parallel()
-	tw.tween_property(l, "position:y", l.position.y - 14.0, 0.6).set_ease(Tween.EASE_OUT)
-	tw.tween_property(l, "modulate:a", 0.0, 0.3).set_delay(0.35)
+	tw.tween_property(l, "position:y", l.position.y - 16.0, 0.5).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "modulate:a", 0.0, 0.3).set_delay(0.8)
 	tw.chain().tween_callback(l.queue_free)
