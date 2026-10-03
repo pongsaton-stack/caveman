@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c34s3yfkropri"
-path="res://.godot/imported/b1_draft.png-035ab6478520f56266a19d772bc77fec.ctex"
+uid="uid://cyg7cdpcix68m"
+path="res://.godot/imported/B1.png-16690fe107ce3bef57bf9b70d1d97824.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://docs/art-bible/previews/b1_draft.png"
-dest_files=["res://.godot/imported/b1_draft.png-035ab6478520f56266a19d772bc77fec.ctex"]
+source_file="res://assets/sprites/monsters_ll/B1.png"
+dest_files=["res://.godot/imported/B1.png-16690fe107ce3bef57bf9b70d1d97824.ctex"]
 
 [params]
 

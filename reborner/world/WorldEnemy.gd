@@ -43,7 +43,8 @@ func _ready() -> void:
 	_label.add_theme_constant_override("outline_size", 2)
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.size = Vector2(80, 10)
-	_label.position = Vector2(-40, -48 if not frames.is_empty() else -24)
+	# ป้ายชื่ออยู่เหนือหัวรูปจริง (บอส 96px สูงกว่ามอนทั่วไปเท่าตัว)
+	_label.position = Vector2(-40, FEET_Y - frames[0].get_size().y - 2.0 if not frames.is_empty() else -24.0)
 	add_child(_label)
 
 func _process(delta: float) -> void:
@@ -91,20 +92,21 @@ func _draw() -> void:
 
 ## วงเงาใต้เท้า = สีความอันตราย · ลูกศรเล็กชี้ทิศที่หัน (เข้าจากฝั่งตรงข้าม = ลอบตี) · รูปมอนยืนบนวง
 func _draw_sprite() -> void:
+	var tex: Texture2D = frames[mini(_frame, frames.size() - 1)]
+	var sz := tex.get_size()
+	var k := sz.x / 48.0                 # วงกว้างตามขนาดรูป (บอส 96px = 2 เท่า)
 	var ring := PackedVector2Array()
 	for i in 20:
 		var a := TAU * i / 20.0
-		ring.append(Vector2(cos(a) * RING_RX, FEET_Y + 1.0 + sin(a) * RING_RY))
+		ring.append(Vector2(cos(a) * RING_RX * k, FEET_Y + 1.0 + sin(a) * RING_RY * k))
 	draw_colored_polygon(ring, Color(body_color, 0.85))
 	ring.append(ring[0])
 	draw_polyline(ring, Color.BLACK, 1.0)
-	var tip := Vector2(facing) * Vector2(RING_RX + 7.0, RING_RY + 7.0) + Vector2(0, FEET_Y + 1.0)
+	var tip := Vector2(facing) * Vector2(RING_RX * k + 7.0, RING_RY * k + 7.0) + Vector2(0, FEET_Y + 1.0)
 	var side := Vector2(-facing.y, facing.x) * 3.0
 	var back := tip - Vector2(facing) * 4.0
 	draw_colored_polygon(PackedVector2Array([tip, back + side, back - side]), Color.WHITE)
 	draw_polyline(PackedVector2Array([tip, back + side, back - side, tip]), Color.BLACK, 1.0)
-	var tex: Texture2D = frames[mini(_frame, frames.size() - 1)]
-	var sz := tex.get_size()
 	var rect := Rect2(Vector2(-sz.x / 2.0, FEET_Y - sz.y), sz)
 	if _face_left:
 		rect.size.x = -rect.size.x   # ขนาดติดลบ = พลิกซ้าย-ขวาในกรอบเดิม (ไม่ต้องเลื่อนตำแหน่ง)

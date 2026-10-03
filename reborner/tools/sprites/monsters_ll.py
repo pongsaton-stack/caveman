@@ -308,11 +308,11 @@ def worm_king(wave=0):
 	from collections import Counter
 	main = Counter(bp[k][:3] for k, v in kind.items() if v == 'body').most_common(1)[0][0]
 	for k, v in kind.items():                      # ลบหน้าสไลม์ทั้งบริเวณ (ราชามีตานับสิบแทน)
-		if v in ('dark', 'mouth', 'shine'):
-			for dx in (-1, 0, 1):
-				for dy in (-1, 0, 1):
+		if v in ('dark', 'mouth', 'shine'):      # รวมขอบรอบตา 2px (ขอบตานับเป็น body เลยเหลือเป็นเส้นแปลกบนปล้อง)
+			for dx in range(-2, 3):
+				for dy in range(-2, 3):
 					q = (k[0] + dx, k[1] + dy)
-					if 0 <= q[0] < body.width and 0 <= q[1] < body.height and bp[q][3] and kind.get(q) != 'body' or q == k:
+					if 0 <= q[0] < body.width and 0 <= q[1] < body.height and bp[q][3]:
 						bp[q] = main + (255,)
 	flesh = _recolor(body, ASH_FLESH)
 	rock = cut(ROCK_BIG_BOX, tol=60, shadow=True, fringe=1)
@@ -344,15 +344,25 @@ def worm_king(wave=0):
 				put(ex + dx, ey + dy, CHAR[0])
 		put(ex, ey, EMBER[1]); put(ex + 1, ey, EMBER[0]); put(ex, ey + 1, EMBER[0]); put(ex + 1, ey + 1, EMBER[2])
 	# เขี้ยวคู่ใหญ่โค้งลง + น้ำลายข้น
-	for fx in (78, 87):                  # เขี้ยวคู่ใหญ่ โคนหนา 4px เรียวลง โค้งเข้า
-		for k in range(14):
-			w = 4 if k < 4 else 3 if k < 8 else 2 if k < 11 else 1
-			x = fx + (k // 5)
+	# เขี้ยวคู่ใหญ่ (วาดหลังเส้นขอบ ไม่งั้นขอบกินเขี้ยวเหลือครึ่ง): โคนกว้าง 6px ยาว 20px เรียวลง โค้งเข้าหากัน · ด้านในเงา · น้ำลายข้นหยดจากปลาย
+	cv = hue_outline(cv); p = cv.load()
+	tusk = set()
+	for fx, inward in ((74, 1), (91, -1)):
+		for k in range(20):
+			w = max(1, 6 - k // 3)
+			x0 = fx + inward * (k * k) // 60 - (w // 2)
 			for dx in range(w):
-				put(x + dx, 49 + k, h2c('E6E2D6') if dx < w - 1 else h2c('A2927B'))
-		for k in range(3):
-			put(fx + 3, 64 + k, h2c('A7B5A0'))   # น้ำลายข้นหยด
-	return hue_outline(cv)
+				shade = h2c('A2927B') if (dx == w - 1 if inward > 0 else dx == 0) and w > 1 else h2c('E6E2D6')
+				put(x0 + dx, 54 + k, shade); tusk.add((x0 + dx, 54 + k))
+		tip_x = fx + inward * (19 * 19) // 60
+		for k in range(4):
+			put(tip_x, 74 + k, h2c('A7B5A0') if k < 3 else h2c('76726A'))
+	for x, y in list(tusk):               # ขอบเข้มเฉพาะรอบเขี้ยวที่ยื่นพ้นตัว
+		for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+			q = (x + dx, y + dy)
+			if 0 <= q[0] < 96 and 0 <= q[1] < 96 and p[q][3] == 0:
+				p[q] = CHAR[0] + (255,)
+	return cv
 
 if __name__ == '__main__':
 	out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'assets/sprites/monsters_ll/')
@@ -371,9 +381,7 @@ if __name__ == '__main__':
 	stone_worm(1, friend=True).save(os.path.join(out, 'COMP-M03_idle1.png'))
 	bat(friend=True).save(os.path.join(out, 'COMP-M06.png'))
 	bat(1, friend=True).save(os.path.join(out, 'COMP-M06_idle1.png'))
-	# ร่างที่ยังไม่อนุมัติ → monsters_ll_draft/ (เกมโหลด monsters_ll/ อัตโนมัติ — ร่างห้ามเข้าเกมก่อนอนุมัติ)
-	draft = out.rstrip('/') + '_draft/'
-	os.makedirs(draft, exist_ok=True)
-	worm_king().save(os.path.join(draft, 'B1.png'))
-	worm_king(1).save(os.path.join(draft, 'B1_idle1.png'))
+	worm_king().save(os.path.join(out, 'B1.png'))                       # B1 อนุมัติแนว 3 ต.ค.
+	worm_king(1).save(os.path.join(out, 'B1_idle1.png'))
+	# ร่างที่ยังไม่อนุมัติ → <out>_draft/ (เกมโหลด monsters_ll/ อัตโนมัติ — ร่างห้ามเข้าเกมก่อนอนุมัติ)
 	print('ok ->', out)

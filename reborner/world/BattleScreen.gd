@@ -53,7 +53,7 @@ const HERO_X := 222                       # ตัวเอกยืนขวา
 const FOE_SPRITE_DIR := "res://assets/sprites/monsters_ll"
 const FOE_AREA := Vector2(100, 178)       # ช่วง x ที่ศัตรูยืน (ระหว่างแผงศัตรูกับมอนฝั่งเรา)
 # มอนฝั่งเรายืนหน้า-ซ้ายของ Rion (หันซ้าย = พลิกรูป) · ช่อง 1 พื้น · ช่อง 2 ลอยสูง (ค้างคาวบินได้ ไม่บังกัน)
-const ALLY_SLOTS := [Vector2(176, 102), Vector2(186, 78)]
+const ALLY_SLOTS := [Vector2(188, 102), Vector2(184, 76)]   # หนอนชิดขอบใสด้านซ้ายของรูป Rion · บอส 96px เกยแค่ 6px
 const STAGE_FEET_Y := 100.0               # เท้าแตะพื้นทราย
 const FOE_IDLE_SEC := 0.45
 var _foe_rects: Dictionary = {}           # Actor → TextureRect
@@ -538,6 +538,7 @@ func _build_foe_sprites(root: Control) -> void:
 	if n == 0:
 		return
 	var step := (FOE_AREA.y - FOE_AREA.x - 48.0) / maxf(float(n - 1), 1.0)
+	const PANEL_EDGE := 98.0             # รูปกว้าง (บอส 96px) ห้ามทับแผงรายชื่อศัตรู
 	# วาดแถวหลัง (ลำดับคี่ ยืนสูงกว่า) ก่อน ให้แถวหน้าทับ
 	var order: Array = range(n)
 	order.sort_custom(func(i, j): return (i % 2) > (j % 2))
@@ -555,7 +556,9 @@ func _build_foe_sprites(root: Control) -> void:
 		r.texture = tex
 		r.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		r.size = tex.get_size()
-		var x: float = FOE_AREA.x + (step * i if n > 1 else (FOE_AREA.y - FOE_AREA.x - 48.0) / 2.0)
+		var w := tex.get_size().x
+		var x: float = FOE_AREA.x + (step * i if n > 1 else (FOE_AREA.y - FOE_AREA.x - w) / 2.0)
+		x = maxf(x, PANEL_EDGE)
 		r.position = Vector2(x, STAGE_FEET_Y - tex.get_size().y - (6.0 if i % 2 == 1 else 0.0))
 		root.add_child(r)
 		_foe_rects[a] = r

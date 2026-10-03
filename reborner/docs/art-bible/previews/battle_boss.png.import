@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dd6u51ek8sx42"
-path="res://.godot/imported/B1_idle1.png-df6b737e04cefed8a14618ceeec5ce6e.ctex"
+uid="uid://b4l3ia443ry4q"
+path="res://.godot/imported/battle_boss.png-4178dbfcdda2ae46613c6f44bb5a9bff.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/monsters_ll_draft/B1_idle1.png"
-dest_files=["res://.godot/imported/B1_idle1.png-df6b737e04cefed8a14618ceeec5ce6e.ctex"]
+source_file="res://docs/art-bible/previews/battle_boss.png"
+dest_files=["res://.godot/imported/battle_boss.png-4178dbfcdda2ae46613c6f44bb5a9bff.ctex"]
 
 [params]
 
