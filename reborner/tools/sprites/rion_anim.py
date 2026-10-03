@@ -36,17 +36,28 @@ def bob(dst, body, hip):
     paste(dst, body, 0, -1)
     return dst
 
-def walk_frontback(n, split=32, lift=3):
+def bend(leg, cut0, cut1, foot_end):
+    """งอเข่า (มุมหน้า/หลัง): ตัดแถว cut0..cut1-1 ออก แถวใต้นั้นถึง foot_end ยกขึ้นแทนที่
+    ต้นขายังติดกางเกงเหมือนเดิม → ไม่มีขอบเข้มทับกางเกง · แถวหลัง foot_end (เงาพื้น) อยู่ที่เดิม"""
+    n=cut1-cut0
+    out=blank(); s=leg.load(); d=out.load(); N=SIZE[0]
+    for y in range(N):
+        if cut0<=y<cut1: continue
+        ny=y-n if cut1<=y<=foot_end else y
+        for x in range(N):
+            if s[x,y][3]: d[x,ny]=s[x,y]
+    return out
+
+def walk_frontback(n, split=32, cut=(57,59), foot_end=61):
+    """มุมหน้า/หลัง 4 เฟรม: ยืน · งอเข่าซ้าย (เท้ายก 2px) · ยืน · งอเข่าขวา
+    เดิมยกขาทั้งท่อนขึ้นไปทับกางเกง → ดูเหมือนกระโดด ไม่ใช่ก้าว"""
     im=load(n)
     upper=region(im, lambda x,y: y<HIP)
     legL=region(im, lambda x,y: y>=HIP and x<split)
     legR=region(im, lambda x,y: y>=HIP and x>=split)
-    f=[]
-    f.append(im.copy())                                                     # contact
-    a=blank(); paste(a,legR); paste(a,legL,0,-lift); bob(a,upper,HIP); f.append(a)   # ซ้ายยก + ตัวลอย
-    f.append(im.copy())
-    b=blank(); paste(b,legL); paste(b,legR,0,-lift); bob(b,upper,HIP); f.append(b)   # ขวายก
-    return f
+    a=blank(); paste(a,upper); paste(a,legR); paste(a,bend(legL,cut[0],cut[1],foot_end))
+    b=blank(); paste(b,upper); paste(b,legL); paste(b,bend(legR,cut[0],cut[1],foot_end))
+    return [im.copy(), a, im.copy(), b]
 
 def walk_side(n, facing_left=True, split=30, k=4):
     im=load(n)
@@ -169,17 +180,15 @@ def dog_walk_side(n, facing_left=True, split=17, k=2):
     c=blank(); paste(c,sh(front,-fw)); paste(c,sh(back,fw)); paste(c,body)       # หุบ: ขาเข้าใต้ตัว
     return [im.copy(), a, p, c]                                                  # w0 = ยืน
 
-def dog_walk_frontback(n, split, hip=24):
-    """หน้า/หลัง: ยกขาซ้าย/ขวาสลับ 2px + ตัวลอย 1px"""
+def dog_walk_frontback(n, split, hip=24, cut=(27,29), foot_end=32):
+    """หน้า/หลัง: งอขาซ้าย/ขวาสลับ (เท้ายก 2px) แบบเดียวกับ Rion"""
     im=load(n, DOG)
     body=region(im, lambda x,y: y<hip)
     L=region(im, lambda x,y: y>=hip and x<split)
     R=region(im, lambda x,y: y>=hip and x>=split)
-    f=[im.copy()]
-    a=blank(); paste(a,R); paste(a,L,0,-2); bob(a,body,hip); f.append(a)
-    f.append(im.copy())
-    b=blank(); paste(b,L); paste(b,R,0,-2); bob(b,body,hip); f.append(b)
-    return f
+    a=blank(); paste(a,body); paste(a,R); paste(a,bend(L,cut[0],cut[1],foot_end))
+    b=blank(); paste(b,body); paste(b,L); paste(b,bend(R,cut[0],cut[1],foot_end))
+    return [im.copy(), a, im.copy(), b]
 
 if __name__ == '__main__':
     import sys

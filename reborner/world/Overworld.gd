@@ -261,12 +261,19 @@ func _dog_snap() -> void:
 		return
 	# ยืนข้างตัวเอก (ช่องเดินได้ช่องแรก) — ไม่ทับกันจนหมาหายหลังตัวเอก
 	dog_cell = ps.cell
-	for d in [Vector2i.UP, Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN]:
+	# ข้างซ้าย/ขวาก่อน — ช่องบนโดนตัวเอก (สูง 64px ≈ 2.6 ช่อง) บังมิด
+	for d in [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.UP]:
 		var c: Vector2i = ps.cell + d
 		if map.walkable(c) and _enemy_at(c) == null:
 			dog_cell = c
 			break
 	dog_node.position = _cell_center(dog_cell)
+	dog_sprite.offset.x = _dog_side(dog_cell, ps.cell)
+
+## หมาอยู่แนวตั้งเดียวกับตัวเอก → เยื้องขวาให้โผล่ข้างตัว (ไม่หายหลังตัวเอก/ไม่บังขา)
+const DOG_SIDE_PX := 16.0
+func _dog_side(dog_c: Vector2i, hero_c: Vector2i) -> float:
+	return DOG_SIDE_PX if dog_c.x == hero_c.x else 0.0
 
 ## หมาเดินไปช่องที่ตัวเอกเพิ่งออกมา
 func _dog_follow(to: Vector2i) -> void:
@@ -282,8 +289,9 @@ func _dog_follow(to: Vector2i) -> void:
 		a = "right"
 	dog_cell = to
 	_walk(dog_sprite, a, true)
-	var tw := create_tween()
+	var tw := create_tween().set_parallel()
 	tw.tween_property(dog_node, "position", _cell_center(to), MOVE_TIME)
+	tw.tween_property(dog_sprite, "offset:x", _dog_side(to, ps.cell), MOVE_TIME)
 
 ## เล่นท่าเดินต่อจากเฟรมเดิม (ไม่รีเซ็ตทุกช่อง) · เริ่มจากยืน → เข้าเฟรมก้าวทันที · moving=false = หันหน้าเฉยๆ
 func _walk(spr: AnimatedSprite2D, a: String, moving: bool) -> void:
@@ -436,7 +444,17 @@ func _refresh_enemy_colors() -> void:
 		e.set_danger(ps.prof)
 
 # ── อินพุต ────────────────────────────────────────────────────
+## ใครอยู่ต่ำกว่าบนจอวาดทีหลัง (บังตัวที่อยู่สูงกว่า) — เดิม z คงที่: หมาโดน Rion ทับเสมอแม้ยืนอยู่ช่องล่าง
+func _y_sort() -> void:
+	for n in [hero_node, dog_node]:
+		if n != null:
+			n.z_index = 2 + int(n.position.y)
+	for e in enemies:
+		if is_instance_valid(e):
+			e.z_index = 2 + int(e.position.y)
+
 func _process(delta: float) -> void:
+	_y_sort()
 	if busy or map == null:
 		if not _moving:
 			_stop_walk()   # เมนู/หีบ/ศึก/ร้าน = ยืนนิ่ง
