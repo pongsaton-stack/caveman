@@ -15,13 +15,14 @@ const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
 
 # ชื่อไฟล์เฟรมตัวเอกต่อทิศ — ถ้าทิศไหนดูผิด แก้ชื่อไฟล์ตรงนี้ได้เลย
 # Rion ตามต้นแบบ Last Light (ตัดจาก docs/art-bible/lastlight_01.png · หมวกน้ำเงิน) 64x64 · ร่าง รอ kwan อนุมัติ
-# *_step = ยกตัว 1px แทนท่าเดินจนกว่าจะมีแอนิเมชันจริง
+# เดิน 4 เฟรม/ทิศ (w0 = ยืน · w1 ก้าว · w2 ผ่าน · w3 ก้าวอีกข้าง) สร้างจาก tools/sprites/rion_anim.py · ร่าง รอ kwan อนุมัติ
 const HERO_ANIMS := {
-	"down":  ["south", "south_step"],
-	"up":    ["north", "north_step"],
-	"left":  ["west", "west_step"],
-	"right": ["east", "east_step"],
+	"down":  ["south_w0", "south_w1", "south_w2", "south_w3"],
+	"up":    ["north_w0", "north_w1", "north_w2", "north_w3"],
+	"left":  ["west_w0", "west_w1", "west_w2", "west_w3"],
+	"right": ["east_w0", "east_w1", "east_w2", "east_w3"],
 }
+const HERO_WALK_FPS := 8.0
 
 # พาเลตต์องก์ 1 โทนจิบลิ (GDD 13) — องก์ถัดไปเปลี่ยนด้วย color grading ไม่ใช่วาดใหม่
 const TILE_COLORS := {
@@ -125,7 +126,7 @@ func _build_hero() -> void:
 	var found := 0
 	for anim in HERO_ANIMS.keys():
 		frames.add_animation(anim)
-		frames.set_animation_speed(anim, 6.0)
+		frames.set_animation_speed(anim, HERO_WALK_FPS)
 		frames.set_animation_loop(anim, true)
 		for fname in HERO_ANIMS[anim]:
 			var p := "%s/%s.png" % [SPRITE_DIR, fname]

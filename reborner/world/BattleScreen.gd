@@ -40,7 +40,8 @@ var _info_label: Label
 var _menu: GridContainer
 var _hero_tex: TextureRect
 var _tex_idle: Texture2D
-var _tex_cast: Texture2D
+var _tex_attack: Array[Texture2D] = []   # west_a0..a3: ง้าง → พุ่ง → ฟันเต็ม → ถอย
+const ATTACK_FRAME_SEC := 0.11
 var _log_shown := 0
 var _recent: Array[String] = []
 var _pending: Dictionary = {}
@@ -92,24 +93,44 @@ func _advance() -> void:
 			_waiting_player = true
 			_show_commands()
 			return
-		b.auto_act(cur)
-		_flush_log()
-		_refresh()
+		if cur == hero:
+			await _hero_auto_turn()
+		else:
+			b.auto_act(cur)
+			_flush_log()
+			_refresh()
 		await get_tree().create_timer(step_delay).timeout
 
 func _commit(action: Dictionary) -> void:
 	_waiting_player = false
 	_clear_menu()
 	_choosing_target = false
-	if _hero_tex != null and _tex_cast != null and str(action.get("kind")) != "guard":
-		_hero_tex.texture = _tex_cast
+	var kind := str(action.get("kind"))
 	b.player_act(action)
 	_flush_log()
 	_refresh()
+	if kind != "guard" and kind != "watch":
+		await _play_attack()
 	await get_tree().create_timer(step_delay).timeout
-	if _hero_tex != null and _tex_idle != null:
-		_hero_tex.texture = _tex_idle
 	_advance()
+
+## เล่นท่าโจมตี 4 เฟรมแล้วกลับท่ายืน · เทสต์ตั้ง step_delay ต่ำ → เฟรมสั้นตาม
+func _play_attack() -> void:
+	if _hero_tex == null or _tex_attack.size() == 0:
+		return
+	var sec := minf(ATTACK_FRAME_SEC, step_delay / 4.0)
+	for t in _tex_attack:
+		_hero_tex.texture = t
+		if sec > 0.0:
+			await get_tree().create_timer(sec).timeout
+	_hero_tex.texture = _tex_idle
+
+func _hero_auto_turn() -> void:
+	b.auto_act(hero)
+	_flush_log()
+	_refresh()
+	if not hero.guarding:
+		await _play_attack()
 
 # ── คำสั่งของผู้เล่น ─────────────────────────────────────────
 func _show_commands() -> void:
@@ -205,9 +226,7 @@ func _toggle_auto() -> void:
 		_waiting_player = false
 		_choosing_target = false
 		_clear_menu()
-		b.auto_act(hero)
-		_flush_log()
-		_refresh()
+		await _hero_auto_turn()
 		await get_tree().create_timer(step_delay).timeout
 		_advance()
 	elif not auto and not _waiting_player:
@@ -291,13 +310,14 @@ func _fill_side(box: VBoxContainer, list: Array, allies: bool) -> void:
 
 # ── สร้าง UI ─────────────────────────────────────────────────
 func _load_textures() -> void:
-	# ปาร์ตี้อยู่ขวา หันซ้ายเข้าหาศัตรู · ยังไม่มีท่าโจมตีจริง ใช้ยกตัว 1px แทน
+	# ปาร์ตี้อยู่ขวา หันซ้ายเข้าหาศัตรู · ท่าโจมตี west_a0-3 (ร่าง รอ kwan อนุมัติ)
+	for i in 4:
+		var pa := "%s/west_a%d.png" % [SPRITE_DIR, i]
+		if ResourceLoader.exists(pa):
+			_tex_attack.append(load(pa))
 	var p_idle := "%s/west.png" % SPRITE_DIR
-	var p_cast := "%s/west_step.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
-	if ResourceLoader.exists(p_cast):
-		_tex_cast = load(p_cast)
 
 func _build() -> void:
 	var root := Control.new()
