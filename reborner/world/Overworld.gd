@@ -36,6 +36,13 @@ const TILE_COLORS := {
 	"S": Color("5c8a7a"),
 }
 
+# ไทล์จากแผ่น grok (tools/sprites/tiles_ll.py · kwan อนุมัติ 3 ต.ค.) · ไม่มีไฟล์ = ช่องสีแบบเดิม
+const TILE_DIR := "res://assets/tiles_ll"
+const GROUND_OF := {".": "ash", ",": "grass", "~": "water", "#": "stone"}
+const EDGED := ["grass", "water"]          # วางทับดินเถ้าแบบขอบกลืน (mask N=1 E=2 S=4 W=8 = ด้านที่ติดชนิดเดียวกัน)
+const FLOWER_EVERY := 17                   # หญ้าบางช่องมีดอกไม้ (ตกแต่ง ไม่กันทาง)
+var _tex_cache := {}
+
 var by_id: Dictionary = {}
 var encounters: Dictionary = {}
 var chests: Dictionary = {}        # symbol -> row จาก chests.csv
@@ -99,6 +106,7 @@ func _ready() -> void:
 	_build_dog()
 	_build_drops()
 	_spawn_chests()
+	_build_map_objects()
 	_label_shops()
 	_spawn_enemies()
 	_build_ui()
@@ -109,6 +117,37 @@ func _ready() -> void:
 func _draw() -> void:
 	if map == null:
 		return
+	if _tex("ash_0") == null:
+		_draw_flat()
+		return
+	# ชั้น 1: ฐานดินเถ้า (หิน = พื้นหินเข้ม) ทุกช่อง สุ่มชิ้น/พลิกแบบคงที่ตามพิกัด ลายจะได้ไม่ซ้ำเป็นตาราง
+	for y in map.h:
+		for x in map.w:
+			var c := Vector2i(x, y)
+			var base := "stone" if _ground(c) == "stone" else "ash"
+			var h := _hash(c)
+			_draw_tile(_tex("%s_%d" % [base, h % 4]), c, (h >> 2) % 2 == 1, (h >> 3) % 2 == 1)
+	# ชั้น 2: หญ้า/น้ำ ขอบกลืนตามเพื่อนบ้าน 4 ทิศ · ชั้น 3: ดอกไม้บนหญ้าบางช่อง
+	for y in map.h:
+		for x in map.w:
+			var c := Vector2i(x, y)
+			var g := _ground(c)
+			if not EDGED.has(g):
+				continue
+			var mask := 0
+			for pair in [[1, Vector2i.UP], [2, Vector2i.RIGHT], [4, Vector2i.DOWN], [8, Vector2i.LEFT]]:
+				var n := _ground(c + pair[1])
+				if n == g or n == "":
+					mask |= pair[0]
+			var part := (y % 2) * 2 + (x % 2)
+			var name := "%s_%d" % [g, part] if mask == 15 else "%s_%d_%d" % [g, part, mask]
+			_draw_tile(_tex(name), c, false, false)
+			if g == "grass" and mask == 15 and _hash(c) % FLOWER_EVERY == 0:
+				var fl := _tex("flowers")
+				if fl != null:
+					draw_texture(fl, Vector2(x * TILE + (TILE - fl.get_width()) / 2.0, (y + 1) * TILE - fl.get_height()))
+
+func _draw_flat() -> void:
 	for y in map.h:
 		for x in map.w:
 			var t := map.tile(Vector2i(x, y))
@@ -116,6 +155,52 @@ func _draw() -> void:
 			var rect := Rect2(x * TILE, y * TILE, TILE, TILE)
 			draw_rect(rect, col)
 			draw_rect(rect, Color(0, 0, 0, 0.08), false, 1.0)
+
+func _tex(name: String) -> Texture2D:
+	if not _tex_cache.has(name):
+		var path := "%s/%s.png" % [TILE_DIR, name]
+		_tex_cache[name] = load(path) if ResourceLoader.exists(path) else null
+	return _tex_cache[name]
+
+## ชนิดพื้นของช่อง · นอกแผนที่ = "" (นับเป็นชนิดเดียวกัน ไม่ทำขอบที่ขอบแผนที่)
+func _ground(c: Vector2i) -> String:
+	if c.x < 0 or c.y < 0 or c.x >= map.w or c.y >= map.h:
+		return ""
+	return GROUND_OF.get(map.tile(c), "ash")
+
+func _hash(c: Vector2i) -> int:
+	return ((c.x * 73856093) ^ (c.y * 19349663)) & 0x7fffffff
+
+func _draw_tile(tex: Texture2D, c: Vector2i, flip_h: bool, flip_v: bool) -> void:
+	if tex == null:
+		return
+	# ขนาดติดลบ = พลิกในกรอบเดิม (เหมือน WorldEnemy)
+	draw_texture_rect(tex, Rect2(c.x * TILE, c.y * TILE, -TILE if flip_h else TILE, -TILE if flip_v else TILE), false)
+
+## วัตถุสูงบนแมพ (กองหิน/ตะเกียงจุดพัก/แผงร้าน) = Sprite2D เรียงลึกแบบเดียวกับตัวละคร (z = 2 + y) · เดินอ้อมหลังร้านแล้วร้านบังตัว
+func _build_map_objects() -> void:
+	if _tex("ash_0") == null:
+		return
+	for y in map.h:
+		for x in map.w:
+			var c := Vector2i(x, y)
+			var t := map.tile(c)
+			var name := ""
+			if t == "#":
+				name = "rock" if _hash(c) % 4 == 0 else "ruins"
+			elif t == "R":
+				name = "lamp"
+			elif t == "S":
+				name = "shop"
+			var tex := _tex(name) if name != "" else null
+			if tex == null:
+				continue
+			var sp := Sprite2D.new()
+			sp.texture = tex
+			sp.position = _cell_center(c)
+			sp.offset = Vector2(0, TILE / 2.0 - tex.get_height() / 2.0)   # ฐานวัตถุแตะขอบล่างช่อง
+			sp.z_index = 2 + int(sp.position.y)
+			add_child(sp)
 
 func _cell_center(c: Vector2i) -> Vector2:
 	return Vector2(c.x * TILE + TILE / 2.0, c.y * TILE + TILE / 2.0)
@@ -512,6 +597,8 @@ func _on_screen_closed() -> void:
 	_update_hud()
 
 func _label_shops() -> void:
+	if _tex("shop") != null:
+		return   # มีรูปแผงร้านแล้ว ไม่ต้องมีป้าย
 	for y in map.h:
 		for x in map.w:
 			if map.tile(Vector2i(x, y)) == "S":
@@ -673,7 +760,7 @@ func _build_ui() -> void:
 	_style(hud2, 6)
 	layer.add_child(hud2)
 	var hint := Label.new()
-	hint.text = "ลูกศร เดิน · Esc เมนู · ช่องทอง = จุดพัก · ช่องเขียวอมฟ้า = ร้าน · ต่อสู้: Enter ยืนยัน · F9 ลบเซฟ"
+	hint.text = "ลูกศร เดิน · Esc เมนู · ตะเกียง = จุดพัก · แผงร้าน = ร้านค้า · ต่อสู้: Enter ยืนยัน · F9 ลบเซฟ"
 	hint.position = Vector2(4, 202)
 	_style(hint, 6)
 	layer.add_child(hint)

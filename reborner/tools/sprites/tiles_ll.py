@@ -65,6 +65,28 @@ BLD_BOX = {'house': (20, 25, 300, 310), 'shop': (310, 40, 590, 310), 'workshop':
 	'clinic': (870, 40, 1150, 310), 'tent': (20, 400, 300, 650), 'water_tower': (320, 375, 580, 650),
 	'generator': (595, 400, 865, 650), 'ruin': (850, 390, 1150, 650)}
 
+import math
+RIM = {'grass': (0x3F, 0x5A, 0x24), 'water': (0xA7, 0xB5, 0xA0)}   # ขอบหญ้าเข้ม · ฟองน้ำอ่อน
+
+def _edge_depth(pos, side):
+	"""ความลึกขอบหยัก 2–4px ตามตำแหน่งบนขอบ · ปลายทั้งสองข้าง = 3 เสมอ (ต่อกับช่องข้างเคียงได้เนียน)"""
+	return 3 + round(1.2 * math.sin(math.pi * pos / TILE * (2 + side % 2)) * math.sin(math.pi * pos / TILE))
+
+def edged(tile, kind, mask):
+	"""mask บิต: N=1 E=2 S=4 W=8 = ด้านนั้นติดพื้นชนิดเดียวกัน (ไม่ต้องมีขอบ) · ด้านที่ไม่ติด → ขอบหยักโปร่ง + เส้นขอบ"""
+	out = tile.copy(); p = out.load(); rim = RIM[kind] + (255,)
+	for y in range(TILE):
+		for x in range(TILE):
+			best = 99
+			for bit, d, pos, side in ((1, y, x, 0), (2, TILE - 1 - x, y, 1), (4, TILE - 1 - y, x, 2), (8, x, y, 3)):
+				if not mask & bit:
+					best = min(best, d - _edge_depth(pos, side))
+			if best < 0:
+				p[x, y] = (0, 0, 0, 0)
+			elif best == 0:
+				p[x, y] = rim
+	return out
+
 def build(out):
 	os.makedirs(out, exist_ok=True)
 	made = []
@@ -73,6 +95,10 @@ def build(out):
 	for name, im in grounds.items():
 		for i, part in enumerate(split4(im)):
 			part.save(os.path.join(out, '%s_%d.png' % (name, i))); made.append('%s_%d' % (name, i))
+			if name in RIM:   # ขอบกลืน 16 แบบต่อชิ้น: <name>_<ชิ้น>_<mask>.png (mask 15 = ไม่มีขอบ = ไฟล์ <name>_<ชิ้น>)
+				for mask in range(15):
+					edged(part, name, mask).save(os.path.join(out, '%s_%d_%d.png' % (name, i, mask)))
+					made.append('%s_%d_%d' % (name, i, mask))
 	objs = {'ruins': ('environment_tiles.jpg', ENV_OBJ_BOX['ruins'], 24), 'rock': ('environment_tiles.jpg', ENV_OBJ_BOX['rock'], 22),
 		'pine': ('environment_tiles.jpg', ENV_OBJ_BOX['pine'], 24), 'bush': ('environment_tiles.jpg', ENV_OBJ_BOX['bush'], 20),
 		'lamp': ('environment_tiles.jpg', ENV_OBJ_BOX['lamp'], 16), 'flowers': ('environment_tiles.jpg', ENV_OBJ_BOX['flowers'], 18),

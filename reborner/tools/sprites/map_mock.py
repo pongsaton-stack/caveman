@@ -10,13 +10,21 @@ im=Image.new('RGBA',(W*T,H*T),(0,0,0,255))
 gnd={'.':'ash',',':'grass','~':'water','#':'stone'}
 OPS=[None,Image.FLIP_LEFT_RIGHT,Image.FLIP_TOP_BOTTOM,Image.ROTATE_180]
 objs=[]; rnd=random.Random(7)
+def kind(x,y):
+    if 0<=y<H and 0<=x<len(rows[y]): return gnd.get(rows[y][x],'ash')
+    return None
+for y,r in enumerate(rows):          # ชั้นฐาน: ดินเถ้าทุกช่อง (หญ้า/น้ำวางทับแบบขอบกลืน)
+    for x,ch in enumerate(r):
+        base='stone' if kind(x,y)=='stone' else 'ash'
+        t=L('%s_%d'%(base,rnd.randrange(4))); op=rnd.choice(OPS)
+        im.alpha_composite(t.transpose(op) if op is not None else t,(x*T,y*T))
 for y,r in enumerate(rows):
     for x,ch in enumerate(r):
-        g=gnd.get(ch,'ash')
-        t=L('%s_%d'%(g,rnd.randrange(4)))
-        op=rnd.choice(OPS)
-        if op is not None and g!='water': t=t.transpose(op)
-        im.alpha_composite(t,(x*T,y*T))
+        g=kind(x,y)
+        if g not in ('grass','water'): continue
+        mask=sum(b for b,(dx,dy) in ((1,(0,-1)),(2,(1,0)),(4,(0,1)),(8,(-1,0))) if kind(x+dx,y+dy) in (g,None))
+        v=(y%2)*2+(x%2)
+        im.alpha_composite(L('%s_%d'%(g,v) if mask==15 else '%s_%d_%d'%(g,v,mask)),(x*T,y*T))
         if ch=='#': objs.append((y,x,'ruins' if (x*7+y*3)%4 else 'rock'))
         elif ch=='R': objs.append((y,x,'lamp'))
         elif ch=='S': objs.append((y,x,'shop'))
