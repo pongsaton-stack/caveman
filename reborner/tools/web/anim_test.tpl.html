@@ -211,6 +211,12 @@ for (const e of (DATA.compendium || [])) {
 	addClip('Compendium · ' + e.region_th + ' (ร่าง ยังไม่เข้าเกม)', 'cmp_' + e.id, e.name + (e.variants > 1 ? ` (${e.variants} แบบในชีต)` : ''), [key, key + '_idle1'], K.FOE_IDLE_SEC);
 }
 
+// ตัวอย่างเจนรายตัว (kwan สั่งตาม grok_prompts ข้อ 10) — ภาพเดี่ยว + หายใจ · แถวท่าขยับ 4 เฟรมตามที่ส่งมา
+if (DATA.sprites['smp/slime_v3']) {
+	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3', 'Slime v3 ภาพเดี่ยว · หายใจ', ['smp/slime_v3', 'smp/slime_v3_idle1'], K.FOE_IDLE_SEC);
+	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3_row', 'Slime v3 แถวท่า (ยืน·หายใจ·โจมตี·โดนตี)', [0, 1, 2, 3].map(i => 'smp/slime_v3_row' + i), 0.3);
+}
+
 // ── สถานะผู้ชม ──
 const S = { tab: 'clips', clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -1028,7 +1034,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_draft' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_draft', smp: 'compendium_samples' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;

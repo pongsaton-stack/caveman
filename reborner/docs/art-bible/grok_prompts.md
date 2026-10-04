@@ -164,4 +164,7 @@ Do NOT build it from simple geometric shapes, flat color bands or code. It must 
 Then a second PNG: 4 cells in a row (4096x1024), SAME drawing and SAME size as image 1, only the pose changes:
 idle 1, idle 2 (squash 1 pixel), attack (lunge right), hit (recoil).
 ```
+ตัวอย่างที่ 3 (สไลม์ v3 · `samples/v3/`) **ผ่าน**: งานวาดจริง มีเงา/ไฮไลต์/ผิวเจลลี่ · ตารางหลวมบล็อก ~16px → native() ได้ 52x28 คมเป๊ะ · พื้นแมเจนตาเป๊ะ
+ยังไม่ตรง: แถวท่าขยับวาดคนละสเกล (บล็อก ~8px · ตัวยาว ~100-125 จุด) ตาใหญ่กว่าภาพเดี่ยว → ใช้ได้เป็นชุดของมันเอง แต่ต่อกับภาพเดี่ยวไม่ได้ · ภาพเดี่ยวทำท่าหายใจเองได้
+ลงหน้า animation test แล้ว (กลุ่ม "ตัวอย่างเจนรายตัว") · ไฟล์ `assets/sprites/compendium_samples/` (.gdignore)
 

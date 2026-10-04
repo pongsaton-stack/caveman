@@ -37,6 +37,12 @@ def sprites():
 		for f in sorted(os.listdir(cd)):
 			if f.endswith('.png') and not f.endswith('_card.png'):
 				out['cmp/' + f[:-4]] = png(os.path.join(cd, f))
+	# ตัวอย่างมอนที่เจนรายตัว (แปลงกลับเป็นพิกเซลจริงแล้ว) — ร่างทดลอง
+	sd = os.path.join(SPR, 'compendium_samples')
+	if os.path.isdir(sd):
+		for f in sorted(os.listdir(sd)):
+			if f.endswith('.png'):
+				out['smp/' + f[:-4]] = png(os.path.join(sd, f))
 	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
 	td = os.path.join(ROOT, 'assets/tiles_ll')
 	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
