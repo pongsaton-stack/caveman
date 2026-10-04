@@ -1,3 +1,3 @@
 monster_id,name_th,power,sp,weight,element,scope,effect,value,turns,once,slots,status,note
-M03,เกราะแข็ง,0,8,1.0,,self,def_up,0.40,3,0,1,ยืนยัน,ผลจาก monsters.csv (DEF ตัวเอง +40% 3 เทิร์น) · SP 8 = เท่าเขี้ยวพุ่ง · น้ำหนัก 1.0 = เท่าฟัน — SP/น้ำหนักรอ kwan ยืนยัน
+M03,เกราะแข็ง,0,8,1.0,,self,def_up,0.40,3,0,1,ยืนยัน,ผลจาก monsters.csv (DEF ตัวเอง +40% 3 เทิร์น) · SP 8 = เท่าเขี้ยวพุ่ง · น้ำหนัก 1.0 = เท่าฟัน
 M06,ผลุบผลับ,100,6,1.0,,single,av_cut,0.30,0,1,1,ยืนยัน,ผลจาก monsters.csv (ลด AV ตัวเอง 30% ครั้งเดียวต่อการต่อสู้) · พลัง 100 = เท่าฟัน · SP 6 = เท่าปาดไว
