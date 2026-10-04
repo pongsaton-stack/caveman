@@ -231,8 +231,9 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   **ขั้น 2 (ยังไม่ทำ)**: ตัวเล่นฝั่ง Godot อ่านไฟล์เดียวกัน แทน `CHOREO` ใน BattleScreen → ท่าใหม่ = เพิ่มข้อมูลในไฟล์นี้อย่างเดียว ได้ทั้งเว็บและเกม
 - **แก้เกม (BattleScreen FX) แล้วต้องสร้างหน้านี้ใหม่ด้วย** — เอฟเฟกต์ในหน้าเป็นสำเนา JS ของ `_fx_*` ไม่ได้อ่านจากเกมอัตโนมัติ
 
-## สำเนาใน Google Drive — ซิงก์ทุกครั้งที่ไฟล์เปลี่ยน
-Pongsaton อนุญาตแล้ว: ไฟล์ไหนในโปรเจกต์ถูกแก้ ให้อัปโหลดทับใน Drive ได้เลยไม่ต้องถาม
+## สำเนาใน Google Drive — อัปโหลดเฉพาะเมื่อ kwan สั่งเป็นครั้งๆ
+**ยกเลิกการซิงก์อัตโนมัติแล้ว (kwan สั่ง 4 ต.ค. 2026)** — ห้ามอัปโหลดลง Drive เอง ต้องรอ kwan บอกทุกครั้ง
+ไฟล์ >~100KB ส่งผ่านตัวเชื่อม Drive ไม่ได้ (ใหญ่สุดที่ผ่านคือ 98KB) · Drive ตอนนี้ยังเป็น CLAUDE.md/GDD.md รุ่นก่อนประกายครั้งแรก
 - โฟลเดอร์ `The Reborner` id `1d3YPhEXP4x86I_VTVzksScbSog-GZDFJ` · โครงเดียวกับ repo
   core `1ivuWP8GZGVi7FPg75dxQl2Adsr0A8pgk` · world `1y7M-SLPV2_urDsoFhyNRei7zoSEd_BWH` · data `1mq4yyiJJMGjAINJJKJSL1Ruotxe6BsVF`
   docs `1atuceU4o6LrYQ8n_kKrVf0VsGKJQBy36` · scenes `1s1sLb00yvq3WhwVY5yQwXrrTEAqOBOYj` · assets/sprites_hero `18ftQRAhD4I9U8DClNAvSavJ03KR1KYdr`
