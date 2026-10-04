@@ -8,31 +8,232 @@
 		"มุม rot หน่วย π (1.0 = 180°) · สี \"school\" = สีของสาย · impact = จังหวะที่ตัวเลขดาเมจ/วาบขึ้น · total = ยาวทั้งท่า"
 	],
 	"version": 1,
-	"cutin": { "sec": 0.8, "bar": 16, "band": [30, 56], "hero_scale": 1.35 },
-	"school_color": { "คม": "#ff5a4a", "แทง": "#7ad0e0", "ทุบ": "#e39253", "ยิง": "#f2c08a", "กล": "#8ad0a0", "มือเปล่า": "#ffd0c0" },
-	"by_school": { "คม": "moon_blades", "ทุบ": "sky_hammer" },
+	"cutin": {
+		"sec": 0.8,
+		"bar": 16,
+		"band": [
+			30,
+			56
+		],
+		"hero_scale": 1.35
+	},
+	"school_color": {
+		"คม": "#ff5a4a",
+		"แทง": "#7ad0e0",
+		"ทุบ": "#e39253",
+		"ยิง": "#f2c08a",
+		"กล": "#8ad0a0",
+		"มือเปล่า": "#ffd0c0"
+	},
+	"by_school": {
+		"คม": "moon_blades",
+		"ทุบ": "sky_hammer",
+		"แทง": "needle_storm",
+		"ยิง": "meteor_rain",
+		"มือเปล่า": "thousand_fists",
+		"กล": "waking_machine"
+	},
 	"moves": {
 		"moon_blades": {
 			"label": "คม · พันคมจันทร์",
 			"impact": 0.81,
 			"total": 1.51,
 			"timeline": [
-				{ "t": 0.0, "op": "ghost", "color": "#ff5a3a", "life": 0.3, "repeat": { "n": 5, "every": 0.03 } },
-				{ "t": 0.0, "op": "hero_move", "to": { "x": ["right", -10], "y": ["home", 0] }, "sec": 0.14, "ease": "out" },
-				{ "t": 0.18, "op": "ghost", "color": "#ff7a4a", "life": 0.35, "frame": "attack2", "at": "center", "repeat": { "n": 5, "every": 0.09, "ring": [30, 16] } },
-				{ "t": 0.18, "op": "crescent", "at": "center", "color": "#ff5a3a", "r": 15, "life": 0.3, "repeat": { "n": 10, "every": 0.055, "jx": [13, 21, 10], "jy": [7, 13, 6], "r_mod": [3, 4], "rot_alt": [0.1, 1.05], "rot_step": 0.0382 } },
-				{ "t": 0.18, "op": "sparks", "at": "center", "color": "#ffb347", "n": 5, "spread": 14, "up": 10, "life": 0.3, "repeat": { "n": 10, "every": 0.055, "jx": [13, 21, 10], "jy": [7, 13, 6] } },
-				{ "t": 0.75, "op": "ghost", "color": "#fff0c0", "life": 0.25 },
-				{ "t": 0.81, "op": "crescent", "at": "center", "color": "#ff4a2a", "r": 44, "rot": 0.85, "life": 0.6, "grow": 1.6 },
-				{ "t": 0.81, "op": "crescent", "at": "center", "color": "#ff8a3a", "r": 40, "rot": 0.15, "life": 0.6, "grow": 1.5 },
-				{ "t": 0.81, "op": "flash", "color": "#fff2e0", "peak": 0.85, "sec": 0.25 },
-				{ "t": 0.81, "op": "shake", "amp": 5, "sec": 0.5 },
-				{ "t": 0.81, "op": "zoom", "at": "center", "k": 1.14, "sec": 0.45 },
-				{ "t": 0.81, "op": "hitstop", "sec": 0.12 },
-				{ "t": 0.81, "op": "debris", "at": "each", "color": "#b3262a", "n": 10, "spread": 22, "up": 22, "life": 0.6, "size": 2 },
-				{ "t": 0.81, "op": "sparks", "at": "each", "color": "#ffb347", "n": 12, "spread": 30, "up": 26, "life": 0.55 },
-				{ "t": 1.21, "op": "hero_move", "to": { "x": ["home", 0], "y": ["home", 0] }, "sec": 0.18, "ease": "out" },
-				{ "t": 1.21, "op": "ghost", "color": "#ff5a3a", "life": 0.25, "repeat": { "n": 3, "every": 0.05 } }
+				{
+					"t": 0.0,
+					"op": "ghost",
+					"color": "#ff5a3a",
+					"life": 0.3,
+					"repeat": {
+						"n": 5,
+						"every": 0.03
+					}
+				},
+				{
+					"t": 0.0,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"right",
+							-10
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.14,
+					"ease": "out"
+				},
+				{
+					"t": 0.18,
+					"op": "ghost",
+					"color": "#ff7a4a",
+					"life": 0.35,
+					"frame": "attack2",
+					"at": "center",
+					"repeat": {
+						"n": 5,
+						"every": 0.09,
+						"ring": [
+							30,
+							16
+						]
+					}
+				},
+				{
+					"t": 0.18,
+					"op": "crescent",
+					"at": "center",
+					"color": "#ff5a3a",
+					"r": 15,
+					"life": 0.3,
+					"repeat": {
+						"n": 10,
+						"every": 0.055,
+						"jx": [
+							13,
+							21,
+							10
+						],
+						"jy": [
+							7,
+							13,
+							6
+						],
+						"r_mod": [
+							3,
+							4
+						],
+						"rot_alt": [
+							0.1,
+							1.05
+						],
+						"rot_step": 0.0382
+					}
+				},
+				{
+					"t": 0.18,
+					"op": "sparks",
+					"at": "center",
+					"color": "#ffb347",
+					"n": 5,
+					"spread": 14,
+					"up": 10,
+					"life": 0.3,
+					"repeat": {
+						"n": 10,
+						"every": 0.055,
+						"jx": [
+							13,
+							21,
+							10
+						],
+						"jy": [
+							7,
+							13,
+							6
+						]
+					}
+				},
+				{
+					"t": 0.75,
+					"op": "ghost",
+					"color": "#fff0c0",
+					"life": 0.25
+				},
+				{
+					"t": 0.81,
+					"op": "crescent",
+					"at": "center",
+					"color": "#ff4a2a",
+					"r": 44,
+					"rot": 0.85,
+					"life": 0.6,
+					"grow": 1.6
+				},
+				{
+					"t": 0.81,
+					"op": "crescent",
+					"at": "center",
+					"color": "#ff8a3a",
+					"r": 40,
+					"rot": 0.15,
+					"life": 0.6,
+					"grow": 1.5
+				},
+				{
+					"t": 0.81,
+					"op": "flash",
+					"color": "#fff2e0",
+					"peak": 0.85,
+					"sec": 0.25
+				},
+				{
+					"t": 0.81,
+					"op": "shake",
+					"amp": 5,
+					"sec": 0.5
+				},
+				{
+					"t": 0.81,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.14,
+					"sec": 0.45
+				},
+				{
+					"t": 0.81,
+					"op": "hitstop",
+					"sec": 0.12
+				},
+				{
+					"t": 0.81,
+					"op": "debris",
+					"at": "each",
+					"color": "#b3262a",
+					"n": 10,
+					"spread": 22,
+					"up": 22,
+					"life": 0.6,
+					"size": 2
+				},
+				{
+					"t": 0.81,
+					"op": "sparks",
+					"at": "each",
+					"color": "#ffb347",
+					"n": 12,
+					"spread": 30,
+					"up": 26,
+					"life": 0.55
+				},
+				{
+					"t": 1.21,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.18,
+					"ease": "out"
+				},
+				{
+					"t": 1.21,
+					"op": "ghost",
+					"color": "#ff5a3a",
+					"life": 0.25,
+					"repeat": {
+						"n": 3,
+						"every": 0.05
+					}
+				}
 			]
 		},
 		"sky_hammer": {
@@ -40,28 +241,923 @@
 			"impact": 0.58,
 			"total": 1.43,
 			"timeline": [
-				{ "t": 0.0, "op": "hero_move", "to": { "x": ["home", 0], "y": ["home", 3] }, "sec": 0.08, "ease": "out" },
-				{ "t": 0.08, "op": "hero_move", "to": { "x": ["home", -10], "y": ["sky", 0] }, "sec": 0.2, "ease": "out" },
-				{ "t": 0.08, "op": "ghost", "color": "#e39253", "life": 0.25, "repeat": { "n": 3, "every": 0.05 } },
-				{ "t": 0.4, "op": "hero_set", "to": { "x": ["center", 2], "y": ["sky", 0] } },
-				{ "t": 0.42, "op": "hero_move", "to": { "x": ["center", 2], "y": ["home", 0] }, "sec": 0.16, "ease": "in" },
-				{ "t": 0.42, "op": "ghost", "color": "#ff7a2a", "life": 0.3, "repeat": { "n": 4, "every": 0.04 } },
-				{ "t": 0.46, "op": "hammer", "at": "ground", "color": "school", "swing": 0.12 },
-				{ "t": 0.58, "op": "flash", "color": "#fff0d0", "peak": 0.9, "sec": 0.3 },
-				{ "t": 0.58, "op": "shake", "amp": 7, "sec": 0.6 },
-				{ "t": 0.58, "op": "zoom", "at": "ground", "k": 1.18, "sec": 0.5 },
-				{ "t": 0.58, "op": "hitstop", "sec": 0.14 },
-				{ "t": 0.58, "op": "pillar", "at": "ground", "color": "#ffb347", "life": 0.6 },
-				{ "t": 0.58, "op": "blast", "at": "ground", "off": [0, -8], "color": "school", "r": 30, "life": 0.7 },
-				{ "t": 0.58, "op": "shock_ring", "at": "ground", "color": "school", "r": 16, "life": 0.5, "repeat": { "n": 5, "every": 0.06, "r_step": 8 } },
-				{ "t": 0.58, "op": "crack", "at": "ground", "w": 75 },
-				{ "t": 0.58, "op": "spikes", "at": "ground", "w": 90, "color": "school" },
-				{ "t": 0.58, "op": "debris", "at": "ground", "color": "#8a6a4a", "n": 22, "spread": 50, "up": 46, "life": 0.8, "size": 3.5 },
-				{ "t": 0.58, "op": "debris", "at": "ground", "color": "#e8c79a", "n": 10, "spread": 34, "up": 34, "life": 0.6, "size": 1.8 },
-				{ "t": 0.58, "op": "sparks", "at": "ground", "color": "#ffcf6a", "n": 24, "spread": 46, "up": 56, "life": 0.9 },
-				{ "t": 0.58, "op": "dust", "at": "ground", "color": "#c8b49a", "life": 1.0 },
-				{ "t": 1.13, "op": "hero_move", "to": ["mix", "hero", "home", 0.5, -14], "sec": 0.13, "ease": "out" },
-				{ "t": 1.26, "op": "hero_move", "to": { "x": ["home", 0], "y": ["home", 0] }, "sec": 0.13, "ease": "in" }
+				{
+					"t": 0.0,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							3
+						]
+					},
+					"sec": 0.08,
+					"ease": "out"
+				},
+				{
+					"t": 0.08,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							-10
+						],
+						"y": [
+							"sky",
+							0
+						]
+					},
+					"sec": 0.2,
+					"ease": "out"
+				},
+				{
+					"t": 0.08,
+					"op": "ghost",
+					"color": "#e39253",
+					"life": 0.25,
+					"repeat": {
+						"n": 3,
+						"every": 0.05
+					}
+				},
+				{
+					"t": 0.4,
+					"op": "hero_set",
+					"to": {
+						"x": [
+							"center",
+							2
+						],
+						"y": [
+							"sky",
+							0
+						]
+					}
+				},
+				{
+					"t": 0.42,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"center",
+							2
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.16,
+					"ease": "in"
+				},
+				{
+					"t": 0.42,
+					"op": "ghost",
+					"color": "#ff7a2a",
+					"life": 0.3,
+					"repeat": {
+						"n": 4,
+						"every": 0.04
+					}
+				},
+				{
+					"t": 0.46,
+					"op": "hammer",
+					"at": "ground",
+					"color": "school",
+					"swing": 0.12
+				},
+				{
+					"t": 0.58,
+					"op": "flash",
+					"color": "#fff0d0",
+					"peak": 0.9,
+					"sec": 0.3
+				},
+				{
+					"t": 0.58,
+					"op": "shake",
+					"amp": 7,
+					"sec": 0.6
+				},
+				{
+					"t": 0.58,
+					"op": "zoom",
+					"at": "ground",
+					"k": 1.18,
+					"sec": 0.5
+				},
+				{
+					"t": 0.58,
+					"op": "hitstop",
+					"sec": 0.14
+				},
+				{
+					"t": 0.58,
+					"op": "pillar",
+					"at": "ground",
+					"color": "#ffb347",
+					"life": 0.6
+				},
+				{
+					"t": 0.58,
+					"op": "blast",
+					"at": "ground",
+					"off": [
+						0,
+						-8
+					],
+					"color": "school",
+					"r": 30,
+					"life": 0.7
+				},
+				{
+					"t": 0.58,
+					"op": "shock_ring",
+					"at": "ground",
+					"color": "school",
+					"r": 16,
+					"life": 0.5,
+					"repeat": {
+						"n": 5,
+						"every": 0.06,
+						"r_step": 8
+					}
+				},
+				{
+					"t": 0.58,
+					"op": "crack",
+					"at": "ground",
+					"w": 75
+				},
+				{
+					"t": 0.58,
+					"op": "spikes",
+					"at": "ground",
+					"w": 90,
+					"color": "school"
+				},
+				{
+					"t": 0.58,
+					"op": "debris",
+					"at": "ground",
+					"color": "#8a6a4a",
+					"n": 22,
+					"spread": 50,
+					"up": 46,
+					"life": 0.8,
+					"size": 3.5
+				},
+				{
+					"t": 0.58,
+					"op": "debris",
+					"at": "ground",
+					"color": "#e8c79a",
+					"n": 10,
+					"spread": 34,
+					"up": 34,
+					"life": 0.6,
+					"size": 1.8
+				},
+				{
+					"t": 0.58,
+					"op": "sparks",
+					"at": "ground",
+					"color": "#ffcf6a",
+					"n": 24,
+					"spread": 46,
+					"up": 56,
+					"life": 0.9
+				},
+				{
+					"t": 0.58,
+					"op": "dust",
+					"at": "ground",
+					"color": "#c8b49a",
+					"life": 1.0
+				},
+				{
+					"t": 1.13,
+					"op": "hero_move",
+					"to": [
+						"mix",
+						"hero",
+						"home",
+						0.5,
+						-14
+					],
+					"sec": 0.13,
+					"ease": "out"
+				},
+				{
+					"t": 1.26,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.13,
+					"ease": "in"
+				}
+			]
+		},
+		"needle_storm": {
+			"label": "แทง · ร้อยเข็มทะลุเมฆ",
+			"impact": 0.92,
+			"total": 1.62,
+			"timeline": [
+				{
+					"t": 0.0,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							6
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.1,
+					"ease": "out"
+				},
+				{
+					"t": 0.0,
+					"op": "charge",
+					"at": "hero_pt",
+					"off": [
+						-14,
+						2
+					],
+					"color": "#9fd4ff",
+					"n": 16,
+					"r": 28,
+					"life": 0.45
+				},
+				{
+					"t": 0.45,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"center",
+							-72
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.12,
+					"ease": "out"
+				},
+				{
+					"t": 0.45,
+					"op": "ghost",
+					"color": "#6fb7ff",
+					"life": 0.3,
+					"repeat": {
+						"n": 6,
+						"every": 0.02
+					}
+				},
+				{
+					"t": 0.5,
+					"op": "beam",
+					"from": "center",
+					"from_off": [
+						56,
+						0
+					],
+					"to": "center",
+					"to_off": [
+						-56,
+						0
+					],
+					"color": "#cfe8ff",
+					"w": 1.4,
+					"life": 0.2,
+					"repeat": {
+						"n": 12,
+						"every": 0.03,
+						"fjy": [
+							7,
+							23,
+							11
+						],
+						"tjy": [
+							11,
+							23,
+							11
+						]
+					}
+				},
+				{
+					"t": 0.5,
+					"op": "sparks",
+					"at": "each",
+					"color": "#9fd4ff",
+					"n": 4,
+					"spread": 10,
+					"up": 8,
+					"life": 0.25,
+					"repeat": {
+						"n": 4,
+						"every": 0.09
+					}
+				},
+				{
+					"t": 0.92,
+					"op": "beam",
+					"from": "right_edge",
+					"to": "left_edge",
+					"color": "#6fb7ff",
+					"w": 9,
+					"life": 0.55
+				},
+				{
+					"t": 0.92,
+					"op": "star",
+					"at": "center",
+					"color": "#c6a8ff",
+					"r": 24,
+					"life": 0.5
+				},
+				{
+					"t": 0.92,
+					"op": "flash",
+					"color": "#e6f2ff",
+					"peak": 0.85,
+					"sec": 0.25
+				},
+				{
+					"t": 0.92,
+					"op": "shake",
+					"amp": 5,
+					"sec": 0.5
+				},
+				{
+					"t": 0.92,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.15,
+					"sec": 0.45
+				},
+				{
+					"t": 0.92,
+					"op": "hitstop",
+					"sec": 0.12
+				},
+				{
+					"t": 0.92,
+					"op": "shock_ring",
+					"at": "center",
+					"color": "#9fd4ff",
+					"r": 12,
+					"life": 0.4,
+					"repeat": {
+						"n": 3,
+						"every": 0.07,
+						"r_step": 8
+					}
+				},
+				{
+					"t": 0.92,
+					"op": "sparks",
+					"at": "each",
+					"color": "#cfe8ff",
+					"n": 12,
+					"spread": 26,
+					"up": 22,
+					"life": 0.55
+				},
+				{
+					"t": 1.3,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.2,
+					"ease": "out"
+				},
+				{
+					"t": 1.3,
+					"op": "ghost",
+					"color": "#6fb7ff",
+					"life": 0.25,
+					"repeat": {
+						"n": 3,
+						"every": 0.05
+					}
+				}
+			]
+		},
+		"meteor_rain": {
+			"label": "ยิง · ฝนดาวตกพันนัด",
+			"impact": 1.2,
+			"total": 1.75,
+			"timeline": [
+				{
+					"t": 0.0,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							-8
+						]
+					},
+					"sec": 0.1,
+					"ease": "out"
+				},
+				{
+					"t": 0.05,
+					"op": "charge",
+					"at": "hero_pt",
+					"off": [
+						-6,
+						-20
+					],
+					"color": "#ffcf6a",
+					"n": 10,
+					"r": 18,
+					"life": 0.25
+				},
+				{
+					"t": 0.25,
+					"op": "beam",
+					"from": "hero_pt",
+					"from_off": [
+						-6,
+						-20
+					],
+					"to": "hero_pt",
+					"to_off": [
+						-30,
+						-130
+					],
+					"color": "#ffcf6a",
+					"w": 3,
+					"life": 0.35
+				},
+				{
+					"t": 0.3,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.12,
+					"ease": "in"
+				},
+				{
+					"t": 0.4,
+					"op": "meteor",
+					"at": "center",
+					"color": "#ffb347",
+					"trail": "#b48cff",
+					"life": 0.45,
+					"repeat": {
+						"n": 18,
+						"every": 0.04,
+						"jx": [
+							17,
+							61,
+							30
+						],
+						"jy": [
+							5,
+							17,
+							8
+						]
+					}
+				},
+				{
+					"t": 0.55,
+					"op": "shake",
+					"amp": 2,
+					"sec": 0.6
+				},
+				{
+					"t": 1.2,
+					"op": "blast",
+					"at": "center",
+					"color": "#ff8a3a",
+					"r": 34,
+					"life": 0.7
+				},
+				{
+					"t": 1.2,
+					"op": "pillar",
+					"at": "ground",
+					"color": "#b48cff",
+					"life": 0.5
+				},
+				{
+					"t": 1.2,
+					"op": "flash",
+					"color": "#fff0d8",
+					"peak": 0.85,
+					"sec": 0.28
+				},
+				{
+					"t": 1.2,
+					"op": "shake",
+					"amp": 6,
+					"sec": 0.5
+				},
+				{
+					"t": 1.2,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.15,
+					"sec": 0.45
+				},
+				{
+					"t": 1.2,
+					"op": "hitstop",
+					"sec": 0.12
+				},
+				{
+					"t": 1.2,
+					"op": "shock_ring",
+					"at": "ground",
+					"color": "#ffb347",
+					"r": 16,
+					"life": 0.45,
+					"repeat": {
+						"n": 3,
+						"every": 0.06,
+						"r_step": 10
+					}
+				},
+				{
+					"t": 1.2,
+					"op": "debris",
+					"at": "each",
+					"color": "#6a4a3a",
+					"n": 8,
+					"spread": 24,
+					"up": 26,
+					"life": 0.6,
+					"size": 2.5
+				},
+				{
+					"t": 1.2,
+					"op": "sparks",
+					"at": "each",
+					"color": "#ffcf6a",
+					"n": 12,
+					"spread": 30,
+					"up": 30,
+					"life": 0.6
+				}
+			]
+		},
+		"thousand_fists": {
+			"label": "มือเปล่า · กายาพันมือ",
+			"impact": 0.82,
+			"total": 1.5,
+			"timeline": [
+				{
+					"t": 0.0,
+					"op": "ghost",
+					"color": "#5fe0c8",
+					"life": 0.3,
+					"repeat": {
+						"n": 4,
+						"every": 0.03
+					}
+				},
+				{
+					"t": 0.0,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"right",
+							-6
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.12,
+					"ease": "out"
+				},
+				{
+					"t": 0.15,
+					"op": "ghost",
+					"color": "#5fe0c8",
+					"life": 0.3,
+					"frame": "attack2",
+					"at": "center",
+					"repeat": {
+						"n": 8,
+						"every": 0.07,
+						"ring": [
+							28,
+							14
+						]
+					}
+				},
+				{
+					"t": 0.15,
+					"op": "star",
+					"at": "center",
+					"color": "#bff8ee",
+					"r": 8,
+					"life": 0.2,
+					"repeat": {
+						"n": 12,
+						"every": 0.05,
+						"jx": [
+							11,
+							29,
+							14
+						],
+						"jy": [
+							7,
+							17,
+							8
+						]
+					}
+				},
+				{
+					"t": 0.15,
+					"op": "shock_ring",
+					"at": "center",
+					"color": "#5fe0c8",
+					"r": 8,
+					"life": 0.25,
+					"repeat": {
+						"n": 6,
+						"every": 0.1,
+						"r_step": 2
+					}
+				},
+				{
+					"t": 0.15,
+					"op": "shake",
+					"amp": 2,
+					"sec": 0.6
+				},
+				{
+					"t": 0.76,
+					"op": "ghost",
+					"color": "#ffffff",
+					"life": 0.2
+				},
+				{
+					"t": 0.82,
+					"op": "star",
+					"at": "center",
+					"color": "#5fe0c8",
+					"r": 30,
+					"life": 0.55
+				},
+				{
+					"t": 0.82,
+					"op": "star",
+					"at": "center",
+					"color": "#ffffff",
+					"r": 16,
+					"life": 0.4
+				},
+				{
+					"t": 0.82,
+					"op": "flash",
+					"color": "#e8fff8",
+					"peak": 0.85,
+					"sec": 0.25
+				},
+				{
+					"t": 0.82,
+					"op": "shake",
+					"amp": 6,
+					"sec": 0.5
+				},
+				{
+					"t": 0.82,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.17,
+					"sec": 0.45
+				},
+				{
+					"t": 0.82,
+					"op": "hitstop",
+					"sec": 0.14
+				},
+				{
+					"t": 0.82,
+					"op": "shock_ring",
+					"at": "center",
+					"color": "#5fe0c8",
+					"r": 14,
+					"life": 0.45,
+					"repeat": {
+						"n": 4,
+						"every": 0.05,
+						"r_step": 9
+					}
+				},
+				{
+					"t": 0.82,
+					"op": "sparks",
+					"at": "each",
+					"color": "#bff8ee",
+					"n": 12,
+					"spread": 28,
+					"up": 24,
+					"life": 0.55
+				},
+				{
+					"t": 1.2,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.18,
+					"ease": "out"
+				},
+				{
+					"t": 1.2,
+					"op": "ghost",
+					"color": "#5fe0c8",
+					"life": 0.25,
+					"repeat": {
+						"n": 3,
+						"every": 0.05
+					}
+				}
+			]
+		},
+		"waking_machine": {
+			"label": "กล · วันเครื่องตื่น",
+			"impact": 1.0,
+			"total": 1.75,
+			"timeline": [
+				{
+					"t": 0.0,
+					"op": "gear",
+					"from": "hero_pt",
+					"at": "center",
+					"color": "#8ad0a0",
+					"r": 7,
+					"life": 0.75,
+					"spin": 1.5,
+					"repeat": {
+						"n": 6,
+						"every": 0.05,
+						"ring": [
+							16,
+							20
+						],
+						"r_mod": [
+							2,
+							3
+						]
+					}
+				},
+				{
+					"t": 0.3,
+					"op": "charge",
+					"at": "center",
+					"off": [
+						0,
+						-20
+					],
+					"color": "#7ae0ff",
+					"n": 16,
+					"r": 30,
+					"life": 0.4
+				},
+				{
+					"t": 0.5,
+					"op": "mech",
+					"at": "ground",
+					"off": [
+						0,
+						4
+					],
+					"color": "#8ad0a0",
+					"life": 1.0
+				},
+				{
+					"t": 0.55,
+					"op": "shake",
+					"amp": 2,
+					"sec": 0.3
+				},
+				{
+					"t": 1.0,
+					"op": "blast",
+					"at": "ground",
+					"off": [
+						0,
+						-8
+					],
+					"color": "#7ae0ff",
+					"r": 32,
+					"life": 0.65
+				},
+				{
+					"t": 1.0,
+					"op": "pillar",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"life": 0.55
+				},
+				{
+					"t": 1.0,
+					"op": "flash",
+					"color": "#e6fff6",
+					"peak": 0.85,
+					"sec": 0.28
+				},
+				{
+					"t": 1.0,
+					"op": "shake",
+					"amp": 6,
+					"sec": 0.5
+				},
+				{
+					"t": 1.0,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.15,
+					"sec": 0.45
+				},
+				{
+					"t": 1.0,
+					"op": "hitstop",
+					"sec": 0.12
+				},
+				{
+					"t": 1.0,
+					"op": "shock_ring",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"r": 16,
+					"life": 0.45,
+					"repeat": {
+						"n": 3,
+						"every": 0.06,
+						"r_step": 10
+					}
+				},
+				{
+					"t": 1.0,
+					"op": "gear",
+					"at": "each",
+					"color": "#8ad0a0",
+					"r": 6,
+					"life": 0.5,
+					"spin": -1
+				},
+				{
+					"t": 1.0,
+					"op": "sparks",
+					"at": "each",
+					"color": "#bfffe8",
+					"n": 12,
+					"spread": 28,
+					"up": 26,
+					"life": 0.6
+				}
 			]
 		}
 	}

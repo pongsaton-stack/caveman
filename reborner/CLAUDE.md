@@ -195,6 +195,9 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - **FX engine (4 ต.ค. 2026 · ขั้น 1)**: ไม้ตายเป็นข้อมูลใน `data/fx/ultimates.json` (กติกาเขียนไว้ใน `_doc` ของไฟล์) — timeline ของคำสั่ง
   `ghost hero_move hero_set crescent sparks debris blast flash shake zoom hitstop pillar hammer shock_ring crack spikes dust` · จุดอ้างอิง center/right/each/ground/home/hero/sky · repeat + ตัวแปรต่อครั้ง
   หน่วย = พิกเซลจริงของสไปรต์ (เท่ากันทั้งเกมและหน้าเว็บ) · `by_school` = สายไหนใช้ท่าไหน · ตัวเล่นฝั่งเว็บ = `playMove()` ใน anim_test.tpl.html (ตรวจแล้วภาพเหมือนแบบเขียนมือเดิม)
+  **รอบ 2 (4 ต.ค.) ครบ 6 สายใน animation test**: แทง needle_storm (รวมพลัง → พุ่งทะลุ → เข็มแสง 12 เส้น → ลำแสงพาดจอ) · ยิง meteor_rain (ยิงแสงขึ้นฟ้า → ดาวตก 18 ลูก → ระเบิด+เสาแสง) ·
+  มือเปล่า thousand_fists (ร่างแยกเขียวน้ำทะเล 8 ร่างรัวหมัด → ดาวแตกยักษ์) · กล waking_machine (เฟือง 6 ตัวบินรวม → หุ่นยักษ์เรืองแสงโผล่ ทุบสองหมัด → ระเบิดพลัง)
+  คำสั่งเพิ่ม: `charge beam meteor star gear mech` · จุดอ้างอิงเพิ่ม hero_pt left_edge right_edge · from/to + fjy/tjy · ภาพ `previews/cine_4schools.png`
   **ขั้น 2 (ยังไม่ทำ)**: ตัวเล่นฝั่ง Godot อ่านไฟล์เดียวกัน แทน `CHOREO` ใน BattleScreen → ท่าใหม่ = เพิ่มข้อมูลในไฟล์นี้อย่างเดียว ได้ทั้งเว็บและเกม
 - **แก้เกม (BattleScreen FX) แล้วต้องสร้างหน้านี้ใหม่ด้วย** — เอฟเฟกต์ในหน้าเป็นสำเนา JS ของ `_fx_*` ไม่ได้อ่านจากเกมอัตโนมัติ
 
