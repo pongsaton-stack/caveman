@@ -19,6 +19,39 @@ static func should_guard(a: Actor, _party: Array, _enemies: Array) -> bool:
 		return true
 	return false
 
+## ท่าเสริมตัวเอง — ใช้เมื่อมีท่าเด่นแบบโจมตีกำลังมา ตีทุกตาที่เหลือก็ขัดไม่ทัน
+## และดาเมจที่บัฟกันได้จากท่าเด่นนั้น มากกว่าดาเมจที่เสียไปเพราะไม่ได้ตีตานี้
+## threats = [{actor, sig, gap, turns}] · เงื่อนไขแคบตามบทเรียน 11.18 · ไม่สุ่ม
+static func choose_buff(a: Actor, pool: Array[Tech], threats: Array) -> Tech:
+	var buff: Tech = null
+	for t in pool:
+		if t.effect == "def_up" and not a.buffs.has("def_up") and (t.sp == 0 or t.sp <= a.sp):
+			buff = t
+			break
+	if buff == null:
+		return null
+	var base := a.base_def if a.base_def > 0 else a.def_val
+	var keep := Formulas.mitigation(float(base) * (1.0 + buff.effect_value)) / Formulas.mitigation(float(a.def_val))
+	for th in threats:
+		var best := 0.0
+		for t in pool:
+			if t.is_attack() and (t.sp == 0 or t.sp <= a.sp):
+				best = maxf(best, estimate(a, th["actor"], t))
+		if best * int(th["turns"]) >= float(th["gap"]):
+			continue   # ขัดได้ทัน — ตีดีกว่า
+		var saved := estimate(th["actor"], a, th["sig"]) * (1.0 - keep)
+		if saved > best:
+			return buff
+	return null
+
+## ดาเมจคาดหวังต่อเป้าหนึ่งตัว (ไม่สุ่ม) — สูตรเดียวกับที่ choose ใช้
+static func estimate(attacker: Actor, target: Actor, t: Tech) -> float:
+	var pos := 1.0
+	if target.row == "หลัง" and not (t.ignore_pos or t.free_row):
+		pos = 0.7
+	return attacker.atk * t.power / 100.0 \
+		* Formulas.mitigation(target.def_val, t.ignore_def) * target.elem_mult(t.element) * pos * t.hits
+
 ## คอมโบ — ยิงเสมอถ้าเป้าหมายกำลังเปิดท่า (แข่งขัดจังหวะ) ไม่งั้น 60%
 static func should_combo(target: Actor) -> bool:
 	if not target.telegraph.is_empty():

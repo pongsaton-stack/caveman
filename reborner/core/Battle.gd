@@ -386,6 +386,11 @@ func _take_turn(cur: Actor, target: Actor) -> void:
 		if not insight_full and Ai.should_guard(cur, allies(), foes()):
 			_do_guard(cur)
 			return
+		# ท่าเสริมตัวเอง (ท่ายึด เช่น เกราะแข็ง) — Insight เต็มแล้วไม่ใช้ เพราะท่าเสริมไม่ประกาย
+		var buff := Ai.choose_buff(cur, pool, _attack_threats(cur)) if not insight_full else null
+		if buff != null:
+			_execute(cur, cur, buff)
+			return
 		tech = Ai.choose(cur, target, pool, foes().size())
 		# คอมโบ — Insight เต็มแล้วไม่ยิงคอมโบ เพราะคอมโบไม่ประกาย
 		if not insight_full and not cur.has_status(Status.SEALED):
@@ -614,6 +619,23 @@ func _signature_tech(a: Actor) -> Tech:
 			t.power = 0.0
 			t.status = ""
 	return t
+
+## ศัตรูที่เปิดท่าเด่นแบบโจมตีไว้ (ให้ Ai ตัดสินว่าบัฟหรือตีขัด)
+## gap = ดาเมจที่ยังขาดถึงเกณฑ์ขัด · turns = ตาของ cur ก่อนศัตรูตัวนั้นลงมือ (นับตานี้ด้วย ตามคิว preview)
+func _attack_threats(cur: Actor) -> Array:
+	var out := []
+	var q := preview(12)
+	for f in foes():
+		if f.telegraph.is_empty() or not _signature_tech(f).is_attack():
+			continue
+		var turns := 0
+		for a in q:
+			if a == f:
+				break
+			if a == cur:
+				turns += 1
+		out.append({"actor": f, "sig": _signature_tech(f), "gap": f.max_hp * Formulas.INTERRUPT_PCT - float(f.telegraph["dmg"]), "turns": maxi(turns, 1)})
+	return out
 
 ## ท่าเด่นแบบครั้งเดียวต่อการต่อสู้ที่ใช้ไปแล้ว ห้ามเปิดท่าซ้ำ
 func _sig_spent(a: Actor) -> bool:
