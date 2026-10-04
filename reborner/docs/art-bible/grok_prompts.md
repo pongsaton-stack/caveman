@@ -114,3 +114,18 @@ Game audio for a cozy post-apocalyptic Ghibli-mood JRPG. Seamless loops, no voca
 - Short SFX (WAV, 0.2–1.0 s, mono): slime squish, stone roll, bat wing flap, wolf bite, boss roar, knife slash, hit thud,
   guard clang, chest open, item pickup, footstep on grass, understanding chime (soft bell), recruit success jingle, menu move tick.
 ```
+
+## 9) เพลงต่อสู้แนว SNES JRPG (kwan ส่งคลิป Romancing SaGa 3 "Battle I" เป็นแนว · 4 ต.ค. 2026)
+ห้ามขอให้ "เหมือนเพลงนั้น" หรือใส่ชื่อเกม/ชื่อผู้แต่งใน prompt — บอกแค่ลักษณะดนตรี (กันได้ทำนองซ้ำของเดิม)
+```
+Original battle music for a 16-bit era JRPG (Super Famicom / SNES sound chip style). Instrumental only, no vocals.
+- Tempo ~150–165 BPM, 4/4, driving and heroic with a slightly dark, adventurous edge.
+- Instruments as sampled by a 1990s console: punchy slap/synth bass playing fast arpeggiated ostinato,
+  brass stabs and a bright brass lead melody, orchestral string runs, timpani + snare + crash, a short harpsichord or
+  organ counter-line in the B section.
+- Structure: 4-bar intro hit → A section (main melody, 16 bars) → B section (modulates up a step, 16 bars) →
+  bridge with bass-only breakdown (8 bars) → back to A. Must loop seamlessly from the end to the start of A.
+- Mix: mono-ish, warm, slightly lo-fi (32 kHz sampler feel), light reverb, no modern sub-bass or EDM sound design.
+- Length 90–120 s per loop. Deliver WAV + OGG. Also deliver a 3-second victory fanfare and a 2-second "glimmer" sting
+  (rising bell arpeggio, bright, like a sudden idea).
+```

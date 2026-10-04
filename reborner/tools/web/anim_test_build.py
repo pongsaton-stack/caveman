@@ -25,6 +25,13 @@ def sprites():
 		for f in sorted(os.listdir(d)):
 			if f.endswith('.png'):
 				out['%s/%s' % (key, f[:-4])] = png(os.path.join(d, f))
+	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
+	td = os.path.join(ROOT, 'assets/tiles_ll')
+	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
+			'ruins', 'rock', 'pine', 'bush', 'ruin_house', 'flowers']:
+		f = os.path.join(td, n + '.png')
+		if os.path.exists(f):
+			out['tile/' + n] = png(f)
 	return out
 
 def techs():

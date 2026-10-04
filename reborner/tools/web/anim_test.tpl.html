@@ -138,7 +138,10 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 				<label for="wpn">อาวุธ <select id="wpn"><option value="14">มีดทำครัว (14)</option><option value="28">อาวุธฐาน 28</option></select></label>
 			</div>
 			<div class="stat" id="heroStat"></div>
-			<div class="row" style="margin-top:8px"><button class="btn" id="btnCine" aria-pressed="true">ไม้ตายแบบใหม่ (คัตอิน + ท่าทาง)</button><span class="note" style="margin:0">ตอนนี้มีสาย คม · ทุบ — เทียบกับแบบในเกมได้โดยปิดปุ่มนี้</span></div>
+			<p class="lbl" style="margin-top:12px">แบบจอศึก</p>
+			<div class="row"><span class="seg" id="segStyle" role="group" aria-label="แบบจอศึก"><button class="btn" data-v="game">แบบในเกมตอนนี้</button><button class="btn" data-v="cine" aria-pressed="true">ซินีมา</button><button class="btn" data-v="saga">SaGa</button></span>
+				<button class="btn" id="btnGlim" aria-pressed="false">ประกาย 💡</button></div>
+			<p class="note" id="styleNote">ซินีมา = คัตอิน · มุมกล้อง · ร่างแยก (6 สาย) · SaGa = แนว Romancing SaGa 3: ฉากเต็มจอ · ทีมเรียงทแยง · วิ่งเข้าตี · กล่องชื่อท่ามุมขวาบน · ไม้ตายเปลี่ยนสีทั้งจอ (ตัวอย่าง: คม · ยิง)</p>
 			<p class="lbl" style="margin-top:12px">สาย (techs.csv)</p>
 			<div class="schools" id="schoolPick"></div>
 			<div class="tlist" id="techList"></div>
@@ -186,7 +189,7 @@ for (const key of Object.keys(DATA.sprites)) {
 
 // ── สถานะผู้ชม ──
 const S = { tab: 'clips', clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
-	hero: { x: 168, y: 38 }, cine: true, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
+	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || t === 'clips') S.tab = t; } catch (e) {}
 
@@ -262,7 +265,7 @@ function skillView(dt) {
 	if (S.cam && S.cam.k !== 1) { const f = Math.min(1, (S.cam.k - 1) / 0.6), cx = S.cam.x + (W() / 2 - S.cam.x) * f, cy = S.cam.y + (H() / 2 - S.cam.y) * f;   // กล้อง: ซูมเข้าจุด และค่อยๆ เลื่อนจุดนั้นมากลางจอ
 		ctx.translate(cx, cy); ctx.scale(S.cam.k, S.cam.k); ctx.translate(-S.cam.x, -S.cam.y); }
 	if (S.zoom && S.zoom.k !== 1) { ctx.translate(S.zoom.x, S.zoom.y); ctx.scale(S.zoom.k, S.zoom.k); ctx.translate(-S.zoom.x, -S.zoom.y); }
-	drawBg();
+	if (S.saga) drawSagaBg(); else drawBg();
 	for (const e of S.fx) if (e.under) e.draw(Math.min(1, e.t / e.dur), e.t);   // ชั้นหลังตัวละคร: ฟ้าเปลี่ยนสี · รัศมีแสง
 	idleT += dt; if (idleT >= K.FOE_IDLE_SEC) { idleT = 0; idleF = 1 - idleF; }
 	for (const f of foeLayout()) {
@@ -270,7 +273,9 @@ function skillView(dt) {
 		const fl = S.flash.get('f' + f.i) || 0;
 		const ko = (S.foeOff && S.foeOff[f.i]) || { x: 0, y: 0 };
 		spr(IMG[key] ? key : 'mon/' + S.foe, f.x + ko.x + (fl > 0 ? Math.sin(fl * 40) * 3 * fl : 0), f.y + ko.y, { flash: fl > 0 ? fl * 1.4 : 0 });
+		if (S.foeTint && S.foeTint.a > 0) { const ti = tinted(IMG[key] ? key : 'mon/' + S.foe, S.foeTint.color); if (ti) { ctx.save(); ctx.globalAlpha = S.foeTint.a; ctx.drawImage(ti, Math.round(f.x + ko.x), Math.round(f.y + ko.y)); ctx.restore(); } }   // SaGa: มอนกลายเป็นเงาสีเดียว
 	}
+	if (S.saga) for (const c of SAGA_PARTY) { const k = c.key + (idleF ? '_idle1' : ''), im = IMG[k] || IMG[c.key]; if (im) spr(IMG[k] ? k : c.key, c.x - im.width / 2, c.y - im.height, { flip: true }); }
 	const hf = S.flash.get('hero') || 0;
 	spr(S.heroFrame, S.hero.x, S.hero.y, { flash: hf });
 	if (S.dim > 0) { ctx.fillStyle = `rgba(13,8,20,${S.dim})`; ctx.fillRect(-4, -4, W() + 8, H() + 8); }
@@ -803,6 +808,110 @@ function playMove(id, pts, school, T0) {
 	return { impact: T0 + mv.impact, total: T0 + mv.total };
 }
 const CINE = new Proxy({}, { get: (_, school) => FXDB.by_school[school] ? (pts, col, T0) => playMove(FXDB.by_school[school], pts, school, T0) : undefined });
+
+// ══ แบบ SaGa (แนว Romancing SaGa 3 · คลิปของ kwan 4 ต.ค.) ══════════════════
+// ฉากเต็มจอปูไทล์แมพของเกม · ทีมยืนเรียงทแยงทางขวา · ท่าธรรมดา = วิ่งเข้าตีแล้ววิ่งกลับ · กล่องชื่อท่ามุมขวาบน
+// ประกาย = หลอดไฟเหนือหัว + บอลลูนชื่อท่า · ไม้ตาย = เปลี่ยนสีทั้งจอ/มอนเป็นเงาสี ไม่ใช้คัตอิน/ซูม
+const SAGA_PARTY = [{ key: 'mon/COMP-M06', x: 220, y: 60 }, { key: 'mon/COMP-M03', x: 218, y: 118 }];   // จุดกลางล่างของรูป: ค้างคาวลอยหลัง-บน · หนอนหน้า-ล่าง (เรียงทแยงกับ Rion)
+// ที่ยืน Rion ต่างกันตามแบบจอ: SaGa ขยับซ้ายให้ทีมเรียงทแยงได้ในจอแคบ
+function setHome() { if (S.saga) { HERO.x = 146; HERO.y = 42; } else { HERO.x = 168; HERO.y = 38; } S.hero = { x: HERO.x, y: HERO.y }; }
+let sagaBgCache = null;
+function drawSagaBg() {
+	if (!sagaBgCache) {
+		const c = document.createElement('canvas'); c.width = 240; c.height = 120; const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+		const hsh = (a, b) => ((a * 73856093) ^ (b * 19349663)) >>> 0;
+		for (let ty = 0; ty < 5; ty++) for (let tx = 0; tx < 10; tx++) {
+			const h = hsh(tx, ty), kind = ty === 0 ? 'stone' : (h % 7 < 2 ? 'grass' : 'ash'), im = IMG[`tile/${kind}_${h % 4}`];
+			if (im) x.drawImage(im, tx * 24, ty * 24);
+		}
+		for (const [n, px, py] of [['ruin_house', 4, -26], ['ruins', 96, 2], ['rock', 150, 6], ['pine', 186, -18], ['ruins', 60, 98], ['bush', 130, 100], ['rock', 8, 92]]) { const im = IMG['tile/' + n]; if (im) x.drawImage(im, px, py); }
+		x.fillStyle = 'rgba(10,8,20,0.28)'; x.fillRect(0, 0, 240, 120);   // หรี่ฉากหลังให้ตัวละครเด่น (SaGa ใช้ฉากหลังทึบกว่าตัว)
+		sagaBgCache = c;
+	}
+	ctx.drawImage(sagaBgCache, 0, 0);
+}
+// กล่องชื่อท่ามุมขวาบน (กรอบน้ำเงินขอบขาวแบบ SNES)
+function nameBox(text, life = 1.3) { S.fx.push({ t: 0, dur: life, ui: true, draw: (p, t) => {
+	ctx.save(); ctx.font = '700 8px Sarabun, sans-serif'; const w = Math.ceil(ctx.measureText(text).width) + 12, x = W() - w - 4, y = 4;
+	ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 1, y - 1, w + 2, 14); ctx.fillStyle = '#1a2a6a'; ctx.fillRect(x, y, w, 12);
+	ctx.fillStyle = '#2c47a8'; ctx.fillRect(x, y, w, 3); ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(text, x + 6, y + 6.5); ctx.restore(); } }); }
+// บอลลูนคำพูด (ประกาย / ท่ามอน)
+function bubble(at, text, life = 0.9) { S.fx.push({ t: 0, dur: life, ui: true, draw: () => {
+	ctx.save(); ctx.font = '700 8px Sarabun, sans-serif'; const w = Math.ceil(ctx.measureText(text).width) + 10, x = Math.min(W() - w - 2, at.x - w / 2), y = at.y - 16;
+	ctx.fillStyle = '#f4ecd8'; ctx.strokeStyle = '#3a2a1a'; ctx.lineWidth = 1; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, 12, 4) : ctx.rect(x, y, w, 12); ctx.fill(); ctx.stroke();
+	ctx.beginPath(); ctx.moveTo(at.x - 3, y + 12); ctx.lineTo(at.x, y + 16); ctx.lineTo(at.x + 3, y + 12); ctx.fill();
+	ctx.fillStyle = '#2a1a0a'; ctx.textBaseline = 'middle'; ctx.fillText(text, x + 5, y + 6.5); ctx.restore(); } }); }
+// หลอดไฟประกาย (พิกเซล) เหนือหัว
+function bulb(life = 0.8) { fx(life, (p, t) => { const at = { x: S.hero.x + 32, y: S.hero.y - 2 + Math.sin(t * 12) * 1 };
+	ctx.save(); ctx.fillStyle = '#fff6a0'; ctx.fillRect(at.x - 3, at.y - 8, 6, 6); ctx.fillRect(at.x - 4, at.y - 7, 8, 4); ctx.fillStyle = '#ffd040'; ctx.fillRect(at.x - 2, at.y - 3, 4, 1);
+	ctx.fillStyle = '#9aa0a8'; ctx.fillRect(at.x - 2, at.y - 2, 4, 2); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.5 + 0.5 * Math.sin(t * 20);
+	ctx.fillStyle = '#fff6a0'; for (const [dx, dy] of [[-7, -6], [7, -6], [0, -12], [-6, -1], [6, -1]]) ctx.fillRect(at.x + dx, at.y + dy, 1, 2); ctx.restore(); }); }
+// ตัวเลขดาเมจแบบ SNES: ตัวเล็กขาว เด้ง 2 ครั้งใต้มอน
+function bounceNum(at, text, col) { fx(1.0, (p, t) => { const b = t < 0.25 ? Math.sin(t / 0.25 * Math.PI) * 8 : t < 0.4 ? Math.sin((t - 0.25) / 0.15 * Math.PI) * 3 : 0, a = t > 0.8 ? 1 - (t - 0.8) / 0.2 : 1;
+	ctx.save(); ctx.globalAlpha = a; ctx.font = '700 8px Sarabun, sans-serif'; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 2; ctx.strokeStyle = '#000';
+	ctx.strokeText(text, at.x, at.y + 14 - b); ctx.fillStyle = col; ctx.fillText(text, at.x, at.y + 14 - b); ctx.restore(); }); }
+// ท่าเดิน (วิ่ง) ระหว่างย้ายตัว: สลับเฟรมเดินตามทิศ
+function runAnim(dir, sec) { const fr = [0, 1, 2, 3].map(i => `rion/${dir}_w${i}`); S.fx.push({ t: 0, dur: sec, draw: () => {}, step: p => { S.heroFrame = fr[Math.floor(p * sec / 0.06) % 4]; } }); }
+function attackAnim(delay, rest = 'rion/west') { const fr = [0, 1, 2, 3].map(i => `rion/west_a${i}`); S.fx.push({ t: -delay, dur: 0.32, draw: () => {}, step: p => { S.heroFrame = fr[Math.min(3, Math.floor(p * 4))]; }, then: () => { S.heroFrame = rest; } }); }
+// จอดับ/หรี่ทั้งฉาก (ใต้ตัวละคร) · สีทั้งจอ (ทับทุกอย่าง แบบ palette)
+function blackout(col, a, life, fadeIn = 0.1, fadeOut = 0.25) { under(life, (p, t) => { const k = t < fadeIn ? t / fadeIn : t > life - fadeOut ? (life - t) / fadeOut : 1; ctx.save(); ctx.globalAlpha = a * Math.max(0, k); ctx.fillStyle = col; ctx.fillRect(-10, -10, W() + 20, H() + 20); ctx.restore(); }); }
+function palette(col, a, life, mode = 'multiply') { S.fx.push({ t: 0, dur: life, ui: true, draw: (p, t) => { const k = t < 0.1 ? t / 0.1 : t > life - 0.2 ? (life - t) / 0.2 : 1; ctx.save(); ctx.globalCompositeOperation = mode; ctx.globalAlpha = a * Math.max(0, k); ctx.fillStyle = col; ctx.fillRect(0, 0, W(), H()); ctx.restore(); } }); }
+function foeTint(color, a, life) { S.fx.push({ t: 0, dur: life, draw: () => {}, step: p => { S.foeTint = { color, a: a * (p > 0.75 ? 1 - (p - 0.75) / 0.25 : 1) }; }, then: () => { S.foeTint = null; } }); }
+
+function sagaPlay(t) {
+	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.rgb = null; S.cam = { x: 120, y: 60, k: 1 }; S.foeOff = {}; S.heroFrame = 'rion/west'; S.dimT = undefined; S.dim = 0;
+	const m = DATA.monsters.find(x => x.monster_id === S.foe), ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
+	const foes = foeLayout(), tg = (t.scope === 'single' ? foes.slice(0, 1) : foes).map(f => ({ ...f.pt, i: f.i, f }));
+	const r = dmgRange(t, m), numTxt = String(r.mid), numCol = r.e === K.WEAK_MULT ? '#ffe08a' : '#ffffff';
+	let T = 0;
+	if (S.glim) { bulb(0.8); later(0.15, () => bubble({ x: S.hero.x + 32, y: S.hero.y + 4 }, t.name_th + '!', 0.75)); T = 0.85; }   // ประกาย: หลอดไฟ + บอลลูน ก่อนลงมือ
+	later(T, () => nameBox(t.name_th, ult ? 1.9 : 1.2));
+	const mv = ult && SAGA[t.school];
+	if (mv) { later(T, () => mv(tg, col, numTxt, numCol, t)); return; }
+	// ท่าธรรมดา: วิ่งเข้าไปหน้ามอนตัวแรก → ฟัน → วิ่งกลับ
+	const tgt = tg[0], front = { x: tgt.f.x + tgt.f.w - 18, y: Math.min(HERO.y, tgt.y - 40) };
+	later(T, () => { runAnim('west', 0.24); heroTo(front, 0.24, p => p); });
+	attackAnim(T + 0.24);
+	later(T + 0.38, () => { for (let h = 0; h < Math.max(1, +t.hits || 1); h++) for (const g of tg) later(h * 0.12, () => {
+		switch (t.school) { case 'คม': fxSlash(g, col, -1); break; case 'แทง': fxPierce(g, col, -1); break; case 'ทุบ': fxCrush(g, col); break; case 'ยิง': fxShoot(heroPt(), g, col); break; default: fxClaw(g, col, -1); }
+		hitFlash('f' + g.i); bounceNum(g, numTxt, numCol); }); });
+	later(T + 0.7, () => { runAnim('east', 0.24); heroTo({ x: HERO.x, y: HERO.y }, 0.24, p => p); });
+	later(T + 0.95, () => { S.heroFrame = 'rion/west'; });
+}
+
+// ไม้ตายแบบ SaGa — ตัวอย่าง 2 สาย
+const SAGA = {
+	// คม (แนว 黄龍剣): จอดับดำ → Rion กระโดดหายขึ้นฟ้า → มังกรไฟเหลืองดิ่งลงใส่เป้า → แสงฟันวงรีแดงกวาดเฉียง → มอนเป็นเงาแดง → Rion ลงกลับที่
+	'คม': (tg, col, num, numCol) => {
+		blackout('#000000', 1, 1.9, 0.12, 0.3);
+		runAnim('north', 0.18); heroTo({ x: HERO.x - 6, y: -70 }, 0.22, easeOut);
+		const c = tg.reduce((a, g) => ({ x: a.x + g.x / tg.length, y: a.y + g.y / tg.length }), { x: 0, y: 0 });
+		later(0.4, () => fx(0.45, (p, t) => {   // มังกรไฟ: ก้อนเปลวหลายลูกเรียงเป็นสาย พุ่งจากมุมขวาบนลงหาเป้า
+			const head = { x: 230 + (c.x - 230) * easeIn(p), y: -20 + (c.y + 20) * easeIn(p) };
+			ctx.save(); ctx.globalCompositeOperation = 'lighter';
+			for (let k = 0; k < 9; k++) { const q = Math.max(0, p - k * 0.04), x = 230 + (c.x - 230) * easeIn(q), y = -20 + (c.y + 20) * easeIn(q), rr = 10 - k * 0.8 + Math.sin(t * 40 + k) * 1.5;
+				const g = ctx.createRadialGradient(x, y, 0, x, y, rr); g.addColorStop(0, '#ffffff'); g.addColorStop(0.35, '#fff27a'); g.addColorStop(1, 'rgba(255,170,30,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, rr, 0, Math.PI * 2); ctx.fill(); }
+			for (let k = 0; k < 6; k++) { ctx.fillStyle = '#ffe050'; ctx.fillRect(head.x - 10 + ((k * 7 + Math.floor(t * 30)) % 20), head.y - 8 + ((k * 11) % 16), 2, 2); }
+			ctx.restore(); }));
+		later(0.85, () => { flash('#fff6d0', 0.8, 0.15); foeTint('#ff2a1a', 0.85, 0.9);
+			fx(0.55, p => { ctx.save(); ctx.globalAlpha = (p < 0.6 ? 0.8 : 0.8 * (1 - (p - 0.6) / 0.4)); ctx.fillStyle = '#c81e1e'; ctx.translate(c.x, c.y); ctx.rotate(-0.55);
+				ctx.beginPath(); ctx.ellipse(0, 0, 70 * easeOut(Math.min(1, p / 0.3)), 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#ff9a6a'; ctx.beginPath(); ctx.ellipse(0, 0, 60 * easeOut(Math.min(1, p / 0.3)), 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); });
+			for (const g of tg) { hitFlash('f' + g.i); bounceNum(g, num, numCol); } shake(3, 0.3); });
+		later(1.45, () => { S.hero = { x: HERO.x, y: -70 }; heroTo({ x: HERO.x, y: HERO.y }, 0.2, easeIn); });
+		later(1.7, () => { S.heroFrame = 'rion/west'; });
+	},
+	// ยิง (แนว スコール): จอหรี่ดำ-น้ำเงิน → ฝนลูกศรเฉียงตกทั้งจอ ~1 วิ → มอนกะพริบน้ำเงิน → ลูกศรปักรอบเป้า
+	'ยิง': (tg, col, num, numCol) => {
+		attackAnim(0); later(0.05, () => fxShoot(heroPt(), { x: HERO.x + 10, y: -20 }, '#cfe8ff'));
+		blackout('#060a18', 0.8, 1.8, 0.2, 0.35);
+		later(0.25, () => fx(1.1, (p, t) => { ctx.save(); ctx.strokeStyle = '#9fc8ff'; ctx.lineWidth = 1;
+			for (let i = 0; i < 46; i++) { const sp = 260 + (i % 5) * 30, x0 = ((i * 37) % 300) - 20, y = ((t * sp + i * 29) % 150) - 20, x = x0 - (y + 20) * 0.45;
+				ctx.globalAlpha = (0.35 + 0.15 * (i % 3)) * (p > 0.85 ? (1 - p) / 0.15 : 1); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 10); ctx.stroke(); }
+			ctx.restore(); }));
+		later(0.6, () => { foeTint('#4a7aff', 0.6, 0.8); for (const g of tg) for (let k = 0; k < 4; k++) later(k * 0.12, () => { fxClaw({ x: g.x - 10 + k * 7, y: g.y - 6 + (k % 2) * 8 }, '#cfe8ff', 1); hitFlash('f' + g.i); }); });
+		later(1.1, () => { for (const g of tg) bounceNum(g, num, numCol); });
+	},
+};
 // ── ดาเมจตามสูตรเกม ──
 const heroAtk = () => Math.round(20 + S.prof * 1.6 + S.wpn);
 function elemMult(m, el) {
@@ -817,7 +926,8 @@ function dmgRange(t, m) {
 
 // ── เล่นสกิล ──
 function playTech(t) {
-	S.tech = t; S.fx = []; S.flash.clear();
+	S.tech = t; S.fx = []; S.flash.clear(); S.foeTint = null;
+	if (S.saga) { sagaPlay(t); setRead(t); return; }
 	const m = DATA.monsters.find(x => x.monster_id === S.foe);
 	const ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
 	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
@@ -978,7 +1088,9 @@ function setTab(t) {
 
 function boot() {
 	$('ultK').textContent = K.ULT_PROF;
-	$('btnCine').onclick = () => { S.cine = !S.cine; $('btnCine').setAttribute('aria-pressed', String(S.cine)); };
+	$('segStyle').onclick = e => { const v = e.target.dataset.v; if (!v) return; S.style = v; S.cine = v === 'cine'; S.saga = v === 'saga'; setHome(); press($('segStyle'), v); try { localStorage.setItem('at_style', v); } catch (er) {} };
+	try { const v = localStorage.getItem('at_style'); if (v) { S.style = v; S.cine = v === 'cine'; S.saga = v === 'saga'; setHome(); press($('segStyle'), v); } } catch (er) {}
+	$('btnGlim').onclick = () => { S.glim = !S.glim; $('btnGlim').setAttribute('aria-pressed', String(S.glim)); };
 	$('btnPlay').onclick = () => { S.playing = !S.playing; updPlay(); };
 	const step = d => { if (S.tab !== 'clips') return; S.playing = false; updPlay(); const n = CLIPS[S.clip].frames.length; S.frame = (S.frame + d + n) % n; syncFrame(); };
 	$('btnPrev').onclick = () => step(-1); $('btnNext').onclick = () => step(1);
