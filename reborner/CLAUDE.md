@@ -6,6 +6,11 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 **เทสต์แล้วเจออะไรไม่ถูกต้อง → แก้ให้ถูกได้เลย ไม่ต้องถาม** (กฎ 3 ต.ค. 2026) แล้วรายงานว่าเจออะไร แก้อย่างไร
 **ท่า/เอฟเฟกต์/อนิเมชั่นใหม่ ต้องทำให้ลองได้ในหน้า animation test ก่อนทุกครั้ง** (กฎ 3 ต.ค. 2026) แล้วค่อยเข้าเกมเมื่อ kwan ดูแล้ว — หน้า: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
 
+## ลิงก์ที่ปักไว้
+- อัปภาพ Monster Compendium (kwan อัปเอง): https://github.com/pongsaton-stack/caveman/upload/claude/zealous-goldberg-50frc1/reborner/docs/art-bible/compendium
+  เลือก "Commit directly to the claude/zealous-goldberg-50frc1 branch" · ไฟล์ละ ≤25MB · ครั้งละ ≤100 ไฟล์
+- เล่นเกมบนเว็บ: https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan · หน้า animation test: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
+
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) และ **บทเรียน 30 ข้อ (หมวด 11) อ่านก่อนแก้อะไรก็ตาม**
 - `docs/STORY_DRAFT.md` — ร่างเรื่อง: ตัวตน Rion · ฉากเปิดเรื่อง · ผู้ที่นับเหตุการณ์ (**ร่าง** ขัดกับ GDD เมื่อไหร่ให้เชื่อ GDD)
