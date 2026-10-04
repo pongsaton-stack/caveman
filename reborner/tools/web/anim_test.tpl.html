@@ -259,6 +259,8 @@ function skillView(dt) {
 	const sx = S.shake > 0 ? Math.sin(S.shake * 60) * amp * S.shake / sd : 0;
 	const sy = S.shake > 0 ? Math.cos(S.shake * 47) * amp * S.shake / sd : 0;
 	ctx.save(); ctx.translate(Math.round(sx), Math.round(sy));
+	if (S.cam && S.cam.k !== 1) { const f = Math.min(1, (S.cam.k - 1) / 0.6), cx = S.cam.x + (W() / 2 - S.cam.x) * f, cy = S.cam.y + (H() / 2 - S.cam.y) * f;   // กล้อง: ซูมเข้าจุด และค่อยๆ เลื่อนจุดนั้นมากลางจอ
+		ctx.translate(cx, cy); ctx.scale(S.cam.k, S.cam.k); ctx.translate(-S.cam.x, -S.cam.y); }
 	if (S.zoom && S.zoom.k !== 1) { ctx.translate(S.zoom.x, S.zoom.y); ctx.scale(S.zoom.k, S.zoom.k); ctx.translate(-S.zoom.x, -S.zoom.y); }
 	drawBg();
 	for (const e of S.fx) if (e.under) e.draw(Math.min(1, e.t / e.dur), e.t);   // ชั้นหลังตัวละคร: ฟ้าเปลี่ยนสี · รัศมีแสง
@@ -266,7 +268,8 @@ function skillView(dt) {
 	for (const f of foeLayout()) {
 		const key = 'mon/' + S.foe + (idleF ? '_idle1' : '');
 		const fl = S.flash.get('f' + f.i) || 0;
-		spr(IMG[key] ? key : 'mon/' + S.foe, f.x + (fl > 0 ? Math.sin(fl * 40) * 3 * fl : 0), f.y, { flash: fl > 0 ? fl * 1.4 : 0 });
+		const ko = (S.foeOff && S.foeOff[f.i]) || { x: 0, y: 0 };
+		spr(IMG[key] ? key : 'mon/' + S.foe, f.x + ko.x + (fl > 0 ? Math.sin(fl * 40) * 3 * fl : 0), f.y + ko.y, { flash: fl > 0 ? fl * 1.4 : 0 });
 	}
 	const hf = S.flash.get('hero') || 0;
 	spr(S.heroFrame, S.hero.x, S.hero.y, { flash: hf });
@@ -635,6 +638,82 @@ function shatter(at, life) { let snap = null; const shards = [];
 	} }); }
 // ประกายจบท่า: แฉกวาบที่อาวุธ Rion
 function finish(col) { const at = { x: S.hero.x + 14, y: S.hero.y + 38 }; star(at, '#ffffff', 9, 0.4); star(at, col, 5, 0.5); sparks(at, col, 8, 10, 12, 0.5); }
+// ── คำสั่งรอบ 5 (แนวคลิปวิดีโอของ kwan: SL30 · PC30 · DV29 vs บอส) ──
+// กล้อง: เลื่อน/ซูมไปที่จุด at ด้วยค่า k ใน sec วิ (sec 0 = ตัดภาพทันที) · ค้างจนคำสั่งกล้องถัดไป
+function camera(at, k, sec) { let from = null;
+	const hw = W() / 2 / k, hh = H() / 2 / k, cl = (v, lo, hi) => Math.max(lo, Math.min(hi, v));   // กล้องไม่เลยขอบฉาก (ไม่เห็นพื้นที่ว่างนอกเวที)
+	const to = { x: at ? cl(at.x, hw, W() - hw) : W() / 2, y: at ? cl(at.y, hh, H() - hh) : H() / 2, k };
+	if (!sec) { S.cam = to; return; }
+	S.fx.push({ t: 0, dur: sec, draw: () => {}, step: p => { if (!from) from = { ...S.cam }; const e = easeOut(p); S.cam = { x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, k: from.k + (to.k - from.k) * e }; }, then: () => { S.cam = to; } }); }
+// ตัดภาพ: เฟรมดำ/ขาวสั้นๆ กลบการเปลี่ยนมุมกล้อง
+function cutFrame(col, sec) { S.fx.push({ t: 0, dur: sec, ui: true, draw: p => { ctx.save(); ctx.globalAlpha = 1 - p; ctx.fillStyle = col; ctx.fillRect(0, 0, W(), H()); ctx.restore(); } }); }
+// แผลเรืองค้างบนตัวเป้า (ไขว้ X) — เต้นเป็นจังหวะ มีถ่านไฟร่วง · ตามตัวเป้าเวลาโดนผลัก
+function wound(base, col, life) { const len = 13;
+	fx(life, (p, t) => { const o = (S.foeOff && S.foeOff[base.i]) || { x: 0, y: 0 }, at = { x: base.x + o.x, y: base.y + o.y }, draw = Math.min(1, t / 0.08);
+		const a = (p > 0.75 ? 1 - (p - 0.75) / 0.25 : 1) * (0.75 + 0.25 * Math.sin(t * 14));
+		for (const [dx, dy] of [[1, -1], [1, 1]]) { const seg = [[at.x - dx * len * draw, at.y - dy * len * draw], [at.x + dx * len * draw, at.y + dy * len * draw]];
+			line(seg, shade(col, -0.35), 3.4, a * 0.8); ctx.save(); ctx.globalCompositeOperation = 'lighter'; line(seg, col, 2, a); line(seg, '#fff2c0', 0.8, a); ctx.restore(); }
+		if (Math.floor(t * 20) % 3 === 0) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.fillStyle = col; ctx.fillRect(at.x + ((Math.floor(t * 20) * 7) % 20) - 10, at.y + 4 + (t * 30) % 14, 1.5, 1.5); ctx.restore(); }
+	}); }
+// สายฟ้าแตกกิ่งไต่รอบตัวเป้า (ค้าง) — สุ่มรูปใหม่ทุก 0.05 วิ แบบกำหนดได้ (ไม่ใช้ Math.random)
+function lightning(base, col, life, r = 20) {
+	fx(life, (p, t) => { const o = (S.foeOff && S.foeOff[base.i]) || { x: 0, y: 0 }, at = { x: base.x + o.x, y: base.y + o.y }, f = Math.floor(t * 20), a = p > 0.7 ? 1 - (p - 0.7) / 0.3 : 1;
+		const rnd = k => { const v = Math.sin((f * 13.7 + k * 7.31) * 12.9898) * 43758.5453; return v - Math.floor(v); };
+		ctx.save(); ctx.globalCompositeOperation = 'lighter';
+		for (let b = 0; b < 4; b++) { let x = at.x + (rnd(b) - 0.5) * 8, y = at.y + (rnd(b + 9) - 0.5) * 8; const ang = rnd(b + 20) * Math.PI * 2; const pts = [[x, y]];
+			for (let s2 = 0; s2 < 5; s2++) { x += Math.cos(ang) * r / 5 + (rnd(b * 10 + s2) - 0.5) * 7; y += Math.sin(ang) * r / 5 * 0.8 + (rnd(b * 10 + s2 + 50) - 0.5) * 7; pts.push([x, y]); }
+			line(pts, col, 1.6, 0.8 * a); line(pts, '#ffffff', 0.6, a); }
+		ctx.restore(); }); }
+// ผลักเป้าถอยไปทางซ้าย dist px แล้วค่อยกลับ
+function knockback(base, dist, sec) { S.fx.push({ t: 0, dur: sec, draw: () => {}, step: p => { const k = p < 0.15 ? p / 0.15 : 1 - easeIn((p - 0.15) / 0.85); S.foeOff[base.i] = { x: -dist * k, y: -2 * Math.sin(Math.PI * Math.min(1, p / 0.3)) }; }, then: () => { S.foeOff[base.i] = { x: 0, y: 0 }; } }); }
+// เสี้ยวโคจร: n เสี้ยวหมุนรอบ Rion → พุ่งเข้าเป้า → แตก
+function orbit(center, target, col, n, r, life) { const spin = life * 0.72;
+	for (let k = 0; k < n; k++) fx(life, (p, t) => { const c = { x: S.hero.x + SPRITE_C.x, y: S.hero.y + SPRITE_C.y }, ang = k * Math.PI * 2 / n + t * 11;
+		let at = { x: c.x + Math.cos(ang) * r, y: c.y + Math.sin(ang) * r * 0.55 };
+		if (t > spin) { const q = easeIn(Math.min(1, (t - spin) / (life - spin))); at = { x: at.x + (target.x - at.x) * q, y: at.y + (target.y - at.y) * q }; }
+		const rot = ang + Math.PI / 2, shape = []; for (let i = 0; i <= 8; i++) { const a2 = (-70 + i * 17.5) * Math.PI / 180; shape.push([Math.cos(a2) * 9, Math.sin(a2) * 9]); }
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; line(tr(shape, at, 1, rot), col, 2.6, 0.9); line(tr(shape, at, 1, rot), '#fff3dc', 0.9, 1); ctx.restore(); });
+	later(life, () => { star(target, col, 14, 0.35); sparks(target, col, 12, 20, 16, 0.4); });
+}
+// ห่าธนูน้ำแข็ง: ลูกศรแสงจาก from ไป to (เอียงตาม spread) หัวลูกศรขาว หางเรือง
+function arrow(from, to, col, life) { fx(life, p => { const k = easeIn(p), x = from.x + (to.x - from.x) * k, y = from.y + (to.y - from.y) * k, dx = to.x - from.x, dy = to.y - from.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+	ctx.save(); ctx.globalCompositeOperation = 'lighter'; line([[x - ux * 22, y - uy * 22], [x, y]], col, 2.4, 0.7); line([[x - ux * 10, y - uy * 10], [x, y]], '#ffffff', 1, 1);
+	ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.moveTo(x + ux * 5, y + uy * 5); ctx.lineTo(x - uy * 2.5, y + ux * 2.5); ctx.lineTo(x + uy * 2.5, y - ux * 2.5); ctx.fill(); ctx.restore(); });
+	later(life, () => { star(to, col, 6, 0.18); sparks(to, col, 4, 8, 8, 0.25); }); }
+// หุ่นคู่หู: หุ่นบล็อกเรืองแสงยืนข้าง Rion แขนปืนชี้ไปทางศัตรู · ปากกระบอก = at + MECH_GUN
+function mechAlly(at, col, life) { fx(life, (p, t) => { const rise = easeOut(Math.min(1, t / 0.3)), a = p > 0.88 ? 1 - (p - 0.88) / 0.12 : 1, recoil = (S.mechRecoil || 0);
+	ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.beginPath(); ctx.rect(at.x - 70, -20, 110, at.y + 46); ctx.clip();
+	const top = at.y - 44 + 50 * (1 - rise);
+	const blk = (x, y, w, h, c, al) => { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = al * Math.max(0, a); ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+	const glow = (x, y, w, h, c, al) => { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = al * Math.max(0, a); ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
+	// ขา: เส้นขอบเข้ม → เกราะ → ไฮไลต์ · ข้อเข่ากลม · เท้ากว้าง
+	for (const lx of [at.x - 7, at.x + 8]) { blk(lx - 1, top + 51, 11, 28, '#1c2024', 1); blk(lx, top + 52, 9, 26, '#4a545a', 1); blk(lx, top + 52, 3, 26, '#6a777e', 1); blk(lx + 1, top + 62, 7, 4, '#2c3236', 1); blk(lx - 2, top + 75, 13, 4, '#2c3236', 1); }
+	// ลำตัว: กรอบเข้ม · แผ่นเกราะ 2 ชั้น · ช่องระบายอากาศ · แกนพลังเรืองกลางอก
+	blk(at.x - 12, top + 16, 34, 40, '#1c2024', 1); blk(at.x - 11, top + 17, 32, 38, '#55616a', 1); blk(at.x - 11, top + 17, 32, 6, '#8796a0', 1); blk(at.x - 11, top + 48, 32, 7, '#3c464d', 1);
+	for (let v = 0; v < 3; v++) blk(at.x + 12, top + 27 + v * 5, 7, 2, '#2a3136', 1);
+	blk(at.x - 4, top + 28, 14, 14, '#1c2024', 1); glow(at.x - 3, top + 29, 12, 12, col, 0.85); glow(at.x, top + 32, 6, 6, '#ffffff', 0.8);
+	// ไหล่ใหญ่ + เฟืองที่ไหล่
+	blk(at.x - 20, top + 12, 14, 12, '#1c2024', 1); blk(at.x - 19, top + 13, 12, 10, '#6a777e', 1); blk(at.x + 17, top + 12, 12, 12, '#1c2024', 1); blk(at.x + 18, top + 13, 10, 10, '#6a777e', 1);
+	glow(at.x - 15, top + 16, 4, 4, col, 0.7);
+	// หัว: หมวกเกราะ · ช่องตาเรือง · เสาอากาศ
+	blk(at.x - 3, top + 0, 18, 17, '#1c2024', 1); blk(at.x - 2, top + 1, 16, 15, '#5d686e', 1); blk(at.x - 2, top + 1, 16, 4, '#8796a0', 1);
+	blk(at.x - 1, top + 7, 14, 4, '#101418', 1); glow(at.x + 0, top + 8, 12, 2, col, 1); blk(at.x + 11, top - 6, 2, 7, '#3c464d', 1); glow(at.x + 11, top - 7, 2, 2, col, 1);
+	// แขนปืน: ท่อปืนยาว · วงแหวนรอบลำกล้อง · ปากกระบอกเรือง (ถอยตามแรงยิง)
+	blk(at.x - 38 + recoil, top + 21, 32, 11, '#1c2024', 1); blk(at.x - 37 + recoil, top + 22, 30, 9, '#4a545a', 1); blk(at.x - 37 + recoil, top + 22, 30, 3, '#7c8a90', 1);
+	for (let r2 = 0; r2 < 3; r2++) blk(at.x - 32 + r2 * 8 + recoil, top + 20, 3, 13, '#2c3236', 1);
+	blk(at.x - 44 + recoil, top + 19, 8, 15, '#1c2024', 1); glow(at.x - 44 + recoil, top + 21, 3, 11, col, 0.95);
+	ctx.restore(); }); }
+// ลำแสงปืนใหญ่ต่อเนื่อง: วงแหวนปากกระบอกเต้น · ลำหนาสั่นไหว · สายฟ้าเลื้อยรอบลำ · จุดกระทบเรือง
+function cannon(from, to, col, w, life) { fx(life, (p, t) => { const grow = Math.min(1, p / 0.08), a = p > 0.85 ? 1 - (p - 0.85) / 0.15 : 1, ww = w * (0.85 + 0.15 * Math.sin(t * 60)) * a;
+	const ex = from.x + (to.x - from.x) * grow, ey = from.y + (to.y - from.y) * grow;
+	ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+	for (const [c, k, al] of [[col, 2.4, 0.3], [col, 1.3, 0.75], ['#ffffff', 0.45, 1]]) { ctx.globalAlpha = al; ctx.strokeStyle = c; ctx.lineWidth = Math.max(0.5, ww * k); ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(ex, ey); ctx.stroke(); }
+	for (let k = 0; k < 3; k++) { const rr = 5 + ((t * 40 + k * 4) % 12); ctx.globalAlpha = (1 - rr / 17) * a; ctx.strokeStyle = k % 2 ? col : '#fff'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.ellipse(from.x - rr * 0.3, from.y, rr * 0.45, rr, 0, 0, Math.PI * 2); ctx.stroke(); }
+	const f = Math.floor(t * 25), rnd = k => { const v = Math.sin((f * 9.1 + k * 3.7) * 12.9898) * 43758.5453; return v - Math.floor(v); };
+	const pts = []; for (let i = 0; i <= 8; i++) { const q = i / 8; pts.push([from.x + (ex - from.x) * q, from.y + (ey - from.y) * q + (rnd(i) - 0.5) * ww * 2.2]); } line(pts, '#ffffff', 0.7, 0.8 * a);
+	if (grow >= 1) { const g = ctx.createRadialGradient(to.x, to.y, 0, to.x, to.y, 18); g.addColorStop(0, 'rgba(255,255,255,0.95)'); g.addColorStop(0.4, col); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.globalAlpha = a; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(to.x, to.y, 18 * (0.9 + 0.1 * Math.sin(t * 50)), 0, Math.PI * 2); ctx.fill(); }
+	ctx.restore(); });
+	S.fx.push({ t: 0, dur: life, draw: () => {}, step: p => { S.mechRecoil = p < 0.9 ? 1.5 * Math.sin(p * 120) + 2 : 0; }, then: () => { S.mechRecoil = 0; } }); }
 // ── ตัวเล่นท่าจากข้อมูล (FX engine) — อ่าน data/fx/ultimates.json ไฟล์เดียวกับเกม ──
 // แต่ละคำสั่งใน timeline เรียกฟังก์ชันวาดข้างบน · ตำแหน่ง/สี/ทำซ้ำ แปลจากข้อมูลตามกติกาใน _doc ของไฟล์
 const FXDB = DATA.fx;
@@ -647,7 +726,7 @@ function anchors(pts) {
 		home: { x: HERO.x, y: HERO.y }, sky: { x: S.hero.x, y: -70 },
 		left_edge: { x: -10, y: c.y }, right_edge: { x: W() + 10, y: c.y } };
 }
-function point(name, A) { return name === 'hero' ? { ...S.hero } : name === 'hero_pt' ? { x: S.hero.x + SPRITE_C.x, y: S.hero.y + SPRITE_C.y } : name === 'sky' ? { x: S.hero.x, y: -70 } : A[name]; }
+function point(name, A) { return name === 'hero' ? { ...S.hero } : name === 'hero_pt' ? { x: S.hero.x + SPRITE_C.x, y: S.hero.y + SPRITE_C.y } : name === 'mech' ? { x: HERO.x - 8, y: FEET - 34 } : name === 'mech_gun' ? { x: HERO.x - 8 - 42, y: FEET - 34 - 17 }   /* หุ่นยืนหน้า Rion เท้าแตะพื้น · ปากกระบอกอยู่ซ้ายสุดของแขน */ : name === 'sky' ? { x: S.hero.x, y: -70 } : A[name]; }
 function heroTarget(to, A) {
 	if (Array.isArray(to) && to[0] === 'mix') { const a = point(to[1], A), b = point(to[2], A), k = to[3]; return { x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k + (to[4] || 0) }; }
 	return { x: point(to.x[0], A).x + to.x[1], y: point(to.y[0], A).y + to.y[1] };
@@ -658,7 +737,7 @@ function runOp(op, i, n, pts, A, school) {
 	const col = fxColor(op.color, school);
 	const rot = ((rp.rot_alt ? rp.rot_alt[i % 2] : (op.rot || 0)) + (rp.rot_step || 0) * (i - (n - 1) / 2)) * Math.PI;
 	const r = (op.r || 0) + (rp.r_mod ? (i % rp.r_mod[1]) * rp.r_mod[0] : 0) + (rp.r_step || 0) * i;
-	const places = op.at === 'each' ? pts : op.at ? [point(op.at, A)] : [null];
+	const places = op.at === 'each' ? pts : op.at && op.at !== 'wide' ? [point(op.at, A)] : [null];
 	for (const base of places) {
 		const at = base && { x: base.x + (op.off ? op.off[0] : 0) + jit(rp.jx), y: base.y + (op.off ? op.off[1] : 0) + jit(rp.jy) };
 		if (at && rp.ring && !op.from) { const ang = -Math.PI / 2 + i * Math.PI * 2 / n; at.x += Math.cos(ang) * rp.ring[0]; at.y += Math.sin(ang) * rp.ring[1]; }
@@ -702,6 +781,15 @@ function runOp(op, i, n, pts, A, school) {
 			case 'rgb_split': rgbSplit(op.amt, op.sec); break;
 			case 'shatter': shatter(at, op.life); break;
 			case 'finish': finish(col); break;
+			case 'camera': camera(op.at === 'wide' ? null : at, op.k, op.sec); break;
+			case 'cut': cutFrame(col || '#000', op.sec || 0.08); break;
+			case 'wound': wound({ ...at, i: base && base.i }, col, op.life); break;
+			case 'lightning': lightning({ ...at, i: base && base.i }, col, op.life, op.r || 20); break;
+			case 'knockback': knockback(base, op.dist, op.sec); break;
+			case 'orbit': orbit(at, to, col, op.n, op.r, op.life); break;
+			case 'arrow': arrow(from, to, col, op.life); break;
+			case 'mech_ally': mechAlly(at, col, op.life); break;
+			case 'cannon': cannon(from, to, col, op.w, op.life); break;
 			default: console.warn('fx: ไม่รู้จักคำสั่ง', op.op);
 		}
 	}
@@ -735,12 +823,12 @@ function playTech(t) {
 	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
 	const from = heroPt();
 	banner((ult ? '◆ ไม้ตาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : shade(col, 0.3), ult);
-	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.rgb = null; S.dimTotal = 0.85;
+	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.rgb = null; S.cam = { x: 120, y: 60, k: 1 }; S.foeOff = {}; S.dimTotal = 0.85;
 	const cine = ult && S.cine && CINE[t.school];
 	let impact = 0;
 	if (cine) {
 		const T0 = cutIn(t.name_th, col);
-		const r0 = cine(tg.map(f => f.pt), col, T0);
+		const r0 = cine(tg.map(f => ({ ...f.pt, i: f.i })), col, T0);
 		impact = r0.impact; S.dimT = 0; S.dimTotal = r0.total;
 		later(T0, () => { S.seq = { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), i: 0, acc: 0, sec: K.ATTACK_FRAME_SEC, rest: 'rion/west' }; });
 	} else if (ult) { S.dimT = 0; S.shake = 0.35; S.shakeAmp = 3; S.shakeDur = 0.35; sig(t, tg.map(f => f.pt), from, col); }

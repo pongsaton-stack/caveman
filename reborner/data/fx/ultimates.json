@@ -35,37 +35,81 @@
 	},
 	"moves": {
 		"moon_blades": {
-			"label": "คม · พันคมจันทร์",
-			"impact": 0.81,
-			"total": 2.51,
+			"label": "คม · พันคมจันทร์ (แนวคลิป SL30)",
+			"impact": 1.55,
+			"total": 3.5,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 2.51
+					"sec": 3.5
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#7a1a10",
 					"alpha": 0.55,
-					"life": 2.41
+					"life": 3.4
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#ff7a4a",
-					"life": 2.31
+					"life": 3.3
+				},
+				{
+					"t": 0.0,
+					"op": "camera",
+					"at": "hero_pt",
+					"k": 1.9,
+					"sec": 0.25
 				},
 				{
 					"t": 0.0,
 					"op": "aura",
 					"color": "#ff5a3a",
-					"life": 0.81
+					"life": 1.0
 				},
 				{
-					"t": 0.0,
+					"t": 0.1,
+					"op": "orbit",
+					"at": "hero_pt",
+					"to": "center",
+					"color": "#ff5a3a",
+					"n": 4,
+					"r": 22,
+					"life": 1.0
+				},
+				{
+					"t": 0.1,
+					"op": "sparks",
+					"at": "hero_pt",
+					"color": "#ffb347",
+					"n": 6,
+					"spread": 18,
+					"up": 14,
+					"life": 0.4,
+					"repeat": {
+						"n": 4,
+						"every": 0.2
+					}
+				},
+				{
+					"t": 0.95,
+					"op": "cut",
+					"color": "#000000",
+					"sec": 0.08
+				},
+				{
+					"t": 0.95,
+					"op": "camera",
+					"at": "wide",
+					"k": 1,
+					"sec": 0
+				},
+				{
+					"t": 0.95,
 					"op": "ghost",
 					"color": "#ff5a3a",
 					"life": 0.3,
@@ -75,7 +119,7 @@
 					}
 				},
 				{
-					"t": 0.0,
+					"t": 0.95,
 					"op": "hero_move",
 					"to": {
 						"x": [
@@ -91,31 +135,15 @@
 					"ease": "out"
 				},
 				{
-					"t": 0.18,
-					"op": "ghost",
-					"color": "#ff7a4a",
-					"life": 0.35,
-					"frame": "attack2",
-					"at": "center",
-					"repeat": {
-						"n": 8,
-						"every": 0.065,
-						"ring": [
-							30,
-							16
-						]
-					}
-				},
-				{
-					"t": 0.18,
+					"t": 1.1,
 					"op": "crescent",
 					"at": "center",
 					"color": "#ff5a3a",
 					"r": 15,
 					"life": 0.3,
 					"repeat": {
-						"n": 16,
-						"every": 0.034,
+						"n": 12,
+						"every": 0.033,
 						"jx": [
 							13,
 							21,
@@ -138,37 +166,21 @@
 					}
 				},
 				{
-					"t": 0.18,
-					"op": "sparks",
+					"t": 1.42,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#ff5a3a",
+					"life": 0.9
+				},
+				{
+					"t": 1.55,
+					"op": "camera",
 					"at": "center",
-					"color": "#ffb347",
-					"n": 5,
-					"spread": 14,
-					"up": 10,
-					"life": 0.3,
-					"repeat": {
-						"n": 16,
-						"every": 0.034,
-						"jx": [
-							13,
-							21,
-							10
-						],
-						"jy": [
-							7,
-							13,
-							6
-						]
-					}
+					"k": 1.8,
+					"sec": 0.12
 				},
 				{
-					"t": 0.75,
-					"op": "ghost",
-					"color": "#fff0c0",
-					"life": 0.25
-				},
-				{
-					"t": 0.81,
+					"t": 1.55,
 					"op": "crescent",
 					"at": "center",
 					"color": "#ff4a2a",
@@ -178,7 +190,7 @@
 					"grow": 1.6
 				},
 				{
-					"t": 0.81,
+					"t": 1.55,
 					"op": "crescent",
 					"at": "center",
 					"color": "#ff8a3a",
@@ -188,53 +200,110 @@
 					"grow": 1.5
 				},
 				{
-					"t": 0.81,
+					"t": 1.55,
+					"op": "wound",
+					"at": "each",
+					"color": "#ff3a2a",
+					"life": 1.9
+				},
+				{
+					"t": 1.55,
+					"op": "knockback",
+					"at": "each",
+					"dist": 8,
+					"sec": 0.7
+				},
+				{
+					"t": 1.55,
 					"op": "flash",
 					"color": "#fff2e0",
 					"peak": 0.85,
 					"sec": 0.25
 				},
 				{
-					"t": 0.81,
+					"t": 1.55,
+					"op": "hitstop",
+					"sec": 0.14
+				},
+				{
+					"t": 1.69,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 1.55,
 					"op": "shake",
 					"amp": 5,
 					"sec": 0.5
 				},
 				{
-					"t": 0.81,
-					"op": "zoom",
+					"t": 1.55,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.55,
+					"op": "sfx_text",
 					"at": "center",
-					"k": 1.14,
-					"sec": 0.45
+					"text": "ฉัวะ!!",
+					"color": "#ffe08a",
+					"life": 0.95
 				},
 				{
-					"t": 0.81,
-					"op": "hitstop",
-					"sec": 0.12
+					"t": 1.95,
+					"op": "blast",
+					"at": "each",
+					"color": "#ff5a3a",
+					"r": 16,
+					"life": 0.6
 				},
 				{
-					"t": 0.81,
+					"t": 1.95,
 					"op": "debris",
 					"at": "each",
-					"color": "#b3262a",
-					"n": 10,
-					"spread": 22,
-					"up": 22,
-					"life": 0.6,
-					"size": 2
+					"color": "#4a3a30",
+					"n": 14,
+					"spread": 30,
+					"up": 34,
+					"life": 0.9,
+					"size": 3
 				},
 				{
-					"t": 0.81,
+					"t": 1.95,
 					"op": "sparks",
 					"at": "each",
 					"color": "#ffb347",
-					"n": 12,
-					"spread": 30,
-					"up": 26,
-					"life": 0.55
+					"n": 16,
+					"spread": 34,
+					"up": 30,
+					"life": 0.8
 				},
 				{
-					"t": 1.21,
+					"t": 1.95,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.08,
+					"sec": 0.35
+				},
+				{
+					"t": 1.95,
+					"op": "embers",
+					"at": "ground",
+					"color": "#ff7a4a",
+					"n": 30,
+					"life": 1.4
+				},
+				{
+					"t": 2.5,
+					"op": "camera",
+					"at": "wide",
+					"k": 1,
+					"sec": 0.45
+				},
+				{
+					"t": 2.6,
 					"op": "hero_move",
 					"to": {
 						"x": [
@@ -246,11 +315,11 @@
 							0
 						]
 					},
-					"sec": 0.18,
+					"sec": 0.2,
 					"ease": "out"
 				},
 				{
-					"t": 1.21,
+					"t": 2.6,
 					"op": "ghost",
 					"color": "#ff5a3a",
 					"life": 0.25,
@@ -260,68 +329,7 @@
 					}
 				},
 				{
-					"t": 0.95,
-					"op": "slowmo",
-					"sec": 0.3,
-					"k": 0.35
-				},
-				{
-					"t": 0.81,
-					"op": "big_ring",
-					"at": "ground",
-					"color": "#ff7a4a",
-					"life": 0.7
-				},
-				{
-					"t": 0.97,
-					"op": "flash",
-					"color": "#ff7a4a",
-					"peak": 0.35,
-					"sec": 0.2
-				},
-				{
-					"t": 0.86,
-					"op": "embers",
-					"at": "ground",
-					"color": "#ff7a4a",
-					"n": 30,
-					"life": 1.5
-				},
-				{
-					"t": 0.36,
-					"op": "spirit",
-					"at": "ground",
-					"color": "#ff5a3a",
-					"life": 0.95
-				},
-				{
-					"t": 0.56,
-					"op": "focus_lines",
-					"at": "center",
-					"life": 0.45
-				},
-				{
-					"t": 0.81,
-					"op": "sfx_text",
-					"at": "center",
-					"text": "ฉัวะ!!",
-					"color": "#ffe08a",
-					"life": 0.95
-				},
-				{
-					"t": 0.81,
-					"op": "rgb_split",
-					"amt": 4,
-					"sec": 0.35
-				},
-				{
-					"t": 1.23,
-					"op": "shatter",
-					"at": "center",
-					"life": 0.85
-				},
-				{
-					"t": 2.16,
+					"t": 3.1,
 					"op": "finish",
 					"color": "#ff5a3a"
 				}
@@ -653,289 +661,272 @@
 			]
 		},
 		"needle_storm": {
-			"label": "แทง · ร้อยเข็มทะลุเมฆ",
-			"impact": 0.92,
-			"total": 2.62,
+			"label": "แทง · ร้อยเข็มทะลุเมฆ (แนวคลิป PC30)",
+			"impact": 1.15,
+			"total": 3.4,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 2.62
+					"sec": 3.4
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#10306a",
 					"alpha": 0.55,
-					"life": 2.52
+					"life": 3.3
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#9fd4ff",
-					"life": 2.42
+					"life": 3.2
+				},
+				{
+					"t": 0.0,
+					"op": "camera",
+					"at": "hero_pt",
+					"k": 1.9,
+					"sec": 0.25
 				},
 				{
 					"t": 0.0,
 					"op": "aura",
 					"color": "#6fb7ff",
-					"life": 0.92
+					"life": 0.9
 				},
 				{
-					"t": 0.0,
-					"op": "hero_move",
-					"to": {
-						"x": [
-							"home",
-							6
-						],
-						"y": [
-							"home",
-							0
-						]
-					},
-					"sec": 0.1,
-					"ease": "out"
-				},
-				{
-					"t": 0.0,
+					"t": 0.1,
 					"op": "charge",
 					"at": "hero_pt",
 					"off": [
-						-14,
+						-16,
 						2
 					],
 					"color": "#9fd4ff",
-					"n": 16,
-					"r": 28,
-					"life": 0.45
+					"n": 18,
+					"r": 30,
+					"life": 0.5
 				},
 				{
-					"t": 0.45,
-					"op": "hero_move",
-					"to": {
-						"x": [
-							"center",
-							-72
-						],
-						"y": [
-							"home",
-							0
-						]
-					},
-					"sec": 0.12,
-					"ease": "out"
+					"t": 0.6,
+					"op": "camera",
+					"at": "wide",
+					"k": 1,
+					"sec": 0.25
 				},
 				{
-					"t": 0.45,
-					"op": "ghost",
-					"color": "#6fb7ff",
-					"life": 0.3,
-					"repeat": {
-						"n": 6,
-						"every": 0.02
-					}
-				},
-				{
-					"t": 0.5,
-					"op": "beam",
-					"from": "center",
+					"t": 0.6,
+					"op": "arrow",
+					"from": "hero_pt",
 					"from_off": [
-						56,
-						0
+						-18,
+						2
 					],
 					"to": "center",
-					"to_off": [
-						-56,
-						0
-					],
-					"color": "#cfe8ff",
-					"w": 1.4,
-					"life": 0.2,
+					"color": "#6fb7ff",
+					"life": 0.22,
 					"repeat": {
-						"n": 20,
-						"every": 0.018,
-						"fjy": [
+						"n": 14,
+						"every": 0.035,
+						"tjy": [
 							7,
 							23,
 							11
 						],
-						"tjy": [
-							11,
-							23,
-							11
+						"tjx": [
+							5,
+							15,
+							7
+						],
+						"fjy": [
+							3,
+							9,
+							4
 						]
 					}
 				},
 				{
-					"t": 0.5,
-					"op": "sparks",
-					"at": "each",
-					"color": "#9fd4ff",
-					"n": 4,
-					"spread": 10,
-					"up": 8,
-					"life": 0.25,
-					"repeat": {
-						"n": 4,
-						"every": 0.09
-					}
-				},
-				{
-					"t": 0.92,
-					"op": "beam",
-					"from": "right_edge",
-					"to": "left_edge",
-					"color": "#6fb7ff",
-					"w": 9,
-					"life": 0.55
-				},
-				{
-					"t": 0.92,
-					"op": "star",
-					"at": "center",
-					"color": "#c6a8ff",
-					"r": 24,
-					"life": 0.5
-				},
-				{
-					"t": 0.92,
-					"op": "flash",
-					"color": "#e6f2ff",
-					"peak": 0.85,
-					"sec": 0.25
-				},
-				{
-					"t": 0.92,
-					"op": "shake",
-					"amp": 5,
-					"sec": 0.5
-				},
-				{
-					"t": 0.92,
-					"op": "zoom",
-					"at": "center",
-					"k": 1.15,
-					"sec": 0.45
-				},
-				{
-					"t": 0.92,
-					"op": "hitstop",
-					"sec": 0.12
-				},
-				{
-					"t": 0.92,
-					"op": "shock_ring",
-					"at": "center",
-					"color": "#9fd4ff",
-					"r": 12,
-					"life": 0.4,
-					"repeat": {
-						"n": 3,
-						"every": 0.07,
-						"r_step": 8
-					}
-				},
-				{
-					"t": 0.92,
-					"op": "sparks",
-					"at": "each",
-					"color": "#cfe8ff",
-					"n": 12,
-					"spread": 26,
-					"up": 22,
-					"life": 0.55
-				},
-				{
-					"t": 1.3,
+					"t": 0.6,
 					"op": "hero_move",
 					"to": {
 						"x": [
 							"home",
-							0
+							5
 						],
 						"y": [
 							"home",
 							0
 						]
 					},
-					"sec": 0.2,
+					"sec": 0.08,
 					"ease": "out"
 				},
 				{
-					"t": 1.3,
-					"op": "ghost",
-					"color": "#6fb7ff",
-					"life": 0.25,
-					"repeat": {
-						"n": 3,
-						"every": 0.05
-					}
+					"t": 1.1,
+					"op": "cut",
+					"color": "#ffffff",
+					"sec": 0.08
 				},
 				{
-					"t": 1.06,
+					"t": 1.15,
+					"op": "camera",
+					"at": "center",
+					"k": 1.8,
+					"sec": 0
+				},
+				{
+					"t": 1.15,
+					"op": "star",
+					"at": "center",
+					"color": "#c6a8ff",
+					"r": 22,
+					"life": 0.45
+				},
+				{
+					"t": 1.15,
+					"op": "lightning",
+					"at": "each",
+					"color": "#6fb7ff",
+					"life": 1.8,
+					"r": 22
+				},
+				{
+					"t": 1.15,
+					"op": "knockback",
+					"at": "each",
+					"dist": 6,
+					"sec": 0.6
+				},
+				{
+					"t": 1.15,
+					"op": "flash",
+					"color": "#e6f2ff",
+					"peak": 0.8,
+					"sec": 0.22
+				},
+				{
+					"t": 1.15,
+					"op": "hitstop",
+					"sec": 0.12
+				},
+				{
+					"t": 1.27,
 					"op": "slowmo",
 					"sec": 0.3,
 					"k": 0.35
 				},
 				{
-					"t": 0.92,
+					"t": 1.15,
+					"op": "shake",
+					"amp": 4,
+					"sec": 0.4
+				},
+				{
+					"t": 1.15,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.3
+				},
+				{
+					"t": 1.15,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ฉึก!!",
+					"color": "#cfe8ff",
+					"life": 0.9
+				},
+				{
+					"t": 1.5,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#6fb7ff",
+					"life": 0.9
+				},
+				{
+					"t": 1.8,
+					"op": "camera",
+					"at": "wide",
+					"k": 1,
+					"sec": 0.3
+				},
+				{
+					"t": 2.15,
+					"op": "blast",
+					"at": "each",
+					"color": "#6fb7ff",
+					"r": 20,
+					"life": 0.6
+				},
+				{
+					"t": 2.15,
+					"op": "debris",
+					"at": "each",
+					"color": "#3a3a44",
+					"n": 16,
+					"spread": 34,
+					"up": 38,
+					"life": 0.9,
+					"size": 3
+				},
+				{
+					"t": 2.15,
+					"op": "sparks",
+					"at": "each",
+					"color": "#ff8a6a",
+					"n": 12,
+					"spread": 30,
+					"up": 30,
+					"life": 0.7
+				},
+				{
+					"t": 2.15,
+					"op": "zoom",
+					"at": "center",
+					"k": 1.12,
+					"sec": 0.4
+				},
+				{
+					"t": 2.15,
+					"op": "shake",
+					"amp": 5,
+					"sec": 0.45
+				},
+				{
+					"t": 2.15,
 					"op": "big_ring",
 					"at": "ground",
 					"color": "#9fd4ff",
 					"life": 0.7
 				},
 				{
-					"t": 1.08,
-					"op": "flash",
-					"color": "#9fd4ff",
-					"peak": 0.35,
-					"sec": 0.2
-				},
-				{
-					"t": 0.97,
+					"t": 2.15,
 					"op": "embers",
 					"at": "ground",
 					"color": "#9fd4ff",
-					"n": 30,
-					"life": 1.5
+					"n": 24,
+					"life": 1.1
 				},
 				{
-					"t": 0.47,
-					"op": "spirit",
-					"at": "ground",
-					"color": "#6fb7ff",
-					"life": 0.95
+					"t": 2.6,
+					"op": "hero_move",
+					"to": {
+						"x": [
+							"home",
+							0
+						],
+						"y": [
+							"home",
+							0
+						]
+					},
+					"sec": 0.15,
+					"ease": "out"
 				},
 				{
-					"t": 0.67,
-					"op": "focus_lines",
-					"at": "center",
-					"life": 0.45
-				},
-				{
-					"t": 0.92,
-					"op": "sfx_text",
-					"at": "center",
-					"text": "ฉึก!!",
-					"color": "#ffe08a",
-					"life": 0.95
-				},
-				{
-					"t": 0.92,
-					"op": "rgb_split",
-					"amt": 4,
-					"sec": 0.35
-				},
-				{
-					"t": 1.34,
-					"op": "shatter",
-					"at": "center",
-					"life": 0.85
-				},
-				{
-					"t": 2.27,
+					"t": 3.0,
 					"op": "finish",
 					"color": "#6fb7ff"
 				}
@@ -1481,50 +1472,48 @@
 			]
 		},
 		"waking_machine": {
-			"label": "กล · วันเครื่องตื่น",
-			"impact": 1.0,
-			"total": 2.75,
+			"label": "กล · วันเครื่องตื่น (แนวคลิป DV29)",
+			"impact": 2.35,
+			"total": 3.9,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 2.75
+					"sec": 3.9
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
-					"color": "#0e3a30",
+					"color": "#0e2a3a",
 					"alpha": 0.55,
-					"life": 2.65
+					"life": 3.8
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#7ae0ff",
-					"life": 2.55
-				},
-				{
-					"t": 0.0,
-					"op": "aura",
-					"color": "#8ad0a0",
-					"life": 1.0
+					"life": 3.7
 				},
 				{
 					"t": 0.0,
 					"op": "gear",
 					"from": "hero_pt",
-					"at": "center",
+					"at": "mech",
+					"off": [
+						0,
+						-10
+					],
 					"color": "#8ad0a0",
 					"r": 7,
-					"life": 0.75,
+					"life": 0.6,
 					"spin": 1.5,
 					"repeat": {
-						"n": 10,
-						"every": 0.035,
+						"n": 8,
+						"every": 0.04,
 						"ring": [
-							16,
-							20
+							18,
+							22
 						],
 						"r_mod": [
 							2,
@@ -1533,174 +1522,203 @@
 					}
 				},
 				{
-					"t": 0.3,
-					"op": "charge",
-					"at": "center",
-					"off": [
-						0,
-						-20
-					],
+					"t": 0.4,
+					"op": "mech_ally",
+					"at": "mech",
 					"color": "#7ae0ff",
-					"n": 16,
-					"r": 30,
-					"life": 0.4
+					"life": 3.3
 				},
 				{
-					"t": 0.5,
-					"op": "mech",
-					"at": "ground",
-					"off": [
-						0,
-						4
-					],
-					"color": "#8ad0a0",
-					"life": 1.0
-				},
-				{
-					"t": 0.55,
+					"t": 0.4,
 					"op": "shake",
 					"amp": 2,
+					"sec": 0.25
+				},
+				{
+					"t": 0.9,
+					"op": "camera",
+					"at": "mech_gun",
+					"k": 1.8,
 					"sec": 0.3
 				},
 				{
-					"t": 1.0,
-					"op": "blast",
-					"at": "ground",
-					"off": [
-						0,
-						-8
-					],
+					"t": 0.95,
+					"op": "charge",
+					"at": "mech_gun",
 					"color": "#7ae0ff",
-					"r": 32,
-					"life": 0.65
-				},
-				{
-					"t": 1.0,
-					"op": "pillar",
-					"at": "ground",
-					"color": "#7ae0ff",
-					"life": 0.55
-				},
-				{
-					"t": 1.0,
-					"op": "flash",
-					"color": "#e6fff6",
-					"peak": 0.85,
-					"sec": 0.28
-				},
-				{
-					"t": 1.0,
-					"op": "shake",
-					"amp": 6,
-					"sec": 0.5
-				},
-				{
-					"t": 1.0,
-					"op": "zoom",
-					"at": "center",
-					"k": 1.15,
-					"sec": 0.45
-				},
-				{
-					"t": 1.0,
-					"op": "hitstop",
-					"sec": 0.12
-				},
-				{
-					"t": 1.0,
-					"op": "shock_ring",
-					"at": "ground",
-					"color": "#7ae0ff",
-					"r": 16,
-					"life": 0.45,
-					"repeat": {
-						"n": 3,
-						"every": 0.06,
-						"r_step": 10
-					}
-				},
-				{
-					"t": 1.0,
-					"op": "gear",
-					"at": "each",
-					"color": "#8ad0a0",
-					"r": 6,
-					"life": 0.5,
-					"spin": -1
-				},
-				{
-					"t": 1.0,
-					"op": "sparks",
-					"at": "each",
-					"color": "#bfffe8",
-					"n": 12,
-					"spread": 28,
-					"up": 26,
+					"n": 20,
+					"r": 28,
 					"life": 0.6
 				},
 				{
-					"t": 1.14,
+					"t": 1.0,
+					"op": "lightning",
+					"at": "mech_gun",
+					"color": "#7ae0ff",
+					"life": 0.55,
+					"r": 10
+				},
+				{
+					"t": 1.55,
+					"op": "camera",
+					"at": "wide",
+					"k": 1,
+					"sec": 0.2
+				},
+				{
+					"t": 1.55,
+					"op": "cannon",
+					"from": "mech_gun",
+					"to": "center",
+					"color": "#7ae0ff",
+					"w": 6,
+					"life": 1.0
+				},
+				{
+					"t": 1.55,
+					"op": "shake",
+					"amp": 2,
+					"sec": 0.9
+				},
+				{
+					"t": 1.6,
+					"op": "lightning",
+					"at": "each",
+					"color": "#7ae0ff",
+					"life": 1.6,
+					"r": 20
+				},
+				{
+					"t": 2.2,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"life": 0.7
+				},
+				{
+					"t": 2.35,
+					"op": "camera",
+					"at": "center",
+					"k": 1.7,
+					"sec": 0.1
+				},
+				{
+					"t": 2.35,
+					"op": "blast",
+					"at": "center",
+					"color": "#7ae0ff",
+					"r": 36,
+					"life": 0.75
+				},
+				{
+					"t": 2.35,
+					"op": "blast",
+					"at": "center",
+					"off": [
+						4,
+						6
+					],
+					"color": "#ff8a3a",
+					"r": 18,
+					"life": 0.6
+				},
+				{
+					"t": 2.35,
+					"op": "knockback",
+					"at": "each",
+					"dist": 10,
+					"sec": 0.8
+				},
+				{
+					"t": 2.35,
+					"op": "flash",
+					"color": "#e6fff6",
+					"peak": 0.9,
+					"sec": 0.3
+				},
+				{
+					"t": 2.35,
+					"op": "hitstop",
+					"sec": 0.14
+				},
+				{
+					"t": 2.49,
 					"op": "slowmo",
 					"sec": 0.3,
 					"k": 0.35
 				},
 				{
-					"t": 1.0,
+					"t": 2.35,
+					"op": "shake",
+					"amp": 7,
+					"sec": 0.6
+				},
+				{
+					"t": 2.35,
+					"op": "rgb_split",
+					"amt": 5,
+					"sec": 0.35
+				},
+				{
+					"t": 2.35,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ครืนนน!!",
+					"color": "#bfffe8",
+					"life": 0.95
+				},
+				{
+					"t": 2.35,
+					"op": "debris",
+					"at": "each",
+					"color": "#3a3530",
+					"n": 18,
+					"spread": 40,
+					"up": 44,
+					"life": 1.0,
+					"size": 3.5
+				},
+				{
+					"t": 2.35,
+					"op": "sparks",
+					"at": "each",
+					"color": "#ffb070",
+					"n": 16,
+					"spread": 36,
+					"up": 34,
+					"life": 0.9
+				},
+				{
+					"t": 2.35,
 					"op": "big_ring",
 					"at": "ground",
 					"color": "#7ae0ff",
 					"life": 0.7
 				},
 				{
-					"t": 1.16,
-					"op": "flash",
-					"color": "#7ae0ff",
-					"peak": 0.35,
-					"sec": 0.2
-				},
-				{
-					"t": 1.05,
-					"op": "embers",
+					"t": 2.4,
+					"op": "dust",
 					"at": "ground",
-					"color": "#7ae0ff",
-					"n": 30,
-					"life": 1.5
-				},
-				{
-					"t": 0.55,
-					"op": "spirit",
-					"at": "ground",
-					"color": "#7ae0ff",
-					"life": 0.95
-				},
-				{
-					"t": 0.75,
-					"op": "focus_lines",
-					"at": "center",
-					"life": 0.45
-				},
-				{
-					"t": 1.0,
-					"op": "sfx_text",
-					"at": "center",
-					"text": "ครืนนน!!",
-					"color": "#ffe08a",
-					"life": 0.95
-				},
-				{
-					"t": 1.0,
-					"op": "rgb_split",
-					"amt": 4,
-					"sec": 0.35
-				},
-				{
-					"t": 1.42,
-					"op": "shatter",
-					"at": "center",
-					"life": 0.85
+					"color": "#8a8478",
+					"life": 1.3
 				},
 				{
 					"t": 2.4,
+					"op": "embers",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"n": 26,
+					"life": 1.3
+				},
+				{
+					"t": 3.0,
+					"op": "camera",
+					"at": "wide",
+					"k": 1,
+					"sec": 0.45
+				},
+				{
+					"t": 3.5,
 					"op": "finish",
 					"color": "#7ae0ff"
 				}
