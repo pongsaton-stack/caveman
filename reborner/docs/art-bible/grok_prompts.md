@@ -168,3 +168,21 @@ idle 1, idle 2 (squash 1 pixel), attack (lunge right), hit (recoil).
 ยังไม่ตรง: แถวท่าขยับวาดคนละสเกล (บล็อก ~8px · ตัวยาว ~100-125 จุด) ตาใหญ่กว่าภาพเดี่ยว → ใช้ได้เป็นชุดของมันเอง แต่ต่อกับภาพเดี่ยวไม่ได้ · ภาพเดี่ยวทำท่าหายใจเองได้
 ลงหน้า animation test แล้ว (กลุ่ม "ตัวอย่างเจนรายตัว") · ไฟล์ `assets/sprites/compendium_samples/` (.gdignore)
 
+### prompt ฉบับ 4 — คมขึ้น + เหมือนต้นฉบับขึ้น (4 ต.ค. หลังสไลม์ v3)
+แนบ 2 ภาพ: (1) `compendium/refs/<id>.jpg` = ภาพตัดเฉพาะตัวนั้นจากชีต ขยายแล้ว บนพื้นแมเจนตา (66 ไฟล์ ชื่อตาม compendium_draft/index.json) (2) ชีต Monster Compendium ทั้งแผ่น
+```
+Image 1 is the EXACT reference for this monster: <NAME>. Image 2 is the full sheet for overall style only.
+Redraw the <WHICH: e.g. "biggest slime at the bottom-right"> from Image 1 as a clean pixel art sprite.
+FIDELITY — copy Image 1, do not reinterpret:
+- Same silhouette and proportions (about <W>:<H> width:height), same face (eye shape, size and position, mouth), same colors, same highlight placement.
+- Do not add legs, arms, accessories or details that are not in Image 1. Do not make it flatter or rounder than Image 1.
+SHARPNESS:
+- Real pixel art: the creature about 56 pixels wide on a 64x64 grid, each pixel drawn as a solid 16x16 block on a 1024x1024 canvas.
+- At most 16 colors. Clean pixel clusters, NO noisy speckles, NO dithering texture, NO anti-aliasing, NO blur.
+- 1-pixel dark outline, hue-shifted toward the shadow color (never black-gray, never a light rim).
+- Light from the top-left, 3 shading steps per material.
+LAYOUT: side view facing RIGHT, full body, centered, bottom near the canvas bottom.
+Background flat magenta #FF00FF only. No ground, shadow, text, label, frame or effects. PNG only. One creature only.
+```
+ท่าขยับ: สั่งต่อในแชตเดิมทีละท่า `Now draw the <attack/hit> pose of THIS exact sprite, same grid, same pixel size, same colors, 1024x1024.` (ไม่สั่งเป็นแถว — v1/v3 แถวเพี้ยนสเกลทุกครั้ง)
+
