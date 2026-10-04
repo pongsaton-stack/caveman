@@ -232,6 +232,8 @@ Pongsaton อนุญาตแล้ว: ไฟล์ไหนในโปร�
 - โฟลเดอร์ `The Reborner` id `1d3YPhEXP4x86I_VTVzksScbSog-GZDFJ` · โครงเดียวกับ repo
   core `1ivuWP8GZGVi7FPg75dxQl2Adsr0A8pgk` · world `1y7M-SLPV2_urDsoFhyNRei7zoSEd_BWH` · data `1mq4yyiJJMGjAINJJKJSL1Ruotxe6BsVF`
   docs `1atuceU4o6LrYQ8n_kKrVf0VsGKJQBy36` · scenes `1s1sLb00yvq3WhwVY5yQwXrrTEAqOBOYj` · assets/sprites_hero `18ftQRAhD4I9U8DClNAvSavJ03KR1KYdr`
+  data/fx `1MHKYuHJ_JRGQeuanxTeESbpmTR4nt486` · docs/art-bible `1C-T1zcszJB18NJRwgXJdz6N3byTCcARZ` · tools_web `1sGZFn8o4U6X-XdE6tC-pg0ZbeES59KDy`
+  tools_sprites `1X8EBPp12gvEMbzAhxgARKmizgYY7OjUa` · assets/fonts `1AvaYQIBfWDq3105wCgijaB8fToWleRhW`
 - เครื่องมือ Drive แก้เนื้อหาไฟล์เดิมไม่ได้ → "ทับ" = สร้างไฟล์ใหม่ชื่อเดิมในโฟลเดอร์เดิม แล้ว trash ไฟล์เก่า
 - ต้องตั้ง `disableConversionToGoogleType: true` เสมอ (ไม่งั้นกลายเป็น Google Docs) · เทียบ `fileSize` กับ `wc -c` ทุกไฟล์
 - ไม่อัปโหลด `.uid` / `.import` ของ PNG / `.godot/` (Godot สร้างใหม่เอง)
