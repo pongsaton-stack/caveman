@@ -32,10 +32,11 @@ def sprites():
 			if f.endswith('.png'):
 				out['draft/' + f[:-4]] = png(os.path.join(dd, f))
 	# ร่างมอนจาก Monster Compendium (tools/sprites/compendium_cut.py) — ตัวหลัก + ท่าหายใจ (ไม่ฝังภาพการ์ดรวม)
-	cd = os.path.join(SPR, 'compendium_draft')
+	# 64px + 4 ท่า (tools/sprites/compendium_animate.py) แทนชุด 48px เดิม
+	cd = os.path.join(SPR, 'compendium_anim')
 	if os.path.isdir(cd):
 		for f in sorted(os.listdir(cd)):
-			if f.endswith('.png') and not f.endswith('_card.png'):
+			if f.endswith('.png'):
 				out['cmp/' + f[:-4]] = png(os.path.join(cd, f))
 	# ตัวอย่างมอนที่เจนรายตัว (แปลงกลับเป็นพิกเซลจริงแล้ว) — ร่างทดลอง
 	sd = os.path.join(SPR, 'compendium_samples')

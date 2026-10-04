@@ -207,8 +207,10 @@ for (const key of Object.keys(DATA.sprites)) {
 // ร่างจาก Monster Compendium (ยังไม่เข้าเกม) — กลุ่มละภูมิ ตามลำดับในชีต
 for (const e of (DATA.compendium || [])) {
 	const key = 'cmp/' + e.id;
-	if (!DATA.sprites[key]) continue;
-	addClip('Compendium · ' + e.region_th + ' (ร่าง ยังไม่เข้าเกม)', 'cmp_' + e.id, e.name + (e.variants > 1 ? ` (${e.variants} แบบในชีต)` : ''), [key, key + '_idle1'], K.FOE_IDLE_SEC);
+	if (!DATA.sprites[key + '_idle1']) continue;
+	// หายใจ 2 รอบ → โจมตี → โดนตี (ทำจากภาพในชีตด้วยโค้ด · 64px)
+	addClip('Compendium · ' + e.region_th + ' (ร่าง ยังไม่เข้าเกม)', 'cmp_' + e.id, e.name + ' · หายใจ/โจมตี/โดนตี',
+		['idle1', 'idle2', 'idle1', 'idle2', 'attack', 'idle1', 'hit', 'idle1'].map(f => key + '_' + f), 0.32);
 }
 
 // ตัวอย่างเจนรายตัว (kwan สั่งตาม grok_prompts ข้อ 10) — ภาพเดี่ยว + หายใจ · แถวท่าขยับ 4 เฟรมตามที่ส่งมา
@@ -1034,7 +1036,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_draft', smp: 'compendium_samples' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1150,7 +1152,7 @@ function boot() {
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
 	buildSkillRef(); buildClips(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
-	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_draft}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
+	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_anim}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ
 		· สร้างใหม่: <code>python3 tools/web/anim_test_build.py out.html</code>`;
