@@ -100,6 +100,8 @@ func make_hero() -> Actor:
 	a.learned.clear()
 	for n in learned:
 		a.learned.append(n)
+	# ยังไม่เคยประกาย = รู้แค่ท่ารากที่ได้ตอน init_new (ท่ายึดแยกอยู่ใน seized ไม่นับ)
+	a.first_glimmer_pending = learned.size() <= 1
 	a.seized.clear()
 	for sz in seized:
 		a.seized.append(str(sz.get("name", "")))

@@ -88,6 +88,9 @@ func preview(n: int) -> Array:
 func _gain_insight(a: Actor, amount: float, why: String) -> void:
 	if a == null or a.down or not a.is_hero: return
 	if a.insight_lock > 0: return
+	if Insight.FIRST_GLIMMER_SURE and a.first_glimmer_pending:
+		amount = maxf(amount, Insight.THRESHOLD - a.insight)
+		why += " · ประกายครั้งแรก"
 	a.insight += amount
 	if a.insight >= Insight.THRESHOLD:
 		fills += 1
@@ -448,6 +451,7 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 			var g: Tech = techs.roll_glimmer(cur.learned, cur.school, cur.tier, tech, cur.steer_branch)
 			if g != null:
 				cur.learned.append(g.name)
+				cur.first_glimmer_pending = false
 				glimmers += 1
 				glimmer_log.append(g.name)
 				if guaranteed:

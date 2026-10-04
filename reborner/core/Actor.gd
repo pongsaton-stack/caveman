@@ -30,6 +30,7 @@ var hits: int = 0                # นับครั้งที่ถูกต
 var sp: int = 0
 var max_sp: int = 0
 var luck: int = 0
+var first_glimmer_pending: bool = false   # ผู้เล่นยังไม่เคยประกาย → Insight ครั้งแรกเต็มทันที (Insight.FIRST_GLIMMER_SURE) · ตั้งจาก PlayerState เท่านั้น Sim ไม่ใช้
 
 # ── ต้นไม้ท่า (ตัวเอกเท่านั้น) ──
 var learned: Array[String] = []  # ชื่อท่าที่เรียนแล้ว
