@@ -37,26 +37,26 @@
 		"moon_blades": {
 			"label": "คม · พันคมจันทร์",
 			"impact": 0.81,
-			"total": 1.81,
+			"total": 2.51,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 1.81
+					"sec": 2.51
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#7a1a10",
 					"alpha": 0.55,
-					"life": 1.71
+					"life": 2.41
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#ff7a4a",
-					"life": 1.61
+					"life": 2.31
 				},
 				{
 					"t": 0.0,
@@ -286,32 +286,70 @@
 					"color": "#ff7a4a",
 					"n": 30,
 					"life": 1.5
+				},
+				{
+					"t": 0.36,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#ff5a3a",
+					"life": 0.95
+				},
+				{
+					"t": 0.56,
+					"op": "focus_lines",
+					"at": "center",
+					"life": 0.45
+				},
+				{
+					"t": 0.81,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ฉัวะ!!",
+					"color": "#ffe08a",
+					"life": 0.95
+				},
+				{
+					"t": 0.81,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.23,
+					"op": "shatter",
+					"at": "center",
+					"life": 0.85
+				},
+				{
+					"t": 2.16,
+					"op": "finish",
+					"color": "#ff5a3a"
 				}
 			]
 		},
 		"sky_hammer": {
 			"label": "ทุบ · ค้อนทลายฟ้า",
 			"impact": 0.58,
-			"total": 1.73,
+			"total": 2.43,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 1.73
+					"sec": 2.43
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#6a3010",
 					"alpha": 0.55,
-					"life": 1.63
+					"life": 2.33
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#ffb347",
-					"life": 1.53
+					"life": 2.23
 				},
 				{
 					"t": 0.0,
@@ -573,32 +611,70 @@
 					"color": "#ffb347",
 					"n": 30,
 					"life": 1.5
+				},
+				{
+					"t": 0.13,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#ffb347",
+					"life": 0.95
+				},
+				{
+					"t": 0.33,
+					"op": "focus_lines",
+					"at": "center",
+					"life": 0.45
+				},
+				{
+					"t": 0.58,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ตูมมม!!",
+					"color": "#ffe08a",
+					"life": 0.95
+				},
+				{
+					"t": 0.58,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.0,
+					"op": "shatter",
+					"at": "center",
+					"life": 0.85
+				},
+				{
+					"t": 2.08,
+					"op": "finish",
+					"color": "#ffb347"
 				}
 			]
 		},
 		"needle_storm": {
 			"label": "แทง · ร้อยเข็มทะลุเมฆ",
 			"impact": 0.92,
-			"total": 1.92,
+			"total": 2.62,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 1.92
+					"sec": 2.62
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#10306a",
 					"alpha": 0.55,
-					"life": 1.82
+					"life": 2.52
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#9fd4ff",
-					"life": 1.72
+					"life": 2.42
 				},
 				{
 					"t": 0.0,
@@ -824,32 +900,70 @@
 					"color": "#9fd4ff",
 					"n": 30,
 					"life": 1.5
+				},
+				{
+					"t": 0.47,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#6fb7ff",
+					"life": 0.95
+				},
+				{
+					"t": 0.67,
+					"op": "focus_lines",
+					"at": "center",
+					"life": 0.45
+				},
+				{
+					"t": 0.92,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ฉึก!!",
+					"color": "#ffe08a",
+					"life": 0.95
+				},
+				{
+					"t": 0.92,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.34,
+					"op": "shatter",
+					"at": "center",
+					"life": 0.85
+				},
+				{
+					"t": 2.27,
+					"op": "finish",
+					"color": "#6fb7ff"
 				}
 			]
 		},
 		"meteor_rain": {
 			"label": "ยิง · ฝนดาวตกพันนัด",
 			"impact": 1.2,
-			"total": 2.05,
+			"total": 2.75,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 2.05
+					"sec": 2.75
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#3a1a5a",
 					"alpha": 0.55,
-					"life": 1.95
+					"life": 2.65
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#ffcf6a",
-					"life": 1.85
+					"life": 2.55
 				},
 				{
 					"t": 0.0,
@@ -1048,32 +1162,70 @@
 					"color": "#ffcf6a",
 					"n": 30,
 					"life": 1.5
+				},
+				{
+					"t": 0.75,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#b48cff",
+					"life": 0.95
+				},
+				{
+					"t": 0.95,
+					"op": "focus_lines",
+					"at": "center",
+					"life": 0.45
+				},
+				{
+					"t": 1.2,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ปัง ปัง ปัง!!",
+					"color": "#ffe08a",
+					"life": 0.95
+				},
+				{
+					"t": 1.2,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.62,
+					"op": "shatter",
+					"at": "center",
+					"life": 0.85
+				},
+				{
+					"t": 2.4,
+					"op": "finish",
+					"color": "#b48cff"
 				}
 			]
 		},
 		"thousand_fists": {
 			"label": "มือเปล่า · กายาพันมือ",
 			"impact": 0.82,
-			"total": 1.8,
+			"total": 2.5,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 1.8
+					"sec": 2.5
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#0e4a42",
 					"alpha": 0.55,
-					"life": 1.7
+					"life": 2.4
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#bff8ee",
-					"life": 1.6
+					"life": 2.3
 				},
 				{
 					"t": 0.0,
@@ -1287,32 +1439,70 @@
 					"color": "#bff8ee",
 					"n": 30,
 					"life": 1.5
+				},
+				{
+					"t": 0.37,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#5fe0c8",
+					"life": 0.95
+				},
+				{
+					"t": 0.57,
+					"op": "focus_lines",
+					"at": "center",
+					"life": 0.45
+				},
+				{
+					"t": 0.82,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ตุบ ตุบ ตุบ!!",
+					"color": "#ffe08a",
+					"life": 0.95
+				},
+				{
+					"t": 0.82,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.24,
+					"op": "shatter",
+					"at": "center",
+					"life": 0.85
+				},
+				{
+					"t": 2.15,
+					"op": "finish",
+					"color": "#5fe0c8"
 				}
 			]
 		},
 		"waking_machine": {
 			"label": "กล · วันเครื่องตื่น",
 			"impact": 1.0,
-			"total": 2.05,
+			"total": 2.75,
 			"timeline": [
 				{
 					"t": 0.0,
 					"op": "bars",
-					"sec": 2.05
+					"sec": 2.75
 				},
 				{
 					"t": 0.0,
 					"op": "tint",
 					"color": "#0e3a30",
 					"alpha": 0.55,
-					"life": 1.95
+					"life": 2.65
 				},
 				{
 					"t": 0.0,
 					"op": "rays",
 					"at": "center",
 					"color": "#7ae0ff",
-					"life": 1.85
+					"life": 2.55
 				},
 				{
 					"t": 0.0,
@@ -1475,6 +1665,44 @@
 					"color": "#7ae0ff",
 					"n": 30,
 					"life": 1.5
+				},
+				{
+					"t": 0.55,
+					"op": "spirit",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"life": 0.95
+				},
+				{
+					"t": 0.75,
+					"op": "focus_lines",
+					"at": "center",
+					"life": 0.45
+				},
+				{
+					"t": 1.0,
+					"op": "sfx_text",
+					"at": "center",
+					"text": "ครืนนน!!",
+					"color": "#ffe08a",
+					"life": 0.95
+				},
+				{
+					"t": 1.0,
+					"op": "rgb_split",
+					"amt": 4,
+					"sec": 0.35
+				},
+				{
+					"t": 1.42,
+					"op": "shatter",
+					"at": "center",
+					"life": 0.85
+				},
+				{
+					"t": 2.4,
+					"op": "finish",
+					"color": "#7ae0ff"
 				}
 			]
 		}

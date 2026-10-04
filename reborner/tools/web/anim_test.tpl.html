@@ -273,6 +273,7 @@ function skillView(dt) {
 	if (S.dim > 0) { ctx.fillStyle = `rgba(13,8,20,${S.dim})`; ctx.fillRect(-4, -4, W() + 8, H() + 8); }
 	for (const e of S.fx) if (!e.ui && !e.under) e.draw(Math.min(1, e.t / e.dur), e.t);
 	ctx.restore();
+	drawRgbSplit(S.playing ? dt / Math.max(S.speed, 0.01) : 0);
 	for (const e of S.fx) if (e.ui) e.draw(Math.min(1, e.t / e.dur), e.t);   // ชั้นจอ: คัตอิน · จอวาบ (ไม่ซูม/ไม่สั่น)
 	if (S.grid) drawGrid();
 }
@@ -589,6 +590,51 @@ function embers(at, col, n, life) { for (let i = 0; i < n; i++) { const x0 = at.
 	fx(life, (p, t) => { const a = (p < 0.15 ? p / 0.15 : 1 - (p - 0.15) / 0.85) * (0.6 + 0.4 * Math.sin(t * 20 + i));
 		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.max(0, a); ctx.fillStyle = i % 3 ? col : '#fff6c8';
 		ctx.fillRect(x0 + Math.sin(t * 3 + i) * 4, y0 - 40 * p, 1.5, 1.5); ctx.restore(); }, d); } }
+// ── คำสั่งรอบ 4 ("อลังการขึ้นอีก" ครั้งที่ 2) ──
+// ร่างวิญญาณยักษ์: Rion ท่าฟันขยาย ~2.4 เท่า โปร่ง เรืองสีสาย โผล่ขึ้นหลังกลุ่มศัตรู (ชั้นหลังตัวละคร)
+function spirit(at, col, life) { const im = tinted('rion/west_a2', col);
+	under(life, (p, t) => { if (!im) return; const rise = easeOut(Math.min(1, p / 0.3)), a = (p < 0.3 ? p / 0.3 : p > 0.7 ? (1 - p) / 0.3 : 1) * 0.55, sc = 2.4;
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.max(0, a); ctx.imageSmoothingEnabled = false;
+		ctx.drawImage(im, at.x - im.width * sc / 2 + 30, at.y - im.height * sc + 30 * (1 - rise) + 8, im.width * sc, im.height * sc); ctx.restore(); }); }
+// เส้นเร่งแบบมังงะ: เส้นจากขอบจอพุ่งเข้าหากลาง (ชั้นจอ) กะพริบทุกเฟรม
+function focusLines(at, life) { S.fx.push({ t: 0, dur: life, ui: true, draw: (p, t) => { const a = (p < 0.2 ? p / 0.2 : 1 - (p - 0.2) / 0.8) * 0.75, fr = Math.floor(t * 30);
+	ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.fillStyle = '#fff';
+	for (let i = 0; i < 40; i++) { const ang = (i * 9 + (fr * 7 + i * 13) % 5) * Math.PI / 180 * 1, rIn = 55 + ((i * 17 + fr * 11) % 30), rOut = 260, w = 0.6 + (i % 3) * 0.5;
+		const cx = at.x, cy = at.y, a1 = ang - w * 0.004, a2 = ang + w * 0.004;
+		ctx.beginPath(); ctx.moveTo(cx + Math.cos(ang) * rIn, cy + Math.sin(ang) * rIn * 0.6); ctx.lineTo(cx + Math.cos(a1) * rOut, cy + Math.sin(a1) * rOut);
+		ctx.lineTo(cx + Math.cos(a2 + 0.012) * rOut, cy + Math.sin(a2 + 0.012) * rOut); ctx.fill(); }
+	ctx.restore(); } }); }
+// ตัวหนังสือเสียงใหญ่ (คำต่างกันตามสาย) ป๊อป + เอียง + สั่น
+function sfxText(at, text, col, life) { fx(life, (p, t) => { const s = p < 0.12 ? 0.4 + 1.0 * (p / 0.12) : 1.4 - 0.25 * Math.min(1, (p - 0.12) / 0.2), a = p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3;
+	const j = p < 0.4 ? Math.sin(t * 90) * 1.2 : 0;
+	ctx.save(); ctx.globalAlpha = Math.max(0, a); ctx.translate(at.x + j, at.y - 30 + j); ctx.rotate(-0.12); ctx.scale(s, s);
+	ctx.font = '700 18px Sarabun, sans-serif'; ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+	ctx.lineWidth = 5; ctx.strokeStyle = '#000'; ctx.strokeText(text, 0, 0); ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff'; ctx.strokeText(text, 0, 0);
+	ctx.fillStyle = col; ctx.fillText(text, 0, 0); ctx.restore(); }); }
+// ภาพแยกสี RGB (แรงกระแทกจนเลนส์สั่น)
+function rgbSplit(amt, sec) { S.rgb = { left: sec, total: sec, amt }; }
+function drawRgbSplit(raw) {
+	if (!S.rgb || S.rgb.left <= 0) return; S.rgb.left -= raw; const k = Math.max(0, S.rgb.left / S.rgb.total), d = Math.round(S.rgb.amt * k); if (!d) return;
+	const tmp = rgbTmp(); const x = tmp.getContext('2d');
+	for (const [col, dx] of [['#ff0000', -d], ['#0040ff', d]]) { x.globalCompositeOperation = 'copy'; x.drawImage(cv, 0, 0); x.globalCompositeOperation = 'multiply'; x.fillStyle = col; x.fillRect(0, 0, tmp.width, tmp.height);
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.45; ctx.drawImage(tmp, dx, 0); ctx.restore(); }
+}
+let _rgb = null; function rgbTmp() { if (!_rgb || _rgb.width !== cv.width) { _rgb = document.createElement('canvas'); _rgb.width = cv.width; _rgb.height = cv.height; } return _rgb; }
+// จอแตก: ถ่ายภาพจอตอนนั้น → แบ่งเป็นเศษสามเหลี่ยมรอบจุดกระทบ → ร่วงหล่น/หมุน/จาง พร้อมรอยร้าวขาว
+function shatter(at, life) { let snap = null; const shards = [];
+	const N = 14; for (let i = 0; i < N; i++) { const a1 = i * Math.PI * 2 / N + ((i * 13) % 5) * 0.03, a2 = (i + 1) * Math.PI * 2 / N; shards.push({ a1, a2, vx: Math.cos((a1 + a2) / 2) * (30 + (i * 17) % 30), vy: -10 - (i * 23) % 20, rot: ((i % 2) ? 1 : -1) * (0.6 + (i % 4) * 0.2) }); }
+	S.fx.push({ t: 0, dur: life, ui: true, draw: (p, t) => {
+		if (!snap) { snap = document.createElement('canvas'); snap.width = cv.width; snap.height = cv.height; snap.getContext('2d').drawImage(cv, 0, 0); }
+		const R = 400, crackT = 0.12;
+		ctx.save(); ctx.fillStyle = '#05040a'; ctx.globalAlpha = Math.min(1, t / 0.05) * (p > 0.65 ? Math.max(0, 1 - (p - 0.65) / 0.35) : 1); ctx.fillRect(0, 0, W(), H()); ctx.restore();   // ช่วงท้ายพื้นดำจาง → ฉากจริงค่อยๆ กลับมา
+		for (const sh of shards) { const k = Math.max(0, t - crackT), dx = sh.vx * k, dy = sh.vy * k + 260 * k * k, rr = sh.rot * k;
+			ctx.save(); ctx.translate(at.x + dx, at.y + dy); ctx.rotate(rr); ctx.translate(-at.x, -at.y);
+			ctx.beginPath(); ctx.moveTo(at.x, at.y); ctx.lineTo(at.x + Math.cos(sh.a1) * R, at.y + Math.sin(sh.a1) * R); ctx.lineTo(at.x + Math.cos(sh.a2) * R, at.y + Math.sin(sh.a2) * R); ctx.closePath();
+			ctx.save(); ctx.clip(); ctx.globalAlpha = Math.max(0, 1 - Math.max(0, p - 0.5) / 0.5); ctx.drawImage(snap, 0, 0); ctx.restore();
+			ctx.globalAlpha = Math.max(0, 1 - p); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; ctx.stroke(); ctx.restore(); }
+	} }); }
+// ประกายจบท่า: แฉกวาบที่อาวุธ Rion
+function finish(col) { const at = { x: S.hero.x + 14, y: S.hero.y + 38 }; star(at, '#ffffff', 9, 0.4); star(at, col, 5, 0.5); sparks(at, col, 8, 10, 12, 0.5); }
 // ── ตัวเล่นท่าจากข้อมูล (FX engine) — อ่าน data/fx/ultimates.json ไฟล์เดียวกับเกม ──
 // แต่ละคำสั่งใน timeline เรียกฟังก์ชันวาดข้างบน · ตำแหน่ง/สี/ทำซ้ำ แปลจากข้อมูลตามกติกาใน _doc ของไฟล์
 const FXDB = DATA.fx;
@@ -650,6 +696,12 @@ function runOp(op, i, n, pts, A, school) {
 			case 'slowmo': slowmo(op.sec, op.k); break;
 			case 'big_ring': bigRing(at, col, op.life); break;
 			case 'embers': embers(at, col, op.n, op.life); break;
+			case 'spirit': spirit(at, col, op.life); break;
+			case 'focus_lines': focusLines(at, op.life); break;
+			case 'sfx_text': sfxText(at, op.text, col, op.life); break;
+			case 'rgb_split': rgbSplit(op.amt, op.sec); break;
+			case 'shatter': shatter(at, op.life); break;
+			case 'finish': finish(col); break;
 			default: console.warn('fx: ไม่รู้จักคำสั่ง', op.op);
 		}
 	}
@@ -683,7 +735,7 @@ function playTech(t) {
 	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
 	const from = heroPt();
 	banner((ult ? '◆ ไม้ตาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : shade(col, 0.3), ult);
-	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.dimTotal = 0.85;
+	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.rgb = null; S.dimTotal = 0.85;
 	const cine = ult && S.cine && CINE[t.school];
 	let impact = 0;
 	if (cine) {
