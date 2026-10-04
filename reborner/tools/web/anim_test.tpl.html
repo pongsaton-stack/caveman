@@ -927,6 +927,13 @@ function dmgRange(t, m) {
 // ── เล่นสกิล ──
 function playTech(t) {
 	S.tech = t; S.fx = []; S.flash.clear(); S.foeTint = null;
+	// ท่ายึด (seize_techs.csv) — เกมลอยข้อความผลแทนเลข 0 (BattleScreen._strike_fx: e["buff"])
+	if (t.effect === 'def_up') {
+		banner('Rion · ' + t.name_th, shade(COL[t.school] || COL_DEF, 0.3), false);
+		S.flash.set('hero', 1); floatNum(heroPt(), 'DEF+' + Math.round(t.value * 100) + '%', '#8ad0f0', 0);
+		setRead(t); return;
+	}
+	if (t.effect === 'av_cut') later(0.3, () => floatNum(heroPt(), 'AV×' + (1 - t.value).toFixed(2), '#8ad0f0', 1));
 	if (S.saga) { sagaPlay(t); setRead(t); return; }
 	const m = DATA.monsters.find(x => x.monster_id === S.foe);
 	const ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
@@ -1003,7 +1010,7 @@ function setRead(t) {
 		const tt = t || S.tech;
 		$('rdClip').textContent = tt ? 'สกิล · ' + tt.name_th : 'สกิล — เลือกท่าด้านขวา';
 		$('rdFrame').textContent = 'ฟัน 4 เฟรม'; $('rdMs').textContent = Math.round(K.ATTACK_FRAME_SEC * 1000) + ' ms';
-		$('rdFile').textContent = tt ? `techs.csv · ${tt.tech_id} · ${tt.school}${tt.branch ? ' / ' + tt.branch : ''}` : '';
+		$('rdFile').textContent = tt ? `${tt.effect !== undefined ? 'seize_techs.csv' : 'techs.csv'} · ${tt.tech_id} · ${tt.school}${tt.branch ? ' / ' + tt.branch : ''}` : '';
 	}
 }
 function syncFrame() {
@@ -1072,8 +1079,8 @@ function renderTechs() {
 		const cls = r.e === K.WEAK_MULT ? 'weak' : r.e < 1 ? 'res' : '';
 		const hits = +t.hits > 1 ? ` ×${t.hits}` : '';
 		b.innerHTML = `<span class="nm">${t.name_th}${ult ? '<span class="ult">◆ ไม้ตาย</span>' : ''}</span>
-			<span class="dmg ${cls}">${r.lo}–${r.hi}${hits}${r.e === K.WEAK_MULT ? ' แพ้ทาง' : r.e === 0 ? ' ไม่ระคาย' : r.e < 1 ? ' ต้านทาน' : ''}</span>
-			<span class="meta">ต้องชำนาญ ${t.req_prof} · พลัง ${t.power} · SP ${t.sp} · ${SCOPE[t.scope] || t.scope} · ธาตุ ${t.element}${+t.ignore_def ? ' · เจาะเกราะ ' + Math.round(t.ignore_def * 100) + '%' : ''}${t.note ? ' · ' + t.note : ''}</span>`;
+			<span class="dmg ${cls}">${+t.power === 0 ? 'ไม่โจมตี' : r.lo + '–' + r.hi}${hits}${r.e === K.WEAK_MULT ? ' แพ้ทาง' : r.e === 0 ? ' ไม่ระคาย' : r.e < 1 ? ' ต้านทาน' : ''}</span>
+			<span class="meta">ต้องชำนาญ ${t.req_prof} · พลัง ${t.power} · SP ${t.sp} · ${SCOPE[t.scope] || t.scope} · ธาตุ ${t.element || '—'}${+t.ignore_def ? ' · เจาะเกราะ ' + Math.round(t.ignore_def * 100) + '%' : ''}${t.note ? ' · ' + t.note : ''}</span>`;
 		b.addEventListener('click', () => { S.playing = true; updPlay(); playTech(t); for (const x of list.children) x.setAttribute('aria-pressed', String(x === b)); });
 		list.append(b);
 	}

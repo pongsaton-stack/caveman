@@ -1,0 +1,3 @@
+monster_id,effect,value,turns,once,strike,source
+M03,def_up,0.40,3,0,0,"monsters.csv tech_effect: DEF ตัวเอง +40% 3 เทิร์น"
+M06,av_cut,0.30,0,1,1,"monsters.csv tech_effect: ลด AV ตัวเอง 30% ครั้งเดียวต่อการต่อสู้"

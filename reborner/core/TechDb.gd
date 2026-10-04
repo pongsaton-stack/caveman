@@ -14,6 +14,38 @@ func load_from(path: String) -> void:
 		by_id[t.id] = t
 		by_name[t.name] = t
 
+## ท่าที่ยึดจากมอนได้ (GDD 5.2 · data/seize_techs.csv) — เข้า by_id/by_name ให้ get_tech หาเจอ
+## แต่ไม่เข้า all → ไม่อยู่ในต้นไม้ท่า ไม่เป็นผู้สมัครประกาย ไม่โผล่ในห้องทดลองสาย
+var seize_by_monster: Dictionary = {}   # monster_id → Tech
+
+func load_seize(path: String) -> void:
+	seize_by_monster.clear()
+	if not FileAccess.file_exists(path):
+		return
+	for row in CsvDb.load_csv(path):
+		var t := Tech.new()
+		t.src_monster = str(row.get("monster_id", ""))
+		t.id = "seize_" + t.src_monster
+		t.name = str(row.get("name_th", ""))
+		t.school = Battle.SEIZE_SCHOOL
+		t.power = float(row.get("power", 0))
+		t.sp = int(row.get("sp", 0))
+		t.weight = float(row.get("weight", 1.0))
+		t.element = str(row.get("element", ""))
+		t.scope = str(row.get("scope", "single"))
+		t.effect = str(row.get("effect", ""))
+		t.effect_value = float(row.get("value", 0.0))
+		t.effect_turns = int(row.get("turns", 0))
+		t.once = int(row.get("once", 0)) == 1
+		t.slots = maxi(1, int(row.get("slots", 1)))
+		t.note = str(row.get("note", ""))
+		seize_by_monster[t.src_monster] = t
+		by_id[t.id] = t
+		by_name[t.name] = t
+
+func seize_for(monster_id: String) -> Tech:
+	return seize_by_monster.get(monster_id, null)
+
 func get_tech(id_or_name: String) -> Tech:
 	if by_id.has(id_or_name): return by_id[id_or_name]
 	if by_name.has(id_or_name): return by_name[id_or_name]

@@ -78,6 +78,7 @@ func _ready() -> void:
 	randomize()
 	by_id = CsvDb.index_by(CsvDb.load_csv("res://data/monsters.csv"), "monster_id")
 	techs.load_from("res://data/techs.csv")
+	techs.load_seize("res://data/seize_techs.csv")   # ท่ายึดจากมอน (GDD 5.2)
 	for r in CsvDb.load_csv("res://data/encounters.csv"):
 		encounters[str(r["symbol"])] = r
 	for r in CsvDb.load_csv("res://data/chests.csv"):
@@ -297,25 +298,37 @@ func _pick_up_drops() -> bool:
 	_show("🎁 เก็บ " + " · ".join(names), 1.4)
 	return true
 
-## ชนะแล้วเข้าใจท่าเด่นครบ → ถามทีละสายพันธุ์ว่ารับเข้าทีมไหม (GDD 5.2)
+## ชนะแล้วเข้าใจท่าเด่นครบ → ถามทีละสายพันธุ์: ยึดท่า หรือ รับเข้าทีม (เลือกทางเดียว · GDD 5.2)
+## มอนที่ไม่มีทั้งสองทาง (ท่าเฉพาะตัวแต่รับไม่ได้ / ยึดไปแล้ว) ข้าม
 func _offer_recruits(ids: Array) -> Array[String]:
 	var notes: Array[String] = []
 	for id in ids:
-		if not recruit_rows.has(str(id)) or not by_id.has(str(id)):
+		var sid := str(id)
+		if not by_id.has(sid):
 			continue
-		var row: Dictionary = recruit_rows[str(id)]
+		var st: Tech = techs.seize_for(sid)
+		if st != null and ps.has_seized(sid):
+			st = null
+		var can_recruit := recruit_rows.has(sid)
+		if st == null and not can_recruit:
+			continue
 		var slots := _monster_slots()
 		var used := 0
 		for m in ps.active_members(slots):
 			used += PlayerState.slot_cost(m)
+		var row: Dictionary = recruit_rows.get(sid, {})
+		var cost := int(row.get("slots", 1)) if can_recruit else -1
 		var screen := RecruitScreen.new()
-		screen.setup(str(row["name"]), str(by_id[str(id)]["signature_tech"]), int(row["slots"]), used + int(row["slots"]) > slots)
+		screen.setup(str(by_id[sid]["name_th"]), str(by_id[sid]["signature_tech"]), cost, can_recruit and used + cost > slots,
+			st.slots if st != null else 0, ps.memory_slots() - ps.used_memory())
 		add_child(screen)
-		var ok: bool = await screen.decided
-		if ok:
+		var choice: String = await screen.decided
+		if choice == "recruit" and can_recruit:
 			var nm := ps.recruit(row)
 			var bench := not ps.active_members(slots).has(ps._member(nm))
 			notes.append("◇ %s เข้าทีมแล้ว%s" % [nm, " (สำรอง)" if bench else ""])
+		elif choice == "seize" and st != null and ps.seize(st):
+			notes.append("◇ ยึดท่า %s ได้แล้ว (ความจำ %d/%d)" % [st.name, ps.used_memory(), ps.memory_slots()])
 	return notes
 
 func _build_dog() -> void:

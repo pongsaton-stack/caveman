@@ -5,6 +5,8 @@
 class_name Battle
 extends RefCounted
 
+const SEIZE_SCHOOL := "ยึด"   # สายของท่าที่ยึดจากมอน (GDD 5.2) — ไม่อยู่ในต้นไม้ท่า ไม่ประกาย
+
 var actors: Array[Actor] = []
 var techs: TechDb
 var verbose := false
@@ -58,6 +60,9 @@ func usable(a: Actor) -> Array[Tech]:
 	var out: Array[Tech] = []
 	if techs == null: return out
 	for n in a.learned:
+		var t: Tech = techs.get_tech(n)
+		if t != null: out.append(t)
+	for n in a.seized:   # ท่าที่ยึดมา (GDD 5.2) — อยู่ใน TechDb แต่ไม่อยู่ในต้นไม้ท่า
 		var t: Tech = techs.get_tech(n)
 		if t != null: out.append(t)
 	return out
@@ -164,6 +169,9 @@ func next_turn() -> Actor:
 		elif cur.tier >= h.tier:
 			_gain_insight(h, Insight.STRONGER_FOE, "ศัตรูแข็งกว่า")
 
+	# บัฟ (เกราะแข็ง) หมดอายุตามเทิร์นของตัวเอง — ไม่ใช้การสุ่ม
+	for k in cur.tick_buffs():
+		_log("    %s หมดบัฟ %s" % [cur.name, k])
 	# สถานะทำงานตอนเริ่มเทิร์นของตัวที่ติด ไม่ใช่ทุกรอบ
 	if _tick_status_damage(cur):
 		return null
@@ -184,7 +192,7 @@ func hero_options(cur: Actor) -> Array[Tech]:
 	var pool := _hero_pool(cur)
 	var out: Array[Tech] = []
 	for t in pool:
-		if t.is_attack() and (t.sp == 0 or t.sp <= cur.sp):
+		if t.is_usable() and (t.sp == 0 or t.sp <= cur.sp) and not (t.once and cur.once_used.has(t.name)):
 			out.append(t)
 	return out
 
@@ -248,7 +256,7 @@ func _set_telegraphs() -> void:
 	# ข้ามช่องแรก — ตัวที่กำลังจะทำอยู่แล้วเปิดท่าไม่ทัน (บทเรียน 11.14)
 	for i in range(1, q.size()):
 		var a: Actor = q[i]
-		if a.side == "foe" and a.telegraph.is_empty() and randf() < Formulas.TEL_CHANCE:
+		if a.side == "foe" and a.telegraph.is_empty() and not _sig_spent(a) and randf() < Formulas.TEL_CHANCE:
 			a.telegraph = {"name": a.signature, "dmg": 0}
 			telegraphs += 1
 			_log("    ▼ %s กำลังจะใช้ %s" % [a.name, a.signature])
@@ -401,7 +409,7 @@ func _confuse_retarget(cur: Actor, target: Actor) -> Actor:
 ## ท่าที่ตัวเอกมีสิทธิ์ใช้ตอนนี้ — ผนึกเหลือเฉพาะท่าไม่เสีย SP
 func _hero_pool(cur: Actor) -> Array[Tech]:
 	# ผนึก — ใช้ได้เฉพาะท่าที่ไม่เสีย SP
-	var pool := usable(cur)
+	var pool := usable(cur).filter(func(t): return not (t.once and cur.once_used.has(t.name)))
 	if cur.has_status(Status.SEALED):
 		var free_pool := pool.filter(func(t): return t.sp == 0)
 		# ถ้าผนึกจนไม่เหลือท่าเลย ต้องเหลือท่ารากไว้เสมอ
@@ -424,7 +432,7 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 	# ── ประกาย (GDD 4.3) ──
 	# สองทาง: Insight เต็ม = แน่นอน · ไม่งั้นโรลตามโอกาส
 	var free := false
-	if allow_glimmer and cur.is_hero and techs != null and tech.is_attack():
+	if allow_glimmer and cur.is_hero and techs != null and tech.is_attack() and tech.school != SEIZE_SCHOOL:
 		tech_uses += 1
 		if target.tier > cur.tier:
 			_gain_insight(cur, Insight.TECH_ON_STRONG, "ใช้ท่ากับศัตรูแข็งกว่า")
@@ -455,14 +463,30 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 	if not free and tech.sp > 0:
 		cur.sp -= tech.sp
 
-	var targets := _resolve_scope(tech, target)
-	var bonus := 1.5 if free else 1.0
-	_fx_glimmer = free
-	for _i in tech.hits:
-		for t in targets:
-			if not t.down:
-				_strike(cur, t, tech, bonus)
-	_fx_glimmer = false
+	if tech.once:
+		cur.once_used.append(tech.name)
+	if tech.effect == "def_up":
+		cur.apply_def_up(tech.effect_value, tech.effect_turns)
+		_log("  รอบ %2d  %s ใช้ %s — DEF +%d%% %d เทิร์น (%d)" % [rounds, cur.name, tech.name,
+			int(round(tech.effect_value * 100.0)), tech.effect_turns, cur.def_val])
+		if capture:
+			events.append({"src": cur, "tgt": cur, "tech": tech.name, "school": tech.school, "dmg": 0,
+				"weak": false, "glimmer": false, "buff": "DEF+%d%%" % int(round(tech.effect_value * 100.0))})
+	# ท่าเด่นที่ไม่ใช่การโจมตี ไม่มีใคร "โดน" — นับเป็นตัวเอกเห็นท่า (+1 · ตั้งรับอยู่ +2) ให้ยังสะสมความเข้าใจได้
+	if cur.side == "foe" and tech.id == "signature" and not tech.is_attack():
+		var h := hero()
+		if h != null and not h.down:
+			_note_understanding(cur, h)
+
+	if tech.is_attack():
+		var targets := _resolve_scope(tech, target)
+		var bonus := 1.5 if free else 1.0
+		_fx_glimmer = free
+		for _i in tech.hits:
+			for t in targets:
+				if not t.down:
+					_strike(cur, t, tech, bonus)
+		_fx_glimmer = false
 
 	var wm := 1.0
 	if cur.windup:
@@ -472,6 +496,9 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 	if cur.has_status(Status.SLOWED):
 		wm *= Status.av_mult_of(Status.SLOWED)
 	cur.av += Formulas.av(cur.spd) * tech.weight * tech.self_av_mult * wm
+	if tech.effect == "av_cut":
+		cur.av *= 1.0 - tech.effect_value
+		_log("    %s ผลุบผลับ — AV x%.2f" % [cur.name, 1.0 - tech.effect_value])
 	if tech.target_av_mult != 1.0 and not target.down:
 		target.av *= tech.target_av_mult
 
@@ -576,7 +603,21 @@ func _signature_tech(a: Actor) -> Tech:
 	t.name = a.signature
 	t.power = Formulas.TEL_POWER
 	t.status_chance = minf(1.0, a.basic_status_chance * Formulas.TEL_STATUS_BONUS)
+	# ท่าเด่นที่มีผลจริง (data/sig_effects.csv · ตัวเลขจากคอลัมน์ tech_effect ของ monsters.csv)
+	var fx: Dictionary = a.sig_effect
+	if not fx.is_empty():
+		t.effect = str(fx.get("effect", ""))
+		t.effect_value = float(fx.get("value", 0.0))
+		t.effect_turns = int(fx.get("turns", 0))
+		t.once = int(fx.get("once", 0)) == 1
+		if int(fx.get("strike", 1)) == 0:
+			t.power = 0.0
+			t.status = ""
 	return t
+
+## ท่าเด่นแบบครั้งเดียวต่อการต่อสู้ที่ใช้ไปแล้ว ห้ามเปิดท่าซ้ำ
+func _sig_spent(a: Actor) -> bool:
+	return int(a.sig_effect.get("once", 0)) == 1 and a.once_used.has(a.signature)
 
 ## โดนท่าเด่น +1 · ตั้งรับใส่ท่านั้น +2 (GDD 5.2) — ท่าที่ถูกขัดจังหวะไม่เคยลงมือ จึงไม่ได้ความเข้าใจ
 func _note_understanding(src: Actor, viewer: Actor) -> void:

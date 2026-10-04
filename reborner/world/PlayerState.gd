@@ -32,6 +32,7 @@ var shop_stock: Dictionary = {}       # item_id -> ที่เหลือใ�
 var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: สู้อัตโนมัติเปิดตั้งแต่เริ่ม สลับได้
 var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
 var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
+var seized: Array[Dictionary] = []     # ท่าที่ยึดจากมอน (GDD 5.2): {id, name, slots} — สลับได้ (ลืมแล้วยึดใหม่)
 
 func init_new(techs: TechDb, start: Vector2i) -> void:
 	learned.clear()
@@ -42,6 +43,36 @@ func init_new(techs: TechDb, start: Vector2i) -> void:
 	rest_cell = start
 	hp = max_hp()
 	sp = max_sp()
+
+## ช่องความจำท่า = 4 + floor(Σ Prof / 150) (GDD 5.2) — ตอนนี้ตัวเอกถือสายเดียว Σ = prof
+func memory_slots() -> int:
+	return 4 + int(prof / 150.0)
+
+func used_memory() -> int:
+	var n := 0
+	for s in seized:
+		n += int(s.get("slots", 1))
+	return n
+
+func has_seized(monster_id: String) -> bool:
+	for s in seized:
+		if str(s.get("id", "")) == monster_id:
+			return true
+	return false
+
+func can_seize(t: Tech) -> bool:
+	return t != null and not has_seized(t.src_monster) and used_memory() + t.slots <= memory_slots()
+
+func seize(t: Tech) -> bool:
+	if not can_seize(t):
+		return false
+	seized.append({"id": t.src_monster, "name": t.name, "slots": t.slots})
+	return true
+
+func forget(monster_id: String) -> void:
+	for i in range(seized.size() - 1, -1, -1):
+		if str(seized[i].get("id", "")) == monster_id:
+			seized.remove_at(i)
 
 func max_hp() -> int:
 	return Formulas.hero_hp(prof)
@@ -69,6 +100,9 @@ func make_hero() -> Actor:
 	a.learned.clear()
 	for n in learned:
 		a.learned.append(n)
+	a.seized.clear()
+	for sz in seized:
+		a.seized.append(str(sz.get("name", "")))
 	return a
 
 ## รับผลจากศึกกลับมา — ท่าที่ประกาย · ความชำนาญโบนัสจาก Insight · HP/SP ที่เหลือ
@@ -263,6 +297,7 @@ func to_dict() -> Dictionary:
 		"met_species": met_species.duplicate(), "rest_count": rest_count,
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
 		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true),
+		"seized": seized.duplicate(true),
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -319,6 +354,10 @@ func from_dict(d: Dictionary) -> void:
 		for n in gd[k]:
 			arr.append(str(n))
 		ground_drops[str(k)] = arr
+	seized.clear()
+	for sz in d.get("seized", []):
+		var sd: Dictionary = sz
+		seized.append({"id": str(sd.get("id", "")), "name": str(sd.get("name", "")), "slots": int(sd.get("slots", 1))})
 	shop_stock.clear()
 	var st: Dictionary = d.get("shop_stock", {})
 	for k in st.keys():

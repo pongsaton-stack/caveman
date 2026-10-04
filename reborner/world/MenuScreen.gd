@@ -64,6 +64,14 @@ func _render() -> void:
 	tech_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tech_text.custom_minimum_size = Vector2(186, 0)
 	left.add_child(tech_text)
+	if not ps.seized.is_empty():
+		var sz: Array = []
+		for st in ps.seized:
+			sz.append(str(st["name"]))
+		var seized_text := UiKit.label("ท่าที่ยึด (ความจำ %d/%d): %s" % [ps.used_memory(), ps.memory_slots(), " · ".join(sz)], 7, UiKit.C_GOLD)
+		seized_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		seized_text.custom_minimum_size = Vector2(186, 0)
+		left.add_child(seized_text)
 	if not ps.materials.is_empty():
 		var mats: Array = []
 		for k in ps.materials.keys():
@@ -126,6 +134,10 @@ func _show_actions() -> void:
 		var arrange := _add(UiKit.button("จัดทีม", 123))
 		arrange.pressed.connect(_pick_front)
 		arrange.focus_entered.connect(func(): _info.text = "เลือกมอนขึ้นหัวทีม — ตัวหัวทีมได้ลงสนามก่อน ที่เกินช่องไปสำรอง")
+	if not ps.seized.is_empty():
+		var mem := _add(UiKit.button("ท่าที่ยึด %d/%d" % [ps.used_memory(), ps.memory_slots()], 123))
+		mem.pressed.connect(_pick_forget)
+		mem.focus_entered.connect(func(): _info.text = "ท่าที่ยึดจากมอน กินช่องความจำ · ลืมท่าเพื่อคืนช่อง (ยึดใหม่ต้องเข้าใจท่าอีกรอบ)")
 	var lab := _add(UiKit.button("ทดลองท่า", 123))
 	lab.pressed.connect(_pick_practice_school)
 	lab.focus_entered.connect(func(): _info.text = "ศึกทดลอง: Rion ใช้ได้ทุกท่าในสาย รวมไม้ตาย · ผลไม่บันทึก")
@@ -153,6 +165,27 @@ func _pick_practice_school() -> void:
 		if first == null or sc == ps.school:
 			first = btn
 	var back := _add(UiKit.button("กลับ", 123))
+	back.pressed.connect(_show_actions)
+	first.grab_focus()
+
+## ความจำ (GDD 5.2): ลืมท่าที่ยึด = คืนช่องความจำ · ท่ากลับมาได้โดยเข้าใจท่าของมอนตัวนั้นอีกครั้ง
+func _pick_forget() -> void:
+	_clear_menu()
+	_picking_lp = true
+	_info.text = "ลืมท่าไหน? (คืนช่องความจำ)"
+	var first: Button = null
+	for st in ps.seized:
+		var id := str(st["id"])
+		var nm := str(st["name"])
+		var btn := _add(UiKit.button("ลืม %s (%d)" % [nm, int(st["slots"])], 123))
+		btn.pressed.connect(func():
+			ps.forget(id)
+			_info.text = "ลืม %s แล้ว · ความจำ %d/%d" % [nm, ps.used_memory(), ps.memory_slots()]
+			_render()
+			_show_actions())
+		if first == null:
+			first = btn
+	var back := _add(UiKit.button("ย้อนกลับ", 123))
 	back.pressed.connect(_show_actions)
 	first.grab_focus()
 

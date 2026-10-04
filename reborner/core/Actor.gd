@@ -45,6 +45,37 @@ var windup: bool = false         # ท่าถัดไปน้ำหนัก
 var basic_status: String = ""    # สถานะที่การโจมตีปกติของตัวนี้ลง
 var basic_status_chance: float = 0.0
 
+# ── ผลพิเศษ (ท่าเด่นมีผลจริง · data/sig_effects.csv) ──
+var base_def: int = 0            # DEF ก่อนบัฟ (ใช้คืนค่าตอนบัฟหมด)
+var buffs: Dictionary = {}       # "def_up" -> เทิร์นที่เหลือ
+var sig_effect: Dictionary = {}  # แถวจาก sig_effects.csv ของมอนตัวนี้ ({} = ท่าเด่นเป็นการตีแรงแบบเดิม)
+var once_used: Array[String] = []   # ชื่อท่าแบบ "ครั้งเดียวต่อการต่อสู้" ที่ใช้ไปแล้ว
+var seized: Array[String] = []   # ตัวเอก: ชื่อท่าที่ยึดมา (แยกจาก learned — ไม่นับในต้นไม้ท่า/โอกาสประกาย)
+
+static var _sig_table := {}
+static func sig_table() -> Dictionary:
+	if _sig_table.is_empty() and FileAccess.file_exists("res://data/sig_effects.csv"):
+		_sig_table = CsvDb.index_by(CsvDb.load_csv("res://data/sig_effects.csv"), "monster_id")
+	return _sig_table
+
+## บัฟ DEF ของตัวเอง (เกราะแข็ง) — ใช้ซ้ำระหว่างบัฟยังอยู่ = ต่ออายุ ไม่ซ้อน
+func apply_def_up(value: float, turns: int) -> void:
+	if base_def == 0: base_def = def_val
+	buffs["def_up"] = turns
+	def_val = int(round(float(base_def) * (1.0 + value)))
+
+## ลดอายุบัฟตอนเริ่มเทิร์นของตัวเอง คืนชื่อที่หมด
+func tick_buffs() -> Array:
+	var expired := []
+	for k in buffs.keys():
+		buffs[k] -= 1
+		if buffs[k] <= 0:
+			buffs.erase(k)
+			expired.append(k)
+			if k == "def_up":
+				def_val = base_def
+	return expired
+
 func has_status(key: String) -> bool:
 	return statuses.has(key)
 
@@ -97,5 +128,6 @@ static func from_csv(row_data: Dictionary) -> Actor:
 	a.is_boss = int(row_data.get("is_boss", 0)) == 1
 	a.basic_status = str(row_data.get("status", ""))
 	a.basic_status_chance = float(row_data.get("status_chance", 0.0))
+	a.sig_effect = sig_table().get(a.id, {})
 	a.reset_av()
 	return a

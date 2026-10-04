@@ -20,6 +20,13 @@ var target_av_mult: float = 1.0
 var ignore_pos: bool = false
 var free_row: bool = false
 var note: String
+# ── ผลพิเศษของท่า (ท่าเด่นมอนที่มีผลจริง · ท่าที่ตัวเอกยึดมา — GDD 5.2) ──
+var effect: String = ""          # "" = ไม่มี · def_up = DEF ตัวเอง +value · av_cut = AV ตัวเองหลังลงมือ x(1-value)
+var effect_value: float = 0.0
+var effect_turns: int = 0        # def_up: จำนวนเทิร์นของตัวที่ใช้
+var once: bool = false           # ใช้ได้ครั้งเดียวต่อการต่อสู้
+var slots: int = 1               # ช่องความจำที่ท่ายึดกิน (GDD 5.2: ทั่วไป 1 · บอส 2)
+var src_monster: String = ""     # ท่ายึด: มาจากมอนตัวไหน
 var status: String = ""          # สถานะที่ท่านี้ลง
 var status_chance: float = 0.0   # โอกาสฐาน ก่อนหัก DEF
 
@@ -49,3 +56,7 @@ static func from_csv(d: Dictionary) -> Tech:
 
 func is_attack() -> bool:
 	return power > 0.0
+
+## ท่าที่กดใช้ได้ในเมนู — ท่าโจมตี หรือท่าที่มีผลพิเศษกับตัวเอง (เช่น เกราะแข็ง)
+func is_usable() -> bool:
+	return power > 0.0 or effect != ""
