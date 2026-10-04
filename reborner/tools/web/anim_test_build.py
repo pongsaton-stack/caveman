@@ -31,6 +31,12 @@ def sprites():
 		for f in sorted(os.listdir(dd)):
 			if f.endswith('.png'):
 				out['draft/' + f[:-4]] = png(os.path.join(dd, f))
+	# ร่างมอนจาก Monster Compendium (tools/sprites/compendium_cut.py) — ตัวหลัก + ท่าหายใจ (ไม่ฝังภาพการ์ดรวม)
+	cd = os.path.join(SPR, 'compendium_draft')
+	if os.path.isdir(cd):
+		for f in sorted(os.listdir(cd)):
+			if f.endswith('.png') and not f.endswith('_card.png'):
+				out['cmp/' + f[:-4]] = png(os.path.join(cd, f))
 	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
 	td = os.path.join(ROOT, 'assets/tiles_ll')
 	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
@@ -64,6 +70,19 @@ def monsters(ids):
 				'weak', 'resist', 'immune', 'signature_tech')})
 	return out
 
+def compendium():
+	f = os.path.join(SPR, 'compendium_draft/index.json')
+	return json.load(open(f, encoding='utf-8')) if os.path.exists(f) else []
+
+def skill_ref():
+	"""ชีตสกิล 173 ท่า แบ่งเป็นภาพละสาย (tools/sprites/skill_panels.py) — ภาพอ้างอิงเท่านั้น"""
+	d = os.path.join(ROOT, 'docs/art-bible/compendium/skill_panels'); out = []
+	for code, th in (('SL', 'คม'), ('PC', 'แทง'), ('CR', 'ทุบ'), ('BD', 'มือเปล่า'), ('ST', 'ยิง'), ('DV', 'กล')):
+		f = os.path.join(d, code + '.jpg')
+		if os.path.exists(f):
+			out.append({'code': code, 'school': th, 'img': 'data:image/jpeg;base64,' + base64.b64encode(open(f, 'rb').read()).decode()})
+	return out
+
 def draft_map():
 	"""ร่างแต่ละแบบ → มอนในเกมที่ MASTER ให้ใช้แบบนั้น (lastlight_archetype)"""
 	names = {r['monster_id']: r['name_th'] for r in csv.DictReader(open(os.path.join(ROOT, 'data/monsters.csv'), encoding='utf-8'))}
@@ -82,6 +101,8 @@ def main(out_path):
 		'fx': {k: v for k, v in json.load(open(os.path.join(ROOT, 'data/fx/ultimates.json'), encoding='utf-8')).items() if k != '_doc'},
 		'monsters': monsters(mon_ids),
 		'draft_map': draft_map(),
+		'compendium': compendium(),
+		'skill_ref': skill_ref(),
 		'k': {
 			'MIT_K': const('core/Formulas.gd', 'MIT_K'),
 			'WEAK_MULT': const('core/Formulas.gd', 'WEAK_MULT'),

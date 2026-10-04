@@ -1,0 +1,464 @@
+[
+ {
+  "id": "overworld_01_slime",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Slime",
+  "variants": 3
+ },
+ {
+  "id": "overworld_02_small-rat",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Small Rat",
+  "variants": 1
+ },
+ {
+  "id": "overworld_03_mutant-rat",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Mutant Rat",
+  "variants": 1
+ },
+ {
+  "id": "overworld_04_scavenger",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Scavenger",
+  "variants": 4
+ },
+ {
+  "id": "overworld_05_bandit",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Bandit",
+  "variants": 4
+ },
+ {
+  "id": "overworld_06_dog-npc",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Dog (NPC)",
+  "variants": 2
+ },
+ {
+  "id": "overworld_07_zombie",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Zombie",
+  "variants": 3
+ },
+ {
+  "id": "overworld_08_runner",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Runner",
+  "variants": 1
+ },
+ {
+  "id": "overworld_09_civilian",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Civilian",
+  "variants": 2
+ },
+ {
+  "id": "overworld_10_security-bot",
+  "region": "overworld",
+  "region_th": "หมู่บ้าน-ซากเมือง",
+  "name": "Security Bot",
+  "variants": 1
+ },
+ {
+  "id": "forest_01_fox",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Fox",
+  "variants": 2
+ },
+ {
+  "id": "forest_02_rabid-fox",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Rabid Fox",
+  "variants": 1
+ },
+ {
+  "id": "forest_03_wolf",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Wolf",
+  "variants": 1
+ },
+ {
+  "id": "forest_04_dire-wolf",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Dire Wolf",
+  "variants": 1
+ },
+ {
+  "id": "forest_05_boar",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Boar",
+  "variants": 2
+ },
+ {
+  "id": "forest_06_alpha-boar",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Alpha Boar",
+  "variants": 3
+ },
+ {
+  "id": "forest_07_forest-spirit",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Forest Spirit",
+  "variants": 2
+ },
+ {
+  "id": "forest_08_treant",
+  "region": "forest",
+  "region_th": "ป่าไม้",
+  "name": "Treant",
+  "variants": 2
+ },
+ {
+  "id": "water_01_fish",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Fish",
+  "variants": 3
+ },
+ {
+  "id": "water_02_piranha",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Piranha",
+  "variants": 2
+ },
+ {
+  "id": "water_03_jellyfish",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Jellyfish",
+  "variants": 1
+ },
+ {
+  "id": "water_04_sea-slime",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Sea Slime",
+  "variants": 2
+ },
+ {
+  "id": "water_05_turtle",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Turtle",
+  "variants": 1
+ },
+ {
+  "id": "water_06_shark",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Shark",
+  "variants": 1
+ },
+ {
+  "id": "water_07_sea-serpent",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Sea Serpent",
+  "variants": 1
+ },
+ {
+  "id": "water_08_crab",
+  "region": "water",
+  "region_th": "แม่น้ำ-ทะเล",
+  "name": "Crab",
+  "variants": 2
+ },
+ {
+  "id": "ruins_01_skeleton",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Skeleton",
+  "variants": 3
+ },
+ {
+  "id": "ruins_02_skeleton-archer",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Skeleton Archer",
+  "variants": 1
+ },
+ {
+  "id": "ruins_03_armored-skeleton",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Armored Skeleton",
+  "variants": 1
+ },
+ {
+  "id": "ruins_04_wraith",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Wraith",
+  "variants": 3
+ },
+ {
+  "id": "ruins_05_ancient-guardian",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Ancient Guardian",
+  "variants": 2
+ },
+ {
+  "id": "ruins_06_stone-golem",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Stone Golem",
+  "variants": 1
+ },
+ {
+  "id": "ruins_07_relic-machine",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Relic Machine",
+  "variants": 1
+ },
+ {
+  "id": "ruins_08_ghost",
+  "region": "ruins",
+  "region_th": "ซากปรักหักพัง",
+  "name": "Ghost",
+  "variants": 3
+ },
+ {
+  "id": "desert_01_sand-slime",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Sand Slime",
+  "variants": 3
+ },
+ {
+  "id": "desert_02_scorpion",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Scorpion",
+  "variants": 1
+ },
+ {
+  "id": "desert_03_cactus-monster",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Cactus Monster",
+  "variants": 1
+ },
+ {
+  "id": "desert_04_sand-bandit",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Sand Bandit",
+  "variants": 3
+ },
+ {
+  "id": "desert_05_worm",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Worm",
+  "variants": 1
+ },
+ {
+  "id": "desert_06_sand-golem",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Sand Golem",
+  "variants": 2
+ },
+ {
+  "id": "desert_07_mummy",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Mummy",
+  "variants": 1
+ },
+ {
+  "id": "desert_08_dust-devil",
+  "region": "desert",
+  "region_th": "ทะเลทราย",
+  "name": "Dust Devil",
+  "variants": 2
+ },
+ {
+  "id": "cave_01_bat",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Bat",
+  "variants": 1
+ },
+ {
+  "id": "cave_02_cave-spider",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Cave Spider",
+  "variants": 1
+ },
+ {
+  "id": "cave_03_rock-golem",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Rock Golem",
+  "variants": 1
+ },
+ {
+  "id": "cave_04_crystal-golem",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Crystal Golem",
+  "variants": 1
+ },
+ {
+  "id": "cave_05_lava-slime",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Lava Slime",
+  "variants": 1
+ },
+ {
+  "id": "cave_06_lava-elemental",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Lava Elemental",
+  "variants": 3
+ },
+ {
+  "id": "cave_07_cave-lizard",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Cave Lizard",
+  "variants": 1
+ },
+ {
+  "id": "cave_08_deep-crawler",
+  "region": "cave",
+  "region_th": "ถ้ำ",
+  "name": "Deep Crawler",
+  "variants": 1
+ },
+ {
+  "id": "underground_01_mole",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Mole",
+  "variants": 1
+ },
+ {
+  "id": "underground_02_tunnel-worm",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Tunnel Worm",
+  "variants": 1
+ },
+ {
+  "id": "underground_03_miner-bot",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Miner Bot",
+  "variants": 1
+ },
+ {
+  "id": "underground_04_crystal-beetle",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Crystal Beetle",
+  "variants": 2
+ },
+ {
+  "id": "underground_05_crystal-spider",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Crystal Spider",
+  "variants": 2
+ },
+ {
+  "id": "underground_06_ancient-dragon",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Ancient Dragon",
+  "variants": 1
+ },
+ {
+  "id": "underground_07_underground-king",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "Underground King",
+  "variants": 1
+ },
+ {
+  "id": "underground_08_the-core",
+  "region": "underground",
+  "region_th": "ใต้ดิน",
+  "name": "The Core",
+  "variants": 1
+ },
+ {
+  "id": "special_01_explosive-slime",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Explosive Slime",
+  "variants": 2
+ },
+ {
+  "id": "special_02_berserker",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Berserker",
+  "variants": 1
+ },
+ {
+  "id": "special_03_toxic-plant",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Toxic Plant",
+  "variants": 3
+ },
+ {
+  "id": "special_04_floating-eye",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Floating Eye",
+  "variants": 3
+ },
+ {
+  "id": "special_05_mirror-knight",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Mirror Knight",
+  "variants": 1
+ },
+ {
+  "id": "special_06_infected-creature",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Infected Creature",
+  "variants": 1
+ },
+ {
+  "id": "special_07_time-anomaly",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Time Anomaly",
+  "variants": 2
+ },
+ {
+  "id": "special_08_reality-fragment",
+  "region": "special",
+  "region_th": "พิเศษ",
+  "name": "Reality Fragment",
+  "variants": 2
+ }
+]

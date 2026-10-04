@@ -51,6 +51,8 @@ header p{margin:0;color:var(--muted);font-size:13px}
 .tabs .btn{font:600 14px var(--f-display);padding:6px 14px}
 .side{display:grid;gap:12px;min-width:0}
 .clips{display:grid;gap:10px}
+.skref{margin-top:14px}.skref summary{cursor:pointer;font:600 14px var(--f-display);color:var(--gold)}
+.skref .muted{color:var(--muted);font-size:12px;margin:6px 0}.skwrap{overflow-x:auto;margin-top:8px}.skwrap img{max-width:100%;display:block;border-radius:6px}
 .cgroup h3{font:600 14px var(--f-display);margin:0 0 6px;color:var(--gold)}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
 .cgrid .btn{text-align:left;font-size:13px;line-height:1.3}
@@ -124,6 +126,12 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 
 		<section class="box" id="paneClips">
 			<div class="clips" id="clipGroups"></div>
+			<details class="skref" id="skillRef">
+				<summary>ชีตสกิล 173 ท่า (ภาพอ้างอิงจาก kwan · ยังไม่อยู่ในเกม)</summary>
+				<p class="muted">ชื่อและจำนวนท่าในชีตต่างจาก techs.csv ในเกม (6 สาย × 7 = 42 ท่า) — ยังไม่ตัดสิน</p>
+				<div class="tabs" id="skRefPick"></div>
+				<div class="skwrap"><img id="skRefImg" alt=""></div>
+			</details>
 		</section>
 
 		<section class="box" id="paneSkills" hidden>
@@ -194,6 +202,13 @@ for (const key of Object.keys(DATA.sprites)) {
 	const used = (DATA.draft_map || {})[m[1]] || [];
 	addClip('ร่างจากชีต Last Light (ยังไม่เข้าเกม)', 'draft_' + m[1], m[1] + (used.length ? ' → ' + used.slice(0, 3).join(', ') + (used.length > 3 ? ` +${used.length - 3}` : '') : ' → ยังไม่มีในเกม'),
 		[key, key + '_idle1'], K.FOE_IDLE_SEC);
+}
+
+// ร่างจาก Monster Compendium (ยังไม่เข้าเกม) — กลุ่มละภูมิ ตามลำดับในชีต
+for (const e of (DATA.compendium || [])) {
+	const key = 'cmp/' + e.id;
+	if (!DATA.sprites[key]) continue;
+	addClip('Compendium · ' + e.region_th + ' (ร่าง ยังไม่เข้าเกม)', 'cmp_' + e.id, e.name + (e.variants > 1 ? ` (${e.variants} แบบในชีต)` : ''), [key, key + '_idle1'], K.FOE_IDLE_SEC);
 }
 
 // ── สถานะผู้ชม ──
@@ -1013,7 +1028,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_draft' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1054,6 +1069,16 @@ function buildClips() {
 		sec.append(grid); box.append(sec);
 	}
 	press(box, S.clip);
+}
+function buildSkillRef() {
+	const refs = DATA.skill_ref || [], box = $('skRefPick');
+	if (!refs.length) { $('skillRef').hidden = true; return; }
+	const show = code => { const r = refs.find(x => x.code === code); $('skRefImg').src = r.img; $('skRefImg').alt = 'ชีตสกิลสาย ' + r.school; press(box, code); };
+	for (const r of refs) {
+		const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = r.code;
+		b.textContent = `${r.code} ${r.school}`; b.addEventListener('click', () => show(r.code)); box.append(b);
+	}
+	show(refs[0].code);
 }
 function buildFoes() {
 	const box = $('foePick'); box.innerHTML = '';
@@ -1118,8 +1143,8 @@ function boot() {
 	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills');
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
-	buildClips(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
-	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
+	buildSkillRef(); buildClips(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_draft}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ
 		· สร้างใหม่: <code>python3 tools/web/anim_test_build.py out.html</code>`;

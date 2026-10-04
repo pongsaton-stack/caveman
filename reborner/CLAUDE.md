@@ -184,6 +184,12 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   **ร่าง ยังไม่เข้าเกม** (คนละโฟลเดอร์กับ monsters_ll ที่เกมอ่านเอง) · หน้า animation test กลุ่ม "ร่างจากชีต Last Light" ป้ายบอกมอนในเกมที่ MASTER ใช้แบบนั้น (lastlight_archetype)
   ในเกม: big-mutant 6 · scavenger 7 · bandit 2 · plant 2 · drone/eye/rat/slime 1 ตัว · บอส Ruined Guardian (B2) ยังไม่ตัด เพราะพื้นหลังเป็นภาพวาด ลบพื้นอัตโนมัติไม่ได้
   ข้อสังเกต: ทุกตัวสูง 42px เท่ากัน (สไลม์/โดรนดูใหญ่เกินจริง) · ยังไม่ลดสีเข้าพาเลตต์ master
+- 4 ต.ค. 2026 **Monster Compendium + ชีตสกิล 173 ท่า ลงหน้า animation test** (kwan ส่ง 2 ชีต → `docs/art-bible/compendium/monster_compendium.jpg` · `skill_sprite_sheet.jpg`)
+  `tools/sprites/compendium_cut.py`: 8 ภูมิ (หมู่บ้าน 10 · ที่เหลือ 8) = 66 ช่อง · แบ่งตารางเท่ากัน 2 แถว · ตัดแถบป้ายชื่อล่าง 26% · ตัวหลัก = ก้อนใหญ่สุด → 48px + idle · `_card.png` = ทุกแบบในช่อง (ไม่ฝังในหน้า)
+  ผล `assets/sprites/compendium_draft/` + `index.json` · ชีตตรวจ `previews/compendium_draft.png` · บอส 6 ตัวล่างยังไม่ตัด (พื้นหลังเป็นภาพวาด)
+  ชีตสกิล: `tools/sprites/skill_panels.py` แบ่งภาพละสาย → `compendium/skill_panels/*.jpg` · หน้าเว็บมีกล่อง "ชีตสกิล 173 ท่า" ใต้รายการท่าขยับ (ภาพอ้างอิงเท่านั้น)
+  **ขัดกับข้อมูลเกม (ยังไม่ตัดสิน)**: ชีตบอก 173 ท่า (5×30 + กล 23) · techs.csv มี 42 · ในชีตมีรหัสซ้ำ/ผิด (DV19 สองช่อง · BD26 สองช่อง · ST "3T")
+  `.gdignore` ใน compendium_draft และ docs/art-bible/compendium → Godot ไม่นำเข้า/ไม่ใส่ใน pck (ร่าง ไม่ใช่ของเกม)
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)
 2. ให้ Pongsaton กด F5 เล่นแผนที่เอง (ความรู้สึกต้องมาจากมือคน ไม่ใช่ตัวเลข)
