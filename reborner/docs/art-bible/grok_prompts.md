@@ -129,3 +129,20 @@ Original battle music for a 16-bit era JRPG (Super Famicom / SNES sound chip sty
 - Length 90–120 s per loop. Deliver WAV + OGG. Also deliver a 3-second victory fanfare and a 2-second "glimmer" sting
   (rising bell arpeggio, bright, like a sudden idea).
 ```
+
+## 10) มอนจาก Monster Compendium ทีละตัว (4 ต.ค. 2026 · ต้นฉบับคมกว่าตัดจากชีตรวม)
+แนบ `docs/art-bible/compendium/monster_compendium.jpg` ทุกครั้ง · ส่งครั้งละ 1 ตัว (ดีสุด) หรือ 4 ตัวในภาพเดียวก็ได้
+```
+[OUTPUT RULES]
+Redraw ONE monster from the attached "Monster Compendium" sheet: <NAME> (row "<REGION>").
+Copy its design exactly (shape, colors, proportions). Do not add or remove parts.
+- Pixel art, modern 16-bit JRPG look, chunky crisp pixels on a clear pixel grid, NO blur, NO soft painting, NO gradients smoothing.
+- Draw it LARGE: the monster about 512 px tall on a 1024x1024 canvas, centered, feet near the bottom.
+- Side view, facing RIGHT. Full body visible, nothing cropped.
+- Background: flat solid magenta #FF00FF only. No ground, no shadow, no text, no name label, no frame, no effects around it.
+- Only ONE creature (if the sheet shows several variants, draw the biggest/main one).
+- Export PNG (not JPG).
+Second image (optional, same rules, same scale): a 4-frame row on 2048x512, cells 512x512:
+idle 1, idle 2 (breathing, body 1-2 px lower), attack (lunge/strike pose), hit (recoil).
+```
+ตั้งชื่อไฟล์ตอนอัป: `<region>_<ชื่ออังกฤษ>.png` เช่น `forest_wolf.png` · อัปที่ลิงก์ใน CLAUDE.md หัวข้อ "ลิงก์ที่ปักไว้"
