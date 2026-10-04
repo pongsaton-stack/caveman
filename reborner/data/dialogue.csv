@@ -1,0 +1,3 @@
+id,trigger,once,text,source
+boss1_count,boss_win,1,...หนึ่ง,STORY_DRAFT ฉากที่ 7 (เสียงเดิมจากฉาก 0 นับ EC)
+boss1_again,boss_win_never_fell,1,...อีกแล้วเหรอ,STORY_DRAFT กฎฉากเปิดเรื่อง: ไม่เคยล้ม → เบาะแส "อีกแล้ว" ย้ายมาหลังชนะบอส

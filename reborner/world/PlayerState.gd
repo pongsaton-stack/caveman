@@ -33,6 +33,8 @@ var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: �
 var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
 var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
 var seized: Array[Dictionary] = []     # ท่าที่ยึดจากมอน (GDD 5.2): {id, name, slots} — สลับได้ (ลืมแล้วยึดใหม่)
+var falls := 0                         # ตัวเอกล้มกี่ครั้ง (STORY_DRAFT: ไม่เคยล้ม → เบาะแส "อีกแล้ว" ย้ายมาหลังชนะบอส)
+var demo_end_seen := false             # เห็นฉากจบเดโมแล้ว — ไม่แสดงซ้ำ
 
 func init_new(techs: TechDb, start: Vector2i) -> void:
 	learned.clear()
@@ -300,6 +302,7 @@ func to_dict() -> Dictionary:
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
 		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true),
 		"seized": seized.duplicate(true),
+		"falls": falls, "demo_end_seen": demo_end_seen,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -360,6 +363,8 @@ func from_dict(d: Dictionary) -> void:
 	for sz in d.get("seized", []):
 		var sd: Dictionary = sz
 		seized.append({"id": str(sd.get("id", "")), "name": str(sd.get("name", "")), "slots": int(sd.get("slots", 1))})
+	falls = int(d.get("falls", 0))
+	demo_end_seen = bool(d.get("demo_end_seen", false))
 	shop_stock.clear()
 	var st: Dictionary = d.get("shop_stock", {})
 	for k in st.keys():

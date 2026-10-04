@@ -51,6 +51,7 @@ var slot_rows: Array = []          # data/party_slots.csv
 var companion_rows: Array = []     # data/companions.csv
 var item_rows: Array = []          # data/items.csv
 var recruit_rows := {}             # data/recruits.csv — มอนที่รับเข้าทีมได้ (GDD 5.2/5.3)
+var dialogue_rows: Array = []      # data/dialogue.csv — บทพูด (STORY_DRAFT · ห้าม hardcode)
 var techs := TechDb.new()
 var map: MapData
 var ps := PlayerState.new()
@@ -87,6 +88,7 @@ func _ready() -> void:
 	companion_rows = CsvDb.load_csv("res://data/companions.csv")
 	item_rows = CsvDb.load_csv("res://data/items.csv")
 	recruit_rows = CsvDb.index_by(CsvDb.load_csv("res://data/recruits.csv"), "monster_id")
+	dialogue_rows = CsvDb.load_csv("res://data/dialogue.csv")
 	map = MapData.load_map(MAP_PATH)
 	if map == null or by_id.is_empty() or techs.all.is_empty():
 		push_error("โหลดข้อมูลไม่ครบ — ตรวจโฟลเดอร์ data/")
@@ -113,6 +115,13 @@ func _ready() -> void:
 	_build_ui()
 	queue_redraw()
 	_show("โหลดเกมที่บันทึกไว้" if loaded else "เริ่มการเดินทางใหม่", 1.2)
+	# เซฟที่ชนะบอสก่อนมีฉากจบเดโม — แสดงครั้งเดียวหลังโหลด
+	if loaded and ps.ec >= 1 and not ps.demo_end_seen:
+		_demo_end_after_message.call_deferred()
+
+func _demo_end_after_message() -> void:
+	await message_done
+	await _demo_end()
 
 # ── วาดแผนที่ ─────────────────────────────────────────────────
 func _draw() -> void:
@@ -781,6 +790,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		ps.rest()
 		hero_node.position = _cell_center(ps.cell)
 		_dog_snap()
+		ps.falls += 1
 		lines.append("แพ้ %s — เสียเงิน %d · กลับจุดพัก" % [e.label_text, lost])
 	for n in ps.after_battle(comps):
 		lines.append(n)
@@ -790,6 +800,51 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	SaveGame.save(ps)
 	_refresh_enemy_colors()
 	_show("\n".join(lines), 2.8 + 0.4 * maxi(0, lines.size() - 3))
+	if res["won"] and e.is_boss and not ps.demo_end_seen:
+		await message_done   # ให้อ่านสรุปศึกจบก่อน แล้วค่อยจอดำ
+		await _demo_end()
+
+## บทพูดตาม trigger จาก data/dialogue.csv
+func _dialogue(trigger: String) -> Array[String]:
+	var out: Array[String] = []
+	for r in dialogue_rows:
+		if str(r["trigger"]) == trigger:
+			out.append(str(r["text"]))
+	return out
+
+## จบเดโม — ชนะบอสภูมิภาค 1 ครั้งแรก (STORY_DRAFT ฉากที่ 7)
+func _demo_end() -> void:
+	busy = true
+	var said := _dialogue("boss_win")
+	if ps.falls == 0:
+		said.append_array(_dialogue("boss_win_never_fell"))
+	var known: Array[String] = []
+	for n in ps.learned:
+		known.append(n)
+	var team: Array[String] = []
+	for m in ps.party:
+		team.append(str(m["name"]))
+	var held: Array[String] = []
+	for sz in ps.seized:
+		held.append(str(sz.get("name", "")))
+	var rows: Array[String] = [
+		"ความชำนาญ %d · EC %d · เงิน %d · ล้ม %d ครั้ง" % [ps.prof, ps.ec, ps.gold, ps.falls],
+		"ท่าที่รู้ %d: %s" % [known.size(), ", ".join(known)],
+		"ท่าที่ยึด %d: %s" % [held.size(), ", ".join(held) if not held.is_empty() else "—"],
+		"ทีม %d: %s" % [team.size(), ", ".join(team) if not team.is_empty() else "—"],
+		"มอนที่หายถาวร: %s" % (", ".join(ps.lost) if not ps.lost.is_empty() else "ไม่มี"),
+	]
+	var scr := DemoEndScreen.new()
+	scr.setup(said, rows)
+	add_child(scr)
+	var choice: String = await scr.decided
+	if choice == "new_game":
+		SaveGame.clear()
+		get_tree().reload_current_scene()
+		return
+	ps.demo_end_seen = true
+	SaveGame.save(ps)
+	busy = false
 
 func _remove_enemy(e: WorldEnemy) -> void:
 	enemies.erase(e)
@@ -847,6 +902,7 @@ const SHOW_LINES := 2
 const SHOW_PAGE_MIN := 1.2
 var _pages: Array[String] = []
 var _page_secs := 0.0
+signal message_done   # กล่องข้อความหน้าสุดท้ายปิดแล้ว
 
 func _show(msg: String, secs: float) -> void:
 	busy = true
@@ -875,3 +931,4 @@ func _hide_panel() -> void:
 	panel.visible = false
 	busy = false
 	_update_hud()
+	message_done.emit()
