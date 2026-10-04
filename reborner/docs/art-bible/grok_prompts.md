@@ -186,3 +186,42 @@ Background flat magenta #FF00FF only. No ground, shadow, text, label, frame or e
 ```
 ท่าขยับ: สั่งต่อในแชตเดิมทีละท่า `Now draw the <attack/hit> pose of THIS exact sprite, same grid, same pixel size, same colors, 1024x1024.` (ไม่สั่งเป็นแถว — v1/v3 แถวเพี้ยนสเกลทุกครั้ง)
 
+### prompt ฉบับ 5 — ใช้ได้ทุกตัว ไม่ต้องกรอกอะไร (4 ต.ค.)
+แนบ 2 ภาพทุกครั้ง: ภาพ 1 = `compendium/refs/<id>.jpg` ของตัวนั้น · ภาพ 2 = ชีต Monster Compendium · ส่งข้อความ 1 แล้วค่อยส่งข้อความ 2 ในแชตเดิม
+ชื่อไฟล์ตอนอัป: `<id>.png` · `<id>_idle2.png` · `<id>_attack.png` · `<id>_hit.png` (id = ชื่อไฟล์ ref เช่น overworld_01_slime)
+
+ข้อความ 1 (ภาพหลัก):
+```
+Image 1 is the exact reference for ONE monster. Image 2 is the full sheet, for style only.
+If Image 1 shows several creatures, use only the BIGGEST one.
+Redraw it as a clean pixel art game sprite.
+
+FIDELITY - copy Image 1, do not reinterpret:
+- Same silhouette, same width:height proportions, same face (eye shape, size, position, mouth), same colors, same highlights, same parts.
+- Do not add or remove anything (no extra legs, arms, weapons, accessories, effects). Do not make it cuter, flatter, rounder or more detailed than Image 1.
+
+SHARPNESS:
+- Real pixel art on a 64x64 grid. The creature is about 56 grid pixels on its longest side.
+- Every grid pixel is a solid 16x16 block, so the file is exactly 1024x1024. No half blocks.
+- At most 16 colors. Clean pixel clusters. NO noisy speckles, NO dithering, NO anti-aliasing, NO blur, NO gradients.
+- 1-pixel dark outline, hue-shifted toward the shadow color. Never a light rim or glow.
+- Light from the top-left, 3 shading steps per material.
+
+LAYOUT:
+- Side view facing RIGHT. Full body, nothing cropped. Centered, lowest point 4 grid pixels above the canvas bottom.
+- Background: flat magenta #FF00FF only, every background pixel exactly that color.
+- NO ground, shadow, text, label, frame, border or particles. One creature only. PNG.
+```
+
+ข้อความ 2 (ท่าขยับ · ส่งหลังได้ภาพหลักที่ผ่าน):
+```
+Now make 3 more images of THIS exact sprite you just drew.
+Rules for all 3: same 64x64 grid, same 16x16 block size, same colors, same outline, same size of the creature, same magenta background, 1024x1024 each, PNG, separate files.
+Only the pose changes. Keep the creature's lowest point at the same height as the first image (except where the pose lifts it).
+1) idle2: breathing - body squashed down by 1 grid pixel and 1 grid pixel wider. Nothing else changes.
+2) attack: lunging forward to the RIGHT with its natural attack (bite, slam, claw, sting, shot - whatever fits this creature), leaning 3-6 grid pixels forward.
+3) hit: recoiling back to the LEFT, eyes squeezed shut, leaning 2-4 grid pixels backward.
+Do not redesign, do not change the camera angle, do not add effects or motion lines.
+```
+ถ้ารูปท่าใดเพี้ยน (ตัวเล็กลง/สีเปลี่ยน/หน้าตาเปลี่ยน) → สั่งเฉพาะท่านั้นซ้ำ: `Redo the <attack> image. It must be the same sprite as the first image, same size and colors.`
+
