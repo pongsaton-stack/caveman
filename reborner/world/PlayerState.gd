@@ -46,7 +46,7 @@ func init_new(techs: TechDb, start: Vector2i) -> void:
 
 ## ช่องความจำท่า = 4 + floor(Σ Prof / 150) (GDD 5.2) — ตอนนี้ตัวเอกถือสายเดียว Σ = prof
 func memory_slots() -> int:
-	return 4 + int(prof / 150.0)
+	return Formulas.tech_slots(prof)
 
 func used_memory() -> int:
 	var n := 0
