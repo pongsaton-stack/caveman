@@ -137,12 +137,14 @@ Original battle music for a 16-bit era JRPG (Super Famicom / SNES sound chip sty
 Redraw ONE monster from the attached "Monster Compendium" sheet: <NAME> (row "<REGION>").
 Copy its design exactly (shape, colors, proportions). Do not add or remove parts.
 - Pixel art, modern 16-bit JRPG look, chunky crisp pixels on a clear pixel grid, NO blur, NO soft painting, NO gradients smoothing.
-- Draw it LARGE: the monster about 512 px tall on a 1024x1024 canvas, centered, feet near the bottom.
+- Pixel scale: design it on a 64x64 pixel grid (the monster about 44-56 grid pixels wide/tall), then enlarge EVERY pixel to an exact 16x16 block (nearest neighbor) so the file is 1024x1024. Same block size everywhere, no half blocks.
 - Side view, facing RIGHT. Full body visible, nothing cropped.
 - Background: flat solid magenta #FF00FF only. No ground, no shadow, no text, no name label, no frame, no effects around it.
 - Only ONE creature (if the sheet shows several variants, draw the biggest/main one).
 - Export PNG (not JPG).
-Second image (optional, same rules, same scale): a 4-frame row on 2048x512, cells 512x512:
-idle 1, idle 2 (breathing, body 1-2 px lower), attack (lunge/strike pose), hit (recoil).
+Second image (optional): a 4-frame row, 4096x1024 (four 1024x1024 cells), SAME 16x16 block size and SAME character size as image 1
+— copy image 1 exactly and change only the pose: idle 1 (= image 1), idle 2 (body 1 grid pixel lower/squashed), attack (lunge/strike), hit (recoil).
 ```
+ตัวอย่างแรก (สไลม์ 4 ต.ค. · `compendium/samples/`): ไฟล์ถูกรูปแบบทุกข้อ แต่พิกเซลละ ~18px → ภาพจริงแค่ 32x23 จุด · เฟรมท่าขยับคนละสเกล (บล็อก ~10px · ตัวแบนเหลือ 11 จุด) · ตัวมีขา ไม่เหมือนสไลม์ในชีต
+→ แก้ prompt ข้างบน: บังคับตาราง 64x64 ขยายบล็อกละ 16 และเฟรมต้องสเกลเดียวกับภาพแรก · ฝั่งเรา `native()` (เก็บสีกลางบล็อก) ได้พิกเซลอาร์ตคมเป๊ะ ไม่ต้องย่อ
 ตั้งชื่อไฟล์ตอนอัป: `<region>_<ชื่ออังกฤษ>.png` เช่น `forest_wolf.png` · อัปที่ลิงก์ใน CLAUDE.md หัวข้อ "ลิงก์ที่ปักไว้"
