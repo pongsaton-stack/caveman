@@ -148,3 +148,20 @@ Second image (optional): a 4-frame row, 4096x1024 (four 1024x1024 cells), SAME 1
 ตัวอย่างแรก (สไลม์ 4 ต.ค. · `compendium/samples/`): ไฟล์ถูกรูปแบบทุกข้อ แต่พิกเซลละ ~18px → ภาพจริงแค่ 32x23 จุด · เฟรมท่าขยับคนละสเกล (บล็อก ~10px · ตัวแบนเหลือ 11 จุด) · ตัวมีขา ไม่เหมือนสไลม์ในชีต
 → แก้ prompt ข้างบน: บังคับตาราง 64x64 ขยายบล็อกละ 16 และเฟรมต้องสเกลเดียวกับภาพแรก · ฝั่งเรา `native()` (เก็บสีกลางบล็อก) ได้พิกเซลอาร์ตคมเป๊ะ ไม่ต้องย่อ
 ตั้งชื่อไฟล์ตอนอัป: `<region>_<ชื่ออังกฤษ>.png` เช่น `forest_wolf.png` · อัปที่ลิงก์ใน CLAUDE.md หัวข้อ "ลิงก์ที่ปักไว้"
+ตัวอย่างที่ 2 (สไลม์ v2 · `samples/v2/`): ตารางเป๊ะ 16px · พื้นแมเจนตาเป๊ะ · เฟรมสเกลเดียวกัน — แต่เป็นวงรีระบายแถบสี 6 สี (วาดด้วยโค้ด) ใช้เป็นงานศิลป์ไม่ได้ (บทเรียนเดียวกับ grok รอบ 2)
+→ บทเรียน: บังคับตารางเป๊ะ = ตัวเจนหันไปเขียนโค้ด · ให้วาดเป็นภาพจริงก่อน ตารางหลวมได้ ฝั่งเรา native() จัดตารางเอง (v1 พิสูจน์แล้ว) · prompt ฉบับ 3 ด้านล่าง
+
+### prompt ฉบับ 3 (หลังสไลม์ v2)
+```
+Redraw ONE monster from the attached "Monster Compendium" sheet: <NAME> (row "<REGION>").
+Key look: <describe the sheet version>.
+Match the sheet's art quality exactly: hand-drawn pixel art illustration with shading, highlights, texture, expressive face, dark outline.
+Do NOT build it from simple geometric shapes, flat color bands or code. It must look like the creature in the sheet, not a placeholder.
+- Big visible pixels (each pixel roughly 12-16 px on screen), creature fills about 60% of a 1024x1024 canvas. A perfect grid is NOT required.
+- Side view facing RIGHT, full body, centered, bottom near the canvas bottom.
+- Background flat magenta #FF00FF only. No ground, shadow, text, label, frame or effects.
+- PNG only.
+Then a second PNG: 4 cells in a row (4096x1024), SAME drawing and SAME size as image 1, only the pose changes:
+idle 1, idle 2 (squash 1 pixel), attack (lunge right), hit (recoil).
+```
+
