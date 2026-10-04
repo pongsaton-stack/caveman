@@ -25,6 +25,12 @@ def sprites():
 		for f in sorted(os.listdir(d)):
 			if f.endswith('.png'):
 				out['%s/%s' % (key, f[:-4])] = png(os.path.join(d, f))
+	# ร่างศัตรูจากชีต Last Light (tools/sprites/ll_enemies.py) — แสดงในหน้านี้อย่างเดียว ยังไม่เข้าเกม
+	dd = os.path.join(SPR, 'monsters_ll_draft')
+	if os.path.isdir(dd):
+		for f in sorted(os.listdir(dd)):
+			if f.endswith('.png'):
+				out['draft/' + f[:-4]] = png(os.path.join(dd, f))
 	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
 	td = os.path.join(ROOT, 'assets/tiles_ll')
 	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
@@ -58,6 +64,15 @@ def monsters(ids):
 				'weak', 'resist', 'immune', 'signature_tech')})
 	return out
 
+def draft_map():
+	"""ร่างแต่ละแบบ → มอนในเกมที่ MASTER ให้ใช้แบบนั้น (lastlight_archetype)"""
+	names = {r['monster_id']: r['name_th'] for r in csv.DictReader(open(os.path.join(ROOT, 'data/monsters.csv'), encoding='utf-8'))}
+	out = {}
+	for e in json.load(open(os.path.join(ROOT, 'docs/art-bible/monster_visual_master.json'), encoding='utf-8'))['entries']:
+		if e['id'] in names:
+			out.setdefault(e['lastlight_archetype'], []).append('%s %s' % (e['id'], names[e['id']]))
+	return out
+
 def main(out_path):
 	spr = sprites()
 	mon_ids = sorted({k.split('/')[1].split('_')[0] for k in spr if k.startswith('mon/') and not k.split('/')[1].startswith('COMP')})
@@ -66,6 +81,7 @@ def main(out_path):
 		'techs': techs(),
 		'fx': {k: v for k, v in json.load(open(os.path.join(ROOT, 'data/fx/ultimates.json'), encoding='utf-8')).items() if k != '_doc'},
 		'monsters': monsters(mon_ids),
+		'draft_map': draft_map(),
 		'k': {
 			'MIT_K': const('core/Formulas.gd', 'MIT_K'),
 			'WEAK_MULT': const('core/Formulas.gd', 'WEAK_MULT'),

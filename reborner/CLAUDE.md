@@ -179,6 +179,11 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   การ์ดสรุป: ความชำนาญ/EC/เงิน/ล้ม · ท่าที่รู้ · ท่าที่ยึด · ทีม · มอนที่หาย · ปุ่ม เดินเล่นต่อ (`ps.demo_end_seen` เซฟ) / เริ่มเกมใหม่ (ลบเซฟ + reload ฉาก)
   เซฟเก่าที่ชนะบอสแล้ว (ec ≥ 1 ยังไม่เห็น) → ขึ้นครั้งเดียวหลังโหลด · เทสต์ `bt/demoend.gd` (11 ข้อ) · `demonew.gd` · `demoload.gd` · ภาพ `$S/demoend.png`
   ยังไม่ทำ: หญ้ารอบทุ่งเหี่ยวตาม EC (STORY_DRAFT ฉาก 7) · บทพูดอื่นในฉากเปิดเรื่อง (ฉาก 0–6)
+- 4 ต.ค. 2026 **ร่างศัตรูจากชีต Last Light ความละเอียดสูง** (kwan ส่งชีตเดียวกับ lastlight_01 แต่ 2576x1717 → `docs/art-bible/compendium/lastlight_sheet_hires.jpg`)
+  `tools/sprites/ll_enemies.py` ตัด 8 แบบในกรอบ Enemies → `assets/sprites/monsters_ll_draft/<archetype>.png` + `_idle1` (48px · ลบพื้น · เส้นขอบ hue-shift) · ชีต `previews/ll_enemies_draft.png`
+  **ร่าง ยังไม่เข้าเกม** (คนละโฟลเดอร์กับ monsters_ll ที่เกมอ่านเอง) · หน้า animation test กลุ่ม "ร่างจากชีต Last Light" ป้ายบอกมอนในเกมที่ MASTER ใช้แบบนั้น (lastlight_archetype)
+  ในเกม: big-mutant 6 · scavenger 7 · bandit 2 · plant 2 · drone/eye/rat/slime 1 ตัว · บอส Ruined Guardian (B2) ยังไม่ตัด เพราะพื้นหลังเป็นภาพวาด ลบพื้นอัตโนมัติไม่ได้
+  ข้อสังเกต: ทุกตัวสูง 42px เท่ากัน (สไลม์/โดรนดูใหญ่เกินจริง) · ยังไม่ลดสีเข้าพาเลตต์ master
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)
 2. ให้ Pongsaton กด F5 เล่นแผนที่เอง (ความรู้สึกต้องมาจากมือคน ไม่ใช่ตัวเลข)

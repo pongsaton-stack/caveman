@@ -187,6 +187,15 @@ for (const key of Object.keys(DATA.sprites)) {
 	addClip(id.startsWith('COMP-') ? 'มอนฝั่งเรา (COMP)' : 'มอนศัตรู', 'mon_' + id, (monName[base] || base) + ' ' + id, [key, key + '_idle1'], K.FOE_IDLE_SEC);
 }
 
+// ร่างศัตรูจากชีต Last Light (ยังไม่เข้าเกม) — ป้ายบอกว่า MASTER ใช้แบบนี้กับมอนตัวไหนในเกม
+for (const key of Object.keys(DATA.sprites)) {
+	const m = key.match(/^draft\/(.+?)$/);
+	if (!m || m[1].endsWith('_idle1')) continue;
+	const used = (DATA.draft_map || {})[m[1]] || [];
+	addClip('ร่างจากชีต Last Light (ยังไม่เข้าเกม)', 'draft_' + m[1], m[1] + (used.length ? ' → ' + used.slice(0, 3).join(', ') + (used.length > 3 ? ` +${used.length - 3}` : '') : ' → ยังไม่มีในเกม'),
+		[key, key + '_idle1'], K.FOE_IDLE_SEC);
+}
+
 // ── สถานะผู้ชม ──
 const S = { tab: 'clips', clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -1004,7 +1013,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1110,7 +1119,7 @@ function boot() {
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
 	buildClips(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
-	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
+	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ
 		· สร้างใหม่: <code>python3 tools/web/anim_test_build.py out.html</code>`;
