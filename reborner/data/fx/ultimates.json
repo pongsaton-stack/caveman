@@ -1,0 +1,68 @@
+{
+	"_doc": [
+		"ไม้ตายแบบมีท่าทาง — แหล่งเดียวของทั้ง animation test (JS) และเกม (GDScript) · แก้ท่าที่ไฟล์นี้ไฟล์เดียว",
+		"หน่วยระยะ = พิกเซลจริงของสไปรต์ (Rion 64x64 ทั้งสองที่) · เวลา = วินาที นับหลังคัตอินจบ",
+		"จุดอ้างอิง (at / to): center = กลางกลุ่มเป้า · right = เป้าขวาสุด · each = ทำกับเป้าทีละตัว · ground = ใต้ center ระดับพื้น · home = ที่ยืนเดิมของ Rion · hero = ตำแหน่ง Rion ตอนนี้ · sky = เหนือขอบจอ",
+		"to ของ hero_move = มุมซ้ายบนของรูป Rion: {x: [จุด, เลื่อน], y: [จุด, เลื่อน]} หรือ [\"mix\", จุดA, จุดB, สัดส่วน]",
+		"repeat = ทำซ้ำ n ครั้ง ห่าง every วิ · ตัวแปรต่อครั้ง i: jx/jy = [คูณ, หาร, ลบ] → ((i×คูณ) % หาร) − ลบ · r_mod = [เพิ่ม, รอบ] → r + (i % รอบ)×เพิ่ม · rot_alt = [มุมคู่, มุมคี่] · rot_step × (i − กลาง) · ring = [rx, ry] วางรอบจุดเป็นวง",
+		"มุม rot หน่วย π (1.0 = 180°) · สี \"school\" = สีของสาย · impact = จังหวะที่ตัวเลขดาเมจ/วาบขึ้น · total = ยาวทั้งท่า"
+	],
+	"version": 1,
+	"cutin": { "sec": 0.8, "bar": 16, "band": [30, 56], "hero_scale": 1.35 },
+	"school_color": { "คม": "#ff5a4a", "แทง": "#7ad0e0", "ทุบ": "#e39253", "ยิง": "#f2c08a", "กล": "#8ad0a0", "มือเปล่า": "#ffd0c0" },
+	"by_school": { "คม": "moon_blades", "ทุบ": "sky_hammer" },
+	"moves": {
+		"moon_blades": {
+			"label": "คม · พันคมจันทร์",
+			"impact": 0.81,
+			"total": 1.51,
+			"timeline": [
+				{ "t": 0.0, "op": "ghost", "color": "#ff5a3a", "life": 0.3, "repeat": { "n": 5, "every": 0.03 } },
+				{ "t": 0.0, "op": "hero_move", "to": { "x": ["right", -10], "y": ["home", 0] }, "sec": 0.14, "ease": "out" },
+				{ "t": 0.18, "op": "ghost", "color": "#ff7a4a", "life": 0.35, "frame": "attack2", "at": "center", "repeat": { "n": 5, "every": 0.09, "ring": [30, 16] } },
+				{ "t": 0.18, "op": "crescent", "at": "center", "color": "#ff5a3a", "r": 15, "life": 0.3, "repeat": { "n": 10, "every": 0.055, "jx": [13, 21, 10], "jy": [7, 13, 6], "r_mod": [3, 4], "rot_alt": [0.1, 1.05], "rot_step": 0.0382 } },
+				{ "t": 0.18, "op": "sparks", "at": "center", "color": "#ffb347", "n": 5, "spread": 14, "up": 10, "life": 0.3, "repeat": { "n": 10, "every": 0.055, "jx": [13, 21, 10], "jy": [7, 13, 6] } },
+				{ "t": 0.75, "op": "ghost", "color": "#fff0c0", "life": 0.25 },
+				{ "t": 0.81, "op": "crescent", "at": "center", "color": "#ff4a2a", "r": 44, "rot": 0.85, "life": 0.6, "grow": 1.6 },
+				{ "t": 0.81, "op": "crescent", "at": "center", "color": "#ff8a3a", "r": 40, "rot": 0.15, "life": 0.6, "grow": 1.5 },
+				{ "t": 0.81, "op": "flash", "color": "#fff2e0", "peak": 0.85, "sec": 0.25 },
+				{ "t": 0.81, "op": "shake", "amp": 5, "sec": 0.5 },
+				{ "t": 0.81, "op": "zoom", "at": "center", "k": 1.14, "sec": 0.45 },
+				{ "t": 0.81, "op": "hitstop", "sec": 0.12 },
+				{ "t": 0.81, "op": "debris", "at": "each", "color": "#b3262a", "n": 10, "spread": 22, "up": 22, "life": 0.6, "size": 2 },
+				{ "t": 0.81, "op": "sparks", "at": "each", "color": "#ffb347", "n": 12, "spread": 30, "up": 26, "life": 0.55 },
+				{ "t": 1.21, "op": "hero_move", "to": { "x": ["home", 0], "y": ["home", 0] }, "sec": 0.18, "ease": "out" },
+				{ "t": 1.21, "op": "ghost", "color": "#ff5a3a", "life": 0.25, "repeat": { "n": 3, "every": 0.05 } }
+			]
+		},
+		"sky_hammer": {
+			"label": "ทุบ · ค้อนทลายฟ้า",
+			"impact": 0.58,
+			"total": 1.43,
+			"timeline": [
+				{ "t": 0.0, "op": "hero_move", "to": { "x": ["home", 0], "y": ["home", 3] }, "sec": 0.08, "ease": "out" },
+				{ "t": 0.08, "op": "hero_move", "to": { "x": ["home", -10], "y": ["sky", 0] }, "sec": 0.2, "ease": "out" },
+				{ "t": 0.08, "op": "ghost", "color": "#e39253", "life": 0.25, "repeat": { "n": 3, "every": 0.05 } },
+				{ "t": 0.4, "op": "hero_set", "to": { "x": ["center", 2], "y": ["sky", 0] } },
+				{ "t": 0.42, "op": "hero_move", "to": { "x": ["center", 2], "y": ["home", 0] }, "sec": 0.16, "ease": "in" },
+				{ "t": 0.42, "op": "ghost", "color": "#ff7a2a", "life": 0.3, "repeat": { "n": 4, "every": 0.04 } },
+				{ "t": 0.46, "op": "hammer", "at": "ground", "color": "school", "swing": 0.12 },
+				{ "t": 0.58, "op": "flash", "color": "#fff0d0", "peak": 0.9, "sec": 0.3 },
+				{ "t": 0.58, "op": "shake", "amp": 7, "sec": 0.6 },
+				{ "t": 0.58, "op": "zoom", "at": "ground", "k": 1.18, "sec": 0.5 },
+				{ "t": 0.58, "op": "hitstop", "sec": 0.14 },
+				{ "t": 0.58, "op": "pillar", "at": "ground", "color": "#ffb347", "life": 0.6 },
+				{ "t": 0.58, "op": "blast", "at": "ground", "off": [0, -8], "color": "school", "r": 30, "life": 0.7 },
+				{ "t": 0.58, "op": "shock_ring", "at": "ground", "color": "school", "r": 16, "life": 0.5, "repeat": { "n": 5, "every": 0.06, "r_step": 8 } },
+				{ "t": 0.58, "op": "crack", "at": "ground", "w": 75 },
+				{ "t": 0.58, "op": "spikes", "at": "ground", "w": 90, "color": "school" },
+				{ "t": 0.58, "op": "debris", "at": "ground", "color": "#8a6a4a", "n": 22, "spread": 50, "up": 46, "life": 0.8, "size": 3.5 },
+				{ "t": 0.58, "op": "debris", "at": "ground", "color": "#e8c79a", "n": 10, "spread": 34, "up": 34, "life": 0.6, "size": 1.8 },
+				{ "t": 0.58, "op": "sparks", "at": "ground", "color": "#ffcf6a", "n": 24, "spread": 46, "up": 56, "life": 0.9 },
+				{ "t": 0.58, "op": "dust", "at": "ground", "color": "#c8b49a", "life": 1.0 },
+				{ "t": 1.13, "op": "hero_move", "to": ["mix", "hero", "home", 0.5, -14], "sec": 0.13, "ease": "out" },
+				{ "t": 1.26, "op": "hero_move", "to": { "x": ["home", 0], "y": ["home", 0] }, "sec": 0.13, "ease": "in" }
+			]
+		}
+	}
+}

@@ -48,6 +48,7 @@ def main(out_path):
 	data = {
 		'sprites': spr,
 		'techs': techs(),
+		'fx': {k: v for k, v in json.load(open(os.path.join(ROOT, 'data/fx/ultimates.json'), encoding='utf-8')).items() if k != '_doc'},
 		'monsters': monsters(mon_ids),
 		'k': {
 			'MIT_K': const('core/Formulas.gd', 'MIT_K'),
