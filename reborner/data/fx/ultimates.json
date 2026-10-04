@@ -37,8 +37,33 @@
 		"moon_blades": {
 			"label": "คม · พันคมจันทร์",
 			"impact": 0.81,
-			"total": 1.51,
+			"total": 1.81,
 			"timeline": [
+				{
+					"t": 0.0,
+					"op": "bars",
+					"sec": 1.81
+				},
+				{
+					"t": 0.0,
+					"op": "tint",
+					"color": "#7a1a10",
+					"alpha": 0.55,
+					"life": 1.71
+				},
+				{
+					"t": 0.0,
+					"op": "rays",
+					"at": "center",
+					"color": "#ff7a4a",
+					"life": 1.61
+				},
+				{
+					"t": 0.0,
+					"op": "aura",
+					"color": "#ff5a3a",
+					"life": 0.81
+				},
 				{
 					"t": 0.0,
 					"op": "ghost",
@@ -73,8 +98,8 @@
 					"frame": "attack2",
 					"at": "center",
 					"repeat": {
-						"n": 5,
-						"every": 0.09,
+						"n": 8,
+						"every": 0.065,
 						"ring": [
 							30,
 							16
@@ -89,8 +114,8 @@
 					"r": 15,
 					"life": 0.3,
 					"repeat": {
-						"n": 10,
-						"every": 0.055,
+						"n": 16,
+						"every": 0.034,
 						"jx": [
 							13,
 							21,
@@ -122,8 +147,8 @@
 					"up": 10,
 					"life": 0.3,
 					"repeat": {
-						"n": 10,
-						"every": 0.055,
+						"n": 16,
+						"every": 0.034,
 						"jx": [
 							13,
 							21,
@@ -233,14 +258,67 @@
 						"n": 3,
 						"every": 0.05
 					}
+				},
+				{
+					"t": 0.95,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 0.81,
+					"op": "big_ring",
+					"at": "ground",
+					"color": "#ff7a4a",
+					"life": 0.7
+				},
+				{
+					"t": 0.97,
+					"op": "flash",
+					"color": "#ff7a4a",
+					"peak": 0.35,
+					"sec": 0.2
+				},
+				{
+					"t": 0.86,
+					"op": "embers",
+					"at": "ground",
+					"color": "#ff7a4a",
+					"n": 30,
+					"life": 1.5
 				}
 			]
 		},
 		"sky_hammer": {
 			"label": "ทุบ · ค้อนทลายฟ้า",
 			"impact": 0.58,
-			"total": 1.43,
+			"total": 1.73,
 			"timeline": [
+				{
+					"t": 0.0,
+					"op": "bars",
+					"sec": 1.73
+				},
+				{
+					"t": 0.0,
+					"op": "tint",
+					"color": "#6a3010",
+					"alpha": 0.55,
+					"life": 1.63
+				},
+				{
+					"t": 0.0,
+					"op": "rays",
+					"at": "center",
+					"color": "#ffb347",
+					"life": 1.53
+				},
+				{
+					"t": 0.0,
+					"op": "aura",
+					"color": "#e39253",
+					"life": 0.58
+				},
 				{
 					"t": 0.0,
 					"op": "hero_move",
@@ -467,14 +545,67 @@
 					},
 					"sec": 0.13,
 					"ease": "in"
+				},
+				{
+					"t": 0.72,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 0.58,
+					"op": "big_ring",
+					"at": "ground",
+					"color": "#ffb347",
+					"life": 0.7
+				},
+				{
+					"t": 0.74,
+					"op": "flash",
+					"color": "#ffb347",
+					"peak": 0.35,
+					"sec": 0.2
+				},
+				{
+					"t": 0.63,
+					"op": "embers",
+					"at": "ground",
+					"color": "#ffb347",
+					"n": 30,
+					"life": 1.5
 				}
 			]
 		},
 		"needle_storm": {
 			"label": "แทง · ร้อยเข็มทะลุเมฆ",
 			"impact": 0.92,
-			"total": 1.62,
+			"total": 1.92,
 			"timeline": [
+				{
+					"t": 0.0,
+					"op": "bars",
+					"sec": 1.92
+				},
+				{
+					"t": 0.0,
+					"op": "tint",
+					"color": "#10306a",
+					"alpha": 0.55,
+					"life": 1.82
+				},
+				{
+					"t": 0.0,
+					"op": "rays",
+					"at": "center",
+					"color": "#9fd4ff",
+					"life": 1.72
+				},
+				{
+					"t": 0.0,
+					"op": "aura",
+					"color": "#6fb7ff",
+					"life": 0.92
+				},
 				{
 					"t": 0.0,
 					"op": "hero_move",
@@ -547,8 +678,8 @@
 					"w": 1.4,
 					"life": 0.2,
 					"repeat": {
-						"n": 12,
-						"every": 0.03,
+						"n": 20,
+						"every": 0.018,
 						"fjy": [
 							7,
 							23,
@@ -665,14 +796,67 @@
 						"n": 3,
 						"every": 0.05
 					}
+				},
+				{
+					"t": 1.06,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 0.92,
+					"op": "big_ring",
+					"at": "ground",
+					"color": "#9fd4ff",
+					"life": 0.7
+				},
+				{
+					"t": 1.08,
+					"op": "flash",
+					"color": "#9fd4ff",
+					"peak": 0.35,
+					"sec": 0.2
+				},
+				{
+					"t": 0.97,
+					"op": "embers",
+					"at": "ground",
+					"color": "#9fd4ff",
+					"n": 30,
+					"life": 1.5
 				}
 			]
 		},
 		"meteor_rain": {
 			"label": "ยิง · ฝนดาวตกพันนัด",
 			"impact": 1.2,
-			"total": 1.75,
+			"total": 2.05,
 			"timeline": [
+				{
+					"t": 0.0,
+					"op": "bars",
+					"sec": 2.05
+				},
+				{
+					"t": 0.0,
+					"op": "tint",
+					"color": "#3a1a5a",
+					"alpha": 0.55,
+					"life": 1.95
+				},
+				{
+					"t": 0.0,
+					"op": "rays",
+					"at": "center",
+					"color": "#ffcf6a",
+					"life": 1.85
+				},
+				{
+					"t": 0.0,
+					"op": "aura",
+					"color": "#b48cff",
+					"life": 1.2
+				},
 				{
 					"t": 0.0,
 					"op": "hero_move",
@@ -743,8 +927,8 @@
 					"trail": "#b48cff",
 					"life": 0.45,
 					"repeat": {
-						"n": 18,
-						"every": 0.04,
+						"n": 28,
+						"every": 0.026,
 						"jx": [
 							17,
 							61,
@@ -836,14 +1020,67 @@
 					"spread": 30,
 					"up": 30,
 					"life": 0.6
+				},
+				{
+					"t": 1.34,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 1.2,
+					"op": "big_ring",
+					"at": "ground",
+					"color": "#ffcf6a",
+					"life": 0.7
+				},
+				{
+					"t": 1.36,
+					"op": "flash",
+					"color": "#ffcf6a",
+					"peak": 0.35,
+					"sec": 0.2
+				},
+				{
+					"t": 1.25,
+					"op": "embers",
+					"at": "ground",
+					"color": "#ffcf6a",
+					"n": 30,
+					"life": 1.5
 				}
 			]
 		},
 		"thousand_fists": {
 			"label": "มือเปล่า · กายาพันมือ",
 			"impact": 0.82,
-			"total": 1.5,
+			"total": 1.8,
 			"timeline": [
+				{
+					"t": 0.0,
+					"op": "bars",
+					"sec": 1.8
+				},
+				{
+					"t": 0.0,
+					"op": "tint",
+					"color": "#0e4a42",
+					"alpha": 0.55,
+					"life": 1.7
+				},
+				{
+					"t": 0.0,
+					"op": "rays",
+					"at": "center",
+					"color": "#bff8ee",
+					"life": 1.6
+				},
+				{
+					"t": 0.0,
+					"op": "aura",
+					"color": "#5fe0c8",
+					"life": 0.82
+				},
 				{
 					"t": 0.0,
 					"op": "ghost",
@@ -878,8 +1115,8 @@
 					"frame": "attack2",
 					"at": "center",
 					"repeat": {
-						"n": 8,
-						"every": 0.07,
+						"n": 10,
+						"every": 0.055,
 						"ring": [
 							28,
 							14
@@ -894,8 +1131,8 @@
 					"r": 8,
 					"life": 0.2,
 					"repeat": {
-						"n": 12,
-						"every": 0.05,
+						"n": 20,
+						"every": 0.03,
 						"jx": [
 							11,
 							29,
@@ -1022,14 +1259,67 @@
 						"n": 3,
 						"every": 0.05
 					}
+				},
+				{
+					"t": 0.96,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 0.82,
+					"op": "big_ring",
+					"at": "ground",
+					"color": "#bff8ee",
+					"life": 0.7
+				},
+				{
+					"t": 0.98,
+					"op": "flash",
+					"color": "#bff8ee",
+					"peak": 0.35,
+					"sec": 0.2
+				},
+				{
+					"t": 0.87,
+					"op": "embers",
+					"at": "ground",
+					"color": "#bff8ee",
+					"n": 30,
+					"life": 1.5
 				}
 			]
 		},
 		"waking_machine": {
 			"label": "กล · วันเครื่องตื่น",
 			"impact": 1.0,
-			"total": 1.75,
+			"total": 2.05,
 			"timeline": [
+				{
+					"t": 0.0,
+					"op": "bars",
+					"sec": 2.05
+				},
+				{
+					"t": 0.0,
+					"op": "tint",
+					"color": "#0e3a30",
+					"alpha": 0.55,
+					"life": 1.95
+				},
+				{
+					"t": 0.0,
+					"op": "rays",
+					"at": "center",
+					"color": "#7ae0ff",
+					"life": 1.85
+				},
+				{
+					"t": 0.0,
+					"op": "aura",
+					"color": "#8ad0a0",
+					"life": 1.0
+				},
 				{
 					"t": 0.0,
 					"op": "gear",
@@ -1040,8 +1330,8 @@
 					"life": 0.75,
 					"spin": 1.5,
 					"repeat": {
-						"n": 6,
-						"every": 0.05,
+						"n": 10,
+						"every": 0.035,
 						"ring": [
 							16,
 							20
@@ -1157,6 +1447,34 @@
 					"spread": 28,
 					"up": 26,
 					"life": 0.6
+				},
+				{
+					"t": 1.14,
+					"op": "slowmo",
+					"sec": 0.3,
+					"k": 0.35
+				},
+				{
+					"t": 1.0,
+					"op": "big_ring",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"life": 0.7
+				},
+				{
+					"t": 1.16,
+					"op": "flash",
+					"color": "#7ae0ff",
+					"peak": 0.35,
+					"sec": 0.2
+				},
+				{
+					"t": 1.05,
+					"op": "embers",
+					"at": "ground",
+					"color": "#7ae0ff",
+					"n": 30,
+					"life": 1.5
 				}
 			]
 		}

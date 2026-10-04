@@ -261,6 +261,7 @@ function skillView(dt) {
 	ctx.save(); ctx.translate(Math.round(sx), Math.round(sy));
 	if (S.zoom && S.zoom.k !== 1) { ctx.translate(S.zoom.x, S.zoom.y); ctx.scale(S.zoom.k, S.zoom.k); ctx.translate(-S.zoom.x, -S.zoom.y); }
 	drawBg();
+	for (const e of S.fx) if (e.under) e.draw(Math.min(1, e.t / e.dur), e.t);   // ชั้นหลังตัวละคร: ฟ้าเปลี่ยนสี · รัศมีแสง
 	idleT += dt; if (idleT >= K.FOE_IDLE_SEC) { idleT = 0; idleF = 1 - idleF; }
 	for (const f of foeLayout()) {
 		const key = 'mon/' + S.foe + (idleF ? '_idle1' : '');
@@ -270,7 +271,7 @@ function skillView(dt) {
 	const hf = S.flash.get('hero') || 0;
 	spr(S.heroFrame, S.hero.x, S.hero.y, { flash: hf });
 	if (S.dim > 0) { ctx.fillStyle = `rgba(13,8,20,${S.dim})`; ctx.fillRect(-4, -4, W() + 8, H() + 8); }
-	for (const e of S.fx) if (!e.ui) e.draw(Math.min(1, e.t / e.dur), e.t);
+	for (const e of S.fx) if (!e.ui && !e.under) e.draw(Math.min(1, e.t / e.dur), e.t);
 	ctx.restore();
 	for (const e of S.fx) if (e.ui) e.draw(Math.min(1, e.t / e.dur), e.t);   // ชั้นจอ: คัตอิน · จอวาบ (ไม่ซูม/ไม่สั่น)
 	if (S.grid) drawGrid();
@@ -555,6 +556,39 @@ function mech(at, col, life) {
 			ctx.fillStyle = shade(col, 0.4); ctx.fillRect(-6, 24, 12, 10); ctx.restore(); }
 		ctx.restore(); });
 }
+// ── คำสั่งบรรยากาศ (engine รอบ 3 · "อลังการขึ้นอีก") ──
+function under(dur, draw, delay = 0) { S.fx.push({ t: -delay, dur, under: true, draw: (p, t) => { if (t >= 0) draw(p, t); } }); }
+// แถบดำบน-ล่างค้างตลอดท่า (ต่อจากคัตอิน)
+function bars(sec) { S.fx.push({ t: 0, dur: sec, ui: true, draw: (p, t) => { const a = t > sec - 0.2 ? (sec - t) / 0.2 : 1, h = 14 * Math.max(0, a);
+	ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W(), h); ctx.fillRect(0, H() - h, W(), h); } }); }
+// ฟ้าเปลี่ยนสีตามสาย (ชั้นหลังตัวละคร)
+function tint(col, alpha, life) { under(life, (p, t) => { const a = t < 0.15 ? t / 0.15 : t > life - 0.3 ? (life - t) / 0.3 : 1;
+	const g = ctx.createLinearGradient(0, 0, 0, H()); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0.6)');
+	ctx.save(); ctx.globalAlpha = alpha * Math.max(0, a); ctx.fillStyle = g; ctx.fillRect(-10, -10, W() + 20, H() + 20); ctx.restore(); }); }
+// รัศมีแสงหมุนช้าหลังตัวละคร
+function rays(at, col, life) { under(life, (p, t) => { const a = (t < 0.2 ? t / 0.2 : t > life - 0.3 ? (life - t) / 0.3 : 1) * 0.28;
+	ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.max(0, a); ctx.fillStyle = col;
+	for (let i = 0; i < 12; i++) { const ang = i * Math.PI / 6 + t * 0.6; ctx.beginPath(); ctx.moveTo(at.x, at.y);
+		ctx.lineTo(at.x + Math.cos(ang - 0.09) * 260, at.y + Math.sin(ang - 0.09) * 260); ctx.lineTo(at.x + Math.cos(ang + 0.09) * 260, at.y + Math.sin(ang + 0.09) * 260); ctx.fill(); }
+	ctx.restore(); }); }
+// ออร่ารอบตัว Rion: วงเรืองเต้นเป็นจังหวะ + ประกายลอยขึ้น (ตามตัวไปทุกที่)
+function aura(col, life) { fx(life, (p, t) => { const c = { x: S.hero.x + SPRITE_C.x, y: S.hero.y + SPRITE_C.y + 6 }, a = t > life - 0.25 ? (life - t) / 0.25 : Math.min(1, t / 0.1);
+	ctx.save(); ctx.globalCompositeOperation = 'lighter'; const pulse = 1 + 0.12 * Math.sin(t * 30);
+	const g = ctx.createRadialGradient(c.x, c.y, 2, c.x, c.y, 30 * pulse); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+	ctx.globalAlpha = 0.55 * Math.max(0, a); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(c.x, c.y, 26 * pulse, 34 * pulse, 0, 0, Math.PI * 2); ctx.fill();
+	for (let i = 0; i < 10; i++) { const ph = (t * 1.6 + i / 10) % 1; ctx.globalAlpha = (1 - ph) * Math.max(0, a); ctx.fillStyle = i % 2 ? col : '#fff';
+		ctx.fillRect(c.x - 14 + ((i * 7) % 28), c.y + 20 - ph * 50, 1.5, 3); }
+	ctx.restore(); }); }
+function slowmo(sec, k) { S.slow = { left: sec, k }; }
+// คลื่นยักษ์กวาดทั้งจอ
+function bigRing(at, col, life) { fx(life, p => { const r = 10 + 290 * easeOut(p); ctx.save(); ctx.globalCompositeOperation = 'lighter';
+	ctx.globalAlpha = 0.8 * (1 - p); ctx.strokeStyle = col; ctx.lineWidth = 4 * (1 - p) + 1; ctx.beginPath(); ctx.ellipse(at.x, at.y, r, r * 0.45, 0, 0, Math.PI * 2); ctx.stroke();
+	ctx.globalAlpha = 0.5 * (1 - p); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(at.x, at.y, r * 0.92, r * 0.41, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }); }
+// ถ่านไฟ/ประกายลอยค้างทั่วฉาก
+function embers(at, col, n, life) { for (let i = 0; i < n; i++) { const x0 = at.x + ((i * 53) % 160) - 80, y0 = at.y + ((i * 29) % 30) - 10, d = (i % 7) * 0.05;
+	fx(life, (p, t) => { const a = (p < 0.15 ? p / 0.15 : 1 - (p - 0.15) / 0.85) * (0.6 + 0.4 * Math.sin(t * 20 + i));
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.max(0, a); ctx.fillStyle = i % 3 ? col : '#fff6c8';
+		ctx.fillRect(x0 + Math.sin(t * 3 + i) * 4, y0 - 40 * p, 1.5, 1.5); ctx.restore(); }, d); } }
 // ── ตัวเล่นท่าจากข้อมูล (FX engine) — อ่าน data/fx/ultimates.json ไฟล์เดียวกับเกม ──
 // แต่ละคำสั่งใน timeline เรียกฟังก์ชันวาดข้างบน · ตำแหน่ง/สี/ทำซ้ำ แปลจากข้อมูลตามกติกาใน _doc ของไฟล์
 const FXDB = DATA.fx;
@@ -609,6 +643,13 @@ function runOp(op, i, n, pts, A, school) {
 			case 'star': star(at, col, r, op.life); break;
 			case 'gear': gear(from, at, col, r, op.life, op.spin || 1); break;
 			case 'mech': mech(at, col, op.life); break;
+			case 'bars': bars(op.sec); break;
+			case 'tint': tint(col, op.alpha, op.life); break;
+			case 'rays': rays(at, col, op.life); break;
+			case 'aura': aura(col, op.life); break;
+			case 'slowmo': slowmo(op.sec, op.k); break;
+			case 'big_ring': bigRing(at, col, op.life); break;
+			case 'embers': embers(at, col, op.n, op.life); break;
 			default: console.warn('fx: ไม่รู้จักคำสั่ง', op.op);
 		}
 	}
@@ -642,7 +683,7 @@ function playTech(t) {
 	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
 	const from = heroPt();
 	banner((ult ? '◆ ไม้ตาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : shade(col, 0.3), ult);
-	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.dimTotal = 0.85;
+	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.dimTotal = 0.85;
 	const cine = ult && S.cine && CINE[t.school];
 	let impact = 0;
 	if (cine) {
@@ -673,6 +714,7 @@ function tick(now) {
 	const raw = Math.min(0.1, (now - last) / 1000); last = now;
 	let dt = raw * S.speed;
 	if (S.hitstop > 0 && S.tab === 'skills' && S.playing) { S.hitstop -= raw; dt *= 0.06; }   // หยุดภาพตอนกระทบ (hit-stop)
+	else if (S.slow && S.slow.left > 0 && S.tab === 'skills' && S.playing) { S.slow.left -= raw; dt *= S.slow.k; }   // สโลว์โมชันหลังหยุดภาพ
 	if (S.tab === 'clips') {
 		const c = CLIPS[S.clip];
 		if (S.playing && c.frames.length > 1) {
