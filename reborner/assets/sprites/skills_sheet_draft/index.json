@@ -1,5 +1,13 @@
 {
  "_doc": "ตัดจาก docs/art-bible/compendium/skill_sprite_sheet.jpg ด้วย tools/sprites/skill_sheet_cut.py · ร่าง ยังไม่เข้าเกม · รหัส = ลำดับตำแหน่งในแผง (ป้ายในชีตบางช่องผิด) · หน้าเทสวาดตาม timeline/poses/stage ชุดนี้",
+ "vfx_samples": [
+  "SL01",
+  "PC06",
+  "CR04",
+  "BD10",
+  "ST05",
+  "DV08"
+ ],
  "ms": 70,
  "timeline": [
   {
@@ -146,7 +154,12 @@
     130,
     42
    ],
-   "hero_px_removed": 803
+   "hero_px_removed": 803,
+   "colors": [
+    "#f59d8d",
+    "#f03039",
+    "#ef071a"
+   ]
   },
   {
    "code": "SL02",
@@ -162,7 +175,12 @@
     122,
     53
    ],
-   "hero_px_removed": 2678
+   "hero_px_removed": 2678,
+   "colors": [
+    "#f7c984",
+    "#ef8e5e",
+    "#ec3022"
+   ]
   },
   {
    "code": "SL03",
@@ -178,7 +196,12 @@
     83,
     54
    ],
-   "hero_px_removed": 1072
+   "hero_px_removed": 1072,
+   "colors": [
+    "#ffe271",
+    "#ffa84b",
+    "#ff5119"
+   ]
   },
   {
    "code": "SL04",
@@ -194,7 +217,12 @@
     138,
     54
    ],
-   "hero_px_removed": 599
+   "hero_px_removed": 599,
+   "colors": [
+    "#fb9949",
+    "#fa5327",
+    "#fc1512"
+   ]
   },
   {
    "code": "SL05",
@@ -210,7 +238,12 @@
     144,
     46
    ],
-   "hero_px_removed": 863
+   "hero_px_removed": 863,
+   "colors": [
+    "#fde0a0",
+    "#f11e2b",
+    "#f3061a"
+   ]
   },
   {
    "code": "SL06",
@@ -226,7 +259,12 @@
     128,
     51
    ],
-   "hero_px_removed": 1126
+   "hero_px_removed": 1126,
+   "colors": [
+    "#fbae8d",
+    "#f85253",
+    "#fc132a"
+   ]
   },
   {
    "code": "SL07",
@@ -242,7 +280,12 @@
     115,
     43
    ],
-   "hero_px_removed": 963
+   "hero_px_removed": 963,
+   "colors": [
+    "#ffe8d1",
+    "#f78c7e",
+    "#f50e22"
+   ]
   },
   {
    "code": "SL08",
@@ -258,7 +301,12 @@
     104,
     52
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffcc7c",
+    "#ff9050",
+    "#ff4a22"
+   ]
   },
   {
    "code": "SL09",
@@ -274,7 +322,12 @@
     123,
     45
    ],
-   "hero_px_removed": 1071
+   "hero_px_removed": 1071,
+   "colors": [
+    "#f3d0f0",
+    "#d19cd9",
+    "#ad5ee3"
+   ]
   },
   {
    "code": "SL10",
@@ -290,7 +343,12 @@
     138,
     42
    ],
-   "hero_px_removed": 820
+   "hero_px_removed": 820,
+   "colors": [
+    "#fdc096",
+    "#f84f3f",
+    "#f90415"
+   ]
   },
   {
    "code": "SL11",
@@ -306,7 +364,12 @@
     154,
     46
    ],
-   "hero_px_removed": 874
+   "hero_px_removed": 874,
+   "colors": [
+    "#f7a19d",
+    "#f36563",
+    "#f72522"
+   ]
   },
   {
    "code": "SL12",
@@ -322,7 +385,12 @@
     143,
     47
    ],
-   "hero_px_removed": 774
+   "hero_px_removed": 774,
+   "colors": [
+    "#fdb380",
+    "#fc7553",
+    "#fd2b24"
+   ]
   },
   {
    "code": "SL13",
@@ -338,7 +406,12 @@
     84,
     48
    ],
-   "hero_px_removed": 1021
+   "hero_px_removed": 1021,
+   "colors": [
+    "#fec3a8",
+    "#ef4642",
+    "#f1030c"
+   ]
   },
   {
    "code": "SL14",
@@ -354,7 +427,12 @@
     96,
     50
    ],
-   "hero_px_removed": 1057
+   "hero_px_removed": 1057,
+   "colors": [
+    "#ffc77e",
+    "#ff8047",
+    "#ff3111"
+   ]
   },
   {
    "code": "SL15",
@@ -370,7 +448,12 @@
     140,
     42
    ],
-   "hero_px_removed": 1536
+   "hero_px_removed": 1536,
+   "colors": [
+    "#f1788a",
+    "#e92650",
+    "#e90433"
+   ]
   },
   {
    "code": "SL16",
@@ -386,7 +469,12 @@
     157,
     53
    ],
-   "hero_px_removed": 620
+   "hero_px_removed": 620,
+   "colors": [
+    "#fc91a0",
+    "#fc4865",
+    "#fc143a"
+   ]
   },
   {
    "code": "SL17",
@@ -402,7 +490,12 @@
     142,
     51
    ],
-   "hero_px_removed": 643
+   "hero_px_removed": 643,
+   "colors": [
+    "#facebc",
+    "#f39dae",
+    "#f65442"
+   ]
   },
   {
    "code": "SL18",
@@ -418,7 +511,12 @@
     91,
     58
    ],
-   "hero_px_removed": 1359
+   "hero_px_removed": 1359,
+   "colors": [
+    "#fdbe9b",
+    "#f94346",
+    "#fc040e"
+   ]
   },
   {
    "code": "SL19",
@@ -434,7 +532,12 @@
     125,
     49
    ],
-   "hero_px_removed": 1157
+   "hero_px_removed": 1157,
+   "colors": [
+    "#b0ddfb",
+    "#84a6ea",
+    "#417fef"
+   ]
   },
   {
    "code": "SL20",
@@ -450,7 +553,12 @@
     100,
     51
    ],
-   "hero_px_removed": 1296
+   "hero_px_removed": 1296,
+   "colors": [
+    "#e7c3c0",
+    "#d39cac",
+    "#d55755"
+   ]
   },
   {
    "code": "SL21",
@@ -466,7 +574,12 @@
     129,
     54
    ],
-   "hero_px_removed": 971
+   "hero_px_removed": 971,
+   "colors": [
+    "#f88451",
+    "#f83a28",
+    "#fa0c1a"
+   ]
   },
   {
    "code": "SL22",
@@ -482,7 +595,12 @@
     147,
     51
    ],
-   "hero_px_removed": 1014
+   "hero_px_removed": 1014,
+   "colors": [
+    "#fa8e7b",
+    "#f73c4b",
+    "#f90b32"
+   ]
   },
   {
    "code": "SL23",
@@ -498,7 +616,12 @@
     125,
     50
    ],
-   "hero_px_removed": 639
+   "hero_px_removed": 639,
+   "colors": [
+    "#fcb680",
+    "#fb854e",
+    "#fd4117"
+   ]
   },
   {
    "code": "SL24",
@@ -514,7 +637,12 @@
     126,
     54
    ],
-   "hero_px_removed": 1274
+   "hero_px_removed": 1274,
+   "colors": [
+    "#ffcb79",
+    "#ffa253",
+    "#ff682a"
+   ]
   },
   {
    "code": "SL25",
@@ -530,7 +658,12 @@
     108,
     53
    ],
-   "hero_px_removed": 1233
+   "hero_px_removed": 1233,
+   "colors": [
+    "#fff4a6",
+    "#ff9052",
+    "#ff0617"
+   ]
   },
   {
    "code": "SL26",
@@ -546,7 +679,12 @@
     129,
     62
    ],
-   "hero_px_removed": 1279
+   "hero_px_removed": 1279,
+   "colors": [
+    "#fdb98b",
+    "#fc725b",
+    "#fd212c"
+   ]
   },
   {
    "code": "SL27",
@@ -562,7 +700,12 @@
     138,
     57
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#f6a1bd",
+    "#ef60a4",
+    "#ee1a6a"
+   ]
   },
   {
    "code": "SL28",
@@ -578,7 +721,12 @@
     124,
     47
    ],
-   "hero_px_removed": 789
+   "hero_px_removed": 789,
+   "colors": [
+    "#f6b179",
+    "#ed824d",
+    "#ef4722"
+   ]
   },
   {
    "code": "SL29",
@@ -594,7 +742,12 @@
     105,
     51
    ],
-   "hero_px_removed": 656
+   "hero_px_removed": 656,
+   "colors": [
+    "#ee7568",
+    "#e73236",
+    "#e80c16"
+   ]
   },
   {
    "code": "SL30",
@@ -610,7 +763,12 @@
     154,
     66
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffd08c",
+    "#ff6b59",
+    "#ff212c"
+   ]
   },
   {
    "code": "PC01",
@@ -626,7 +784,12 @@
     50,
     22
    ],
-   "hero_px_removed": 2183
+   "hero_px_removed": 2183,
+   "colors": [
+    "#f7fdff",
+    "#68a3f3",
+    "#3070f6"
+   ]
   },
   {
    "code": "PC02",
@@ -642,7 +805,12 @@
     61,
     43
    ],
-   "hero_px_removed": 2510
+   "hero_px_removed": 2510,
+   "colors": [
+    "#eedde0",
+    "#b8daf6",
+    "#afa7d1"
+   ]
   },
   {
    "code": "PC03",
@@ -658,7 +826,12 @@
     39,
     35
    ],
-   "hero_px_removed": 3016
+   "hero_px_removed": 3016,
+   "colors": [
+    "#c1e8fe",
+    "#8cbaf5",
+    "#4d8ef3"
+   ]
   },
   {
    "code": "PC04",
@@ -674,7 +847,12 @@
     58,
     43
    ],
-   "hero_px_removed": 2216
+   "hero_px_removed": 2216,
+   "colors": [
+    "#f6fffe",
+    "#76b7f4",
+    "#227ff5"
+   ]
   },
   {
    "code": "PC05",
@@ -690,7 +868,12 @@
     76,
     45
    ],
-   "hero_px_removed": 2577
+   "hero_px_removed": 2577,
+   "colors": [
+    "#a4d6fb",
+    "#549ef7",
+    "#1264f8"
+   ]
   },
   {
    "code": "PC06",
@@ -706,7 +889,12 @@
     90,
     36
    ],
-   "hero_px_removed": 1882
+   "hero_px_removed": 1882,
+   "colors": [
+    "#a6ccfb",
+    "#6a9bf6",
+    "#1b4df9"
+   ]
   },
   {
    "code": "PC07",
@@ -722,7 +910,12 @@
     90,
     54
    ],
-   "hero_px_removed": 1336
+   "hero_px_removed": 1336,
+   "colors": [
+    "#e2f9fe",
+    "#a9dcfa",
+    "#49aaf4"
+   ]
   },
   {
    "code": "PC08",
@@ -738,7 +931,12 @@
     95,
     44
    ],
-   "hero_px_removed": 1226
+   "hero_px_removed": 1226,
+   "colors": [
+    "#f4feff",
+    "#aac5f0",
+    "#4584f3"
+   ]
   },
   {
    "code": "PC09",
@@ -754,7 +952,12 @@
     62,
     33
    ],
-   "hero_px_removed": 2194
+   "hero_px_removed": 2194,
+   "colors": [
+    "#add0f9",
+    "#6f9ff4",
+    "#2d66fa"
+   ]
   },
   {
    "code": "PC10",
@@ -770,7 +973,12 @@
     92,
     57
    ],
-   "hero_px_removed": 1369
+   "hero_px_removed": 1369,
+   "colors": [
+    "#4cbcfc",
+    "#1a8dfc",
+    "#0b72fe"
+   ]
   },
   {
    "code": "PC11",
@@ -786,7 +994,12 @@
     63,
     44
    ],
-   "hero_px_removed": 2250
+   "hero_px_removed": 2250,
+   "colors": [
+    "#d7e0f9",
+    "#b9c8f4",
+    "#6f99f9"
+   ]
   },
   {
    "code": "PC12",
@@ -802,7 +1015,12 @@
     103,
     52
    ],
-   "hero_px_removed": 2685
+   "hero_px_removed": 2685,
+   "colors": [
+    "#d6f5fe",
+    "#9bd8f8",
+    "#76bbf3"
+   ]
   },
   {
    "code": "PC13",
@@ -818,7 +1036,12 @@
     58,
     31
    ],
-   "hero_px_removed": 1759
+   "hero_px_removed": 1759,
+   "colors": [
+    "#fffaf7",
+    "#e5eaed",
+    "#efa47b"
+   ]
   },
   {
    "code": "PC14",
@@ -834,7 +1057,12 @@
     72,
     53
    ],
-   "hero_px_removed": 1935
+   "hero_px_removed": 1935,
+   "colors": [
+    "#a4aaf8",
+    "#5c69f4",
+    "#2d3cf9"
+   ]
   },
   {
    "code": "PC15",
@@ -850,7 +1078,12 @@
     87,
     45
    ],
-   "hero_px_removed": 1793
+   "hero_px_removed": 1793,
+   "colors": [
+    "#f8fdfc",
+    "#daf0fc",
+    "#2a71f4"
+   ]
   },
   {
    "code": "PC16",
@@ -866,7 +1099,12 @@
     43,
     20
    ],
-   "hero_px_removed": 2566
+   "hero_px_removed": 2566,
+   "colors": [
+    "#b9d4fb",
+    "#84a6f2",
+    "#4c77f5"
+   ]
   },
   {
    "code": "PC17",
@@ -882,7 +1120,12 @@
     59,
     35
    ],
-   "hero_px_removed": 1886
+   "hero_px_removed": 1886,
+   "colors": [
+    "#f5fefc",
+    "#98b9ed",
+    "#3c83f5"
+   ]
   },
   {
    "code": "PC18",
@@ -898,7 +1141,12 @@
     78,
     44
    ],
-   "hero_px_removed": 1301
+   "hero_px_removed": 1301,
+   "colors": [
+    "#e9f5fb",
+    "#a0bcf4",
+    "#2357f8"
+   ]
   },
   {
    "code": "PC19",
@@ -914,7 +1162,12 @@
     85,
     46
    ],
-   "hero_px_removed": 1295
+   "hero_px_removed": 1295,
+   "colors": [
+    "#ace4fd",
+    "#53a3f7",
+    "#196bf8"
+   ]
   },
   {
    "code": "PC20",
@@ -930,7 +1183,12 @@
     85,
     39
    ],
-   "hero_px_removed": 1639
+   "hero_px_removed": 1639,
+   "colors": [
+    "#bfe4fd",
+    "#89b7f4",
+    "#3d7af7"
+   ]
   },
   {
    "code": "PC21",
@@ -946,7 +1204,12 @@
     83,
     45
    ],
-   "hero_px_removed": 1416
+   "hero_px_removed": 1416,
+   "colors": [
+    "#bbccf4",
+    "#7798f7",
+    "#385ef9"
+   ]
   },
   {
    "code": "PC22",
@@ -962,7 +1225,12 @@
     96,
     42
    ],
-   "hero_px_removed": 1326
+   "hero_px_removed": 1326,
+   "colors": [
+    "#f1dfe3",
+    "#efbcc1",
+    "#f77e82"
+   ]
   },
   {
    "code": "PC23",
@@ -978,7 +1246,12 @@
     89,
     39
    ],
-   "hero_px_removed": 1883
+   "hero_px_removed": 1883,
+   "colors": [
+    "#d1e1f7",
+    "#a8c4f2",
+    "#f6b4a9"
+   ]
   },
   {
    "code": "PC24",
@@ -994,7 +1267,12 @@
     89,
     43
    ],
-   "hero_px_removed": 1367
+   "hero_px_removed": 1367,
+   "colors": [
+    "#7bd3fb",
+    "#3498f8",
+    "#0d65fa"
+   ]
   },
   {
    "code": "PC25",
@@ -1010,7 +1288,12 @@
     81,
     39
    ],
-   "hero_px_removed": 1256
+   "hero_px_removed": 1256,
+   "colors": [
+    "#d8e2f5",
+    "#a0b7f6",
+    "#4668f9"
+   ]
   },
   {
    "code": "PC26",
@@ -1026,7 +1309,12 @@
     38,
     22
    ],
-   "hero_px_removed": 2722
+   "hero_px_removed": 2722,
+   "colors": [
+    "#c9ddfc",
+    "#9cb7f3",
+    "#6b8ff3"
+   ]
   },
   {
    "code": "PC27",
@@ -1042,7 +1330,12 @@
     104,
     49
    ],
-   "hero_px_removed": 1183
+   "hero_px_removed": 1183,
+   "colors": [
+    "#aee1fd",
+    "#81bdfa",
+    "#5d94fd"
+   ]
   },
   {
    "code": "PC28",
@@ -1058,7 +1351,12 @@
     90,
     25
    ],
-   "hero_px_removed": 1334
+   "hero_px_removed": 1334,
+   "colors": [
+    "#f0dfee",
+    "#e6cbe6",
+    "#f1a7b4"
+   ]
   },
   {
    "code": "PC29",
@@ -1074,7 +1372,12 @@
     90,
     37
    ],
-   "hero_px_removed": 1381
+   "hero_px_removed": 1381,
+   "colors": [
+    "#c1ddfb",
+    "#7ca7f7",
+    "#3064f9"
+   ]
   },
   {
    "code": "PC30",
@@ -1090,7 +1393,10 @@
     134,
     62
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffffff"
+   ]
   },
   {
    "code": "CR01",
@@ -1106,7 +1412,12 @@
     132,
     48
    ],
-   "hero_px_removed": 2234
+   "hero_px_removed": 2234,
+   "colors": [
+    "#fee7a7",
+    "#eeb76c",
+    "#e35617"
+   ]
   },
   {
    "code": "CR02",
@@ -1122,7 +1433,12 @@
     143,
     38
    ],
-   "hero_px_removed": 2054
+   "hero_px_removed": 2054,
+   "colors": [
+    "#fce1af",
+    "#eeb480",
+    "#e0661a"
+   ]
   },
   {
    "code": "CR03",
@@ -1138,7 +1454,12 @@
     130,
     45
    ],
-   "hero_px_removed": 311
+   "hero_px_removed": 311,
+   "colors": [
+    "#f4ba7e",
+    "#e89b5b",
+    "#eb7425"
+   ]
   },
   {
    "code": "CR04",
@@ -1154,7 +1475,12 @@
     111,
     52
    ],
-   "hero_px_removed": 1473
+   "hero_px_removed": 1473,
+   "colors": [
+    "#feebc2",
+    "#f6bf89",
+    "#f57e3f"
+   ]
   },
   {
    "code": "CR05",
@@ -1170,7 +1496,12 @@
     119,
     50
    ],
-   "hero_px_removed": 1103
+   "hero_px_removed": 1103,
+   "colors": [
+    "#fff3ba",
+    "#b2d7d3",
+    "#fed271"
+   ]
   },
   {
    "code": "CR06",
@@ -1186,7 +1517,12 @@
     76,
     58
    ],
-   "hero_px_removed": 1836
+   "hero_px_removed": 1836,
+   "colors": [
+    "#fcd9b8",
+    "#eca97c",
+    "#ea743c"
+   ]
   },
   {
    "code": "CR07",
@@ -1202,7 +1538,12 @@
     138,
     55
    ],
-   "hero_px_removed": 1812
+   "hero_px_removed": 1812,
+   "colors": [
+    "#fbdba9",
+    "#f5b475",
+    "#f07b35"
+   ]
   },
   {
    "code": "CR08",
@@ -1218,7 +1559,12 @@
     124,
     56
    ],
-   "hero_px_removed": 1875
+   "hero_px_removed": 1875,
+   "colors": [
+    "#d4c3ab",
+    "#d0aa88",
+    "#de823e"
+   ]
   },
   {
    "code": "CR09",
@@ -1234,7 +1580,12 @@
     126,
     56
    ],
-   "hero_px_removed": 3382
+   "hero_px_removed": 3382,
+   "colors": [
+    "#fcdc86",
+    "#fabd5d",
+    "#fb8f28"
+   ]
   },
   {
    "code": "CR10",
@@ -1250,7 +1601,12 @@
     120,
     51
    ],
-   "hero_px_removed": 3498
+   "hero_px_removed": 3498,
+   "colors": [
+    "#fed19e",
+    "#fec080",
+    "#fea85f"
+   ]
   },
   {
    "code": "CR11",
@@ -1266,7 +1622,12 @@
     144,
     55
    ],
-   "hero_px_removed": 1644
+   "hero_px_removed": 1644,
+   "colors": [
+    "#f7b578",
+    "#f49854",
+    "#f57329"
+   ]
   },
   {
    "code": "CR12",
@@ -1282,7 +1643,12 @@
     152,
     53
    ],
-   "hero_px_removed": 891
+   "hero_px_removed": 891,
+   "colors": [
+    "#f7bd7a",
+    "#ec9650",
+    "#ed7022"
+   ]
   },
   {
    "code": "CR13",
@@ -1298,7 +1664,12 @@
     133,
     54
    ],
-   "hero_px_removed": 1100
+   "hero_px_removed": 1100,
+   "colors": [
+    "#ffeebb",
+    "#fdcb83",
+    "#fc943b"
+   ]
   },
   {
    "code": "CR14",
@@ -1314,7 +1685,12 @@
     119,
     53
    ],
-   "hero_px_removed": 2006
+   "hero_px_removed": 2006,
+   "colors": [
+    "#facd73",
+    "#f1a349",
+    "#f0741c"
+   ]
   },
   {
    "code": "CR15",
@@ -1330,7 +1706,12 @@
     139,
     59
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#fee8bb",
+    "#fbc489",
+    "#fb8d3a"
+   ]
   },
   {
    "code": "CR16",
@@ -1346,7 +1727,12 @@
     140,
     59
    ],
-   "hero_px_removed": 630
+   "hero_px_removed": 630,
+   "colors": [
+    "#f4b174",
+    "#ee9451",
+    "#f0752d"
+   ]
   },
   {
    "code": "CR17",
@@ -1362,7 +1748,12 @@
     139,
     62
    ],
-   "hero_px_removed": 1625
+   "hero_px_removed": 1625,
+   "colors": [
+    "#ebb280",
+    "#e6985a",
+    "#e67a39"
+   ]
   },
   {
    "code": "CR18",
@@ -1378,7 +1769,12 @@
     114,
     52
    ],
-   "hero_px_removed": 1209
+   "hero_px_removed": 1209,
+   "colors": [
+    "#fdddb8",
+    "#f7c097",
+    "#f28e5c"
+   ]
   },
   {
    "code": "CR19",
@@ -1394,7 +1790,12 @@
     73,
     57
    ],
-   "hero_px_removed": 2890
+   "hero_px_removed": 2890,
+   "colors": [
+    "#e8a97f",
+    "#e09266",
+    "#e37a51"
+   ]
   },
   {
    "code": "CR20",
@@ -1410,7 +1811,12 @@
     134,
     57
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#fabf80",
+    "#f99c4e",
+    "#fa7a24"
+   ]
   },
   {
    "code": "CR21",
@@ -1426,7 +1832,12 @@
     144,
     54
    ],
-   "hero_px_removed": 825
+   "hero_px_removed": 825,
+   "colors": [
+    "#fabf7f",
+    "#f7a159",
+    "#f87b2b"
+   ]
   },
   {
    "code": "CR22",
@@ -1442,7 +1853,12 @@
     152,
     54
    ],
-   "hero_px_removed": 2943
+   "hero_px_removed": 2943,
+   "colors": [
+    "#f4b26e",
+    "#eb904b",
+    "#eb6d21"
+   ]
   },
   {
    "code": "CR23",
@@ -1458,7 +1874,12 @@
     129,
     43
    ],
-   "hero_px_removed": 2250
+   "hero_px_removed": 2250,
+   "colors": [
+    "#f6c075",
+    "#e49148",
+    "#e35f13"
+   ]
   },
   {
    "code": "CR24",
@@ -1474,7 +1895,12 @@
     79,
     50
    ],
-   "hero_px_removed": 1206
+   "hero_px_removed": 1206,
+   "colors": [
+    "#f6c285",
+    "#efa05b",
+    "#f07c2f"
+   ]
   },
   {
    "code": "CR25",
@@ -1490,7 +1916,12 @@
     132,
     54
    ],
-   "hero_px_removed": 2745
+   "hero_px_removed": 2745,
+   "colors": [
+    "#fac489",
+    "#f9aa64",
+    "#fa8539"
+   ]
   },
   {
    "code": "CR26",
@@ -1506,7 +1937,12 @@
     136,
     54
    ],
-   "hero_px_removed": 418
+   "hero_px_removed": 418,
+   "colors": [
+    "#f9c17b",
+    "#f39c4f",
+    "#f67423"
+   ]
   },
   {
    "code": "CR27",
@@ -1522,7 +1958,12 @@
     126,
     53
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffc36b",
+    "#ffa94b",
+    "#ff8625"
+   ]
   },
   {
    "code": "CR28",
@@ -1538,7 +1979,12 @@
     128,
     57
    ],
-   "hero_px_removed": 726
+   "hero_px_removed": 726,
+   "colors": [
+    "#f8bb79",
+    "#f6a662",
+    "#f88f43"
+   ]
   },
   {
    "code": "CR29",
@@ -1554,7 +2000,12 @@
     108,
     55
    ],
-   "hero_px_removed": 1940
+   "hero_px_removed": 1940,
+   "colors": [
+    "#e9a77f",
+    "#e29369",
+    "#e57e49"
+   ]
   },
   {
    "code": "CR30",
@@ -1570,7 +2021,10 @@
     152,
     61
    ],
-   "hero_px_removed": 0
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffffff"
+   ]
   },
   {
    "code": "BD01",
@@ -1586,7 +2040,12 @@
     31,
     34
    ],
-   "hero_px_removed": 3331
+   "hero_px_removed": 3331,
+   "colors": [
+    "#e5ffff",
+    "#89e5e4",
+    "#54e5e1"
+   ]
   },
   {
    "code": "BD02",
@@ -1602,7 +2061,12 @@
     85,
     35
    ],
-   "hero_px_removed": 2267
+   "hero_px_removed": 2267,
+   "colors": [
+    "#a7f3f3",
+    "#78e5e1",
+    "#4fe7dc"
+   ]
   },
   {
    "code": "BD03",
@@ -1618,7 +2082,12 @@
     89,
     53
    ],
-   "hero_px_removed": 2575
+   "hero_px_removed": 2575,
+   "colors": [
+    "#e4f8fa",
+    "#9adcdd",
+    "#7dede5"
+   ]
   },
   {
    "code": "BD04",
@@ -1634,7 +2103,12 @@
     23,
     29
    ],
-   "hero_px_removed": 1977
+   "hero_px_removed": 1977,
+   "colors": [
+    "#e5ffff",
+    "#a3e7e6",
+    "#6be5df"
+   ]
   },
   {
    "code": "BD05",
@@ -1650,7 +2124,12 @@
     40,
     37
    ],
-   "hero_px_removed": 2739
+   "hero_px_removed": 2739,
+   "colors": [
+    "#e4fffe",
+    "#a5ecec",
+    "#66ebe1"
+   ]
   },
   {
    "code": "BD06",
@@ -1666,7 +2145,12 @@
     37,
     36
    ],
-   "hero_px_removed": 2604
+   "hero_px_removed": 2604,
+   "colors": [
+    "#9df1ed",
+    "#67e2d9",
+    "#3ce7d5"
+   ]
   },
   {
    "code": "BD07",
@@ -1682,7 +2166,12 @@
     62,
     50
    ],
-   "hero_px_removed": 2235
+   "hero_px_removed": 2235,
+   "colors": [
+    "#b9dde4",
+    "#9bebe8",
+    "#9addde"
+   ]
   },
   {
    "code": "BD08",
@@ -1698,7 +2187,12 @@
     81,
     38
    ],
-   "hero_px_removed": 1645
+   "hero_px_removed": 1645,
+   "colors": [
+    "#fdfce4",
+    "#fcf1cd",
+    "#c7f0d7"
+   ]
   },
   {
    "code": "BD09",
@@ -1714,7 +2208,12 @@
     80,
     42
    ],
-   "hero_px_removed": 1193
+   "hero_px_removed": 1193,
+   "colors": [
+    "#fbcb7c",
+    "#e4974f",
+    "#e56c24"
+   ]
   },
   {
    "code": "BD10",
@@ -1730,7 +2229,12 @@
     39,
     38
    ],
-   "hero_px_removed": 2244
+   "hero_px_removed": 2244,
+   "colors": [
+    "#d7feff",
+    "#7ee3e3",
+    "#5fe7e1"
+   ]
   },
   {
    "code": "BD11",
@@ -1746,7 +2250,12 @@
     26,
     32
    ],
-   "hero_px_removed": 3040
+   "hero_px_removed": 3040,
+   "colors": [
+    "#dffefe",
+    "#62ded5",
+    "#3ae6d9"
+   ]
   },
   {
    "code": "BD12",
@@ -1762,7 +2271,12 @@
     49,
     36
    ],
-   "hero_px_removed": 2330
+   "hero_px_removed": 2330,
+   "colors": [
+    "#fbc67b",
+    "#e9874c",
+    "#f04c1a"
+   ]
   },
   {
    "code": "BD13",
@@ -1778,7 +2292,12 @@
     33,
     29
    ],
-   "hero_px_removed": 2315
+   "hero_px_removed": 2315,
+   "colors": [
+    "#fbc27d",
+    "#e88347",
+    "#f15019"
+   ]
   },
   {
    "code": "BD14",
@@ -1794,7 +2313,12 @@
     27,
     28
    ],
-   "hero_px_removed": 1975
+   "hero_px_removed": 1975,
+   "colors": [
+    "#adfafa",
+    "#78e8e4",
+    "#47ebdb"
+   ]
   },
   {
    "code": "BD15",
@@ -1810,7 +2334,12 @@
     38,
     35
    ],
-   "hero_px_removed": 1914
+   "hero_px_removed": 1914,
+   "colors": [
+    "#b6f9f8",
+    "#74ebe3",
+    "#42ebdc"
+   ]
   },
   {
    "code": "BD16",
@@ -1826,7 +2355,12 @@
     67,
     40
    ],
-   "hero_px_removed": 2591
+   "hero_px_removed": 2591,
+   "colors": [
+    "#e9e5d8",
+    "#edcbaa",
+    "#eb9b65"
+   ]
   },
   {
    "code": "BD17",
@@ -1842,7 +2376,12 @@
     72,
     37
    ],
-   "hero_px_removed": 2516
+   "hero_px_removed": 2516,
+   "colors": [
+    "#f7e5c8",
+    "#c2ecdd",
+    "#eeb893"
+   ]
   },
   {
    "code": "BD18",
@@ -1858,7 +2397,12 @@
     57,
     31
    ],
-   "hero_px_removed": 2874
+   "hero_px_removed": 2874,
+   "colors": [
+    "#cffefc",
+    "#9dfbf6",
+    "#48e7dd"
+   ]
   },
   {
    "code": "BD19",
@@ -1874,7 +2418,12 @@
     28,
     32
    ],
-   "hero_px_removed": 2179
+   "hero_px_removed": 2179,
+   "colors": [
+    "#a9f7f4",
+    "#78eae1",
+    "#47ead7"
+   ]
   },
   {
    "code": "BD20",
@@ -1890,7 +2439,12 @@
     58,
     44
    ],
-   "hero_px_removed": 1963
+   "hero_px_removed": 1963,
+   "colors": [
+    "#defdfb",
+    "#88f4f0",
+    "#22edd7"
+   ]
   },
   {
    "code": "BD21",
@@ -1906,7 +2460,12 @@
     112,
     38
    ],
-   "hero_px_removed": 1485
+   "hero_px_removed": 1485,
+   "colors": [
+    "#92d9f9",
+    "#62b3ef",
+    "#298bf0"
+   ]
   },
   {
    "code": "BD22",
@@ -1922,7 +2481,12 @@
     93,
     36
    ],
-   "hero_px_removed": 1009
+   "hero_px_removed": 1009,
+   "colors": [
+    "#dffbfe",
+    "#8ee4fa",
+    "#2388f0"
+   ]
   },
   {
    "code": "BD23",
@@ -1938,7 +2502,12 @@
     98,
     31
    ],
-   "hero_px_removed": 2404
+   "hero_px_removed": 2404,
+   "colors": [
+    "#f6bc8e",
+    "#efa67b",
+    "#eb8755"
+   ]
   },
   {
    "code": "BD24",
@@ -1954,7 +2523,12 @@
     36,
     37
    ],
-   "hero_px_removed": 1579
+   "hero_px_removed": 1579,
+   "colors": [
+    "#adf6f2",
+    "#7ae7dc",
+    "#42e8ce"
+   ]
   },
   {
    "code": "BD25",
@@ -1970,7 +2544,12 @@
     44,
     41
    ],
-   "hero_px_removed": 1894
+   "hero_px_removed": 1894,
+   "colors": [
+    "#94f5f3",
+    "#5ae7e1",
+    "#25ebde"
+   ]
   },
   {
    "code": "BD26",
@@ -1986,7 +2565,12 @@
     113,
     35
    ],
-   "hero_px_removed": 2233
+   "hero_px_removed": 2233,
+   "colors": [
+    "#c9feff",
+    "#7ef9f7",
+    "#5ae9e9"
+   ]
   },
   {
    "code": "BD27",
@@ -2002,7 +2586,12 @@
     83,
     35
    ],
-   "hero_px_removed": 840
+   "hero_px_removed": 840,
+   "colors": [
+    "#f9fffe",
+    "#bdeceb",
+    "#87ece0"
+   ]
   },
   {
    "code": "BD28",
@@ -2018,7 +2607,12 @@
     54,
     32
    ],
-   "hero_px_removed": 1468
+   "hero_px_removed": 1468,
+   "colors": [
+    "#f8c274",
+    "#ea934f",
+    "#ee6824"
+   ]
   },
   {
    "code": "BD29",
@@ -2034,7 +2628,12 @@
     29,
     34
    ],
-   "hero_px_removed": 2098
+   "hero_px_removed": 2098,
+   "colors": [
+    "#fcd685",
+    "#eba55c",
+    "#f07934"
+   ]
   },
   {
    "code": "BD30",
@@ -2050,7 +2649,12 @@
     141,
     46
    ],
-   "hero_px_removed": 830
+   "hero_px_removed": 830,
+   "colors": [
+    "#ffffff",
+    "#adefff",
+    "#85c6ff"
+   ]
   },
   {
    "code": "ST01",
@@ -2066,7 +2670,12 @@
     71,
     37
    ],
-   "hero_px_removed": 1860
+   "hero_px_removed": 1860,
+   "colors": [
+    "#f8b390",
+    "#ee745d",
+    "#f03537"
+   ]
   },
   {
    "code": "ST02",
@@ -2082,7 +2691,12 @@
     99,
     44
    ],
-   "hero_px_removed": 1448
+   "hero_px_removed": 1448,
+   "colors": [
+    "#d89cd9",
+    "#ae5fd1",
+    "#7d2ced"
+   ]
   },
   {
    "code": "ST03",
@@ -2098,7 +2712,12 @@
     136,
     42
    ],
-   "hero_px_removed": 2205
+   "hero_px_removed": 2205,
+   "colors": [
+    "#f9ae81",
+    "#ee7053",
+    "#f33223"
+   ]
   },
   {
    "code": "ST04",
@@ -2114,7 +2733,12 @@
     98,
     43
    ],
-   "hero_px_removed": 861
+   "hero_px_removed": 861,
+   "colors": [
+    "#f8a567",
+    "#eb623f",
+    "#ee301b"
+   ]
   },
   {
    "code": "ST05",
@@ -2130,7 +2754,12 @@
     118,
     39
    ],
-   "hero_px_removed": 793
+   "hero_px_removed": 793,
+   "colors": [
+    "#bfb1f3",
+    "#816ef8",
+    "#4b31fc"
+   ]
   },
   {
    "code": "ST06",
@@ -2146,7 +2775,12 @@
     86,
     40
    ],
-   "hero_px_removed": 960
+   "hero_px_removed": 960,
+   "colors": [
+    "#fdcaeb",
+    "#f46cab",
+    "#f5166a"
+   ]
   },
   {
    "code": "ST07",
@@ -2162,7 +2796,12 @@
     134,
     36
    ],
-   "hero_px_removed": 1190
+   "hero_px_removed": 1190,
+   "colors": [
+    "#f7948f",
+    "#ed4957",
+    "#ef132f"
+   ]
   },
   {
    "code": "ST08",
@@ -2178,7 +2817,12 @@
     105,
     35
    ],
-   "hero_px_removed": 1665
+   "hero_px_removed": 1665,
+   "colors": [
+    "#fcc8c3",
+    "#f05a74",
+    "#f50624"
+   ]
   },
   {
    "code": "ST09",
@@ -2194,7 +2838,12 @@
     93,
     39
    ],
-   "hero_px_removed": 1206
+   "hero_px_removed": 1206,
+   "colors": [
+    "#cbfeff",
+    "#5ae3f2",
+    "#3ab7f3"
+   ]
   },
   {
    "code": "ST10",
@@ -2210,7 +2859,12 @@
     91,
     48
    ],
-   "hero_px_removed": 1215
+   "hero_px_removed": 1215,
+   "colors": [
+    "#f9a962",
+    "#f16539",
+    "#f52819"
+   ]
   },
   {
    "code": "ST11",
@@ -2226,7 +2880,12 @@
     91,
     44
    ],
-   "hero_px_removed": 872
+   "hero_px_removed": 872,
+   "colors": [
+    "#bdaffa",
+    "#8b75f8",
+    "#5e3afa"
+   ]
   },
   {
    "code": "ST12",
@@ -2242,7 +2901,12 @@
     113,
     39
    ],
-   "hero_px_removed": 1369
+   "hero_px_removed": 1369,
+   "colors": [
+    "#c686f6",
+    "#9b45f4",
+    "#8217f6"
+   ]
   },
   {
    "code": "ST13",
@@ -2258,7 +2922,12 @@
     80,
     53
    ],
-   "hero_px_removed": 1608
+   "hero_px_removed": 1608,
+   "colors": [
+    "#efe3fe",
+    "#a17bf6",
+    "#591af8"
+   ]
   },
   {
    "code": "ST14",
@@ -2274,7 +2943,12 @@
     92,
     38
    ],
-   "hero_px_removed": 1471
+   "hero_px_removed": 1471,
+   "colors": [
+    "#f8b07c",
+    "#ef6844",
+    "#f5221b"
+   ]
   },
   {
    "code": "ST15",
@@ -2290,7 +2964,12 @@
     42,
     44
    ],
-   "hero_px_removed": 1672
+   "hero_px_removed": 1672,
+   "colors": [
+    "#cd62f5",
+    "#b83df0",
+    "#a412f8"
+   ]
   },
   {
    "code": "ST16",
@@ -2306,7 +2985,12 @@
     108,
     46
    ],
-   "hero_px_removed": 840
+   "hero_px_removed": 840,
+   "colors": [
+    "#fca475",
+    "#fc7356",
+    "#fe3b3b"
+   ]
   },
   {
    "code": "ST17",
@@ -2322,7 +3006,12 @@
     89,
     40
    ],
-   "hero_px_removed": 892
+   "hero_px_removed": 892,
+   "colors": [
+    "#fdd8fe",
+    "#f28cf9",
+    "#d826f9"
+   ]
   },
   {
    "code": "ST18",
@@ -2338,7 +3027,12 @@
     102,
     38
    ],
-   "hero_px_removed": 887
+   "hero_px_removed": 887,
+   "colors": [
+    "#ffebcd",
+    "#ee73b4",
+    "#f5377d"
+   ]
   },
   {
    "code": "ST19",
@@ -2354,7 +3048,12 @@
     126,
     43
    ],
-   "hero_px_removed": 1129
+   "hero_px_removed": 1129,
+   "colors": [
+    "#ed7648",
+    "#e93228",
+    "#ee0a25"
+   ]
   },
   {
    "code": "ST20",
@@ -2370,7 +3069,12 @@
     46,
     44
    ],
-   "hero_px_removed": 1788
+   "hero_px_removed": 1788,
+   "colors": [
+    "#fcc471",
+    "#f17848",
+    "#f43527"
+   ]
   },
   {
    "code": "ST21",
@@ -2386,7 +3090,12 @@
     97,
     41
    ],
-   "hero_px_removed": 1103
+   "hero_px_removed": 1103,
+   "colors": [
+    "#c29ef6",
+    "#8868fb",
+    "#5936fe"
+   ]
   },
   {
    "code": "ST22",
@@ -2402,7 +3111,12 @@
     31,
     32
    ],
-   "hero_px_removed": 2342
+   "hero_px_removed": 2342,
+   "colors": [
+    "#ebfcfe",
+    "#76a6f2",
+    "#337bf9"
+   ]
   },
   {
    "code": "ST23",
@@ -2418,7 +3132,12 @@
     137,
     38
    ],
-   "hero_px_removed": 374
+   "hero_px_removed": 374,
+   "colors": [
+    "#f9c7a1",
+    "#f09075",
+    "#f14832"
+   ]
   },
   {
    "code": "ST24",
@@ -2434,7 +3153,12 @@
     59,
     36
    ],
-   "hero_px_removed": 2118
+   "hero_px_removed": 2118,
+   "colors": [
+    "#f8ae9c",
+    "#f05d66",
+    "#f91e43"
+   ]
   },
   {
    "code": "ST25",
@@ -2450,7 +3174,12 @@
     71,
     42
    ],
-   "hero_px_removed": 1074
+   "hero_px_removed": 1074,
+   "colors": [
+    "#f9a55a",
+    "#ef6f42",
+    "#f23d1f"
+   ]
   },
   {
    "code": "ST26",
@@ -2466,7 +3195,12 @@
     78,
     51
    ],
-   "hero_px_removed": 1371
+   "hero_px_removed": 1371,
+   "colors": [
+    "#9688fa",
+    "#6257f9",
+    "#4b39fc"
+   ]
   },
   {
    "code": "ST27",
@@ -2482,7 +3216,12 @@
     100,
     44
    ],
-   "hero_px_removed": 870
+   "hero_px_removed": 870,
+   "colors": [
+    "#fcffff",
+    "#8fbbff",
+    "#4c88ff"
+   ]
   },
   {
    "code": "ST28",
@@ -2498,7 +3237,12 @@
     104,
     51
    ],
-   "hero_px_removed": 766
+   "hero_px_removed": 766,
+   "colors": [
+    "#f4ccf1",
+    "#cda0fc",
+    "#925fff"
+   ]
   },
   {
    "code": "ST30",
@@ -2514,7 +3258,10 @@
     176,
     42
    ],
-   "hero_px_removed": 369
+   "hero_px_removed": 369,
+   "colors": [
+    "#ffffff"
+   ]
   },
   {
    "code": "DV07",
@@ -2530,7 +3277,12 @@
     25,
     40
    ],
-   "hero_px_removed": 2597
+   "hero_px_removed": 2597,
+   "colors": [
+    "#f9c588",
+    "#f2a55d",
+    "#fa7f2b"
+   ]
   },
   {
    "code": "DV08",
@@ -2546,7 +3298,12 @@
     39,
     47
    ],
-   "hero_px_removed": 2743
+   "hero_px_removed": 2743,
+   "colors": [
+    "#fee681",
+    "#f7bc4d",
+    "#f37f23"
+   ]
   },
   {
    "code": "DV09",
@@ -2562,7 +3319,12 @@
     82,
     26
    ],
-   "hero_px_removed": 2357
+   "hero_px_removed": 2357,
+   "colors": [
+    "#ecd2d7",
+    "#cbc0d0",
+    "#cfa3bf"
+   ]
   },
   {
    "code": "DV10",
@@ -2578,7 +3340,12 @@
     87,
     43
    ],
-   "hero_px_removed": 1385
+   "hero_px_removed": 1385,
+   "colors": [
+    "#fdf8dc",
+    "#f5c87f",
+    "#f59c40"
+   ]
   },
   {
    "code": "DV11",
@@ -2594,7 +3361,12 @@
     76,
     12
    ],
-   "hero_px_removed": 2410
+   "hero_px_removed": 2410,
+   "colors": [
+    "#ddf5ff",
+    "#d9d1f2",
+    "#89b3f0"
+   ]
   },
   {
    "code": "DV12",
@@ -2610,7 +3382,12 @@
     77,
     56
    ],
-   "hero_px_removed": 1946
+   "hero_px_removed": 1946,
+   "colors": [
+    "#ffe094",
+    "#f2b666",
+    "#f6812d"
+   ]
   },
   {
    "code": "DV13",
@@ -2626,7 +3403,12 @@
     81,
     44
    ],
-   "hero_px_removed": 1343
+   "hero_px_removed": 1343,
+   "colors": [
+    "#ebfffc",
+    "#a2e6fd",
+    "#2395f4"
+   ]
   },
   {
    "code": "DV14",
@@ -2642,7 +3424,12 @@
     57,
     39
    ],
-   "hero_px_removed": 2158
+   "hero_px_removed": 2158,
+   "colors": [
+    "#fcf5f2",
+    "#f2e1d2",
+    "#fac999"
+   ]
   },
   {
    "code": "DV15",
@@ -2658,7 +3445,12 @@
     51,
     35
    ],
-   "hero_px_removed": 2076
+   "hero_px_removed": 2076,
+   "colors": [
+    "#90d3f8",
+    "#59adf0",
+    "#288ef6"
+   ]
   },
   {
    "code": "DV16",
@@ -2674,7 +3466,12 @@
     56,
     42
    ],
-   "hero_px_removed": 1408
+   "hero_px_removed": 1408,
+   "colors": [
+    "#c2a0f9",
+    "#9b69f2",
+    "#6d24f5"
+   ]
   },
   {
    "code": "DV17",
@@ -2690,7 +3487,12 @@
     56,
     31
    ],
-   "hero_px_removed": 2589
+   "hero_px_removed": 2589,
+   "colors": [
+    "#f7d7a5",
+    "#f4b57e",
+    "#f99042"
+   ]
   },
   {
    "code": "DV18",
@@ -2706,7 +3508,12 @@
     38,
     48
    ],
-   "hero_px_removed": 2784
+   "hero_px_removed": 2784,
+   "colors": [
+    "#fcd26e",
+    "#f2933c",
+    "#f56121"
+   ]
   },
   {
    "code": "DV19",
@@ -2722,7 +3529,12 @@
     82,
     40
    ],
-   "hero_px_removed": 1571
+   "hero_px_removed": 1571,
+   "colors": [
+    "#ecf5fb",
+    "#e5e4df",
+    "#f6bd6b"
+   ]
   },
   {
    "code": "DV20",
@@ -2738,7 +3550,12 @@
     84,
     41
    ],
-   "hero_px_removed": 1037
+   "hero_px_removed": 1037,
+   "colors": [
+    "#fff3d7",
+    "#ffdaa7",
+    "#f6c07f"
+   ]
   },
   {
    "code": "DV21",
@@ -2754,7 +3571,12 @@
     35,
     29
    ],
-   "hero_px_removed": 2156
+   "hero_px_removed": 2156,
+   "colors": [
+    "#f1fefc",
+    "#abedfd",
+    "#5bc0f3"
+   ]
   },
   {
    "code": "DV22",
@@ -2770,7 +3592,12 @@
     87,
     42
    ],
-   "hero_px_removed": 1247
+   "hero_px_removed": 1247,
+   "colors": [
+    "#fcfefd",
+    "#b8e6ee",
+    "#fdd4ac"
+   ]
   },
   {
    "code": "DV23",
@@ -2786,7 +3613,12 @@
     89,
     35
    ],
-   "hero_px_removed": 1093
+   "hero_px_removed": 1093,
+   "colors": [
+    "#afdcf1",
+    "#edad9e",
+    "#f67254"
+   ]
   },
   {
    "code": "DV24",
@@ -2802,7 +3634,12 @@
     92,
     42
    ],
-   "hero_px_removed": 1982
+   "hero_px_removed": 1982,
+   "colors": [
+    "#fef3ef",
+    "#e9e9ef",
+    "#f7d6d0"
+   ]
   },
   {
    "code": "DV25",
@@ -2818,7 +3655,12 @@
     61,
     38
    ],
-   "hero_px_removed": 2155
+   "hero_px_removed": 2155,
+   "colors": [
+    "#ebdcd2",
+    "#f1b394",
+    "#f48a5e"
+   ]
   },
   {
    "code": "DV26",
@@ -2834,7 +3676,12 @@
     66,
     38
    ],
-   "hero_px_removed": 1858
+   "hero_px_removed": 1858,
+   "colors": [
+    "#f3f3eb",
+    "#e8ceb0",
+    "#f3a458"
+   ]
   },
   {
    "code": "DV27",
@@ -2850,7 +3697,12 @@
     42,
     72
    ],
-   "hero_px_removed": 7069
+   "hero_px_removed": 7069,
+   "colors": [
+    "#faebc7",
+    "#f3b479",
+    "#f18654"
+   ]
   },
   {
    "code": "DV28",
@@ -2866,7 +3718,12 @@
     56,
     72
    ],
-   "hero_px_removed": 8867
+   "hero_px_removed": 8867,
+   "colors": [
+    "#f9d892",
+    "#f8bd74",
+    "#f98c59"
+   ]
   },
   {
    "code": "DV29",
@@ -2882,7 +3739,12 @@
     176,
     50
    ],
-   "hero_px_removed": 25233
+   "hero_px_removed": 25233,
+   "colors": [
+    "#fefad4",
+    "#5cecfd",
+    "#fc8c46"
+   ]
   }
  ]
 }

@@ -47,6 +47,8 @@ POSES = {
 	'DV': ['grips/cast_fwd_0', 'grips/cast_fwd_1', 'grips/cast_fwd_3', 'grips/cast_fwd_4', 'grips/cast_fwd_5'],
 }
 # เฟรมละ MS · pose = ช่องใน POSES · reveal = เอฟเฟกต์เผยจากมือออกไปกี่ส่วน · alpha · flash = สว่างเพิ่ม
+# VFX ซ้อน (หน้าเทสวาดด้วยโค้ดทับภาพชีต · kwan เลือก 5 ต.ค.) — สายละ 1 ท่าให้ดูก่อนทาทั้ง 172
+VFX_SAMPLES = ['SL01', 'PC06', 'CR04', 'BD10', 'ST05', 'DV08']
 MS = 70
 TIMELINE = [
 	{'pose': 0, 'reveal': 0, 'alpha': 0, 'flash': 0},
@@ -140,6 +142,17 @@ def effect(cell):
 	if not len(xs): return None, 0
 	return out[ys.min():ys.max() + 1, xs.min():xs.max() + 1], int(cut.sum())
 
+def glow_colors(img, n=3):
+	"""สีหลักของแสง 3 สี (สว่างสุดก่อน) — ให้อนุภาค/ประกาย/คลื่นของ VFX ในหน้าเทสใช้สีเดียวกับเอฟเฟกต์"""
+	a = np.asarray(img)
+	px = a[a[..., 3] > 128][:, :3]
+	if len(px) < 8: return ['#ffffff']
+	q = Image.fromarray(px[None].astype(np.uint8), 'RGB').quantize(n + 2, Image.Quantize.MEDIANCUT)
+	cnt = np.bincount(np.asarray(q).ravel(), minlength=n + 2)
+	pal = np.array(q.getpalette()[:3 * (n + 2)]).reshape(-1, 3)
+	top = sorted([i for i in np.argsort(cnt)[::-1][:n] if cnt[i]], key=lambda i: -int(pal[i].sum()))
+	return ['#%02x%02x%02x' % tuple(int(v) for v in pal[i]) for i in top]
+
 def fit(img):
 	s = min(1.0, FX_MAX[0] / img.width, FX_MAX[1] / img.height)
 	return img.resize((max(1, round(img.width * s)), max(1, round(img.height * s))), Image.LANCZOS) if s < 1 else img
@@ -171,14 +184,14 @@ def main():
 		if fx is None: print('ไม่มีเอฟเฟกต์', c['code']); continue
 		fxi = fit(Image.fromarray(fx, 'RGBA').transpose(Image.FLIP_LEFT_RIGHT))
 		fxi.save(os.path.join(OUT, c['code'] + '_fx.png'))
-		c.update(fx_size=list(fxi.size), hero_px_removed=cut)
+		c.update(fx_size=list(fxi.size), hero_px_removed=cut, colors=glow_colors(fxi))
 		items.append(c)
 		if c['code'] in ('SL01', 'SL20', 'PC06', 'CR04', 'BD10', 'ST05', 'DV08', 'SL30'): previews.append((c['family'], fxi))
 	cnt = {}
 	for c in items: cnt[c['family']] = cnt.get(c['family'], 0) + 1
 	json.dump({'_doc': 'ตัดจาก docs/art-bible/compendium/skill_sprite_sheet.jpg ด้วย tools/sprites/skill_sheet_cut.py · ร่าง ยังไม่เข้าเกม · '
 		'รหัส = ลำดับตำแหน่งในแผง (ป้ายในชีตบางช่องผิด) · หน้าเทสวาดตาม timeline/poses/stage ชุดนี้',
-		'ms': MS, 'timeline': TIMELINE, 'poses': POSES, 'stage': STAGE, 'rion_at': RION_AT, 'hand': HAND, 'items': items},
+		'vfx_samples': VFX_SAMPLES, 'ms': MS, 'timeline': TIMELINE, 'poses': POSES, 'stage': STAGE, 'rion_at': RION_AT, 'hand': HAND, 'items': items},
 		open(os.path.join(OUT, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 	keys = [3, 5, 6, 8, 10]
 	pv = Image.new('RGBA', (STAGE[0] * len(keys), STAGE[1] * len(previews)), (58, 62, 70, 255))
