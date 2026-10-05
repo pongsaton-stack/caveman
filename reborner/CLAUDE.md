@@ -273,6 +273,8 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   `tools/sprites/aseprite_io.py` (read/write) · `aseprite_export.py` → `docs/art-bible/aseprite/{game,poses64,spells,npcs}/` (103 ไฟล์ 1.8 MB · แท็กตามชื่อไฟล์ · จังหวะจากค่าคงที่เกม · เฟรมซ้ำ = linked cel)
   `aseprite_import.py` → PNG + meta.json ไปที่ `docs/art-bible/aseprite/imported/` (เข้าเกมด้วย --into เมื่อ kwan อนุมัติเท่านั้น) · `aseprite_check.py` ไป-กลับ 4944 เฟรม mismatch 0
   ตรวจตัวอ่านกับไฟล์ทดสอบ 20 ไฟล์ของ Aseprite เอง · ตรวจไฟล์ที่เขียนด้วย ase-parser (npm อิสระ) 103/103 เปิดได้ แท็ก/จังหวะ/พาเลตต์ถูก
+  + kwan สั่ง "ใส่ลง repo" → เลือก submodule: `third_party/aseprite` (ราก repo · ไม่อยู่ใน reborner/ ให้ Godot ไม่สแกน) ชี้ github.com/aseprite/aseprite แท็ก v1.3.18.6 · shallow
+     เก็บแค่ลิงก์ ไม่ใช่สำเนาโค้ด (repo นี้ public → คัดลอกโค้ด = แจกจ่าย ผิด EULA) · วิธีคอมไพล์ใช้เองอยู่ในสกิล · ห้าม commit build/ หรือไบนารี
   แนวทางที่ให้ kwan: ขนาด 64px สมูทพอที่ 8-12 ภาพ/วินาที · เดิน 6-8 · วิ่ง 6 · หายใจ 4 · ฟัน 5-6 (มีค้างตอนง้าง/กระทบ) · โดนตี 2-3 · เกินนี้แทบไม่เห็นต่างเพราะขาขยับได้ทีละ 1px
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)

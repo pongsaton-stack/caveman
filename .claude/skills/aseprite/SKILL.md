@@ -7,7 +7,21 @@ description: Move REBORNER sprites in and out of Aseprite (.aseprite/.ase files)
 
 Aseprite itself is **not** in this repo and must never be added: its source is under an EULA (compile for personal use only, no distribution). Everything here works from the published file-format spec (`docs/ase-file-specs.md` in github.com/aseprite/aseprite) with pure Python (PIL + zlib). kwan runs Aseprite on their own machine.
 
-All paths below are relative to `reborner/`.
+The repo carries the official source **only as a git submodule pointer** (`third_party/aseprite`, pinned to tag `v1.3.18.6`, outside `reborner/` so Godot never scans it). A submodule stores a link to github.com/aseprite/aseprite, not a copy of its code, so nothing is redistributed. Never vendor the files, commit a build, or add a release binary.
+
+### Build Aseprite for your own use (optional)
+
+The `.aseprite` tools below do not need it. Build only when kwan wants the real program, on their own machine (EULA: personal compile only).
+
+```
+git submodule update --init --recursive third_party/aseprite      # source + its own submodules (laf, third_party)
+cd third_party/aseprite && ./build.sh                             # official script: downloads prebuilt Skia, runs cmake + ninja
+# Linux packages first: g++ clang cmake ninja-build unzip libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev
+```
+
+The binary lands in `third_party/aseprite/build/bin/aseprite`. `build/` is outside version control; never `git add` it. To move to a newer release: `cd third_party/aseprite && git fetch --depth 1 origin tag <vX.Y.Z> && git checkout <vX.Y.Z>`, then commit the new pointer and update the tag named above.
+
+All tool paths below are relative to `reborner/`.
 
 ## Tools
 

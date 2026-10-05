@@ -1,0 +1,4 @@
+[submodule "third_party/aseprite"]
+	path = third_party/aseprite
+	url = https://github.com/aseprite/aseprite.git
+	shallow = true
