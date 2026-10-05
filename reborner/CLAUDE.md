@@ -295,6 +295,11 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - 5 ต.ค. 2026 **pixel-agents เป็นโปรเจกต์อ้างอิง** (kwan สั่ง "ติดตั้ง") — submodule `third_party/pixel-agents` (3537e14 · v1.4.1 · MIT · shallow)
   เป็นเครื่องมือบนเครื่อง kwan ไม่ใช่ของเกม: แสดง Claude Code แต่ละตัวเป็นตัวละครพิกเซลในออฟฟิศเล็ก (ส่วนขยาย VS Code หรือ `npx pixel-agents` · Node 20+)
   ติดตั้งจริงต้องทำบนเครื่อง kwan — มันเพิ่ม hook ใน `~/.claude/settings.json` ของเครื่องนั้น · **ไม่ติดตั้งในเครื่องคลาวด์** (kwan มองหน้าเว็บที่รันในนี้ไม่ได้) · URL ที่มี `?token=` ห้ามแชร์
+- 5 ต.ค. 2026 **เทสต์ย้ายเข้า repo** (เดิมอยู่ใน $S/bt ของเครื่องคลาวด์ หายเมื่อเครื่องถูกคืน) — `tests/check/` 15 เทสต์ผ่าน/ไม่ผ่าน · `tests/measure/` 10 สคริปต์วัดค่า · `tests/shots/` 7 สคริปต์ถ่ายภาพ · `tests/seedcheck.gd` + `tests/seed.md5`
+  **คำสั่งเดียว:** `GODOT=<godot> tools/run_tests.sh [--sim] [--shots]` → ผ่าน = exit 0 · เทสต์ที่ต้องมีจอใช้ xvfb-run (ไม่มี = ข้ามแล้วบอก) · ผลอยู่ใน tests/out/ (gitignore)
+  เกณฑ์ผ่าน: exit 0 · ไม่มี SCRIPT ERROR · ไม่มีบรรทัด `FAIL …` · `FAILS n` ต้อง 0 · seed md5 ต้องเท่า tests/seed.md5 (พิสูจน์แล้วว่าจับเทสต์พังได้: exit 1)
+  **เซฟเทสต์แยกไฟล์:** `SaveGame.PATH` อ่าน env `REBORNER_SAVE` (runner ตั้ง user://test_save.json) — เดิม demoend/demoload ล้าง/ทับเซฟจริง ถ้ารันบนเครื่อง kwan จะลบเซฟ · ตรวจแล้วไม่มีสคริปต์ไหนเขียนเซฟจริงเมื่อตั้ง env
+  สคริปต์ภาพ: ภาพไป tests/out/<ชื่อ>_<i>.png (หรือ $SHOT) · battleshot/fxshot/ultshot มีค่าเริ่ม FOES=M01,M02 · TECH=bl4 (เดิมพังถ้าไม่ส่ง env) · export เว็บไม่รวม tests/ (exclude_filter)
   แนวทางที่ให้ kwan: ขนาด 64px สมูทพอที่ 8-12 ภาพ/วินาที · เดิน 6-8 · วิ่ง 6 · หายใจ 4 · ฟัน 5-6 (มีค้างตอนง้าง/กระทบ) · โดนตี 2-3 · เกินนี้แทบไม่เห็นต่างเพราะขาขยับได้ทีละ 1px
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)

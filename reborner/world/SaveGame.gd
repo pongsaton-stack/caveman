@@ -3,7 +3,8 @@
 class_name SaveGame
 extends RefCounted
 
-const PATH := "user://reborner_save.json"
+## เทสต์ตั้ง REBORNER_SAVE ให้ชี้ไฟล์แยก (tools/run_tests.sh) — กันเทสต์ลบ/ทับเซฟจริงของผู้เล่นบนเครื่องเดียวกัน
+static var PATH: String = OS.get_environment("REBORNER_SAVE") if OS.has_environment("REBORNER_SAVE") else "user://reborner_save.json"
 
 static func save(ps: PlayerState) -> bool:
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
