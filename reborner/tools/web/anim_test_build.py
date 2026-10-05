@@ -50,6 +50,12 @@ def sprites():
 		for f in sorted(os.listdir(wd)):
 			if f.endswith('.png'):
 				out['wpn/' + f[:-4]] = png(os.path.join(wd, f))
+	# Rion ถืออาวุธ (tools/sprites/weapons_held.py) — ยืน + ฟัน 4 เฟรม ต่ออาวุธ
+	hd = os.path.join(SPR, 'weapons_held')
+	if os.path.isdir(hd):
+		for f in sorted(os.listdir(hd)):
+			if f.endswith('.png'):
+				out['held/' + f[:-4]] = png(os.path.join(hd, f))
 	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
 	td = os.path.join(ROOT, 'assets/tiles_ll')
 	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
