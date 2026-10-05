@@ -62,12 +62,12 @@ def sprites():
 		for f in sorted(os.listdir(sp)):
 			if f.endswith('.png'):
 				out['spl/' + f[:-4]] = png(os.path.join(sp, f))
-	# อิริยาบถร่าง Rion + หมา (tools/sprites/poses_anim.py)
-	pd = os.path.join(SPR, 'poses_draft')
+	# ทุกคลิปในแท็บท่าขยับแบบ 64 เฟรม (tools/sprites/poses64.py) — เก็บเฉพาะภาพไม่ซ้ำ
+	pd = os.path.join(SPR, 'poses64_draft')
 	if os.path.isdir(pd):
 		for f in sorted(os.listdir(pd)):
 			if f.endswith('.png'):
-				out['pose/' + f[:-4]] = png(os.path.join(pd, f))
+				out['p64/' + f[:-4]] = png(os.path.join(pd, f))
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -149,7 +149,7 @@ def main(out_path):
 		'structures': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/structures.json'), encoding='utf-8')),
 		'vehicles': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/vehicles.json'), encoding='utf-8')),
 		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
-		'poses': json.load(open(os.path.join(SPR, 'poses_draft/index.json'), encoding='utf-8'))['poses'] if os.path.exists(os.path.join(SPR, 'poses_draft/index.json')) else [],
+		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
 		'compendium': compendium(),
 		'weapons': [dict(w, school=f['school']) for f in json.load(open(os.path.join(ROOT, 'docs/art-bible/weapons/weapons_full.json'), encoding='utf-8'))['families'] for w in f['weapons']],

@@ -268,25 +268,13 @@ function addClip(group, id, label, frames, sec, opt = {}) {
 	CLIPS[id].tab = g.tab;
 	g.ids.push(id);
 }
-for (const [d, th] of DIRS) addClip('Rion บนแผนที่', 'rion_walk_' + d, 'เดิน' + th, [0, 1, 2, 3].map(i => `rion/${d}_w${i}`), WALK_SEC);
-addClip('Rion ในศึก', 'rion_stand', 'ยืน', ['rion/west'], 1);
-addClip('Rion ในศึก', 'rion_attack', 'ฟัน', [0, 1, 2, 3].map(i => `rion/west_a${i}`), K.ATTACK_FRAME_SEC);
-addClip('Rion ในศึก', 'rion_hurt', 'โดนตี', ['rion/west_h0', 'rion/west_h1'], K.ATTACK_FRAME_SEC);
-addClip('Rion ในศึก', 'rion_ko', 'ล้ม', ['rion/west_h0', 'rion/west_k0', 'rion/west_k1'], K.ATTACK_FRAME_SEC, { hold: true });
-for (const [d, th] of DIRS) addClip('หมาคู่หู', 'dog_walk_' + d, 'เดิน' + th, [0, 1, 2, 3].map(i => `dog/${d}_w${i}`), WALK_SEC);
-// อิริยาบถร่าง (tools/sprites/poses_anim.py · ยังไม่เข้าเกม) — Rion ก่อน หมาตาม
-for (const who of ['rion', 'dog']) for (const p of (DATA.poses || []).filter(x => x.who === who)) {
-	if (!DATA.sprites[p.sets ? `pose/${p.id}_s${p.sets[0].n}_0` : `pose/${p.id}_0`]) continue;
-	// เทียบเฟรม (32 / 64): รอบเท่ากันทุกช่อง — เดิน 1 รอบ = 2 ช่อง (2 × MOVE_TIME) · หายใจ 1 รอบ = 2 × FOE_IDLE_SEC
-	// คลิปเดินตามชุดใหญ่สุด · ช่องอื่นเลือกเฟรมตามสัดส่วนเวลา
-	if (p.sets) {
-		const cyc = { walk: 2 * K.MOVE_TIME, idle: 2 * K.FOE_IDLE_SEC }[p.timing], top = p.sets[p.sets.length - 1].n;
-		const panels = p.sets.map(st => ({ label: `${st.n} เฟรม (ภาพไม่ซ้ำ ${st.unique})`,
-			keys: Array.from({ length: top }, (_, i) => `pose/${p.id}_s${st.n}_${st.order[Math.floor(i * st.n / top)]}`) }));
-		addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, panels[panels.length - 1].keys, cyc / top, { panels });
-		continue;
-	}
-	addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, p.order.map(i => `pose/${p.id}_${i}`), p.sec);
+// ทุกคลิปในแท็บนี้ = 64 เฟรม (tools/sprites/poses64.py · kwan สั่ง 5 ต.ค.) · เฟรมที่ปัดพิกเซลแล้วซ้ำกันใช้ไฟล์เดียว
+// รอบ: เดิน = 2 ช่อง (2 × MOVE_TIME) · หายใจในศึก = 2 × FOE_IDLE_SEC · ฟัน 4 / โดนตี 2 / ล้ม 3 × ATTACK_FRAME_SEC (เท่ากับชุด 4 เฟรมเดิม) · ท่าร่าง = ยาวเท่ารอบเดิม
+const CYCLE = { walk: 2 * K.MOVE_TIME, idle: 2 * K.FOE_IDLE_SEC, attack: 4 * K.ATTACK_FRAME_SEC, hurt: 2 * K.ATTACK_FRAME_SEC, ko: 3 * K.ATTACK_FRAME_SEC };
+for (const p of DATA.poses64 || []) {
+	const group = p.clip_id ? p.group : `${p.who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`;
+	addClip(group, p.clip_id || 'pose_' + p.id, `${p.label}`, p.order.map(u => `p64/${p.id}_${u}`), (p.cycle || CYCLE[p.timing]) / p.n,
+		Object.assign({ unique: p.unique }, p.hold ? { hold: true } : {}));
 }
 const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
 for (const key of Object.keys(DATA.sprites)) {
@@ -382,7 +370,6 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
-	if (c.panels) return panelView(c);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
 	drawBg();
 	if (S.onion && c.frames.length > 1) {
@@ -390,19 +377,6 @@ function clipView() {
 		if (pim) spr(pk, (96 - pim.width) / 2, 92 - pim.height, { alpha: 0.32 });
 	}
 	if (im) spr(key, (96 - im.width) / 2, Math.max(0, 92 - im.height));
-	if (S.grid) drawGrid();
-}
-
-// เทียบเฟรม: แต่ละช่องเล่นชุดของตัวเองพร้อมกัน รอบเท่ากัน (ซ้าย = ชุดในเกม)
-function panelView(c) {
-	const n = c.panels.length; cv.width = 96 * n; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
-	ctx.font = '7px system-ui, sans-serif';
-	c.panels.forEach((p, k) => {
-		const key = p.keys[S.frame], im = IMG[key];
-		if (im) spr(key, 96 * k + (96 - im.width) / 2, 92 - im.height);
-		if (k) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(96 * k - 1, 0, 2, 96); }
-		ctx.fillStyle = '#1c1a16'; ctx.fillText(p.label, 96 * k + 4, 9);
-	});
 	if (S.grid) drawGrid();
 }
 
@@ -1169,8 +1143,8 @@ function setRead(t) {
 	if (isClip()) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
-		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', pose: 'poses_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1210,7 +1184,7 @@ function buildClips() {
 		const grid = document.createElement('div'); grid.className = 'cgrid';
 		for (const id of g.ids) {
 			const c = CLIPS[id], b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = id;
-			b.innerHTML = `${c.label}<small>${c.frames.length} เฟรม${c.frames.length > 1 ? ' · ' + Math.round(c.sec * 1000) + ' ms' : ''}</small>`;
+			b.innerHTML = `${c.label}<small>${c.frames.length} เฟรม${c.unique ? ' (ภาพไม่ซ้ำ ' + c.unique + ')' : ''}${c.frames.length > 1 ? ' · ' + (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : ''}</small>`;
 			b.addEventListener('click', () => pickClip(id));
 			grid.append(b);
 		}
