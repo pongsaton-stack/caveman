@@ -6,6 +6,13 @@ import glob, base64, csv, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPR = os.path.join(ROOT, 'assets/sprites')
 
+def webp(path, q=80):
+	"""ภาพที่ไม่ใช่พิกเซลอาร์ต (เอฟเฟกต์เรืองแสง · ช่องจากชีต jpg) → webp เล็กกว่า png หลายเท่า หน้าไม่เกิน 16 MB"""
+	import io
+	from PIL import Image
+	b = io.BytesIO(); Image.open(path).save(b, 'WEBP', quality=q, method=6)
+	return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+
 def png(path):
 	with open(path, 'rb') as f:
 		return 'data:image/png;base64,' + base64.b64encode(f.read()).decode()
@@ -86,6 +93,18 @@ def sprites():
 		for f in sorted(os.listdir(sd)):
 			if f.endswith('.png'):
 				out['wst/' + f[:-4]] = png(os.path.join(sd, f))
+	# ท่า Rion ตามการจับ (rion_grips.py) — ใช้กับอนิเมชันสกิลจากชีต
+	gd = os.path.join(SPR, 'rion_lastlight_draft/grips')
+	if os.path.isdir(gd):
+		for f in sorted(os.listdir(gd)):
+			if f.endswith('.png'):
+				out['rion/grips/' + f[:-4]] = png(os.path.join(gd, f))
+	# สกิลจากชีต 173 ท่า (tools/sprites/skill_sheet_cut.py) — เอฟเฟกต์ + ช่องต้นฉบับ (webp)
+	kd = os.path.join(SPR, 'skills_sheet_draft')
+	if os.path.isdir(kd):
+		for f in sorted(os.listdir(kd)):
+			if f.endswith('_fx.png'): out['skf/' + f[:-7]] = webp(os.path.join(kd, f))
+			elif f.endswith('_cell.png'): out['skc/' + f[:-9]] = webp(os.path.join(kd, f), 60)
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -174,6 +193,7 @@ def main(out_path):
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
 		'sheet_cut': sheet_cut(),
+		'skill_sheet': json.load(open(os.path.join(SPR, 'skills_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'skills_sheet_draft/index.json')) else None,
 		'weapon_stack': json.load(open(os.path.join(SPR, 'weapons_stack_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_stack_draft/index.json')) else None,
 		'weapon_sheet': json.load(open(os.path.join(SPR, 'weapons_sheet_draft/index.json'), encoding='utf-8'))['items'] if os.path.exists(os.path.join(SPR, 'weapons_sheet_draft/index.json')) else [],
 		'compendium': compendium(),

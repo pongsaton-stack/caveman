@@ -142,6 +142,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" id="tabMonsters" aria-pressed="false">มอนสเตอร์</button>
 			<button class="btn" role="tab" id="tabBosses" aria-pressed="false">บอส</button>
 			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
+			<button class="btn" role="tab" id="tabSksheet" aria-pressed="false">สกิลจากชีต</button>
 			<button class="btn" role="tab" id="tabArms" aria-pressed="false">อาวุธ</button>
 			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
 			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
@@ -171,6 +172,12 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<div class="cgrid" id="bossList"></div>
 			<div class="wcard" id="bossCard"></div>
 			<div class="clips" id="bossGroups" hidden></div>
+		</section>
+
+		<section class="box" id="paneSksheet" hidden>
+			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
+				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
+			<div class="clips" id="skGroups"></div>
 		</section>
 
 		<section class="box" id="paneArms" hidden>
@@ -327,6 +334,27 @@ if (DATA.sprites['smp/slime_v3']) {
 }
 
 // อาวุธจากชีต "Weapon Collection 210" ของ kwan (ตัดทีละช่องด้วย tools/sprites/weapons_sheet_cut.py) — เล่นคู่ ขนาดชีต | 32px
+// สกิลจากชีต 173 ท่า (tools/sprites/skill_sheet_cut.py) — timeline/poses/ตำแหน่งมาจาก index.json ชุดเดียวกับสคริปต์
+const SKS = DATA.skill_sheet, SK_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล' };
+for (const it of ((SKS || {}).items || [])) {
+	if (!DATA.sprites['skf/' + it.code]) continue;
+	addClip('สกิลจากชีต · ' + SK_FAM[it.family] + ' (สาย' + it.school + ' · ร่าง)', 'sks_' + it.code, it.code,
+		SKS.timeline.map(t => 'rion/' + SKS.poses[it.family][t.pose]), SKS.ms / 1000, { tab: 'sksheet', skill: it });
+}
+function sheetSkillView(c) {
+	const it = c.skill, t = SKS.timeline[S.frame], [W, H] = SKS.stage, fx = IMG['skf/' + it.code];
+	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false; drawBg();
+	const cell = IMG['skc/' + it.code];
+	if (cell) { const k = 40 / cell.height; ctx.globalAlpha = 0.9; ctx.drawImage(cell, 2, 2, Math.round(cell.width * k), 40); ctx.globalAlpha = 1; }
+	if (fx && t.alpha > 0 && t.reveal > 0) {   // เผยจากมือ (ขวา) ออกไปทางซ้าย
+		const cw = Math.max(1, Math.round(fx.width * t.reveal)), x = Math.max(0, SKS.hand[0] - cw), y = Math.max(0, SKS.hand[1] - (fx.height >> 1));
+		ctx.globalAlpha = t.alpha; ctx.drawImage(fx, fx.width - cw, 0, cw, fx.height, x, y, cw, fx.height);
+		if (t.flash) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = t.flash; ctx.drawImage(fx, fx.width - cw, 0, cw, fx.height, x, y, cw, fx.height); ctx.globalCompositeOperation = 'source-over'; }
+		ctx.globalAlpha = 1;
+	}
+	spr(c.frames[S.frame], SKS.rion_at[0], SKS.rion_at[1]);
+	if (S.grid) drawGrid();
+}
 // sprite stack (tools/sprites/weapons_stack.py): วางราบ หมุนทุกชั้น nearest ที่ความละเอียดจริง หดแกนลึกด้วย tilt ชั้นละ 1px ขึ้น — เหมือน render() ในสคริปต์
 const STACK = Object.fromEntries(((DATA.weapon_stack || {}).items || []).map(x => [x.code, x])), STACK_TILT = (DATA.weapon_stack || {}).tilt || 0.62;
 const STACK_FRAMES = 32, STACK_SEC = 3.2;   // หมุนครบรอบ 3.2 วิ (ค่าดูในหน้าเทสเท่านั้น)
@@ -370,7 +398,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 }
 
 // ── สถานะผู้ชม ──
-const CLIP_TABS = ['clips', 'monsters', 'bosses', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', arms: 'armGroups' };
+const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -415,6 +443,7 @@ function spr(key, x, y, opt = {}) {
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
 	if (c.panels) return panelView(c);
+	if (c.skill) return sheetSkillView(c);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
 	drawBg();
 	if (S.onion && c.frames.length > 1) {
@@ -1203,7 +1232,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1445,7 +1474,7 @@ function buildGalleries() {
 		thumb: x => `<img src="${DATA.sprites['npc/' + x.id + '_0']}" alt=""><span>${x.name}</span><small>${x.where}</small>`,
 		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.where}</span><br>${x.role}<br><span class="muted">ที่มา: ${x.source} · คลิป: ยืนหายใจ → คุย (...) → เดิน</span>` });
 }
-const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
+const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', sksheet: 'Sksheet', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
 	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }

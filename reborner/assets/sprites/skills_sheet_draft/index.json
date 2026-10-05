@@ -1,0 +1,2888 @@
+{
+ "_doc": "ตัดจาก docs/art-bible/compendium/skill_sprite_sheet.jpg ด้วย tools/sprites/skill_sheet_cut.py · ร่าง ยังไม่เข้าเกม · รหัส = ลำดับตำแหน่งในแผง (ป้ายในชีตบางช่องผิด) · หน้าเทสวาดตาม timeline/poses/stage ชุดนี้",
+ "ms": 70,
+ "timeline": [
+  {
+   "pose": 0,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  },
+  {
+   "pose": 1,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  },
+  {
+   "pose": 1,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  },
+  {
+   "pose": 2,
+   "reveal": 0.3,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 2,
+   "reveal": 0.6,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 3,
+   "reveal": 0.9,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 3,
+   "reveal": 1,
+   "alpha": 1,
+   "flash": 0.6
+  },
+  {
+   "pose": 3,
+   "reveal": 1,
+   "alpha": 1,
+   "flash": 0.25
+  },
+  {
+   "pose": 3,
+   "reveal": 1,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 4,
+   "reveal": 1,
+   "alpha": 0.66,
+   "flash": 0
+  },
+  {
+   "pose": 4,
+   "reveal": 1,
+   "alpha": 0.33,
+   "flash": 0
+  },
+  {
+   "pose": 0,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  }
+ ],
+ "poses": {
+  "SL": [
+   "west",
+   "west_a0",
+   "west_a1",
+   "west_a2",
+   "west_a3"
+  ],
+  "PC": [
+   "west",
+   "west_a0",
+   "west_a1",
+   "west_a1",
+   "west_a3"
+  ],
+  "CR": [
+   "grips/twohand_0",
+   "grips/twohand_1",
+   "grips/twohand_2",
+   "grips/twohand_3",
+   "grips/twohand_4"
+  ],
+  "BD": [
+   "grips/punch_0",
+   "grips/punch_1",
+   "grips/punch_2",
+   "grips/punch_3",
+   "grips/punch_4"
+  ],
+  "ST": [
+   "grips/aim_0",
+   "grips/aim_1",
+   "grips/aim_2",
+   "grips/aim_3",
+   "grips/aim_4"
+  ],
+  "DV": [
+   "grips/cast_fwd_0",
+   "grips/cast_fwd_1",
+   "grips/cast_fwd_3",
+   "grips/cast_fwd_4",
+   "grips/cast_fwd_5"
+  ]
+ },
+ "stage": [
+  256,
+  96
+ ],
+ "rion_at": [
+  192,
+  30
+ ],
+ "hand": [
+  210,
+  70
+ ],
+ "items": [
+  {
+   "code": "SL01",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    287,
+    202,
+    372
+   ],
+   "fx_size": [
+    130,
+    42
+   ],
+   "hero_px_removed": 803
+  },
+  {
+   "code": "SL02",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    210,
+    287,
+    370,
+    372
+   ],
+   "fx_size": [
+    122,
+    53
+   ],
+   "hero_px_removed": 2678
+  },
+  {
+   "code": "SL03",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    379,
+    287,
+    503,
+    372
+   ],
+   "fx_size": [
+    83,
+    54
+   ],
+   "hero_px_removed": 1072
+  },
+  {
+   "code": "SL04",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    510,
+    287,
+    665,
+    372
+   ],
+   "fx_size": [
+    138,
+    54
+   ],
+   "hero_px_removed": 599
+  },
+  {
+   "code": "SL05",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    287,
+    832,
+    372
+   ],
+   "fx_size": [
+    144,
+    46
+   ],
+   "hero_px_removed": 863
+  },
+  {
+   "code": "SL06",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    380,
+    202,
+    468
+   ],
+   "fx_size": [
+    128,
+    51
+   ],
+   "hero_px_removed": 1126
+  },
+  {
+   "code": "SL07",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    211,
+    380,
+    369,
+    468
+   ],
+   "fx_size": [
+    115,
+    43
+   ],
+   "hero_px_removed": 963
+  },
+  {
+   "code": "SL08",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    380,
+    509,
+    468
+   ],
+   "fx_size": [
+    104,
+    52
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "SL09",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    518,
+    380,
+    665,
+    468
+   ],
+   "fx_size": [
+    123,
+    45
+   ],
+   "hero_px_removed": 1071
+  },
+  {
+   "code": "SL10",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    380,
+    831,
+    468
+   ],
+   "fx_size": [
+    138,
+    42
+   ],
+   "hero_px_removed": 820
+  },
+  {
+   "code": "SL11",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    476,
+    201,
+    565
+   ],
+   "fx_size": [
+    154,
+    46
+   ],
+   "hero_px_removed": 874
+  },
+  {
+   "code": "SL12",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    210,
+    476,
+    369,
+    565
+   ],
+   "fx_size": [
+    143,
+    47
+   ],
+   "hero_px_removed": 774
+  },
+  {
+   "code": "SL13",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    476,
+    517,
+    565
+   ],
+   "fx_size": [
+    84,
+    48
+   ],
+   "hero_px_removed": 1021
+  },
+  {
+   "code": "SL14",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    525,
+    476,
+    665,
+    565
+   ],
+   "fx_size": [
+    96,
+    50
+   ],
+   "hero_px_removed": 1057
+  },
+  {
+   "code": "SL15",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    476,
+    831,
+    565
+   ],
+   "fx_size": [
+    140,
+    42
+   ],
+   "hero_px_removed": 1536
+  },
+  {
+   "code": "SL16",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    573,
+    201,
+    663
+   ],
+   "fx_size": [
+    157,
+    53
+   ],
+   "hero_px_removed": 620
+  },
+  {
+   "code": "SL17",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    210,
+    573,
+    369,
+    663
+   ],
+   "fx_size": [
+    142,
+    51
+   ],
+   "hero_px_removed": 643
+  },
+  {
+   "code": "SL18",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    573,
+    515,
+    663
+   ],
+   "fx_size": [
+    91,
+    58
+   ],
+   "hero_px_removed": 1359
+  },
+  {
+   "code": "SL19",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    523,
+    573,
+    665,
+    663
+   ],
+   "fx_size": [
+    125,
+    49
+   ],
+   "hero_px_removed": 1157
+  },
+  {
+   "code": "SL20",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    573,
+    831,
+    663
+   ],
+   "fx_size": [
+    100,
+    51
+   ],
+   "hero_px_removed": 1296
+  },
+  {
+   "code": "SL21",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    28,
+    672,
+    200,
+    765
+   ],
+   "fx_size": [
+    129,
+    54
+   ],
+   "hero_px_removed": 971
+  },
+  {
+   "code": "SL22",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    208,
+    672,
+    369,
+    765
+   ],
+   "fx_size": [
+    147,
+    51
+   ],
+   "hero_px_removed": 1014
+  },
+  {
+   "code": "SL23",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    672,
+    514,
+    765
+   ],
+   "fx_size": [
+    125,
+    50
+   ],
+   "hero_px_removed": 639
+  },
+  {
+   "code": "SL24",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    523,
+    672,
+    664,
+    765
+   ],
+   "fx_size": [
+    126,
+    54
+   ],
+   "hero_px_removed": 1274
+  },
+  {
+   "code": "SL25",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    672,
+    830,
+    765
+   ],
+   "fx_size": [
+    108,
+    53
+   ],
+   "hero_px_removed": 1233
+  },
+  {
+   "code": "SL26",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    28,
+    772,
+    198,
+    876
+   ],
+   "fx_size": [
+    129,
+    62
+   ],
+   "hero_px_removed": 1279
+  },
+  {
+   "code": "SL27",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    208,
+    772,
+    359,
+    876
+   ],
+   "fx_size": [
+    138,
+    57
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "SL28",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    369,
+    772,
+    507,
+    876
+   ],
+   "fx_size": [
+    124,
+    47
+   ],
+   "hero_px_removed": 789
+  },
+  {
+   "code": "SL29",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    516,
+    772,
+    638,
+    876
+   ],
+   "fx_size": [
+    105,
+    51
+   ],
+   "hero_px_removed": 656
+  },
+  {
+   "code": "SL30",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    646,
+    772,
+    829,
+    876
+   ],
+   "fx_size": [
+    154,
+    66
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "PC01",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    286,
+    1028,
+    373
+   ],
+   "fx_size": [
+    50,
+    22
+   ],
+   "hero_px_removed": 2183
+  },
+  {
+   "code": "PC02",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    286,
+    1200,
+    373
+   ],
+   "fx_size": [
+    61,
+    43
+   ],
+   "hero_px_removed": 2510
+  },
+  {
+   "code": "PC03",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    286,
+    1362,
+    373
+   ],
+   "fx_size": [
+    39,
+    35
+   ],
+   "hero_px_removed": 3016
+  },
+  {
+   "code": "PC04",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    286,
+    1526,
+    373
+   ],
+   "fx_size": [
+    58,
+    43
+   ],
+   "hero_px_removed": 2216
+  },
+  {
+   "code": "PC05",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1534,
+    286,
+    1684,
+    373
+   ],
+   "fx_size": [
+    76,
+    45
+   ],
+   "hero_px_removed": 2577
+  },
+  {
+   "code": "PC06",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    380,
+    1028,
+    474
+   ],
+   "fx_size": [
+    90,
+    36
+   ],
+   "hero_px_removed": 1882
+  },
+  {
+   "code": "PC07",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1038,
+    380,
+    1201,
+    474
+   ],
+   "fx_size": [
+    90,
+    54
+   ],
+   "hero_px_removed": 1336
+  },
+  {
+   "code": "PC08",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    380,
+    1361,
+    474
+   ],
+   "fx_size": [
+    95,
+    44
+   ],
+   "hero_px_removed": 1226
+  },
+  {
+   "code": "PC09",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    380,
+    1524,
+    474
+   ],
+   "fx_size": [
+    62,
+    33
+   ],
+   "hero_px_removed": 2194
+  },
+  {
+   "code": "PC10",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1534,
+    380,
+    1684,
+    474
+   ],
+   "fx_size": [
+    92,
+    57
+   ],
+   "hero_px_removed": 1369
+  },
+  {
+   "code": "PC11",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    483,
+    1028,
+    573
+   ],
+   "fx_size": [
+    63,
+    44
+   ],
+   "hero_px_removed": 2250
+  },
+  {
+   "code": "PC12",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1038,
+    483,
+    1200,
+    573
+   ],
+   "fx_size": [
+    103,
+    52
+   ],
+   "hero_px_removed": 2685
+  },
+  {
+   "code": "PC13",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    483,
+    1360,
+    573
+   ],
+   "fx_size": [
+    58,
+    31
+   ],
+   "hero_px_removed": 1759
+  },
+  {
+   "code": "PC14",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    483,
+    1523,
+    573
+   ],
+   "fx_size": [
+    72,
+    53
+   ],
+   "hero_px_removed": 1935
+  },
+  {
+   "code": "PC15",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1533,
+    483,
+    1684,
+    573
+   ],
+   "fx_size": [
+    87,
+    45
+   ],
+   "hero_px_removed": 1793
+  },
+  {
+   "code": "PC16",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    581,
+    1028,
+    671
+   ],
+   "fx_size": [
+    43,
+    20
+   ],
+   "hero_px_removed": 2566
+  },
+  {
+   "code": "PC17",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    581,
+    1200,
+    671
+   ],
+   "fx_size": [
+    59,
+    35
+   ],
+   "hero_px_removed": 1886
+  },
+  {
+   "code": "PC18",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    581,
+    1360,
+    671
+   ],
+   "fx_size": [
+    78,
+    44
+   ],
+   "hero_px_removed": 1301
+  },
+  {
+   "code": "PC19",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    581,
+    1523,
+    671
+   ],
+   "fx_size": [
+    85,
+    46
+   ],
+   "hero_px_removed": 1295
+  },
+  {
+   "code": "PC20",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1533,
+    581,
+    1683,
+    671
+   ],
+   "fx_size": [
+    85,
+    39
+   ],
+   "hero_px_removed": 1639
+  },
+  {
+   "code": "PC21",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    877,
+    680,
+    1028,
+    773
+   ],
+   "fx_size": [
+    83,
+    45
+   ],
+   "hero_px_removed": 1416
+  },
+  {
+   "code": "PC22",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    680,
+    1200,
+    773
+   ],
+   "fx_size": [
+    96,
+    42
+   ],
+   "hero_px_removed": 1326
+  },
+  {
+   "code": "PC23",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    680,
+    1361,
+    773
+   ],
+   "fx_size": [
+    89,
+    39
+   ],
+   "hero_px_removed": 1883
+  },
+  {
+   "code": "PC24",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    680,
+    1524,
+    773
+   ],
+   "fx_size": [
+    89,
+    43
+   ],
+   "hero_px_removed": 1367
+  },
+  {
+   "code": "PC25",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1534,
+    680,
+    1684,
+    773
+   ],
+   "fx_size": [
+    81,
+    39
+   ],
+   "hero_px_removed": 1256
+  },
+  {
+   "code": "PC26",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    877,
+    780,
+    1029,
+    878
+   ],
+   "fx_size": [
+    38,
+    22
+   ],
+   "hero_px_removed": 2722
+  },
+  {
+   "code": "PC27",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    780,
+    1201,
+    878
+   ],
+   "fx_size": [
+    104,
+    49
+   ],
+   "hero_px_removed": 1183
+  },
+  {
+   "code": "PC28",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    780,
+    1361,
+    878
+   ],
+   "fx_size": [
+    90,
+    25
+   ],
+   "hero_px_removed": 1334
+  },
+  {
+   "code": "PC29",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    780,
+    1524,
+    878
+   ],
+   "fx_size": [
+    90,
+    37
+   ],
+   "hero_px_removed": 1381
+  },
+  {
+   "code": "PC30",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1533,
+    780,
+    1683,
+    878
+   ],
+   "fx_size": [
+    134,
+    62
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "CR01",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    287,
+    1893,
+    374
+   ],
+   "fx_size": [
+    132,
+    48
+   ],
+   "hero_px_removed": 2234
+  },
+  {
+   "code": "CR02",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1902,
+    287,
+    2069,
+    374
+   ],
+   "fx_size": [
+    143,
+    38
+   ],
+   "hero_px_removed": 2054
+  },
+  {
+   "code": "CR03",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2080,
+    287,
+    2230,
+    374
+   ],
+   "fx_size": [
+    130,
+    45
+   ],
+   "hero_px_removed": 311
+  },
+  {
+   "code": "CR04",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2239,
+    287,
+    2400,
+    374
+   ],
+   "fx_size": [
+    111,
+    52
+   ],
+   "hero_px_removed": 1473
+  },
+  {
+   "code": "CR05",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2410,
+    287,
+    2545,
+    374
+   ],
+   "fx_size": [
+    119,
+    50
+   ],
+   "hero_px_removed": 1103
+  },
+  {
+   "code": "CR06",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    381,
+    1893,
+    475
+   ],
+   "fx_size": [
+    76,
+    58
+   ],
+   "hero_px_removed": 1836
+  },
+  {
+   "code": "CR07",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1903,
+    381,
+    2069,
+    475
+   ],
+   "fx_size": [
+    138,
+    55
+   ],
+   "hero_px_removed": 1812
+  },
+  {
+   "code": "CR08",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2080,
+    381,
+    2230,
+    475
+   ],
+   "fx_size": [
+    124,
+    56
+   ],
+   "hero_px_removed": 1875
+  },
+  {
+   "code": "CR09",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2240,
+    381,
+    2400,
+    475
+   ],
+   "fx_size": [
+    126,
+    56
+   ],
+   "hero_px_removed": 3382
+  },
+  {
+   "code": "CR10",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2410,
+    381,
+    2545,
+    475
+   ],
+   "fx_size": [
+    120,
+    51
+   ],
+   "hero_px_removed": 3498
+  },
+  {
+   "code": "CR11",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    483,
+    1893,
+    577
+   ],
+   "fx_size": [
+    144,
+    55
+   ],
+   "hero_px_removed": 1644
+  },
+  {
+   "code": "CR12",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1903,
+    483,
+    2072,
+    577
+   ],
+   "fx_size": [
+    152,
+    53
+   ],
+   "hero_px_removed": 891
+  },
+  {
+   "code": "CR13",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2082,
+    483,
+    2230,
+    577
+   ],
+   "fx_size": [
+    133,
+    54
+   ],
+   "hero_px_removed": 1100
+  },
+  {
+   "code": "CR14",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2240,
+    483,
+    2382,
+    577
+   ],
+   "fx_size": [
+    119,
+    53
+   ],
+   "hero_px_removed": 2006
+  },
+  {
+   "code": "CR15",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2391,
+    483,
+    2545,
+    577
+   ],
+   "fx_size": [
+    139,
+    59
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "CR16",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    585,
+    1894,
+    680
+   ],
+   "fx_size": [
+    140,
+    59
+   ],
+   "hero_px_removed": 630
+  },
+  {
+   "code": "CR17",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1904,
+    585,
+    2071,
+    680
+   ],
+   "fx_size": [
+    139,
+    62
+   ],
+   "hero_px_removed": 1625
+  },
+  {
+   "code": "CR18",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2081,
+    585,
+    2231,
+    680
+   ],
+   "fx_size": [
+    114,
+    52
+   ],
+   "hero_px_removed": 1209
+  },
+  {
+   "code": "CR19",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2241,
+    585,
+    2382,
+    680
+   ],
+   "fx_size": [
+    73,
+    57
+   ],
+   "hero_px_removed": 2890
+  },
+  {
+   "code": "CR20",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2392,
+    585,
+    2545,
+    680
+   ],
+   "fx_size": [
+    134,
+    57
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "CR21",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    689,
+    1893,
+    781
+   ],
+   "fx_size": [
+    144,
+    54
+   ],
+   "hero_px_removed": 825
+  },
+  {
+   "code": "CR22",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1903,
+    689,
+    2072,
+    781
+   ],
+   "fx_size": [
+    152,
+    54
+   ],
+   "hero_px_removed": 2943
+  },
+  {
+   "code": "CR23",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2082,
+    689,
+    2231,
+    781
+   ],
+   "fx_size": [
+    129,
+    43
+   ],
+   "hero_px_removed": 2250
+  },
+  {
+   "code": "CR24",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2241,
+    689,
+    2383,
+    781
+   ],
+   "fx_size": [
+    79,
+    50
+   ],
+   "hero_px_removed": 1206
+  },
+  {
+   "code": "CR25",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2393,
+    689,
+    2545,
+    781
+   ],
+   "fx_size": [
+    132,
+    54
+   ],
+   "hero_px_removed": 2745
+  },
+  {
+   "code": "CR26",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    789,
+    1892,
+    882
+   ],
+   "fx_size": [
+    136,
+    54
+   ],
+   "hero_px_removed": 418
+  },
+  {
+   "code": "CR27",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1902,
+    789,
+    2069,
+    882
+   ],
+   "fx_size": [
+    126,
+    53
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "CR28",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2079,
+    789,
+    2230,
+    882
+   ],
+   "fx_size": [
+    128,
+    57
+   ],
+   "hero_px_removed": 726
+  },
+  {
+   "code": "CR29",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2240,
+    789,
+    2366,
+    882
+   ],
+   "fx_size": [
+    108,
+    55
+   ],
+   "hero_px_removed": 1940
+  },
+  {
+   "code": "CR30",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2375,
+    789,
+    2543,
+    882
+   ],
+   "fx_size": [
+    152,
+    61
+   ],
+   "hero_px_removed": 0
+  },
+  {
+   "code": "BD01",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1019,
+    202,
+    1105
+   ],
+   "fx_size": [
+    31,
+    34
+   ],
+   "hero_px_removed": 3331
+  },
+  {
+   "code": "BD02",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    212,
+    1019,
+    366,
+    1105
+   ],
+   "fx_size": [
+    85,
+    35
+   ],
+   "hero_px_removed": 2267
+  },
+  {
+   "code": "BD03",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1019,
+    523,
+    1105
+   ],
+   "fx_size": [
+    89,
+    53
+   ],
+   "hero_px_removed": 2575
+  },
+  {
+   "code": "BD04",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    532,
+    1019,
+    667,
+    1105
+   ],
+   "fx_size": [
+    23,
+    29
+   ],
+   "hero_px_removed": 1977
+  },
+  {
+   "code": "BD05",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    676,
+    1019,
+    829,
+    1105
+   ],
+   "fx_size": [
+    40,
+    37
+   ],
+   "hero_px_removed": 2739
+  },
+  {
+   "code": "BD06",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    30,
+    1114,
+    202,
+    1196
+   ],
+   "fx_size": [
+    37,
+    36
+   ],
+   "hero_px_removed": 2604
+  },
+  {
+   "code": "BD07",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    212,
+    1114,
+    366,
+    1196
+   ],
+   "fx_size": [
+    62,
+    50
+   ],
+   "hero_px_removed": 2235
+  },
+  {
+   "code": "BD08",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1114,
+    523,
+    1196
+   ],
+   "fx_size": [
+    81,
+    38
+   ],
+   "hero_px_removed": 1645
+  },
+  {
+   "code": "BD09",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    533,
+    1114,
+    667,
+    1196
+   ],
+   "fx_size": [
+    80,
+    42
+   ],
+   "hero_px_removed": 1193
+  },
+  {
+   "code": "BD10",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    676,
+    1114,
+    829,
+    1196
+   ],
+   "fx_size": [
+    39,
+    38
+   ],
+   "hero_px_removed": 2244
+  },
+  {
+   "code": "BD11",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1205,
+    200,
+    1289
+   ],
+   "fx_size": [
+    26,
+    32
+   ],
+   "hero_px_removed": 3040
+  },
+  {
+   "code": "BD12",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    210,
+    1205,
+    366,
+    1289
+   ],
+   "fx_size": [
+    49,
+    36
+   ],
+   "hero_px_removed": 2330
+  },
+  {
+   "code": "BD13",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1205,
+    522,
+    1289
+   ],
+   "fx_size": [
+    33,
+    29
+   ],
+   "hero_px_removed": 2315
+  },
+  {
+   "code": "BD14",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    532,
+    1205,
+    667,
+    1289
+   ],
+   "fx_size": [
+    27,
+    28
+   ],
+   "hero_px_removed": 1975
+  },
+  {
+   "code": "BD15",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    677,
+    1205,
+    829,
+    1289
+   ],
+   "fx_size": [
+    38,
+    35
+   ],
+   "hero_px_removed": 1914
+  },
+  {
+   "code": "BD16",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1298,
+    201,
+    1381
+   ],
+   "fx_size": [
+    67,
+    40
+   ],
+   "hero_px_removed": 2591
+  },
+  {
+   "code": "BD17",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    211,
+    1298,
+    366,
+    1381
+   ],
+   "fx_size": [
+    72,
+    37
+   ],
+   "hero_px_removed": 2516
+  },
+  {
+   "code": "BD18",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1298,
+    522,
+    1381
+   ],
+   "fx_size": [
+    57,
+    31
+   ],
+   "hero_px_removed": 2874
+  },
+  {
+   "code": "BD19",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    532,
+    1298,
+    667,
+    1381
+   ],
+   "fx_size": [
+    28,
+    32
+   ],
+   "hero_px_removed": 2179
+  },
+  {
+   "code": "BD20",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    677,
+    1298,
+    829,
+    1381
+   ],
+   "fx_size": [
+    58,
+    44
+   ],
+   "hero_px_removed": 1963
+  },
+  {
+   "code": "BD21",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1389,
+    202,
+    1469
+   ],
+   "fx_size": [
+    112,
+    38
+   ],
+   "hero_px_removed": 1485
+  },
+  {
+   "code": "BD22",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    212,
+    1389,
+    366,
+    1469
+   ],
+   "fx_size": [
+    93,
+    36
+   ],
+   "hero_px_removed": 1009
+  },
+  {
+   "code": "BD23",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1389,
+    523,
+    1469
+   ],
+   "fx_size": [
+    98,
+    31
+   ],
+   "hero_px_removed": 2404
+  },
+  {
+   "code": "BD24",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    533,
+    1389,
+    668,
+    1469
+   ],
+   "fx_size": [
+    36,
+    37
+   ],
+   "hero_px_removed": 1579
+  },
+  {
+   "code": "BD25",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    677,
+    1389,
+    829,
+    1469
+   ],
+   "fx_size": [
+    44,
+    41
+   ],
+   "hero_px_removed": 1894
+  },
+  {
+   "code": "BD26",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1476,
+    201,
+    1548
+   ],
+   "fx_size": [
+    113,
+    35
+   ],
+   "hero_px_removed": 2233
+  },
+  {
+   "code": "BD27",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    211,
+    1476,
+    364,
+    1548
+   ],
+   "fx_size": [
+    83,
+    35
+   ],
+   "hero_px_removed": 840
+  },
+  {
+   "code": "BD28",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    374,
+    1476,
+    513,
+    1548
+   ],
+   "fx_size": [
+    54,
+    32
+   ],
+   "hero_px_removed": 1468
+  },
+  {
+   "code": "BD29",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    522,
+    1476,
+    662,
+    1548
+   ],
+   "fx_size": [
+    29,
+    34
+   ],
+   "hero_px_removed": 2098
+  },
+  {
+   "code": "BD30",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    671,
+    1476,
+    830,
+    1548
+   ],
+   "fx_size": [
+    141,
+    46
+   ],
+   "hero_px_removed": 830
+  },
+  {
+   "code": "ST01",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1020,
+    1036,
+    1103
+   ],
+   "fx_size": [
+    71,
+    37
+   ],
+   "hero_px_removed": 1860
+  },
+  {
+   "code": "ST02",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1020,
+    1202,
+    1103
+   ],
+   "fx_size": [
+    99,
+    44
+   ],
+   "hero_px_removed": 1448
+  },
+  {
+   "code": "ST03",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1020,
+    1370,
+    1103
+   ],
+   "fx_size": [
+    136,
+    42
+   ],
+   "hero_px_removed": 2205
+  },
+  {
+   "code": "ST04",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1020,
+    1536,
+    1103
+   ],
+   "fx_size": [
+    98,
+    43
+   ],
+   "hero_px_removed": 861
+  },
+  {
+   "code": "ST05",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1020,
+    1683,
+    1103
+   ],
+   "fx_size": [
+    118,
+    39
+   ],
+   "hero_px_removed": 793
+  },
+  {
+   "code": "ST06",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1110,
+    1035,
+    1193
+   ],
+   "fx_size": [
+    86,
+    40
+   ],
+   "hero_px_removed": 960
+  },
+  {
+   "code": "ST07",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1110,
+    1202,
+    1193
+   ],
+   "fx_size": [
+    134,
+    36
+   ],
+   "hero_px_removed": 1190
+  },
+  {
+   "code": "ST08",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1110,
+    1370,
+    1193
+   ],
+   "fx_size": [
+    105,
+    35
+   ],
+   "hero_px_removed": 1665
+  },
+  {
+   "code": "ST09",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1110,
+    1536,
+    1193
+   ],
+   "fx_size": [
+    93,
+    39
+   ],
+   "hero_px_removed": 1206
+  },
+  {
+   "code": "ST10",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1110,
+    1683,
+    1193
+   ],
+   "fx_size": [
+    91,
+    48
+   ],
+   "hero_px_removed": 1215
+  },
+  {
+   "code": "ST11",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1201,
+    1035,
+    1283
+   ],
+   "fx_size": [
+    91,
+    44
+   ],
+   "hero_px_removed": 872
+  },
+  {
+   "code": "ST12",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1201,
+    1202,
+    1283
+   ],
+   "fx_size": [
+    113,
+    39
+   ],
+   "hero_px_removed": 1369
+  },
+  {
+   "code": "ST13",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1201,
+    1370,
+    1283
+   ],
+   "fx_size": [
+    80,
+    53
+   ],
+   "hero_px_removed": 1608
+  },
+  {
+   "code": "ST14",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1201,
+    1536,
+    1283
+   ],
+   "fx_size": [
+    92,
+    38
+   ],
+   "hero_px_removed": 1471
+  },
+  {
+   "code": "ST15",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1201,
+    1683,
+    1283
+   ],
+   "fx_size": [
+    42,
+    44
+   ],
+   "hero_px_removed": 1672
+  },
+  {
+   "code": "ST16",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1290,
+    1036,
+    1372
+   ],
+   "fx_size": [
+    108,
+    46
+   ],
+   "hero_px_removed": 840
+  },
+  {
+   "code": "ST17",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1290,
+    1202,
+    1372
+   ],
+   "fx_size": [
+    89,
+    40
+   ],
+   "hero_px_removed": 892
+  },
+  {
+   "code": "ST18",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1290,
+    1370,
+    1372
+   ],
+   "fx_size": [
+    102,
+    38
+   ],
+   "hero_px_removed": 887
+  },
+  {
+   "code": "ST19",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1290,
+    1536,
+    1372
+   ],
+   "fx_size": [
+    126,
+    43
+   ],
+   "hero_px_removed": 1129
+  },
+  {
+   "code": "ST20",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1290,
+    1683,
+    1372
+   ],
+   "fx_size": [
+    46,
+    44
+   ],
+   "hero_px_removed": 1788
+  },
+  {
+   "code": "ST21",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    878,
+    1379,
+    1035,
+    1461
+   ],
+   "fx_size": [
+    97,
+    41
+   ],
+   "hero_px_removed": 1103
+  },
+  {
+   "code": "ST22",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1379,
+    1202,
+    1461
+   ],
+   "fx_size": [
+    31,
+    32
+   ],
+   "hero_px_removed": 2342
+  },
+  {
+   "code": "ST23",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1379,
+    1370,
+    1461
+   ],
+   "fx_size": [
+    137,
+    38
+   ],
+   "hero_px_removed": 374
+  },
+  {
+   "code": "ST24",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1379,
+    1536,
+    1461
+   ],
+   "fx_size": [
+    59,
+    36
+   ],
+   "hero_px_removed": 2118
+  },
+  {
+   "code": "ST25",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1379,
+    1682,
+    1461
+   ],
+   "fx_size": [
+    71,
+    42
+   ],
+   "hero_px_removed": 1074
+  },
+  {
+   "code": "ST26",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1467,
+    1036,
+    1547
+   ],
+   "fx_size": [
+    78,
+    51
+   ],
+   "hero_px_removed": 1371
+  },
+  {
+   "code": "ST27",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1467,
+    1202,
+    1547
+   ],
+   "fx_size": [
+    100,
+    44
+   ],
+   "hero_px_removed": 870
+  },
+  {
+   "code": "ST28",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1467,
+    1371,
+    1547
+   ],
+   "fx_size": [
+    104,
+    51
+   ],
+   "hero_px_removed": 766
+  },
+  {
+   "code": "ST30",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1382,
+    1467,
+    1682,
+    1547
+   ],
+   "fx_size": [
+    176,
+    42
+   ],
+   "hero_px_removed": 369
+  },
+  {
+   "code": "DV07",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1019,
+    1892,
+    1107
+   ],
+   "fx_size": [
+    25,
+    40
+   ],
+   "hero_px_removed": 2597
+  },
+  {
+   "code": "DV08",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1903,
+    1019,
+    2068,
+    1107
+   ],
+   "fx_size": [
+    39,
+    47
+   ],
+   "hero_px_removed": 2743
+  },
+  {
+   "code": "DV09",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2078,
+    1019,
+    2231,
+    1107
+   ],
+   "fx_size": [
+    82,
+    26
+   ],
+   "hero_px_removed": 2357
+  },
+  {
+   "code": "DV10",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1019,
+    2395,
+    1107
+   ],
+   "fx_size": [
+    87,
+    43
+   ],
+   "hero_px_removed": 1385
+  },
+  {
+   "code": "DV11",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2407,
+    1019,
+    2543,
+    1107
+   ],
+   "fx_size": [
+    76,
+    12
+   ],
+   "hero_px_removed": 2410
+  },
+  {
+   "code": "DV12",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1115,
+    1892,
+    1201
+   ],
+   "fx_size": [
+    77,
+    56
+   ],
+   "hero_px_removed": 1946
+  },
+  {
+   "code": "DV13",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1903,
+    1115,
+    2068,
+    1201
+   ],
+   "fx_size": [
+    81,
+    44
+   ],
+   "hero_px_removed": 1343
+  },
+  {
+   "code": "DV14",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2079,
+    1115,
+    2231,
+    1201
+   ],
+   "fx_size": [
+    57,
+    39
+   ],
+   "hero_px_removed": 2158
+  },
+  {
+   "code": "DV15",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1115,
+    2395,
+    1201
+   ],
+   "fx_size": [
+    51,
+    35
+   ],
+   "hero_px_removed": 2076
+  },
+  {
+   "code": "DV16",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2406,
+    1115,
+    2544,
+    1201
+   ],
+   "fx_size": [
+    56,
+    42
+   ],
+   "hero_px_removed": 1408
+  },
+  {
+   "code": "DV17",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1210,
+    1891,
+    1295
+   ],
+   "fx_size": [
+    56,
+    31
+   ],
+   "hero_px_removed": 2589
+  },
+  {
+   "code": "DV18",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1904,
+    1210,
+    2068,
+    1295
+   ],
+   "fx_size": [
+    38,
+    48
+   ],
+   "hero_px_removed": 2784
+  },
+  {
+   "code": "DV19",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2080,
+    1210,
+    2231,
+    1295
+   ],
+   "fx_size": [
+    82,
+    40
+   ],
+   "hero_px_removed": 1571
+  },
+  {
+   "code": "DV20",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1210,
+    2395,
+    1295
+   ],
+   "fx_size": [
+    84,
+    41
+   ],
+   "hero_px_removed": 1037
+  },
+  {
+   "code": "DV21",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2406,
+    1210,
+    2544,
+    1295
+   ],
+   "fx_size": [
+    35,
+    29
+   ],
+   "hero_px_removed": 2156
+  },
+  {
+   "code": "DV22",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1303,
+    1891,
+    1385
+   ],
+   "fx_size": [
+    87,
+    42
+   ],
+   "hero_px_removed": 1247
+  },
+  {
+   "code": "DV23",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1904,
+    1303,
+    2068,
+    1385
+   ],
+   "fx_size": [
+    89,
+    35
+   ],
+   "hero_px_removed": 1093
+  },
+  {
+   "code": "DV24",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2080,
+    1303,
+    2230,
+    1385
+   ],
+   "fx_size": [
+    92,
+    42
+   ],
+   "hero_px_removed": 1982
+  },
+  {
+   "code": "DV25",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1303,
+    2395,
+    1385
+   ],
+   "fx_size": [
+    61,
+    38
+   ],
+   "hero_px_removed": 2155
+  },
+  {
+   "code": "DV26",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2406,
+    1303,
+    2544,
+    1385
+   ],
+   "fx_size": [
+    66,
+    38
+   ],
+   "hero_px_removed": 1858
+  },
+  {
+   "code": "DV27",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1393,
+    1891,
+    1546
+   ],
+   "fx_size": [
+    42,
+    72
+   ],
+   "hero_px_removed": 7069
+  },
+  {
+   "code": "DV28",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1904,
+    1393,
+    2092,
+    1546
+   ],
+   "fx_size": [
+    56,
+    72
+   ],
+   "hero_px_removed": 8867
+  },
+  {
+   "code": "DV29",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2105,
+    1393,
+    2543,
+    1546
+   ],
+   "fx_size": [
+    176,
+    50
+   ],
+   "hero_px_removed": 25233
+  }
+ ]
+}
