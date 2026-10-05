@@ -18,3 +18,7 @@
 	path = third_party/DND-5e-LaTeX-Template
 	url = https://github.com/rpgtex/DND-5e-LaTeX-Template.git
 	shallow = true
+[submodule "third_party/pixel-agents"]
+	path = third_party/pixel-agents
+	url = https://github.com/pixel-agents-hq/pixel-agents.git
+	shallow = true
