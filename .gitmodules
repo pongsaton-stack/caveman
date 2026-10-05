@@ -10,3 +10,11 @@
 	path = third_party/RPG-DiffusionMaster
 	url = https://github.com/YangLing0818/RPG-DiffusionMaster.git
 	shallow = true
+[submodule "third_party/RPG-JS"]
+	path = third_party/RPG-JS
+	url = https://github.com/RSamaium/RPG-JS.git
+	shallow = true
+[submodule "third_party/DND-5e-LaTeX-Template"]
+	path = third_party/DND-5e-LaTeX-Template
+	url = https://github.com/rpgtex/DND-5e-LaTeX-Template.git
+	shallow = true
