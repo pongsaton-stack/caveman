@@ -567,7 +567,7 @@ function auInit() {
 		const comp = ac.createDynamicsCompressor(); comp.threshold.value = -14; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.2;
 		const master = ac.createGain(); master.gain.value = 0.85; comp.connect(master); master.connect(ac.destination);
 		const sfx = ac.createGain(); sfx.gain.value = 1; sfx.connect(comp);
-		const music = ac.createGain(); music.gain.value = 0.2; music.connect(comp);
+		const music = ac.createGain(); music.gain.value = 0.28; music.connect(comp);
 		const nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate), d = nb.getChannelData(0); let s = 12345; for (let i = 0; i < d.length; i++) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; d[i] = s / 2147483648 - 1; }
 		const ir = ac.createBuffer(2, ac.sampleRate * 1.6, ac.sampleRate);   // ห้องก้อง: เสียงซ่าที่จางลง 1.6 วิ
 		for (let ch = 0; ch < 2; ch++) { const x = ir.getChannelData(ch); for (let i = 0; i < x.length; i++) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; x[i] = (s / 2147483648 - 1) * Math.pow(1 - i / x.length, 3); } }
@@ -623,44 +623,96 @@ function vfxSound(c, f) {   // เรียกเมื่อเฟรมเด�
 	if (f === VFX.HIT + VFX.STOP + 2) AU_SFX.tail(fam);
 }
 
-// ── เพลงต่อสู้แนว SNES JRPG (แต่งใหม่สำหรับหน้านี้ · ไม่ใช่เพลงของเกมอื่น) ── D minor · 152 BPM · 8 ห้องวน
-// ลีด (สแควร์ 2 ตัวเหลื่อมเสียง + สั่น + เสียงสะท้อน) · เบส (ซอว์กรองต่ำ ตีโน้ตเต็ม/คู่แปด) · อาร์เปจจิโอ 16 ส่วน · กลอง (คิก สแนร์ ไฮแฮต)
+// ── เพลงต่อสู้ (แต่งใหม่สำหรับหน้านี้ · ไม่ใช่เพลงของเกมอื่น) ── D minor · 152 BPM · 16 ห้องวน
+// ท่อน A (ห้อง 1–8): ทำนอง SNES (สแควร์คู่ + สั่น + เสียงสะท้อน) + อาร์เปจจิโอ + เบสวิ่ง + กลองหนัก
+// ท่อน B (ห้อง 9–16): ริฟกีตาร์ไฟฟ้าแนวนูเมทัล — จูนต่ำ (Drop D) ตบสาย (palm mute) สลับคอร์ดเปิด · แตกพร่าหนัก กลางเสียงเว้า (scooped) ·
+//   อัดสองแทร็กซ้าย-ขวา · เบสเล่นตามริฟต่ำลงคู่แปด · กลองเหยียบตามจังหวะตบสาย · จบท่อนด้วยเสียงหวีดกีตาร์ (pinch harmonic)
 const BGM = { bpm: 152, chords: [[50, 'm'], [46, 'M'], [48, 'M'], [45, 'm'], [50, 'm'], [46, 'M'], [43, 'm'], [45, 'M']],
 	lead: [[[69, 2], [74, 2], [77, 2], [76, 2], [74, 4], [69, 4]], [[77, 2], [79, 2], [81, 4], [79, 2], [77, 2], [74, 4]],
 		[[76, 2], [77, 2], [79, 4], [72, 2], [76, 2], [79, 4]], [[81, 6], [79, 2], [76, 4], [73, 4]],
 		[[74, 2], [77, 2], [81, 2], [86, 2], [84, 2], [81, 2], [77, 4]], [[82, 4], [81, 2], [79, 2], [77, 4], [74, 4]],
 		[[79, 2], [82, 2], [86, 4], [84, 2], [82, 2], [79, 4]], [[81, 4], [76, 2], [79, 2], [85, 4], [81, 4]]],
-	kick: [0, 6, 8, 11], snare: [4, 12] };
+	kickA: [0, 3, 6, 8, 10, 11], snareA: [4, 12], ghostA: [7, 15],
+	// ริฟ 4 ห้อง (เล่น 2 รอบ): [จังหวะ 16 ส่วน, โน้ตราก, 'm' ตบสาย | 'o' คอร์ดเปิด, ยาวกี่จังหวะ] · 38 = D ต่ำ (Drop D)
+	riff: [[[0, 38, 'm', 1], [2, 38, 'm', 1], [3, 38, 'm', 1], [5, 38, 'm', 1], [7, 38, 'm', 1], [8, 41, 'o', 2], [10, 38, 'm', 1], [11, 38, 'm', 1], [12, 44, 'o', 3], [15, 38, 'm', 1]],
+		[[0, 38, 'm', 1], [1, 38, 'm', 1], [3, 38, 'm', 1], [4, 46, 'o', 2], [6, 38, 'm', 1], [8, 38, 'm', 1], [9, 38, 'm', 1], [11, 38, 'm', 1], [12, 45, 'o', 4]],
+		[[0, 38, 'm', 1], [2, 38, 'm', 1], [3, 38, 'm', 1], [5, 38, 'm', 1], [7, 38, 'm', 1], [8, 41, 'o', 2], [10, 38, 'm', 1], [11, 38, 'm', 1], [12, 44, 'o', 3], [15, 38, 'm', 1]],
+		[[0, 38, 'm', 1], [2, 38, 'm', 1], [4, 48, 'o', 2], [6, 46, 'o', 2], [8, 45, 'o', 2], [10, 44, 'o', 2], [12, 38, 'm', 1], [13, 38, 'm', 1], [14, 38, 'm', 1], [15, 38, 'm', 1]]] };
 const mhz = n => 440 * Math.pow(2, (n - 69) / 12);
-let bgmTimer = null, bgmNext = 0, bgmStep = 0, bgmEcho = null;
+let bgmTimer = null, bgmNext = 0, bgmStep = 0, bgmEcho = null, bgmGtr = null;
+function bgmGuitarChains() {   // กีตาร์ 2 แทร็ก (ซ้าย/ขวา): ตัดเบสต่ำ → แตกพร่าหนัก → ตู้แอมป์ (ตัดแหลม) → กลางเว้า · แหลมบนดันขึ้น
+	if (bgmGtr) return bgmGtr; const { ac, music } = AU;
+	const curve = new Float32Array(2048); for (let i = 0; i < 2048; i++) { const x = i / 1024 - 1; curve[i] = Math.tanh(x * 30); }
+	bgmGtr = [-0.65, 0.65].map(pan => {
+		const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 85;
+		const ws = ac.createWaveShaper(); ws.curve = curve; ws.oversample = '4x';
+		const cab = ac.createBiquadFilter(); cab.type = 'lowpass'; cab.frequency.value = 4800; cab.Q.value = 0.8;
+		const scoop = ac.createBiquadFilter(); scoop.type = 'peaking'; scoop.frequency.value = 750; scoop.Q.value = 1.1; scoop.gain.value = -8;
+		const bite = ac.createBiquadFilter(); bite.type = 'peaking'; bite.frequency.value = 2600; bite.Q.value = 1.4; bite.gain.value = 4;
+		const g = ac.createGain(); g.gain.value = 0.32; const pn = ac.createStereoPanner ? ac.createStereoPanner() : null; if (pn) pn.pan.value = pan;
+		hp.connect(ws); ws.connect(cab); cab.connect(scoop); scoop.connect(bite); bite.connect(g); (pn ? (g.connect(pn), pn) : g).connect(music);
+		return hp; });
+	return bgmGtr;
+}
+function bgmGuitar(t, root, kind, len) {   // คอร์ดพาวเวอร์ (ราก + ห้า + คู่แปด) ส่งเข้ากีตาร์ทั้งสองแทร็ก เหลื่อมเสียงกันนิดหน่อยให้กว้าง
+	const { ac } = AU, chains = bgmGuitarChains(), mute = kind === 'm', dur = mute ? 0.11 : len;
+	chains.forEach((inp, side) => {
+		const pre = ac.createBiquadFilter(); pre.type = 'lowpass'; pre.frequency.value = mute ? 650 : 3200;   // ตบสาย = ก่อนแตกพร่าตัดแหลมทิ้ง เสียงหนา "จึ๊ก"
+		const g = ac.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(mute ? 0.9 : 0.75, t + 0.004);
+		g.gain.exponentialRampToValueAtTime(mute ? 0.05 : 0.45, t + (mute ? dur : 0.12)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.04);
+		pre.connect(g); g.connect(inp);
+		for (const [iv, lvl] of [[0, 0.5], [7, 0.4], [12, 0.25]]) { const os = ac.createOscillator(), og = ac.createGain(); os.type = 'sawtooth'; os.frequency.value = mhz(root + iv); os.detune.value = side ? 9 : -9;
+			og.gain.value = lvl; os.connect(og); og.connect(pre); os.start(t); os.stop(t + dur + 0.08); }
+	});
+}
+function bgmSqueal(t) {   // เสียงหวีด (pinch harmonic) ปิดท่อน: โน้ตสูงผ่านแตกพร่า เอื้อนขึ้นแล้วดิ่ง
+	const { ac } = AU; for (const inp of bgmGuitarChains()) { const os = ac.createOscillator(), g = ac.createGain(); os.type = 'sawtooth';
+		os.frequency.setValueAtTime(mhz(86), t); os.frequency.linearRampToValueAtTime(mhz(88), t + 0.18); os.frequency.exponentialRampToValueAtTime(mhz(70), t + 0.55);
+		g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6); os.connect(g); g.connect(inp); os.start(t); os.stop(t + 0.65); }
+}
 function bgmNote(t, n, len, kind) {
 	const { ac, music } = AU, o = { dest: music, t };
 	if (kind === 'lead') {
-		if (!bgmEcho) { const d = ac.createDelay(1); d.delayTime.value = 60 / BGM.bpm * 0.75; const fb = ac.createGain(); fb.gain.value = 0.32; const lp = ac.createBiquadFilter(); lp.frequency.value = 2400;
+		if (!bgmEcho) { const d = ac.createDelay(1); d.delayTime.value = 60 / BGM.bpm * 0.75; const fb = ac.createGain(); fb.gain.value = 0.3; const lp = ac.createBiquadFilter(); lp.frequency.value = 2400;
 			d.connect(lp); lp.connect(fb); fb.connect(d); lp.connect(music); bgmEcho = d; }
 		for (const dt of [-7, 7]) { const os = ac.createOscillator(), g = ac.createGain(), fl = ac.createBiquadFilter(), lfo = ac.createOscillator(), lg = ac.createGain();
 			os.type = 'square'; os.frequency.value = mhz(n); os.detune.value = dt; fl.type = 'lowpass'; fl.frequency.value = 3200;
-			lfo.frequency.value = 5.6; lg.gain.value = 0; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(9, t + Math.min(len, 0.25) + 0.05); lfo.connect(lg); lg.connect(os.detune);   // สั่นเสียงหลังโน้ตยาวเริ่ม
-			g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.42, t + 0.01); g.gain.exponentialRampToValueAtTime(0.25, t + 0.08); g.gain.setValueAtTime(0.25, t + len * 0.85); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+			lfo.frequency.value = 5.6; lg.gain.value = 0; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(9, t + Math.min(len, 0.25) + 0.05); lfo.connect(lg); lg.connect(os.detune);
+			g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.3, t + 0.01); g.gain.exponentialRampToValueAtTime(0.18, t + 0.08); g.gain.setValueAtTime(0.18, t + len * 0.85); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
 			os.connect(fl); fl.connect(g); g.connect(music); g.connect(bgmEcho); os.start(t); lfo.start(t); os.stop(t + len + 0.05); lfo.stop(t + len + 0.05); }
-	} else if (kind === 'bass') auTone(len, 'sawtooth', mhz(n), mhz(n), 0.55, 0, 0.004, { ...o, lp: 700, q: 7 });
-	else if (kind === 'arp') auTone(len, 'square', mhz(n), mhz(n), 0.09, 0, 0.003, { ...o, lp: 2600 });
-	else if (kind === 'kick') auTone(0.14, 'sine', 160, 42, 0.9, 0, 0.002, o);
-	else if (kind === 'snare') { auNoise(0.13, 'bandpass', 1900, 1200, 0.6, 0.9, 0, o); auTone(0.08, 'triangle', 220, 160, 0.3, 0, 0.002, o); }
-	else if (kind === 'hat') auNoise(0.035, 'highpass', 7500, 7500, 0.22, 1, 0, o);
+	} else if (kind === 'bass') {   // เบส: ซอว์ + สแควร์ต่ำลงคู่แปด (ซับ) กรองต่ำ ดังกว่าเดิม
+		auTone(len, 'sawtooth', mhz(n), mhz(n), 0.8, 0, 0.003, { ...o, lp: 900, q: 5 }); auTone(len, 'square', mhz(n - 12), mhz(n - 12), 0.45, 0, 0.003, { ...o, lp: 220 }); }
+	else if (kind === 'arp') auTone(len, 'square', mhz(n), mhz(n), 0.06, 0, 0.003, { ...o, lp: 2600 });
+	else if (kind === 'kick') { auTone(0.26, 'sine', 170, 38, 1.6, 0, 0.002, o); auTone(0.05, 'triangle', 900, 200, 0.5, 0, 0.001, o); auNoise(0.012, 'highpass', 3000, 3000, 0.7, 1, 0, o); }   // คิกหนัก: ตัวตูม + หัวคลิก
+	else if (kind === 'snare') { auNoise(0.2, 'bandpass', 1900, 1100, 1.2, 0.8, 0, o); auTone(0.11, 'triangle', 200, 150, 0.7, 0, 0.002, o); auNoise(0.35, 'highpass', 2500, 2500, 0.25, 1, 0, o); }
+	else if (kind === 'ghost') auNoise(0.06, 'bandpass', 2000, 1500, 0.3, 1, 0, o);
+	else if (kind === 'hat') auNoise(0.035, 'highpass', 7500, 7500, 0.3, 1, 0, o);
+	else if (kind === 'crash') auNoise(1.5, 'highpass', 4500, 3000, 0.55, 0.7, 0, o);
 }
 function bgmTick() {
 	if (!AU) return; const ac = AU.ac, st = 60 / BGM.bpm / 4;
 	if (bgmNext < ac.currentTime) bgmNext = ac.currentTime + 0.05;
 	while (bgmNext < ac.currentTime + 0.12) {
-		const bar = (bgmStep >> 4) % 8, s16 = bgmStep % 16, [root, q] = BGM.chords[bar], t = bgmNext;
-		const tri = [0, q === 'm' ? 3 : 4, 7, 12];
-		let pos = 0; for (const [n, l] of BGM.lead[bar]) { if (pos === s16) bgmNote(t, n, l * st, 'lead'); pos += l; }
-		if (s16 % 2 === 0) bgmNote(t, root - 12 + (s16 % 4 === 2 ? 12 : 0), st * 1.8, 'bass');
-		bgmNote(t, root + 12 + tri[s16 % 4], st * 0.9, 'arp');
-		if (BGM.kick.includes(s16)) bgmNote(t, 0, 0, 'kick');
-		if (BGM.snare.includes(s16) || (bar === 7 && s16 >= 12)) bgmNote(t, 0, 0, 'snare');   // ห้องสุดท้ายรัวสแนร์ส่งกลับต้น
-		if (s16 % 2 === 0) bgmNote(t, 0, 0, 'hat');
+		const bar16 = (bgmStep >> 4) % 16, riffSec = bar16 >= 8, bar = bar16 % 8, s16 = bgmStep % 16, t = bgmNext;
+		if (s16 === 0 && (bar === 0 || bar === 4)) bgmNote(t, 0, 0, 'crash');
+		if (!riffSec) {   // ท่อน A
+			const [root, q] = BGM.chords[bar], tri = [0, q === 'm' ? 3 : 4, 7, 12];
+			let pos = 0; for (const [n, l] of BGM.lead[bar]) { if (pos === s16) bgmNote(t, n, l * st, 'lead'); pos += l; }
+			if (s16 % 2 === 0) bgmNote(t, root - 12 + (s16 % 4 === 2 ? 12 : 0), st * 1.8, 'bass');
+			bgmNote(t, root + 12 + tri[s16 % 4], st * 0.9, 'arp');
+			if (BGM.kickA.includes(s16)) bgmNote(t, 0, 0, 'kick');
+			if (BGM.snareA.includes(s16) || (bar === 7 && s16 >= 12)) bgmNote(t, 0, 0, 'snare'); else if (BGM.ghostA.includes(s16)) bgmNote(t, 0, 0, 'ghost');
+			if (s16 % 2 === 0) bgmNote(t, 0, 0, 'hat');
+		} else {   // ท่อน B: ริฟนูเมทัล
+			for (const [at, root, kind, len] of BGM.riff[bar % 4]) if (at === s16) {
+				bgmGuitar(t, root, kind, len * st);
+				bgmNote(t, root - 12, (kind === 'm' ? 1 : len) * st * 0.95, 'bass');
+				if (kind === 'm' || at % 4 === 0) bgmNote(t, 0, 0, 'kick');   // กระเดื่องตามจังหวะตบสาย
+			}
+			if (s16 === 4 || s16 === 12) bgmNote(t, 0, 0, 'snare');
+			if (s16 % 2 === 0) bgmNote(t, 0, 0, 'hat');
+			if (bar === 7 && s16 === 12) bgmSqueal(t);
+		}
 		bgmNext += st; bgmStep++;
 	}
 }
