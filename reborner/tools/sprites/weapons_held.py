@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import weapons as W
+import rion_grips as G
 
 ROOT = W.ROOT
 RION = os.path.join(ROOT, 'assets/sprites/rion_lastlight_draft')
@@ -35,6 +36,9 @@ POSE = {
 }
 FAMILY_POSE = {'SL': 'blade', 'PC': 'blade', 'CR': 'bat', 'ST': 'sling', 'DV': 'gun'}
 POSE_OVERRIDE = {'ST-4': 'gun'}   # หน้าไม้ร่ม = ประทับยิงแนวนอนเหมือนปืน ไม่ใช่ตั้งง่าม
+# ท่าตัวละครตามกลุ่มการจับ (rion_grips.py) — มีด/ดินสอใช้ท่าฟันมีดเดิม
+GRIP = {'bat': 'twohand', 'gun': 'aim', 'sling': 'sling'}
+RUBBER = {'ST-1': '#c9a06a', 'ST-2': '#2a2a30', 'ST-3': '#c03a3a', 'ST-5': '#7ae0ff'}
 
 def plain_icon(fam, tier):
 	"""ไอคอนแบบไม่มีเส้นขอบ (เส้นขอบใส่ใหม่หลังย่อ)"""
@@ -112,12 +116,12 @@ def strip_baked_knife(frame, name):
 			if red or knife or x < 15: p[x, y] = (0, 0, 0, 0)
 	return im
 
-def glove_on(frame, icon, name, fist):
+def glove_on(frame, icon, hand, fist):
 	"""ถุงมือ: ย่อทั้งตัวเท่าฝ่ามือ (~8 จุด) สวมทับมือ · ท่าฟัน = กำหมัดชี้หน้า (หมุน 90°)"""
 	bb = icon.getbbox(); g = icon.crop(bb)
 	if fist: g = g.rotate(90, Image.NEAREST, expand=True)
 	k = max(1, round(max(g.size) * 8 / 9)); big = g.resize((g.width * 8, g.height * 8), Image.NEAREST)
-	small = outline(mode_downscale(big, k)); hx, hy = HAND[name]
+	small = outline(mode_downscale(big, k)); hx, hy = hand
 	frame.alpha_composite(small, (int(hx - small.width / 2), int(hy - small.height / 2)))
 	return frame
 
@@ -127,21 +131,35 @@ def main():
 		fam = f['family_id']
 		for wpn in f['weapons']:
 			icon = plain_icon(fam, wpn['tier'])
+			pose = 'punch' if fam == 'BD' else POSE_OVERRIDE.get(wpn['id'], FAMILY_POSE[fam])
+			grip_set = 'punch' if fam == 'BD' else GRIP.get(pose)
 			for i, name in enumerate(FRAMES):
-				base = Image.open(os.path.join(RION, name + '.png')).convert('RGBA')
-				if name != 'west': base = strip_baked_knife(base, name)
+				if grip_set:
+					base = Image.open(os.path.join(G.OUT, '%s_%d.png' % (grip_set, i))).convert('RGBA')
+					P = G.POSES[grip_set][i]; hand, ang, back_hand = P[2], P[5], P[4]
+				else:
+					base = Image.open(os.path.join(RION, name + '.png')).convert('RGBA')
+					if name != 'west': base = strip_baked_knife(base, name)
+					hand, ang, back_hand = HAND[name], POSE[pose][i], None
 				if fam == 'BD':
-					out = glove_on(base, icon, name, i in (2, 3))
+					out = glove_on(base, icon, hand, i in (2, 3))
 				else:
 					grip, idir = grip_and_dir(fam, icon)
 					L = max(MIN_PX, HELD_CM[wpn['id']] * PX_PER_CM * CHIBI)
-					pose = POSE_OVERRIDE.get(wpn['id'], FAMILY_POSE[fam])
-					spr, (cx, cy) = held_sprite(icon, grip, idir, L, POSE[pose][i])
-					spr = outline(spr); hx, hy = HAND[name]; at = (int(round(hx - cx)), int(round(hy - cy)))
+					spr, (cx, cy) = held_sprite(icon, grip, idir, L, ang)
+					spr = outline(spr); hx, hy = hand; at = (int(round(hx - cx)), int(round(hy - cy)))
 					if i in BEHIND.get(pose, ()):
 						out = Image.new('RGBA', base.size, (0, 0, 0, 0)); out.alpha_composite(spr, at); out.alpha_composite(base)
 					else:
 						out = base.copy(); out.alpha_composite(spr, at)
+					if pose == 'sling' and back_hand and i == 2:   # ยางสองเส้นจากปลายง่ามถึงมือหลังที่ดึง
+						a = math.radians(ang); tip = (hx + math.cos(a) * L * 0.95, hy - math.sin(a) * L * 0.95)
+						col = W.hx(RUBBER.get(wpn['id'], '#c9a06a')) + (255,); q = out.load()
+						for side in (-2, 2):
+							s0 = (tip[0] + side, tip[1]); steps = 30
+							for k in range(steps + 1):
+								t = k / steps; x = int(round(s0[0] + (back_hand[0] - s0[0]) * t)); y = int(round(s0[1] + (back_hand[1] - s0[1]) * t))
+								if 0 <= x < 64 and 0 <= y < 64: q[x, y] = col
 				out.save(os.path.join(OUT, '%s_%d.png' % (wpn['id'], i))); n += 1
 	print('ok', n)
 
