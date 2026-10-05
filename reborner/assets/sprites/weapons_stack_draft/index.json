@@ -1,0 +1,1287 @@
+{
+ "_doc": "sprite stack ของอาวุธจากชีต 210 · ไฟล์ = ชั้นเรียงซ้าย→ขวา (ล่าง→บน) ช่องละ 32px · ร่าง ยังไม่เข้าเกม · tools/sprites/weapons_stack.py",
+ "tilt": 0.62,
+ "items": [
+  {
+   "code": "SL01",
+   "family": "SL",
+   "tier": 1,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "SL02",
+   "family": "SL",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL03",
+   "family": "SL",
+   "tier": 1,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL04",
+   "family": "SL",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL05",
+   "family": "SL",
+   "tier": 1,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL06",
+   "family": "SL",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL07",
+   "family": "SL",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "SL08",
+   "family": "SL",
+   "tier": 2,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL09",
+   "family": "SL",
+   "tier": 2,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL10",
+   "family": "SL",
+   "tier": 2,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL11",
+   "family": "SL",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "SL12",
+   "family": "SL",
+   "tier": 2,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL13",
+   "family": "SL",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL14",
+   "family": "SL",
+   "tier": 3,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "SL15",
+   "family": "SL",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL16",
+   "family": "SL",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL17",
+   "family": "SL",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL18",
+   "family": "SL",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL19",
+   "family": "SL",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL20",
+   "family": "SL",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL21",
+   "family": "SL",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL22",
+   "family": "SL",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL23",
+   "family": "SL",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL24",
+   "family": "SL",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL25",
+   "family": "SL",
+   "tier": 5,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL26",
+   "family": "SL",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL27",
+   "family": "SL",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "SL28",
+   "family": "SL",
+   "tier": 5,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL29",
+   "family": "SL",
+   "tier": 5,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "SL30",
+   "family": "SL",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "PC01",
+   "family": "PC",
+   "tier": 1,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC02",
+   "family": "PC",
+   "tier": 1,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC03",
+   "family": "PC",
+   "tier": 1,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC04",
+   "family": "PC",
+   "tier": 1,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC05",
+   "family": "PC",
+   "tier": 1,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC06",
+   "family": "PC",
+   "tier": 1,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC07",
+   "family": "PC",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC08",
+   "family": "PC",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC09",
+   "family": "PC",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC10",
+   "family": "PC",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC11",
+   "family": "PC",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC12",
+   "family": "PC",
+   "tier": 2,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC13",
+   "family": "PC",
+   "tier": 3,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC14",
+   "family": "PC",
+   "tier": 3,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC15",
+   "family": "PC",
+   "tier": 3,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC16",
+   "family": "PC",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC17",
+   "family": "PC",
+   "tier": 3,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC18",
+   "family": "PC",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC19",
+   "family": "PC",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC20",
+   "family": "PC",
+   "tier": 4,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC21",
+   "family": "PC",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC22",
+   "family": "PC",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "PC23",
+   "family": "PC",
+   "tier": 4,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC24",
+   "family": "PC",
+   "tier": 4,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC25",
+   "family": "PC",
+   "tier": 5,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC26",
+   "family": "PC",
+   "tier": 5,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC27",
+   "family": "PC",
+   "tier": 5,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC28",
+   "family": "PC",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "PC29",
+   "family": "PC",
+   "tier": 5,
+   "name": null,
+   "layers": 3
+  },
+  {
+   "code": "PC30",
+   "family": "PC",
+   "tier": 5,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "CR01",
+   "family": "CR",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR02",
+   "family": "CR",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR03",
+   "family": "CR",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR04",
+   "family": "CR",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR05",
+   "family": "CR",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR06",
+   "family": "CR",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR07",
+   "family": "CR",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR08",
+   "family": "CR",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR09",
+   "family": "CR",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR10",
+   "family": "CR",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR11",
+   "family": "CR",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR12",
+   "family": "CR",
+   "tier": 2,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "CR13",
+   "family": "CR",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR14",
+   "family": "CR",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR15",
+   "family": "CR",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR16",
+   "family": "CR",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR17",
+   "family": "CR",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR18",
+   "family": "CR",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR19",
+   "family": "CR",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "CR20",
+   "family": "CR",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR21",
+   "family": "CR",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR22",
+   "family": "CR",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR23",
+   "family": "CR",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR24",
+   "family": "CR",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR25",
+   "family": "CR",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR26",
+   "family": "CR",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR27",
+   "family": "CR",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR28",
+   "family": "CR",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR29",
+   "family": "CR",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "CR30",
+   "family": "CR",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD01",
+   "family": "BD",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD02",
+   "family": "BD",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD03",
+   "family": "BD",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD04",
+   "family": "BD",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD05",
+   "family": "BD",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD06",
+   "family": "BD",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD07",
+   "family": "BD",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD08",
+   "family": "BD",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD09",
+   "family": "BD",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD10",
+   "family": "BD",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD11",
+   "family": "BD",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD12",
+   "family": "BD",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD13",
+   "family": "BD",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD14",
+   "family": "BD",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD15",
+   "family": "BD",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD16",
+   "family": "BD",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD17",
+   "family": "BD",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD18",
+   "family": "BD",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD19",
+   "family": "BD",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD20",
+   "family": "BD",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD21",
+   "family": "BD",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD22",
+   "family": "BD",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD23",
+   "family": "BD",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD24",
+   "family": "BD",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD25",
+   "family": "BD",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD26",
+   "family": "BD",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD27",
+   "family": "BD",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD28",
+   "family": "BD",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD29",
+   "family": "BD",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "BD30",
+   "family": "BD",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST01",
+   "family": "ST",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST02",
+   "family": "ST",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST03",
+   "family": "ST",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST04",
+   "family": "ST",
+   "tier": 1,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST05",
+   "family": "ST",
+   "tier": 1,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "ST06",
+   "family": "ST",
+   "tier": 1,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "ST07",
+   "family": "ST",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST08",
+   "family": "ST",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST09",
+   "family": "ST",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST10",
+   "family": "ST",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST11",
+   "family": "ST",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST12",
+   "family": "ST",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST13",
+   "family": "ST",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "ST14",
+   "family": "ST",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST15",
+   "family": "ST",
+   "tier": 3,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "ST16",
+   "family": "ST",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST17",
+   "family": "ST",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST18",
+   "family": "ST",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST19",
+   "family": "ST",
+   "tier": 4,
+   "name": null,
+   "layers": 4
+  },
+  {
+   "code": "ST20",
+   "family": "ST",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST21",
+   "family": "ST",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST22",
+   "family": "ST",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST23",
+   "family": "ST",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST24",
+   "family": "ST",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST25",
+   "family": "ST",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST26",
+   "family": "ST",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST27",
+   "family": "ST",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST28",
+   "family": "ST",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST29",
+   "family": "ST",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "ST30",
+   "family": "ST",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV07",
+   "family": "DV",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV08",
+   "family": "DV",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV09",
+   "family": "DV",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV10",
+   "family": "DV",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV11",
+   "family": "DV",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV12",
+   "family": "DV",
+   "tier": 2,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV13",
+   "family": "DV",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV14",
+   "family": "DV",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV15",
+   "family": "DV",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV16",
+   "family": "DV",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV17",
+   "family": "DV",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV18",
+   "family": "DV",
+   "tier": 3,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV19",
+   "family": "DV",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV20",
+   "family": "DV",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV21",
+   "family": "DV",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV22",
+   "family": "DV",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV23",
+   "family": "DV",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV24",
+   "family": "DV",
+   "tier": 4,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV25",
+   "family": "DV",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV26",
+   "family": "DV",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV27",
+   "family": "DV",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV28",
+   "family": "DV",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "DV29",
+   "family": "DV",
+   "tier": 5,
+   "name": null,
+   "layers": 5
+  },
+  {
+   "code": "W301",
+   "family": "W",
+   "tier": null,
+   "name": "กระทะ",
+   "layers": 5
+  },
+  {
+   "code": "W302",
+   "family": "W",
+   "tier": null,
+   "name": "ไม้กวาด",
+   "layers": 5
+  },
+  {
+   "code": "W303",
+   "family": "W",
+   "tier": null,
+   "name": "ขวดแก้ว",
+   "layers": 5
+  },
+  {
+   "code": "W304",
+   "family": "W",
+   "tier": null,
+   "name": "ค้อน",
+   "layers": 5
+  },
+  {
+   "code": "W305",
+   "family": "W",
+   "tier": null,
+   "name": "คีม",
+   "layers": 4
+  },
+  {
+   "code": "W306",
+   "family": "W",
+   "tier": null,
+   "name": "ปืนฉีดน้ำ",
+   "layers": 5
+  },
+  {
+   "code": "W307",
+   "family": "W",
+   "tier": null,
+   "name": "ร่ม",
+   "layers": 5
+  },
+  {
+   "code": "W308",
+   "family": "W",
+   "tier": null,
+   "name": "ถังแก๊ส",
+   "layers": 5
+  },
+  {
+   "code": "W309",
+   "family": "W",
+   "tier": null,
+   "name": "จอบ",
+   "layers": 4
+  },
+  {
+   "code": "W310",
+   "family": "W",
+   "tier": null,
+   "name": "โทรโข่ง",
+   "layers": 5
+  }
+ ]
+}

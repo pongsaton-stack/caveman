@@ -80,6 +80,12 @@ def sprites():
 		for f in sorted(os.listdir(wd)):
 			if f.endswith('.png'):
 				out['wsh/' + f[:-4]] = png(os.path.join(wd, f))
+	# sprite stack ของอาวุธชุดเดียวกัน (tools/sprites/weapons_stack.py) — แถบชั้นล่าง→บน
+	sd = os.path.join(SPR, 'weapons_stack_draft')
+	if os.path.isdir(sd):
+		for f in sorted(os.listdir(sd)):
+			if f.endswith('.png'):
+				out['wst/' + f[:-4]] = png(os.path.join(sd, f))
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -168,6 +174,7 @@ def main(out_path):
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
 		'sheet_cut': sheet_cut(),
+		'weapon_stack': json.load(open(os.path.join(SPR, 'weapons_stack_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_stack_draft/index.json')) else None,
 		'weapon_sheet': json.load(open(os.path.join(SPR, 'weapons_sheet_draft/index.json'), encoding='utf-8'))['items'] if os.path.exists(os.path.join(SPR, 'weapons_sheet_draft/index.json')) else [],
 		'compendium': compendium(),
 		'weapons': [dict(w, school=f['school']) for f in json.load(open(os.path.join(ROOT, 'docs/art-bible/weapons/weapons_full.json'), encoding='utf-8'))['families'] for w in f['weapons']],

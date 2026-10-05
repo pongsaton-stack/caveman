@@ -327,12 +327,32 @@ if (DATA.sprites['smp/slime_v3']) {
 }
 
 // อาวุธจากชีต "Weapon Collection 210" ของ kwan (ตัดทีละช่องด้วย tools/sprites/weapons_sheet_cut.py) — เล่นคู่ ขนาดชีต | 32px
+// sprite stack (tools/sprites/weapons_stack.py): วางราบ หมุนทุกชั้น nearest ที่ความละเอียดจริง หดแกนลึกด้วย tilt ชั้นละ 1px ขึ้น — เหมือน render() ในสคริปต์
+const STACK = Object.fromEntries(((DATA.weapon_stack || {}).items || []).map(x => [x.code, x])), STACK_TILT = (DATA.weapon_stack || {}).tilt || 0.62;
+const STACK_FRAMES = 32, STACK_SEC = 3.2;   // หมุนครบรอบ 3.2 วิ (ค่าดูในหน้าเทสเท่านั้น)
+const STACK_CACHE = {};
+function stackLayers(code, n) {
+	if (STACK_CACHE[code]) return STACK_CACHE[code];
+	const im = IMG['wst/' + code]; if (!im || !im.complete || !im.naturalWidth) return null;   // ยังโหลดไม่เสร็จ = ไม่แคชภาพว่าง
+	return STACK_CACHE[code] = Array.from({ length: n }, (_, z) => { const c = document.createElement('canvas'); c.width = c.height = 32; c.getContext('2d').drawImage(im, -32 * z, 0); return c; });
+}
+const STACK_OC = document.createElement('canvas'); STACK_OC.width = STACK_OC.height = 48;
+function drawStack(code, n, angle, x, y) {   // วาดที่ 48px แล้วขยาย ×2 ลงช่อง 96px ของเวที
+	const L = stackLayers(code, n); if (!L) return;
+	const o = STACK_OC.getContext('2d'); o.imageSmoothingEnabled = false; o.clearRect(0, 0, 48, 48);
+	o.fillStyle = 'rgba(0,0,0,.16)'; o.beginPath(); o.ellipse(24, 31, 12, 12 * STACK_TILT, 0, 0, 7); o.fill();
+	L.forEach((lay, z) => { o.save(); o.translate(24, 30 - z); o.scale(1, STACK_TILT); o.rotate(angle); o.drawImage(lay, -16, -16); o.restore(); });
+	ctx.drawImage(STACK_OC, x, y, 96, 96);
+}
 const WSH_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล', W: 'อาวุธเดิม W301–W310' };
 for (const w of (DATA.weapon_sheet || [])) {
 	const k = 'wsh/' + w.code;
 	if (!DATA.sprites[k]) continue;
-	addClip('ชีตอาวุธ 210 · ' + WSH_FAM[w.family] + ' (ร่าง ยังไม่เข้าเกม)', 'wsh_' + w.code, w.code + (w.tier ? ' · T' + w.tier : '') + (w.name ? ' ' + w.name : ''), [k], 1,
-		{ tab: 'arms', panels: [{ label: 'ขนาดชีต', keys: [k + '_src'] }, { label: '32px', keys: [k] }] });
+	const st = STACK[w.code], n = st ? STACK_FRAMES : 1;   // มี sprite stack = หมุนครบรอบใน STACK_FRAMES เฟรม (ช่องอื่นค้างภาพเดิม)
+	const panels = [{ label: 'ขนาดชีต', keys: [k + '_src'] }, { label: '32px', keys: [k] }];
+	if (st) panels.push({ label: 'หมุน', keys: [k], stack: w.code, layers: st.layers });
+	addClip('ชีตอาวุธ 210 · ' + WSH_FAM[w.family] + ' (ร่าง ยังไม่เข้าเกม)', 'wsh_' + w.code, w.code + (w.tier ? ' · T' + w.tier : '') + (w.name ? ' ' + w.name : ''),
+		Array(n).fill(k), st ? STACK_SEC / n : 1, { tab: 'arms', panels });
 }
 // อาวุธร่าง (weapons_full.json · วาดด้วย tools/sprites/weapons.py) — ภาพนิ่ง กลุ่มละสาย
 for (const w of (DATA.weapons || [])) {
@@ -411,7 +431,8 @@ function panelView(c) {
 	ctx.font = '7px system-ui, sans-serif';
 	c.panels.forEach((p, k) => {
 		const key = p.keys[S.frame % p.keys.length], im = IMG[key];
-		if (im) spr(key, 96 * k + (96 - im.width) / 2, Math.max(0, 92 - im.height));
+		if (p.stack) drawStack(p.stack, p.layers, S.frame / c.frames.length * Math.PI * 2, 96 * k, 0);
+		else if (im) spr(key, 96 * k + (96 - im.width) / 2, Math.max(0, 92 - im.height));
 		if (k) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(96 * k - 1, 0, 2, 96); }
 		ctx.fillStyle = '#1c1a16'; ctx.fillText(p.label, 96 * k + 4, 9);
 	});
@@ -1182,7 +1203,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
