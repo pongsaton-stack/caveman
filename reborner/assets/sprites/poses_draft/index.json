@@ -570,6 +570,112 @@
    "sec": 0.16
   },
   {
+   "id": "rion_walk8_west",
+   "who": "rion",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "Rion เดินซ้าย 4 → 8 เฟรม",
+   "n": 8,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "timing": "walk8",
+   "old_n": 4
+  },
+  {
+   "id": "rion_walk8_east",
+   "who": "rion",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "Rion เดินขวา 4 → 8 เฟรม",
+   "n": 8,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "timing": "walk8",
+   "old_n": 4
+  },
+  {
+   "id": "rion_walk8_south",
+   "who": "rion",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "Rion เดินหน้า 4 → 8 เฟรม",
+   "n": 8,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "timing": "walk8",
+   "old_n": 4
+  },
+  {
+   "id": "rion_walk8_north",
+   "who": "rion",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "Rion เดินหลัง 4 → 8 เฟรม",
+   "n": 8,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "timing": "walk8",
+   "old_n": 4
+  },
+  {
+   "id": "rion_idle4_south",
+   "who": "rion",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "Rion หายใจ หน้า 2 → 4 เฟรม",
+   "n": 4,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "timing": "idle4",
+   "old_n": 2
+  },
+  {
+   "id": "rion_idle4_west",
+   "who": "rion",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "Rion หายใจ ซ้าย 2 → 4 เฟรม",
+   "n": 4,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "timing": "idle4",
+   "old_n": 2
+  },
+  {
    "id": "dog_idle_south",
    "who": "dog",
    "group": "ยืน · หายใจ",
@@ -947,6 +1053,59 @@
     3
    ],
    "sec": 0.2
+  },
+  {
+   "id": "dog_walk8_west",
+   "who": "dog",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "หมาเดินซ้าย 4 → 8 เฟรม",
+   "n": 8,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "timing": "walk8",
+   "old_n": 4
+  },
+  {
+   "id": "dog_walk8_east",
+   "who": "dog",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "หมาเดินขวา 4 → 8 เฟรม",
+   "n": 8,
+   "order": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "timing": "walk8",
+   "old_n": 4
+  },
+  {
+   "id": "dog_idle4_west",
+   "who": "dog",
+   "group": "เทียบจำนวนเฟรม",
+   "label": "หมาหายใจ ซ้าย 2 → 4 เฟรม",
+   "n": 4,
+   "order": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "timing": "idle4",
+   "old_n": 2
   }
  ]
 }

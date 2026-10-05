@@ -275,7 +275,10 @@ for (const [d, th] of DIRS) addClip('หมาคู่หู', 'dog_walk_' + d,
 // อิริยาบถร่าง (tools/sprites/poses_anim.py · ยังไม่เข้าเกม) — Rion ก่อน หมาตาม
 for (const who of ['rion', 'dog']) for (const p of (DATA.poses || []).filter(x => x.who === who)) {
 	if (!DATA.sprites[`pose/${p.id}_0`]) continue;
-	addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, p.order.map(i => `pose/${p.id}_${i}`), p.sec);
+	// เทียบเฟรม: รอบเท่ากัน — เดิน 1 รอบ = 2 ช่อง (2 × MOVE_TIME) · หายใจ 1 รอบ = 2 × FOE_IDLE_SEC · ฝั่งซ้ายเล่นชุดเดิมเฟรมละ 2 จังหวะ
+	const cyc = { walk8: 2 * K.MOVE_TIME, idle4: 2 * K.FOE_IDLE_SEC }[p.timing];
+	addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, p.order.map(i => `pose/${p.id}_${i}`), cyc ? cyc / p.n : p.sec,
+		p.old_n ? { pair: p.order.map(i => `pose/${p.id}_old${Math.floor(i * p.old_n / p.n)}`), pairLabel: [`${p.old_n} เฟรม (ตอนนี้)`, `${p.n} เฟรม (ใหม่)`] } : {});
 }
 const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
 for (const key of Object.keys(DATA.sprites)) {
@@ -370,14 +373,27 @@ function spr(key, x, y, opt = {}) {
 
 // ── โหมดท่าขยับ ──
 function clipView() {
+	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.pair) return pairView(c, key, im);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
 	drawBg();
-	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
 	if (S.onion && c.frames.length > 1) {
 		const pk = c.frames[(S.frame - 1 + c.frames.length) % c.frames.length], pim = IMG[pk];
 		if (pim) spr(pk, (96 - pim.width) / 2, 92 - pim.height, { alpha: 0.32 });
 	}
 	if (im) spr(key, (96 - im.width) / 2, Math.max(0, 92 - im.height));
+	if (S.grid) drawGrid();
+}
+
+// คู่เทียบ: ซ้าย = ชุดเดิม · ขวา = ชุดเฟรมละเอียด เล่นพร้อมกัน รอบเท่ากัน
+function pairView(c, key, im) {
+	cv.width = 192; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
+	const ok = c.pair[S.frame], oim = IMG[ok];
+	if (oim) spr(ok, (96 - oim.width) / 2, 92 - oim.height);
+	if (im) spr(key, 96 + (96 - im.width) / 2, 92 - im.height);
+	ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(95, 0, 2, 96);
+	ctx.font = '7px system-ui, sans-serif'; ctx.fillStyle = '#1c1a16';
+	ctx.fillText(c.pairLabel[0], 4, 9); ctx.fillText(c.pairLabel[1], 100, 9);
 	if (S.grid) drawGrid();
 }
 
