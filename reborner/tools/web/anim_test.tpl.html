@@ -133,6 +133,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" id="tabMonsters" aria-pressed="false">มอนสเตอร์</button>
 			<button class="btn" role="tab" id="tabBosses" aria-pressed="false">บอส</button>
 			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
+			<button class="btn" role="tab" id="tabArms" aria-pressed="false">อาวุธ</button>
 			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
 			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
 		</div>
@@ -157,6 +158,11 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<div class="cgrid" id="bossList"></div>
 			<div class="wcard" id="bossCard"></div>
 			<div class="clips" id="bossGroups" hidden></div>
+		</section>
+
+		<section class="box" id="paneArms" hidden>
+			<p class="muted wnote">ภาพอาวุธร่าง 30 ชิ้น (weapons_full.json · tools/sprites/weapons.py) แยกตามสาย — ดู Rion ถือได้ที่แท็บ "ติดตั้งอาวุธ"</p>
+			<div class="clips" id="armGroups"></div>
 		</section>
 
 		<section class="box" id="paneWeapons" hidden>
@@ -227,6 +233,11 @@ addClip('Rion ในศึก', 'rion_attack', 'ฟัน', [0, 1, 2, 3].map(i =
 addClip('Rion ในศึก', 'rion_hurt', 'โดนตี', ['rion/west_h0', 'rion/west_h1'], K.ATTACK_FRAME_SEC);
 addClip('Rion ในศึก', 'rion_ko', 'ล้ม', ['rion/west_h0', 'rion/west_k0', 'rion/west_k1'], K.ATTACK_FRAME_SEC, { hold: true });
 for (const [d, th] of DIRS) addClip('หมาคู่หู', 'dog_walk_' + d, 'เดิน' + th, [0, 1, 2, 3].map(i => `dog/${d}_w${i}`), WALK_SEC);
+// อิริยาบถร่าง (tools/sprites/poses_anim.py · ยังไม่เข้าเกม) — Rion ก่อน หมาตาม
+for (const who of ['rion', 'dog']) for (const p of (DATA.poses || []).filter(x => x.who === who)) {
+	if (!DATA.sprites[`pose/${p.id}_0`]) continue;
+	addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, p.order.map(i => `pose/${p.id}_${i}`), p.sec);
+}
 const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
 for (const key of Object.keys(DATA.sprites)) {
 	const m = key.match(/^mon\/(.+?)$/);
@@ -264,7 +275,7 @@ if (DATA.sprites['smp/slime_v3']) {
 // อาวุธร่าง (weapons_full.json · วาดด้วย tools/sprites/weapons.py) — ภาพนิ่ง กลุ่มละสาย
 for (const w of (DATA.weapons || [])) {
 	if (!DATA.sprites['wpn/' + w.id]) continue;
-	addClip('อาวุธสาย' + w.school + ' (ร่าง ยังไม่เข้าเกม)', 'wpn_' + w.id, `${w.id} T${w.tier} · ${w.name}`, ['wpn/' + w.id], 1);
+	addClip('อาวุธสาย' + w.school + ' (ร่าง ยังไม่เข้าเกม)', 'wpn_' + w.id, `${w.id} T${w.tier} · ${w.name}`, ['wpn/' + w.id], 1, { tab: 'arms' });
 }
 // Rion ถืออาวุธ: ยืนถือ → ง้าง → ฟัน → ตาม (ขนาดตามของจริง · ท่าจับตามชนิด)
 for (const w of (DATA.weapons || [])) {
@@ -277,7 +288,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 }
 
 // ── สถานะผู้ชม ──
-const CLIP_TABS = ['clips', 'monsters', 'bosses', 'weapons', 'spells'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups' };
+const CLIP_TABS = ['clips', 'monsters', 'bosses', 'arms', 'weapons', 'spells'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -1095,7 +1106,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', pose: 'poses_draft' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1281,7 +1292,7 @@ function buildSpells() {
 	}
 	showSchool(ss[0]);
 }
-const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', weapons: 'Weapons', spells: 'Spells' };
+const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', arms: 'Arms', weapons: 'Weapons', spells: 'Spells' };
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
 	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }
