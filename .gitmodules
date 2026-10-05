@@ -6,3 +6,7 @@
 	path = third_party/godot-open-rpg
 	url = https://github.com/gdquest-demos/godot-open-rpg.git
 	shallow = true
+[submodule "third_party/RPG-DiffusionMaster"]
+	path = third_party/RPG-DiffusionMaster
+	url = https://github.com/YangLing0818/RPG-DiffusionMaster.git
+	shallow = true
