@@ -177,6 +177,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSksheet" hidden>
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
+			<p><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงปิด — กดเพื่อเปิดเสียงประกอบ (ตัวอย่าง VFX)</button></p>
 			<div class="clips" id="skGroups"></div>
 		</section>
 
@@ -334,9 +335,10 @@ if (DATA.sprites['smp/slime_v3']) {
 }
 
 // อาวุธจากชีต "Weapon Collection 210" ของ kwan (ตัดทีละช่องด้วย tools/sprites/weapons_sheet_cut.py) — เล่นคู่ ขนาดชีต | 32px
-const VFX = { N: 24, SEC: 0.05, REL: 6, HIT: 10,
-	POSE: [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 0, 0],
-	SHAKE: { SL: 2, PC: 2, CR: 5, BD: 3, ST: 2, DV: 4 }, GRAV: { CR: 0.45 }, TARGET: { x: 58, foot: 90, key: 'mon/M01' } };
+const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชาร์จ 1–7 · ปล่อย 8–13 · กระทบ 14 (หยุดภาพ 2 เฟรม) · ผลหลังกระทบ ถึง ~29 · คืนท่า
+	POSE: [0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0],
+	SHAKE: { SL: 3, PC: 3, CR: 7, BD: 4, ST: 3, DV: 6 }, GRAV: { CR: 0.45 }, TARGET: { x: 58, foot: 90, key: 'mon/M01' },
+	TEXT: { SL: 'ฉัวะ!!', PC: 'ฉึก!!', CR: 'ตูมมม!!', BD: 'ตุบ ตุบ ตุบ!!', ST: 'ปัง!!', DV: 'ครืนนน!!' } };   // ตัวหนังสือเสียงชุดเดียวกับไม้ตาย (ultimates.json sfx_text)
 const VFX_POSE_KEYS = it => VFX.POSE.map(p => 'rion/' + SKS.poses[it.family][p]);
 // สกิลจากชีต 173 ท่า (tools/sprites/skill_sheet_cut.py) — timeline/poses/ตำแหน่งมาจาก index.json ชุดเดียวกับสคริปต์
 const SKS = DATA.skill_sheet, SK_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล' };
@@ -350,91 +352,169 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // ตัวอย่า
 	addClip('ตัวอย่าง VFX · สายละ 1 ท่า (รอ kwan ดูก่อนทาทั้ง 172)', 'vfx_' + code, code + ' · VFX', VFX_POSE_KEYS(it), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true });
 }
 { const i = GROUPS.findIndex(g => g.name.startsWith('ตัวอย่าง VFX')); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
-// ── VFX ซ้อนบนภาพชีต (kwan เลือก 5 ต.ค. · ตัวอย่างสายละ 1 ท่า = SKS.vfx_samples) ──
-// เฟรมละ VFX.SEC · ง้าง 0–5 · ปล่อย 6–9 · กระทบ VFX.HIT · ค้าง/จาง ถึง 21 · ทุกอย่างคิดจากเลขเฟรม (สุ่มแบบมี seed ตามรหัสท่า) → กดทีละเฟรมได้ ภาพเดิมทุกครั้ง
-// ค่าทั้งหมดเป็นค่าภาพในหน้าเทส ไม่ใช่ค่าเกม
+// ── VFX ซ้อนบนภาพชีต (kwan เลือก 5 ต.ค. · "อลังการกว่านี้พร้อมเสียง" · ตัวอย่างสายละ 1 ท่า = SKS.vfx_samples) ──
+// ทุกอย่างคิดจากเลขเฟรม (สุ่มแบบมี seed ตามรหัสท่า) → กดทีละเฟรมได้ ภาพเดิมทุกครั้ง · ค่าทั้งหมดเป็นค่าภาพ/เสียงในหน้าเทส ไม่ใช่ค่าเกม
 const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
 const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
 const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
+const vTime = f => f < VFX.HIT ? f : f < VFX.HIT + VFX.STOP ? VFX.HIT : f - VFX.STOP;   // หยุดภาพตอนกระทบ: เวลาของการเคลื่อนไหวค้างไว้ STOP เฟรม
 function vfxImg(img, x, y, sx, sy, a, alpha, add) {   // วางภาพเอฟเฟกต์กลาง (x, y) · add = บวกแสง
 	if (!img || alpha <= 0) return;
 	ctx.save(); if (add) ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, alpha);
 	ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(a); ctx.scale(sx, sy); ctx.drawImage(img, -img.width / 2, -img.height / 2); ctx.restore();
 }
 function vfxDot(x, y, r, col, alpha) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.max(0, Math.min(1, alpha)); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, Math.max(0.5, r), 0, 7); ctx.fill(); ctx.restore(); }
-function vfxRing(x, y, rx, ry, col, alpha, w) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.max(0, alpha); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.ellipse(x, y, rx, Math.max(1, ry), 0, 0, 7); ctx.stroke(); ctx.restore(); }
-function vfxBurst(code, t0, f, x, y, n, col, opt = {}) {   // อนุภาคกระจายจาก (x, y) เมื่อเฟรม t0 · คิดตำแหน่งจากเวลา ไม่สะสม
-	const dt = f - t0; if (dt < 0 || dt > (opt.life || 9)) return;
-	const r = vRng(vHash(code) + t0 * 977), g = opt.grav ?? 0.18, life = opt.life || 9;
+function vfxRing(x, y, rx, ry, col, alpha, w) { if (alpha <= 0) return; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, alpha); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.ellipse(x, y, rx, Math.max(1, ry), 0, 0, 7); ctx.stroke(); ctx.restore(); }
+function vfxRays(x, y, n, len, rot, col, alpha) {   // รัศมีแสงหมุนหลังเป้า
+	if (alpha <= 0) return; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, alpha); ctx.fillStyle = col;
+	for (let i = 0; i < n; i++) { const a = rot + i * 2 * Math.PI / n, w = 0.09; ctx.beginPath(); ctx.moveTo(x, y);
+		ctx.lineTo(x + Math.cos(a - w) * len, y + Math.sin(a - w) * len); ctx.lineTo(x + Math.cos(a + w) * len, y + Math.sin(a + w) * len); ctx.fill(); }
+	ctx.restore();
+}
+function vfxBurst(code, t0, f, x, y, n, col, opt = {}) {   // อนุภาคกระจายจาก (x, y) เมื่อเวลา t0 · คิดตำแหน่งจากเวลา ไม่สะสม
+	const life = opt.life || 9, dt = f - t0; if (dt < 0 || dt > life) return;
+	const r = vRng(vHash(code) + t0 * 977 + (opt.salt || 0)), g = opt.grav ?? 0.18;
 	for (let i = 0; i < n; i++) {
 		const a = (opt.dir ?? 0) + (r() * 2 - 1) * (opt.spread ?? Math.PI), v = (opt.speed || 3) * (0.4 + r() * 0.8), c = col[i % col.length];
-		const px = x + Math.cos(a) * v * dt, py = y + Math.sin(a) * v * dt + 0.5 * g * dt * dt;
-		const sz = (opt.size || 2) * (1 - dt / (life + 1)) + 0.5;
+		const px = x + Math.cos(a) * v * dt, py = y + Math.sin(a) * v * dt + 0.5 * g * dt * dt, sz = (opt.size || 2) * (1 - dt / (life + 1)) + 0.5;
 		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - dt / (life + 1); ctx.fillStyle = c;
+		if (opt.streak) { ctx.strokeStyle = c; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px - Math.cos(a) * v * 1.5, py - Math.sin(a) * v * 1.5); ctx.stroke(); }
 		ctx.fillRect(Math.round(px - sz / 2), Math.round(py - sz / 2), Math.ceil(sz), Math.ceil(sz)); ctx.restore();
 	}
 }
+function vfxText(txt, x, y, f0, f, col) {   // ตัวหนังสือเสียงเด้งขึ้นแล้วจาง
+	const d = f - f0; if (d < 0 || d > 11) return;
+	const sc = d < 2 ? 1.6 - d * 0.3 : 1, a = d < 8 ? 1 : 1 - (d - 7) / 4;
+	ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y - d * 0.6); ctx.rotate(-0.12); ctx.scale(sc, sc);
+	ctx.font = '900 15px system-ui, "Noto Sans Thai", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+	ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#120a14'; ctx.strokeText(txt, 0, 0); ctx.fillStyle = col; ctx.fillText(txt, 0, 0);
+	ctx.lineWidth = 1; ctx.strokeStyle = '#ffffff'; ctx.globalAlpha = a * 0.6; ctx.strokeText(txt, 0, -1); ctx.restore();
+}
+const VFX_OC = document.createElement('canvas');
 function vfxView(c) {
-	const it = c.skill, f = S.frame, fam = it.family, [W0, H0] = SKS.stage, fx = IMG['skf/' + it.code], col = it.colors || ['#ffffff'];
-	const Hx = SKS.hand[0], Hy = SKS.hand[1], T = { x: VFX.TARGET.x, y: VFX.TARGET.foot - 22 }, HIT = VFX.HIT, rel = (f - VFX.REL) / (HIT - VFX.REL);
-	const hits = fam === 'BD' ? [8, 10, 12] : [HIT];
-	const since = Math.min(...hits.map(h => f >= h ? f - h : 99));
+	const it = c.skill, f = S.frame, t = vTime(f), fam = it.family, [W0, H0] = SKS.stage, fx = IMG['skf/' + it.code], col = it.colors || ['#ffffff'];
+	const Hx = SKS.hand[0], Hy = SKS.hand[1], T = { x: VFX.TARGET.x, y: VFX.TARGET.foot - 22 }, HIT = VFX.HIT, REL = VFX.REL, rel = (t - REL) / (HIT - REL);
+	const hits = fam === 'BD' ? [HIT - 4, HIT - 2, HIT] : [HIT];
+	const since = Math.min(...hits.map(h => t >= h ? t - h : 99)), fsince = f >= HIT ? f - HIT : 99;   // fsince = เวลาจริง (นับรวมหยุดภาพ)
+	const fw = fx ? fx.width : 40, k80 = Math.min(1, 80 / fw);
 	cv.width = W0; cv.height = H0; ctx.imageSmoothingEnabled = false;
-	const sh = since < 4 ? VFX.SHAKE[fam] * (1 - since / 4) : 0, rs = vRng(vHash(it.code) + f * 31);
-	ctx.save(); ctx.translate(Math.round((rs() * 2 - 1) * sh), Math.round((rs() * 2 - 1) * sh));
+	ctx.save();
+	// กล้อง: ซูมเข้าเป้าตอนกระทบ + จอสั่น
+	const zoom = fsince < 8 ? 1 + 0.16 * (1 - fsince / 8) : 1, sh = since < 5 ? VFX.SHAKE[fam] * (1 - since / 5) : 0, rs = vRng(vHash(it.code) + f * 31);
+	ctx.translate(T.x, T.y); ctx.scale(zoom, zoom); ctx.translate(-T.x + Math.round((rs() * 2 - 1) * sh), -T.y + Math.round((rs() * 2 - 1) * sh));
 	drawBg();
-	const dim = f < VFX.REL - 3 ? 0 : f < VFX.REL ? 0.12 * (f - VFX.REL + 3) : f < HIT + 6 ? 0.36 : f < HIT + 10 ? 0.36 * (1 - (f - HIT - 6) / 4) : 0;
-	if (dim) { ctx.fillStyle = `rgba(8,10,22,${dim})`; ctx.fillRect(-8, -8, W0 + 16, H0 + 16); }
+	// ฟ้าเปลี่ยนสีตามแสงของท่า + มืดลง
+	const dim = t < 3 ? 0 : t < REL ? 0.1 * (t - 2) : t < HIT + 12 ? 0.5 : t < HIT + 16 ? 0.5 * (1 - (t - HIT - 12) / 4) : 0;
+	if (dim) { ctx.fillStyle = `rgba(6,8,20,${dim})`; ctx.fillRect(-40, -40, W0 + 80, H0 + 80);
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = dim * 0.35; ctx.fillStyle = col[col.length - 1]; ctx.fillRect(-40, -40, W0 + 80, H0 * 0.62 + 40); ctx.restore(); }
 	const cell = IMG['skc/' + it.code];
 	if (cell) { const k = 40 / cell.height; ctx.globalAlpha = 0.9; ctx.drawImage(cell, 2, 2, Math.round(cell.width * k), 40); ctx.globalAlpha = 1; }
-	// เป้า: กระเด็นถอย + วาบขาวตอนโดน
+	// รัศมีแสงหมุนหลังเป้า (หลังกระทบ)
+	if (since < 14) vfxRays(T.x, T.y, 14, 70 + since * 3, t * 0.06, col[0], 0.22 * (1 - since / 14));
+	// เส้นความเร็วตอนปล่อย
+	if (t >= REL && t < HIT + 2) { const r = vRng(vHash(it.code) + 11); ctx.save(); ctx.globalCompositeOperation = 'lighter';
+		for (let i = 0; i < 14; i++) { const y = 8 + r() * (H0 - 16), L = 18 + r() * 40, x = ((r() * W0 - (t - REL) * 34) % W0 + W0) % W0;
+			ctx.globalAlpha = 0.25 + r() * 0.3; ctx.fillStyle = i % 3 ? '#ffffff' : col[0]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(L), 1); } ctx.restore(); }
+	// เป้า: กระเด็นถอย + วาบขาว
 	const tg = IMG[VFX.TARGET.key];
 	if (tg) {
-		const kb = since < 6 ? -[0, 4, 6, 5, 3, 1][since] : 0, tx = T.x - (tg.width >> 1) + kb, ty = VFX.TARGET.foot - tg.height;
+		const kb = since < 7 ? -[0, 5, 8, 7, 5, 3, 1][since] : 0, tx = T.x - (tg.width >> 1) + kb, ty = VFX.TARGET.foot - tg.height - (since < 4 ? [0, 3, 2, 1][since] : 0);
 		ctx.drawImage(tg, tx, ty);
-		if (since < 2) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = since ? 0.4 : 0.85; ctx.drawImage(tg, tx, ty); ctx.restore(); }
+		if (since < 3) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = [1, 0.6, 0.3][since]; ctx.drawImage(tg, tx, ty); ctx.restore(); }
 	}
-	const fw = fx ? fx.width : 40, k80 = Math.min(1, 80 / fw);   // เอฟเฟกต์ที่วิ่งไปเป้า (ฟัน/แทง) ย่อให้กว้างไม่เกิน 80px ไม่ล้นจอ
-	if (fam === 'SL') {   // เสี้ยวฟันกวาดหมุนจากมือไปเป้า ทิ้งรอย
-		if (f >= VFX.REL && f < HIT) {
-			for (let k = 3; k >= 0; k--) { const p = rel - k * 0.09; if (p < 0) continue;
-				vfxImg(fx, lerp(Hx - 24, T.x + 14, p), lerp(Hy - 4, T.y, p), k80, k80, lerp(-0.8, 0.35, p), k ? 0.28 / k : 1, k > 0); }
-		}
-		if (f >= HIT && f < HIT + 7) { const q = (f - HIT) / 6; const sc = k80 * (1 + q * 0.3); vfxImg(fx, T.x + 6, T.y, sc, sc, 0.35, 1 - q, false); vfxImg(fx, T.x + 6, T.y, sc * 1.1, sc * 1.1, 0.35, (1 - q) * 0.6, true); }
-		if (since < 3) for (const s of [-1, 1]) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - since / 3; ctx.strokeStyle = col[0]; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(T.x - 18, T.y - 14 * s); ctx.lineTo(T.x + 18, T.y + 14 * s); ctx.stroke(); ctx.restore(); }
-	} else if (fam === 'PC') {   // พุ่งเป็นลำยืด + เส้นเข็มแตกรอบเป้า
-		if (f >= VFX.REL && f < HIT) for (let k = 4; k >= 0; k--) { const p = rel - k * 0.07; if (p < 0) continue;
-			vfxImg(fx, lerp(Hx - fw * k80 * 0.5, T.x + 10, p), lerp(Hy - 2, T.y, p), k80 * (k ? 1.4 : 1), 0.6, 0, k ? 0.22 : 1, k > 0); }
-		if (f >= HIT && f < HIT + 5) { const q = (f - HIT) / 4; vfxImg(fx, T.x + 4, T.y, k80, 0.6, 0, (1 - q) * 0.9, true);
-			const r = vRng(vHash(it.code) + 5); for (let i = 0; i < 10; i++) { const a = r() * 6.28, L = 6 + q * 22; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - q; ctx.strokeStyle = col[i % col.length]; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(T.x + Math.cos(a) * L * 0.4, T.y + Math.sin(a) * L * 0.4); ctx.lineTo(T.x + Math.cos(a) * L, T.y + Math.sin(a) * L); ctx.stroke(); ctx.restore(); } }
-	} else if (fam === 'ST') {   // แสงปากกระบอก → กระสุนเล็กวิ่ง → ระเบิดเต็มขนาดที่เป้า
-		if (f === VFX.REL || f === VFX.REL + 1) vfxDot(Hx - 4, Hy - 2, f === VFX.REL ? 7 : 4, col[0], 0.9);
-		if (f >= VFX.REL && f < HIT) for (let k = 3; k >= 0; k--) { const p = rel - k * 0.08; if (p < 0) continue;
-			vfxImg(fx, lerp(Hx - 10, T.x + 6, p), lerp(Hy - 3, T.y, p), 0.38 - k * 0.06, 0.38 - k * 0.06, 0, k ? 0.35 : 1, k > 0); }
-		if (f >= HIT && f < HIT + 7) { const q = (f - HIT) / 6; vfxImg(fx, T.x, T.y, 0.6 + q * 0.5, 0.6 + q * 0.5, 0, 1 - q * 0.9, false); vfxImg(fx, T.x, T.y, 0.7 + q * 0.5, 0.7 + q * 0.5, 0, (1 - q) * 0.5, true); }
-	} else if (fam === 'CR') {   // ง้างมีแสงที่มือ → ระเบิดโผล่จากพื้นใต้เป้า + คลื่นพื้น + เศษกระเด็นตกตามแรงโน้มถ่วง
-		if (f >= 2 && f < VFX.REL + 2) vfxDot(Hx - 2, Hy - 18, 2 + (f - 2) * 0.8, col[1] || col[0], 0.7);
-		if (f >= HIT && f < HIT + 9) { const q = (f - HIT) / 8, s = q < 0.4 ? lerp(0.4, 1.1, q / 0.4) : 1.1, img = fx;
-			if (img) vfxImg(img, T.x, VFX.TARGET.foot - img.height * s / 2, s, s, 0, q < 0.6 ? 1 : 1 - (q - 0.6) / 0.4, false);
-			vfxRing(T.x, VFX.TARGET.foot, 6 + q * 70, (6 + q * 70) * 0.18, col[0], 1 - q, 2); vfxRing(T.x, VFX.TARGET.foot, 3 + q * 40, (3 + q * 40) * 0.18, col[1] || col[0], (1 - q) * 0.7, 1); }
-	} else if (fam === 'BD') {   // รัวหมัด 3 ครั้งที่เป้า แต่ละครั้งมีวงประกาย
-		for (const h of hits) { const d = f - h; if (d < 0 || d > 3) continue; const r = vRng(vHash(it.code) + h);
-			const ox = (r() * 2 - 1) * 8, oy = (r() * 2 - 1) * 6; vfxImg(fx, T.x + ox, T.y + oy, 0.55 + d * 0.08, 0.55 + d * 0.08, (r() - 0.5) * 0.6, 1 - d / 4, d > 0);
-			vfxRing(T.x + ox, T.y + oy, 4 + d * 6, 4 + d * 6, col[0], 1 - d / 4, 1); }
-		if (f >= 6 && f < 13 && (f % 2 === 0)) vfxDot(Hx - 6, Hy, 3, col[0], 0.7);   // แสงที่หมัด
-	} else if (fam === 'DV') {   // ชาร์จลูกพลังที่มือ (อนุภาคดูดเข้า) → ลำแสงยืดจากมือถึงเป้า กะพริบ → ระเบิด
-		if (f >= 1 && f < VFX.REL + 1) { const q = (f - 1) / VFX.REL; vfxDot(Hx - 6, Hy - 2, 2 + q * 6, col[0], 0.5 + q * 0.4); vfxDot(Hx - 6, Hy - 2, 1 + q * 3, '#ffffff', 0.8);
-			const r = vRng(vHash(it.code) + 3); for (let i = 0; i < 8; i++) { const a = r() * 6.28, L = 22 * (1 - q) + 4; vfxDot(Hx - 6 + Math.cos(a) * L, Hy - 2 + Math.sin(a) * L, 1, col[i % col.length], 0.9); } }
-		if (f >= VFX.REL + 1 && f < HIT + 3 && fx) { const len = (Hx - 8) - T.x, flick = 0.75 + 0.25 * Math.sin(f * 2.3);
-			ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = flick; ctx.drawImage(fx, T.x, Hy - fx.height * 0.35 - 2, len, fx.height * 0.7); ctx.restore(); }
-		if (f >= HIT && f < HIT + 7) { const q = (f - HIT) / 6; vfxImg(fx, T.x, T.y, 0.7 + q * 0.6, 0.7 + q * 0.6, 0, 1 - q, false); vfxRing(T.x, T.y, 4 + q * 30, 4 + q * 30, col[0], 1 - q, 2); }
+	// ออร่ารอบ Rion ตอนชาร์จ + ประกายลอยขึ้น
+	const rx = SKS.rion_at[0] + 32, ry = SKS.rion_at[1] + 40;
+	if (t >= VFX.CHG && t < HIT + 4) { const q = Math.min(1, (t - VFX.CHG) / (REL - VFX.CHG)), fade = t < HIT ? 1 : 1 - (t - HIT) / 4;
+		vfxRing(rx, ry + 20, 10 + q * 14, (10 + q * 14) * 0.3, col[0], 0.7 * fade, 2);
+		vfxDot(rx, ry, 18 + q * 8 + Math.sin(t * 1.7) * 2, col[col.length - 1], 0.18 * fade); vfxDot(rx, ry - 4, 10 + q * 4, col[0], 0.18 * fade);
+		const r = vRng(vHash(it.code) + 7); for (let i = 0; i < 12; i++) { const ph = (t * 0.09 + r()) % 1; vfxDot(rx - 18 + r() * 36, ry + 22 - ph * 50, 1, col[i % col.length], (1 - ph) * fade); } }
+	if (fam === 'SL') {   // เสี้ยวหมุนกวาดไปเป้า ทิ้งรอย → เสี้ยวไขว้ 2 สาย + กากบาทแสง
+		if (t >= REL && t < HIT) for (let k = 4; k >= 0; k--) { const p = rel - k * 0.08; if (p < 0) continue;
+			vfxImg(fx, lerp(Hx - 24, T.x + 14, p), lerp(Hy - 4, T.y, p), k80, k80, lerp(-0.8, 0.35, p), k ? 0.3 / k : 1, k > 0); }
+		if (t >= HIT && t < HIT + 9) { const q = (t - HIT) / 8, sc = k80 * (1 + q * 0.35);
+			vfxImg(fx, T.x + 6, T.y, sc, sc, 0.35, 1 - q, false); vfxImg(fx, T.x + 6, T.y, sc * 1.15, sc * 1.15, 0.35, (1 - q) * 0.7, true);
+			vfxImg(fx, T.x - 2, T.y, sc, -sc, -0.5, (1 - q) * 0.85, true); }
+		if (since < 4) for (const sg of [-1, 1]) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - since / 4; ctx.strokeStyle = since ? col[0] : '#ffffff'; ctx.lineWidth = 3 - since * 0.5;
+			ctx.beginPath(); ctx.moveTo(T.x - 26, T.y - 20 * sg); ctx.lineTo(T.x + 26, T.y + 20 * sg); ctx.stroke(); ctx.restore(); }
+	} else if (fam === 'PC') {   // ลำพุ่งยืด → ทะลุเป้าเลยไปทางซ้าย + เส้นเข็มแตกรอบเป้า
+		if (t >= REL && t < HIT + 3) for (let k = 5; k >= 0; k--) { const p = (t - REL) / (HIT - REL) - k * 0.07; if (p < 0) continue;
+			vfxImg(fx, lerp(Hx - fw * k80 * 0.5, T.x - 30, p * 0.85), lerp(Hy - 2, T.y, p), k80 * (k ? 1.5 : 1.1), 0.65, 0, k ? 0.22 : 1, k > 0); }
+		if (t >= HIT && t < HIT + 7) { const q = (t - HIT) / 6; vfxImg(fx, T.x + 4, T.y, k80 * 1.2, 0.8, 0, (1 - q) * 0.9, true);
+			const r = vRng(vHash(it.code) + 5); for (let i = 0; i < 16; i++) { const a = r() * 6.28, L = 8 + q * 34; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - q; ctx.strokeStyle = col[i % col.length]; ctx.lineWidth = i % 4 ? 1 : 2; ctx.beginPath(); ctx.moveTo(T.x + Math.cos(a) * L * 0.35, T.y + Math.sin(a) * L * 0.35); ctx.lineTo(T.x + Math.cos(a) * L, T.y + Math.sin(a) * L); ctx.stroke(); ctx.restore(); } }
+	} else if (fam === 'ST') {   // แสงปากกระบอก 3 นัด → กระสุนเล็กวิ่ง → ระเบิดเต็มขนาดที่เป้า
+		for (const m of [REL, REL + 2, REL + 4]) if (t === m || t === m + 1) vfxDot(Hx - 4, Hy - 2, t === m ? 9 : 5, col[0], 0.95);
+		for (const [m, dy] of [[REL, 0], [REL + 2, -5], [REL + 4, 5]]) { const p = (t - m) / (HIT - REL); if (p < 0 || p > 1) continue;
+			for (let k = 3; k >= 0; k--) { const pp = p - k * 0.08; if (pp < 0) continue; vfxImg(fx, lerp(Hx - 10, T.x + 6, pp), lerp(Hy - 3, T.y + dy, pp), 0.34 - k * 0.05, 0.34 - k * 0.05, 0, k ? 0.35 : 1, k > 0); } }
+		if (t >= HIT && t < HIT + 9) { const q = (t - HIT) / 8; vfxImg(fx, T.x, T.y, 0.6 + q * 0.6, 0.6 + q * 0.6, 0, 1 - q * 0.9, false); vfxImg(fx, T.x, T.y, 0.75 + q * 0.6, 0.75 + q * 0.6, 0, (1 - q) * 0.55, true);
+			vfxRing(T.x, T.y, 6 + q * 40, 6 + q * 40, col[0], 1 - q, 2); }
+	} else if (fam === 'CR') {   // ลูกไฟที่มือตอนง้าง → ระเบิดโผล่จากพื้น + เสาแสง + คลื่นพื้น 3 วง + หินกระเด็น
+		if (t >= 2 && t < REL + 3) vfxDot(Hx - 2, Hy - 18, 2 + (t - 2) * 1.0, col[1] || col[0], 0.8);
+		if (t >= HIT && t < HIT + 5) { const q = (t - HIT) / 4; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - q; ctx.fillStyle = col[0]; ctx.fillRect(T.x - 8 - q * 6, -10, 16 + q * 12, VFX.TARGET.foot + 10); ctx.restore(); }
+		if (t >= HIT && t < HIT + 11) { const q = (t - HIT) / 10, s = q < 0.35 ? lerp(0.4, 1.25, q / 0.35) : 1.25;
+			if (fx) vfxImg(fx, T.x, VFX.TARGET.foot - fx.height * s / 2, s, s, 0, q < 0.6 ? 1 : 1 - (q - 0.6) / 0.4, false);
+			if (fx) vfxImg(fx, T.x, VFX.TARGET.foot - fx.height * s / 2, s * 1.1, s * 1.1, 0, (1 - q) * 0.5, true);
+			for (const [k, w] of [[1, 3], [0.65, 2], [0.4, 1]]) vfxRing(T.x, VFX.TARGET.foot, (6 + q * 90) * k, (6 + q * 90) * k * 0.18, col[0], (1 - q) * (k === 1 ? 1 : 0.7), w); }
+		vfxBurst(it.code, HIT, t, T.x, VFX.TARGET.foot - 4, 14, ['#6b5444', '#8d735d', '#4a3b30'], { grav: 0.5, speed: 3.6, dir: -Math.PI / 2, spread: 1.0, life: 12, size: 3, salt: 3 });
+	} else if (fam === 'BD') {   // รัวหมัด 3 ครั้ง แต่ละครั้งวงประกาย + ร่างแยกหมัดเรือง
+		for (const h of hits) { const d = t - h; if (d < 0 || d > 4) continue; const r = vRng(vHash(it.code) + h);
+			const ox = (r() * 2 - 1) * 9, oy = (r() * 2 - 1) * 7; vfxImg(fx, T.x + ox, T.y + oy, 0.6 + d * 0.1, 0.6 + d * 0.1, (r() - 0.5) * 0.6, 1 - d / 5, d > 0);
+			vfxRing(T.x + ox, T.y + oy, 4 + d * 8, 4 + d * 8, col[0], 1 - d / 5, 2); vfxRing(T.x + ox, T.y + oy, 2 + d * 4, 2 + d * 4, '#ffffff', 1 - d / 4, 1); }
+		if (t >= REL - 2 && t < HIT + 2) { vfxDot(Hx - 6, Hy, 3 + (t % 2) * 2, col[0], 0.85);
+			const ghost = IMG['rion/' + SKS.poses.BD[2]]; if (ghost) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.28; ctx.drawImage(ghost, SKS.rion_at[0] - 30 - (t % 3) * 8, SKS.rion_at[1]); ctx.restore(); } }
+		if (since < 10) vfxBurst(it.code, HIT, t, T.x, T.y, 26, col, { speed: 4.2, life: 10, streak: true, salt: 9 });
+	} else if (fam === 'DV') {   // ชาร์จลูกพลังดูดอนุภาค → ลำแสงยืดจากมือถึงเป้า กะพริบ + แกนขาว → ระเบิด + วง
+		if (t >= 1 && t < REL + 1) { const q = (t - 1) / REL; vfxDot(Hx - 6, Hy - 2, 3 + q * 9, col[0], 0.5 + q * 0.4); vfxDot(Hx - 6, Hy - 2, 1 + q * 4, '#ffffff', 0.85);
+			const r = vRng(vHash(it.code) + 3); for (let i = 0; i < 14; i++) { const a = r() * 6.28, L = 30 * (1 - ((q + r()) % 1)) + 4; vfxDot(Hx - 6 + Math.cos(a) * L, Hy - 2 + Math.sin(a) * L, 1, col[i % col.length], 0.9); } }
+		if (t >= REL + 1 && t < HIT + 5 && fx) { const len = (Hx - 8) - T.x, flick = 0.75 + 0.25 * Math.sin(t * 2.3), hgt = fx.height * (t < HIT ? 0.5 : 0.9);
+			ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = flick; ctx.drawImage(fx, T.x, Hy - hgt / 2 - 2, len, hgt);
+			ctx.fillStyle = '#ffffff'; ctx.globalAlpha = flick * 0.8; ctx.fillRect(T.x, Hy - 3, len, 2); ctx.restore(); }
+		if (t >= HIT && t < HIT + 9) { const q = (t - HIT) / 8; vfxImg(fx, T.x, T.y, 0.8 + q * 0.7, 0.8 + q * 0.7, 0, 1 - q, false); vfxImg(fx, T.x, T.y, 0.9 + q * 0.7, 0.9 + q * 0.7, 0, (1 - q) * 0.5, true);
+			vfxRing(T.x, T.y, 4 + q * 46, 4 + q * 46, col[0], 1 - q, 3); vfxRing(T.x, T.y, 2 + q * 26, 2 + q * 26, '#ffffff', 1 - q, 1); }
 	}
-	for (const h of hits) vfxBurst(it.code, h, f, T.x, T.y, fam === 'BD' ? 8 : 18, col,
-		{ grav: VFX.GRAV[fam] ?? 0.18, speed: fam === 'CR' ? 3.2 : 2.6, dir: fam === 'CR' ? -Math.PI / 2 : Math.PI, spread: fam === 'CR' ? 1.1 : Math.PI, life: fam === 'BD' ? 5 : 9 });
+	for (const h of hits) vfxBurst(it.code, h, t, T.x, T.y, fam === 'BD' ? 10 : 24, col,
+		{ grav: VFX.GRAV[fam] ?? 0.18, speed: fam === 'CR' ? 3.4 : 3, dir: fam === 'CR' ? -Math.PI / 2 : Math.PI, spread: fam === 'CR' ? 1.1 : Math.PI, life: fam === 'BD' ? 6 : 11 });
+	// ถ่านไฟลอยค้างหลังกระทบ
+	if (t > HIT && t < HIT + 18) { const r = vRng(vHash(it.code) + 21); for (let i = 0; i < 16; i++) { const ph = (t - HIT) / 18, sx0 = T.x - 40 + r() * 80, sp = 0.6 + r();
+		vfxDot(sx0 + Math.sin((t + i) * 0.5) * 3, T.y + 20 - ph * 40 * sp, 1, col[i % col.length], (1 - ph) * (0.5 + 0.5 * Math.sin(t * 1.3 + i))); } }
 	spr('rion/' + SKS.poses[fam][VFX.POSE[f]], SKS.rion_at[0], SKS.rion_at[1]);
-	if (since < 2) { ctx.fillStyle = `rgba(255,255,255,${since ? 0.1 : 0.28})`; ctx.fillRect(-8, -8, W0 + 16, H0 + 16); }
+	vfxText(VFX.TEXT[fam], T.x + 8, T.y - 30, HIT, f, col[0]);
 	ctx.restore();
+	// หลังวาดฉาก: ภาพแยกสี RGB ตอนกระทบ + จอวาบ
+	if (fsince < 3) { VFX_OC.width = W0; VFX_OC.height = H0; VFX_OC.getContext('2d').drawImage(cv, 0, 0);
+		ctx.save(); ctx.globalAlpha = fsince ? 0.16 : 0.28;   // เงาซ้อนเหลื่อมซ้าย-ขวา (บวกแสงทั้งจอบนพื้นสว่างจะขาวโพลน)
+		ctx.drawImage(VFX_OC, -3 + fsince, 0); ctx.drawImage(VFX_OC, 3 - fsince, 0); ctx.restore(); }
+	if (fsince < 3) { ctx.fillStyle = `rgba(255,255,255,${[0.22, 0.1, 0.04][fsince]})`; ctx.fillRect(0, 0, W0, H0); }
 	if (S.grid) drawGrid();
+}
+
+// ── เสียงประกอบ (Web Audio สังเคราะห์ในหน้า · ไม่มีไฟล์เสียง) ── เปิดด้วยปุ่ม "เสียง" (เบราว์เซอร์ให้เล่นได้หลังกดเท่านั้น)
+let AU = null;
+function auInit() { if (!AU) { try { const C = window.AudioContext || window.webkitAudioContext; const ac = new C(); const out = ac.createGain(); out.gain.value = 0.5; out.connect(ac.destination);
+	const nb = ac.createBuffer(1, ac.sampleRate, ac.sampleRate), d = nb.getChannelData(0); let s = 12345; for (let i = 0; i < d.length; i++) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; d[i] = s / 2147483648 - 1; }
+	AU = { ac, out, nb }; } catch (e) { AU = null; } } if (AU && AU.ac.state === 'suspended') AU.ac.resume(); return AU; }
+function auEnv(g, t0, a, peak, dur) { g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(peak, t0 + a); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); }
+function auNoise(dur, type, f0, f1, peak, q = 1, delay = 0) { const { ac, out, nb } = AU, t0 = ac.currentTime + delay, src = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain();
+	src.buffer = nb; fl.type = type; fl.Q.value = q; fl.frequency.setValueAtTime(f0, t0); fl.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t0 + dur);
+	auEnv(g, t0, 0.01, peak, dur); src.connect(fl); fl.connect(g); g.connect(out); src.start(t0); src.stop(t0 + dur + 0.05); }
+function auTone(dur, wave, f0, f1, peak, delay = 0, attack = 0.005) { const { ac, out } = AU, t0 = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+	o.type = wave; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t0 + dur); auEnv(g, t0, attack, peak, dur); o.connect(g); g.connect(out); o.start(t0); o.stop(t0 + dur + 0.05); }
+const AU_SFX = {
+	charge: fam => { auTone(0.34, 'sine', 180, fam === 'DV' ? 900 : 520, 0.12, 0, 0.2); auTone(0.34, 'triangle', 360, fam === 'DV' ? 1800 : 1040, 0.05, 0, 0.2); },
+	release: { SL: () => auNoise(0.22, 'bandpass', 600, 4200, 0.5, 2.5), PC: () => { auNoise(0.12, 'highpass', 2500, 6000, 0.35); auTone(0.14, 'sawtooth', 1600, 400, 0.12); },
+		ST: () => [0, 0.09, 0.18].forEach(d => { auTone(0.1, 'square', 1100, 180, 0.14, d); auNoise(0.06, 'highpass', 3000, 3000, 0.25, 1, d); }),
+		CR: () => auNoise(0.3, 'bandpass', 300, 1400, 0.45, 1.5), BD: () => auNoise(0.14, 'bandpass', 900, 3000, 0.35, 2), DV: () => { auTone(0.4, 'sawtooth', 110, 150, 0.16); auTone(0.4, 'square', 220, 300, 0.06); auNoise(0.4, 'bandpass', 1800, 2400, 0.12, 3); } },
+	hit: (fam, big) => { auTone(big ? 0.7 : 0.4, 'sine', big ? 120 : 160, 38, big ? 0.9 : 0.6); auNoise(big ? 0.6 : 0.3, 'lowpass', 2400, 120, big ? 0.8 : 0.55);
+		auNoise(0.08, 'highpass', 4000, 4000, 0.4); if (fam === 'SL' || fam === 'PC') auTone(0.5, 'triangle', 2600, 1800, 0.07, 0.03); },
+	punch: () => { auTone(0.16, 'sine', 140, 50, 0.7); auNoise(0.09, 'bandpass', 1400, 400, 0.5, 1.2); },
+	tail: fam => { if (fam === 'CR' || fam === 'DV') auNoise(1.0, 'lowpass', 500, 60, 0.35); else [0, 0.06, 0.13, 0.21].forEach((d, i) => auTone(0.25, 'triangle', 1800 + i * 420, 2600 + i * 300, 0.05, d)); },
+};
+function vfxSound(c, f) {   // เรียกเมื่อเฟรมเดินเอง (ไม่เล่นตอนกดทีละเฟรม)
+	if (!S.sound || !AU) return; const fam = c.skill.family, t = vTime(f);
+	if (f === VFX.CHG) AU_SFX.charge(fam);
+	if (f === VFX.REL) AU_SFX.release[fam]();
+	if (fam === 'BD' && (f === VFX.HIT - 4 || f === VFX.HIT - 2)) AU_SFX.punch();
+	if (f === VFX.HIT) AU_SFX.hit(fam, fam === 'CR' || fam === 'DV');
+	if (f === VFX.HIT + VFX.STOP + 2) AU_SFX.tail(fam);
 }
 function sheetSkillView(c) {
 	if (c.vfx) return vfxView(c);
@@ -1302,7 +1382,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.vfx) vfxSound(c, S.frame); }
 		}
 		clipView();
 	} else {
@@ -1586,6 +1666,8 @@ function boot() {
 	$('ultK').textContent = K.ULT_PROF;
 	$('segStyle').onclick = e => { const v = e.target.dataset.v; if (!v) return; S.style = v; S.cine = v === 'cine'; S.saga = v === 'saga'; setHome(); press($('segStyle'), v); try { localStorage.setItem('at_style', v); } catch (er) {} };
 	try { const v = localStorage.getItem('at_style'); if (v) { S.style = v; S.cine = v === 'cine'; S.saga = v === 'saga'; setHome(); press($('segStyle'), v); } } catch (er) {}
+	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
+		b.textContent = S.sound ? (AU ? '🔊 เสียงเปิด — เล่นตอนท่าเดินเอง' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงปิด — กดเพื่อเปิดเสียงประกอบ (ตัวอย่าง VFX)'; };
 	$('btnGlim').onclick = () => { S.glim = !S.glim; $('btnGlim').setAttribute('aria-pressed', String(S.glim)); };
 	$('btnPlay').onclick = () => { S.playing = !S.playing; updPlay(); };
 	const step = d => { if (!isClip()) return; S.playing = false; updPlay(); const n = CLIPS[S.clip].frames.length; S.frame = (S.frame + d + n) % n; syncFrame(); };
