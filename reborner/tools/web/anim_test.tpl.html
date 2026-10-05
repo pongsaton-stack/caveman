@@ -343,14 +343,15 @@ const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h
 const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
 const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
 // แนว RS3 (Romancing SaGa 3 · kwan 5 ต.ค. "ทำแนว RS3 แต่เพิ่มความอลังการ"): ฉากปูไทล์ 240x120 แบบโหมด SaGa · ทีมเรียงทแยงขวา · มอนซ้าย
-// เฟรม: หลอดไฟประกาย 0–5 · กล่องชื่อท่า 4– · วิ่งเข้า 6–11 · ท่า (VFX เฟรม 0–29) 12–41 · วิ่งกลับ 42–47 · ยืน 48–53
-const RS3 = { N: 54, RUN: 6, ATK: 12, BACK: 42, IDLE: 48, HOME: [146, 42], FRONT_DX: 30,
+// เฟรม: หลอดไฟประกาย 0–5 · กล่องชื่อท่า 4– · วิ่งเข้า 6–11 · ตะโกนชื่อท่า 12–27 (บอลลูน + เสียงพูด) · ท่า (VFX เฟรม 0–29) 28–57 · วิ่งกลับ 58–63 · ยืน 64–69
+const RS3 = { N: 70, RUN: 6, SHOUT: 12, ATK: 28, BACK: 58, IDLE: 64, HOME: [146, 42], FRONT_DX: 30,
 	TARGET: { x: 52, foot: 98, key: 'mon/M01' }, BACKFOE: { x: 22, foot: 72, key: 'mon/M15' },
 	PARTY: [{ key: 'mon/COMP-M06', x: 220, y: 60 }, { key: 'mon/COMP-M03', x: 218, y: 118 }] };
 function rs3Rion(it, f) {   // ตำแหน่งมุมซ้ายบน + ภาพของ Rion ที่เฟรม f
 	const front = RS3.TARGET.x + RS3.FRONT_DX, [hx, hy] = RS3.HOME;
 	if (f < RS3.RUN) return { x: hx, y: hy, key: 'rion/west' };
-	if (f < RS3.ATK) { const p = (f - RS3.RUN + 1) / (RS3.ATK - RS3.RUN); return { x: Math.round(lerp(hx, front, p)), y: hy, key: `rion/west_w${f % 4}` }; }
+	if (f < RS3.SHOUT) { const p = (f - RS3.RUN + 1) / (RS3.SHOUT - RS3.RUN); return { x: Math.round(lerp(hx, front, p)), y: hy, key: `rion/west_w${f % 4}` }; }
+	if (f < RS3.ATK) return { x: front, y: hy - ((f >> 2) % 2), key: 'rion/' + SKS.poses[it.family][1] };   // ตะโกน: ท่าง้าง ตัวกระตุกขึ้นลงทีละ 1px
 	if (f < RS3.BACK) return { x: front, y: hy, key: 'rion/' + SKS.poses[it.family][VFX.POSE[f - RS3.ATK]] };
 	if (f < RS3.IDLE) { const p = (f - RS3.BACK + 1) / (RS3.IDLE - RS3.BACK); return { x: Math.round(lerp(front, hx, p)), y: hy, key: `rion/east_w${f % 4}` }; }
 	return { x: hx, y: hy, key: 'rion/west' };
@@ -526,6 +527,25 @@ function rs3NameBox(text, alpha, W0) {   // กล่องชื่อท่า
 	ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 1, y - 1, w + 2, 14); ctx.fillStyle = '#1a2a6a'; ctx.fillRect(x, y, w, 12);
 	ctx.fillStyle = '#2c47a8'; ctx.fillRect(x, y, w, 3); ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(text, x + 6, y + 6.5); ctx.restore();
 }
+function rs3Bubble(text, x, y, d, alpha) {   // บอลลูนคำพูด (แบบ bubble() ของโหมด SaGa) เด้งตอนเริ่ม
+	if (alpha <= 0) return; ctx.save(); ctx.globalAlpha = Math.min(1, alpha); ctx.font = '900 9px Sarabun, sans-serif';
+	const sc = d < 2 ? 1.35 - d * 0.17 : 1, w = Math.ceil(ctx.measureText(text).width) + 12, bx = Math.max(2, Math.min(240 - w * sc - 2, x - w * sc / 2)), by = y - 18;
+	ctx.translate(bx, by); ctx.scale(sc, sc);
+	ctx.fillStyle = '#fffaf0'; ctx.strokeStyle = '#2a1a0a'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0, 0, w, 14, 5) : ctx.rect(0, 0, w, 14); ctx.fill(); ctx.stroke();
+	ctx.beginPath(); ctx.moveTo(w / 2 - 3, 14); ctx.lineTo(w / 2 + 2, 19); ctx.lineTo(w / 2 + 3, 14); ctx.fill();
+	ctx.fillStyle = '#c0181e'; ctx.textBaseline = 'middle'; ctx.fillText(text, 6, 7.5); ctx.restore();
+}
+// เสียงตะโกนชื่อท่า: ใช้เสียงพูดภาษาไทยที่มีในเครื่องของคนดู (Web Speech) — ไม่มีไฟล์เสียงพากย์
+// เลือกเสียงผู้ชายไทยก่อน (Niwat/Pattara) แล้วดันเสียงสูงขึ้นให้เป็นเด็กชายวัยรุ่น · มีแค่เสียงผู้หญิง = กดเสียงต่ำลงเล็กน้อย · ไม่มีเสียงไทย = บอลลูนอย่างเดียว
+const VOICE_PITCH = { male: 1.5, other: 0.92 }, VOICE_RATE = 1.2;
+function thVoices() { return 'speechSynthesis' in window ? speechSynthesis.getVoices().filter(v => /^th/i.test(v.lang)) : []; }
+function rionVoice() { const vs = thVoices(), male = vs.find(v => /niwat|pattara|male|ชาย/i.test(v.name)); return { v: male || vs[0], male: !!male, n: vs.length }; }
+function rionShout(text) {
+	const { v, male } = rionVoice(); if (!v) return false;
+	const u = new SpeechSynthesisUtterance(text + '!'); u.lang = 'th-TH'; try { u.voice = v; } catch (e) {}   /* เลือกเสียงไม่ได้ = ใช้เสียงไทยค่าเริ่มของเครื่อง */
+	u.pitch = male ? VOICE_PITCH.male : VOICE_PITCH.other; u.rate = VOICE_RATE; u.volume = 1;
+	speechSynthesis.cancel(); speechSynthesis.speak(u); window.__shouts = (window.__shouts || 0) + 1; return true;
+}
 function rs3View(c) {
 	const it = c.skill, f = S.frame, r = rs3Rion(it, f), col = it.colors || ['#ffffff'], lf = f - RS3.ATK;
 	const hex = col[0].replace('#', ''), cr = parseInt(hex.slice(0, 2), 16), cg = parseInt(hex.slice(2, 4), 16), cb = parseInt(hex.slice(4, 6), 16);
@@ -536,13 +556,15 @@ function rs3View(c) {
 		party: () => { for (const m of RS3.PARTY) { const im = IMG[m.key]; if (im) { ctx.save(); ctx.translate(m.x + (im.width >> 1), m.y - im.height); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); ctx.restore(); } } },
 		over: () => {
 			if (f < RS3.RUN + 1) rs3Bulb(r.x + 32, r.y - 2 + (f % 2), f);
-			if (f >= 4 && f < RS3.IDLE + 2) rs3NameBox(it.code + ' · สาย' + it.school, f < 6 ? (f - 3) / 3 : f > RS3.IDLE - 1 ? Math.max(0, 1 - (f - RS3.IDLE + 1) / 3) : 1, 240);
+			if (f >= RS3.SHOUT && f < RS3.ATK + 6) rs3Bubble((it.name_th || it.code) + '!!', r.x + 30, r.y + 2, f - RS3.SHOUT, f < RS3.ATK + 3 ? 1 : 1 - (f - RS3.ATK - 2) / 4);
+			if (f >= 4 && f < RS3.IDLE + 2) rs3NameBox((it.name_th || it.code) + ' · สาย' + it.school, f < 6 ? (f - 3) / 3 : f > RS3.IDLE - 1 ? Math.max(0, 1 - (f - RS3.IDLE + 1) / 3) : 1, 240);
 		} });
 }
 function rs3Sound(c, f) {
 	if (!S.sound || !AU) return;
 	if (f === 1) AU_SFX.glim();
 	if (f === 4) AU_SFX.blip();
+	if (f === RS3.SHOUT) rionShout(c.skill.name_th || c.skill.code);
 	if ((f >= RS3.RUN && f < RS3.ATK) || (f >= RS3.BACK && f < RS3.IDLE)) { if (f % 2 === 0) AU_SFX.step(); }
 	if (f >= RS3.ATK && f < RS3.BACK) vfxSound(c, f - RS3.ATK);
 }
@@ -1730,7 +1752,9 @@ function boot() {
 	$('segStyle').onclick = e => { const v = e.target.dataset.v; if (!v) return; S.style = v; S.cine = v === 'cine'; S.saga = v === 'saga'; setHome(); press($('segStyle'), v); try { localStorage.setItem('at_style', v); } catch (er) {} };
 	try { const v = localStorage.getItem('at_style'); if (v) { S.style = v; S.cine = v === 'cine'; S.saga = v === 'saga'; setHome(); press($('segStyle'), v); } } catch (er) {}
 	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
-		b.textContent = S.sound ? (AU ? '🔊 เสียงเปิด — เล่นตอนท่าเดินเอง' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงปิด — กดเพื่อเปิดเสียงประกอบ (ตัวอย่าง VFX)'; };
+		const vz = () => { const r = rionVoice(); return r.v ? ` · เสียงพูด: ${r.v.name}${r.male ? '' : ' (ไม่มีเสียงผู้ชายไทยในเครื่องนี้)'}` : ' · เครื่องนี้ไม่มีเสียงพูดภาษาไทย (ขึ้นบอลลูนอย่างเดียว)'; };
+		b.textContent = S.sound ? (AU ? '🔊 เสียงเปิด — เล่นตอนท่าเดินเอง' + vz() : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงปิด — กดเพื่อเปิดเสียงประกอบ (ตัวอย่าง VFX)';
+		if (S.sound && 'speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { if (S.sound) b.textContent = '🔊 เสียงเปิด — เล่นตอนท่าเดินเอง' + vz(); }; };
 	$('btnGlim').onclick = () => { S.glim = !S.glim; $('btnGlim').setAttribute('aria-pressed', String(S.glim)); };
 	$('btnPlay').onclick = () => { S.playing = !S.playing; updPlay(); };
 	const step = d => { if (!isClip()) return; S.playing = false; updPlay(); const n = CLIPS[S.clip].frames.length; S.frame = (S.frame + d + n) % n; syncFrame(); };

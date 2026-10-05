@@ -187,6 +187,9 @@ def main():
 		c.update(fx_size=list(fxi.size), hero_px_removed=cut, colors=glow_colors(fxi))
 		items.append(c)
 		if c['code'] in ('SL01', 'SL20', 'PC06', 'CR04', 'BD10', 'ST05', 'DV08', 'SL30'): previews.append((c['family'], fxi))
+	names = json.load(open(os.path.join(ROOT, 'docs/art-bible/compendium/skill_names.json'), encoding='utf-8'))['names']
+	for c in items:
+		if c['code'] in names: c.update(name_th=names[c['code']]['name'], name_status=names[c['code']]['status'])
 	cnt = {}
 	for c in items: cnt[c['family']] = cnt.get(c['family'], 0) + 1
 	json.dump({'_doc': 'ตัดจาก docs/art-bible/compendium/skill_sprite_sheet.jpg ด้วย tools/sprites/skill_sheet_cut.py · ร่าง ยังไม่เข้าเกม · '
