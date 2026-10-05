@@ -1,7 +1,7 @@
 # tools/web/anim_test_build.py — สร้างหน้า "animation test" จากข้อมูลเกมปัจจุบัน
 # อ่านสไปรต์จาก assets/ + techs.csv + monsters.csv + ค่าคงที่จาก Formulas.gd / BattleScreen.gd / Overworld.gd
 # แล้วฝังทั้งหมดลงไฟล์ HTML เดียว (Artifact ห้ามโหลดไฟล์ภายนอก) · รัน: python3 tools/web/anim_test_build.py <out.html>
-import base64, csv, json, os, re, sys
+import glob, base64, csv, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPR = os.path.join(ROOT, 'assets/sprites')
@@ -68,6 +68,12 @@ def sprites():
 		for f in sorted(os.listdir(pd)):
 			if f.endswith('.png'):
 				out['p64/' + f[:-4]] = png(os.path.join(pd, f))
+	# ผลจากเครื่องตัดชีต (tools/sprites/sheet_cut.py) — ไม่เอาชีตขยายที่ไว้ดูตรวจ
+	cd = os.path.join(SPR, 'sheet_cut_draft')
+	if os.path.isdir(cd):
+		for f in sorted(os.listdir(cd)):
+			if f.endswith('.png') and not f.endswith('_sheet.png'):
+				out['cut/' + f[:-4]] = png(os.path.join(cd, f))
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -83,6 +89,10 @@ def sprites():
 		if os.path.exists(f):
 			out['tile/' + n] = png(f)
 	return out
+
+def sheet_cut():
+	cd = os.path.join(SPR, 'sheet_cut_draft')
+	return [dict(json.load(open(p, encoding='utf-8')), name=os.path.basename(p)[:-5]) for p in sorted(glob.glob(os.path.join(cd, '*.json')))]
 
 def techs():
 	rows = []
@@ -151,6 +161,7 @@ def main(out_path):
 		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
+		'sheet_cut': sheet_cut(),
 		'compendium': compendium(),
 		'weapons': [dict(w, school=f['school']) for f in json.load(open(os.path.join(ROOT, 'docs/art-bible/weapons/weapons_full.json'), encoding='utf-8'))['families'] for w in f['weapons']],
 		'spells': json.load(open(os.path.join(ROOT, 'docs/art-bible/spells/spells_full.json'), encoding='utf-8'))['schools'],

@@ -1,0 +1,71 @@
+{
+ "source": "slime_overworld_frames.png",
+ "background": "flood",
+ "frames": 4,
+ "size": [
+  64,
+  48
+ ],
+ "baseline": 46,
+ "scale": 17.467,
+ "scale_mode": "ย่อให้เฟรมกว้างสุดกว้าง 60px (ไม่เจอพิกเซลปลอม · มั่นใจ 0.00)",
+ "palette": "auto16",
+ "palette_dist": 4.5,
+ "ms": 300,
+ "files": [
+  "slime_v3_ai_0.png",
+  "slime_v3_ai_1.png",
+  "slime_v3_ai_2.png",
+  "slime_v3_ai_3.png"
+ ],
+ "cells": [
+  {
+   "box": [
+    154,
+    367,
+    936,
+    630
+   ],
+   "row": 0,
+   "dx": 10,
+   "dy": 31,
+   "clipped": false
+  },
+  {
+   "box": [
+    1087,
+    389,
+    1869,
+    631
+   ],
+   "row": 0,
+   "dx": 9,
+   "dy": 33,
+   "clipped": false
+  },
+  {
+   "box": [
+    1999,
+    418,
+    3047,
+    637
+   ],
+   "row": 0,
+   "dx": 0,
+   "dy": 34,
+   "clipped": false
+  },
+  {
+   "box": [
+    3174,
+    398,
+    3949,
+    631
+   ],
+   "row": 0,
+   "dx": 10,
+   "dy": 33,
+   "clipped": false
+  }
+ ]
+}

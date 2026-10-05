@@ -73,7 +73,7 @@ header p{margin:0;color:var(--muted);font-size:13px}
 .wcard{margin-top:10px;font-size:13px;line-height:1.5}.wcard b{color:var(--gold)}.wcard .muted{color:var(--muted)}
 .cgroup h3{font:600 14px var(--f-display);margin:0 0 6px;color:var(--gold)}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
-.cgrid .btn{text-align:left;font-size:13px;line-height:1.3}
+.cgrid .btn{text-align:left;font-size:13px;line-height:1.3;min-width:0;overflow-wrap:anywhere}   /* ชื่อไฟล์ยาวไม่มีช่องว่าง (slime_v3_ai …) ห้ามดันหน้ากว้างเกินจอ */
 .cgrid .btn small{display:block;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
 .schools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .tlist{display:grid;gap:6px}
@@ -278,6 +278,19 @@ for (const p of DATA.poses64 || []) {
 	const panels = old ? [{ label: 'ตอนนี้', keys: old.order.map(u => `p64/${old.id}_${u}`) }, { label: 'ระดับ 2 (ใหม่)', keys }] : null;
 	addClip(group, p.clip_id || 'pose_' + p.id, `${p.label}`, keys, (p.cycle || CYCLE[p.timing]) / p.n,
 		Object.assign({ unique: p.unique }, p.hold ? { hold: true } : {}, panels ? { panels } : {}));
+}
+// เครื่องตัดชีต (tools/sprites/sheet_cut.py · kwan เลือก 5 ต.ค.) — ชีตที่ตัวเจนให้มา → ลบพื้น · หาเฟรม · ย่อ · ล็อกสี · จัดเท้า
+// demo_* = ชีตจำลองจากเฟรม Rion จริง เล่นคู่ ต้นฉบับ | ตัดจากชีต (sheet_cut_test.py) · ที่เหลือ = ชีตจริงจากตัวเจน
+for (const c of (DATA.sheet_cut || [])) {
+	const keys = c.files.map(f => 'cut/' + f.replace(/\.png$/, ''));
+	const info = `${c.frames} เฟรม · ย่อ ×${c.scale}` + (c.match != null ? ` · ตรงต้นฉบับ ${c.match}%` : '');
+	if (c.compare_with) {
+		const orig = keys.map((_, i) => `p64/${c.compare_with}_${i}`);
+		addClip('ตัดจากสไปรต์ชีต (ทดสอบเครื่องตัด)', 'cut_' + c.name, `${c.compare_with} · ${info}`, keys, c.ms / 1000,
+			{ panels: [{ label: 'ต้นฉบับ', keys: orig }, { label: 'ตัดจากชีตจำลอง', keys }] });
+	} else {
+		addClip('ตัดจากสไปรต์ชีต (ร่าง ยังไม่เข้าเกม)', 'cut_' + c.name, `${c.name} · ${info} · ${c.source}`, keys, c.ms / 1000, { tab: 'monsters' });
+	}
 }
 const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
 for (const key of Object.keys(DATA.sprites)) {
@@ -1161,7 +1174,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
