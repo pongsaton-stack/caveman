@@ -50,6 +50,7 @@ header p{margin:0;color:var(--muted);font-size:13px}
 .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .tabs .btn{font:600 14px var(--f-display);padding:6px 14px}
 .side{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
+[hidden]{display:none!important}
 .clips{display:grid;gap:10px}
 .skref{margin-top:14px}.skref summary{cursor:pointer;font:600 14px var(--f-display);color:var(--gold)}
 .skref .muted{color:var(--muted);font-size:12px;margin:6px 0}.skwrap{overflow-x:auto;margin-top:8px}.skwrap img{max-width:100%;display:block;border-radius:6px}
@@ -129,6 +130,8 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 	<div class="side">
 		<div class="tabs" role="tablist">
 			<button class="btn" role="tab" id="tabClips" aria-pressed="true">ท่าขยับ</button>
+			<button class="btn" role="tab" id="tabMonsters" aria-pressed="false">มอนสเตอร์</button>
+			<button class="btn" role="tab" id="tabBosses" aria-pressed="false">บอส</button>
 			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
 			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
 			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
@@ -142,6 +145,18 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 				<div class="tabs" id="skRefPick"></div>
 				<div class="skwrap"><img id="skRefImg" alt=""></div>
 			</details>
+		</section>
+
+		<section class="box" id="paneMonsters" hidden>
+			<div class="wcard" id="monCard"></div>
+			<div class="clips" id="monGroups"></div>
+		</section>
+
+		<section class="box" id="paneBosses" hidden>
+			<p class="muted wnote">บอสทั้งหมดใน monsters.csv (is_boss) · ค่าจากไฟล์เกมตรง ๆ</p>
+			<div class="cgrid" id="bossList"></div>
+			<div class="wcard" id="bossCard"></div>
+			<div class="clips" id="bossGroups" hidden></div>
 		</section>
 
 		<section class="box" id="paneWeapons" hidden>
@@ -202,7 +217,8 @@ const GROUPS = [];
 function addClip(group, id, label, frames, sec, opt = {}) {
 	CLIPS[id] = Object.assign({ id, label, frames, sec, loop: true }, opt);
 	let g = GROUPS.find(x => x.name === group);
-	if (!g) GROUPS.push(g = { name: group, ids: [] });
+	if (!g) GROUPS.push(g = { name: group, ids: [], tab: opt.tab || 'clips' });
+	CLIPS[id].tab = g.tab;
 	g.ids.push(id);
 }
 for (const [d, th] of DIRS) addClip('Rion บนแผนที่', 'rion_walk_' + d, 'เดิน' + th, [0, 1, 2, 3].map(i => `rion/${d}_w${i}`), WALK_SEC);
@@ -216,7 +232,9 @@ for (const key of Object.keys(DATA.sprites)) {
 	const m = key.match(/^mon\/(.+?)$/);
 	if (!m || m[1].endsWith('_idle1')) continue;
 	const id = m[1], base = id.replace('COMP-', '');
-	addClip(id.startsWith('COMP-') ? 'มอนฝั่งเรา (COMP)' : 'มอนศัตรู', 'mon_' + id, (monName[base] || base) + ' ' + id, [key, key + '_idle1'], K.FOE_IDLE_SEC);
+	const boss = /^B\d/.test(id);
+	addClip(boss ? 'บอสในเกม' : id.startsWith('COMP-') ? 'มอนฝั่งเรา (COMP)' : 'มอนศัตรูในเกม', 'mon_' + id, (monName[base] || base) + ' ' + id, [key, key + '_idle1'], K.FOE_IDLE_SEC,
+		{ tab: boss ? 'bosses' : 'monsters', mon: base });
 }
 
 // ร่างศัตรูจากชีต Last Light (ยังไม่เข้าเกม) — ป้ายบอกว่า MASTER ใช้แบบนี้กับมอนตัวไหนในเกม
@@ -225,7 +243,7 @@ for (const key of Object.keys(DATA.sprites)) {
 	if (!m || m[1].endsWith('_idle1')) continue;
 	const used = (DATA.draft_map || {})[m[1]] || [];
 	addClip('ร่างจากชีต Last Light (ยังไม่เข้าเกม)', 'draft_' + m[1], m[1] + (used.length ? ' → ' + used.slice(0, 3).join(', ') + (used.length > 3 ? ` +${used.length - 3}` : '') : ' → ยังไม่มีในเกม'),
-		[key, key + '_idle1'], K.FOE_IDLE_SEC);
+		[key, key + '_idle1'], K.FOE_IDLE_SEC, { tab: 'monsters' });
 }
 
 // ร่างจาก Monster Compendium (ยังไม่เข้าเกม) — กลุ่มละภูมิ ตามลำดับในชีต
@@ -234,13 +252,13 @@ for (const e of (DATA.compendium || [])) {
 	if (!DATA.sprites[key + '_idle1']) continue;
 	// หายใจ 2 รอบ → โจมตี → โดนตี (ทำจากภาพในชีตด้วยโค้ด · 64px)
 	addClip('Compendium · ' + e.region_th + ' (ร่าง ยังไม่เข้าเกม)', 'cmp_' + e.id, e.name + ' · หายใจ/โจมตี/โดนตี',
-		['idle1', 'idle2', 'idle1', 'idle2', 'attack', 'idle1', 'hit', 'idle1'].map(f => key + '_' + f), 0.32);
+		['idle1', 'idle2', 'idle1', 'idle2', 'attack', 'idle1', 'hit', 'idle1'].map(f => key + '_' + f), 0.32, { tab: 'monsters' });
 }
 
 // ตัวอย่างเจนรายตัว (kwan สั่งตาม grok_prompts ข้อ 10) — ภาพเดี่ยว + หายใจ · แถวท่าขยับ 4 เฟรมตามที่ส่งมา
 if (DATA.sprites['smp/slime_v3']) {
-	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3', 'Slime v3 ภาพเดี่ยว · หายใจ', ['smp/slime_v3', 'smp/slime_v3_idle1'], K.FOE_IDLE_SEC);
-	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3_row', 'Slime v3 แถวท่า (ยืน·หายใจ·โจมตี·โดนตี)', [0, 1, 2, 3].map(i => 'smp/slime_v3_row' + i), 0.3);
+	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3', 'Slime v3 ภาพเดี่ยว · หายใจ', ['smp/slime_v3', 'smp/slime_v3_idle1'], K.FOE_IDLE_SEC, { tab: 'monsters' });
+	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3_row', 'Slime v3 แถวท่า (ยืน·หายใจ·โจมตี·โดนตี)', [0, 1, 2, 3].map(i => 'smp/slime_v3_row' + i), 0.3, { tab: 'monsters' });
 }
 
 // อาวุธร่าง (weapons_full.json · วาดด้วย tools/sprites/weapons.py) — ภาพนิ่ง กลุ่มละสาย
@@ -259,11 +277,12 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 }
 
 // ── สถานะผู้ชม ──
-const isClip = () => S.tab === 'clips' || S.tab === 'weapons' || S.tab === 'spells';
-const S = { tab: 'clips', clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
+const CLIP_TABS = ['clips', 'monsters', 'bosses', 'weapons', 'spells'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups' };
+const isClip = () => CLIP_TABS.includes(S.tab);
+const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
-try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || t === 'clips' || t === 'weapons' || t === 'spells') S.tab = t; } catch (e) {}
+try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
 
 // ── วาด ──
 const W = () => cv.width, H = () => cv.height;
@@ -1102,21 +1121,57 @@ function buildStrip() {
 	});
 	syncFrame();
 }
+function pickClip(id) {
+	const c = CLIPS[id]; S.clip = id; S.frame = 0; S.acc = 0; S.playing = true; updPlay();
+	if (GROUP_BOX[c.tab]) { S.last[c.tab] = id; press($(GROUP_BOX[c.tab]), id); }
+	if (c.tab === 'monsters') monCard(c.mon); if (c.tab === 'bosses') bossCard(c.mon);
+	buildStrip();
+}
 function buildClips() {
-	const box = $('clipGroups');
 	for (const g of GROUPS) {
+		const box = $(GROUP_BOX[g.tab]);
 		const sec = document.createElement('div'); sec.className = 'cgroup';
 		sec.innerHTML = `<h3>${g.name}</h3>`;
 		const grid = document.createElement('div'); grid.className = 'cgrid';
 		for (const id of g.ids) {
 			const c = CLIPS[id], b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = id;
 			b.innerHTML = `${c.label}<small>${c.frames.length} เฟรม${c.frames.length > 1 ? ' · ' + Math.round(c.sec * 1000) + ' ms' : ''}</small>`;
-			b.addEventListener('click', () => { S.clip = id; S.frame = 0; S.acc = 0; S.playing = true; updPlay(); press($('clipGroups'), id); buildStrip(); });
+			b.addEventListener('click', () => pickClip(id));
 			grid.append(b);
 		}
 		sec.append(grid); box.append(sec);
 	}
-	press(box, S.clip);
+	for (const t in GROUP_BOX) if (!S.last[t]) S.last[t] = (GROUPS.find(g => g.tab === t) || { ids: [] }).ids[0];
+	press($('clipGroups'), S.clip);
+}
+// การ์ดค่าจาก monsters.csv (มอนในเกมเท่านั้น · ร่างไม่มีค่า)
+function statLine(m) {
+	return `HP <b>${m.hp}</b> · ATK <b>${m.atk}</b> · DEF <b>${m.def}</b> · SPD <b>${m.spd}</b>`
+		+ `<br><span class="muted">แพ้ทาง ${m.weak || '—'} · ต้านทาน ${m.resist || '—'} · ไม่ระคาย ${m.immune || '—'}</span>`;
+}
+function monCard(id) {
+	const m = DATA.monsters.find(x => x.monster_id === id);
+	$('monCard').innerHTML = m ? `<b>${m.name_th}</b> <span class="muted">${m.monster_id} · ${m.name_en} · ระดับ ${m.tier}</span><br>${statLine(m)}<br><span class="muted">ท่าประจำตัว: ${m.signature_tech || '—'}</span>`
+		: '<span class="muted">ร่าง — ยังไม่มีค่าในเกม (monsters.csv)</span>';
+}
+let bossPick = null;
+function bossCard(id) {
+	const m = (DATA.bosses || []).find(x => x.monster_id === id); if (!m) return;
+	bossPick = id; press($('bossList'), id);
+	$('bossCard').innerHTML = `<b>${m.name_th}</b> <span class="muted">${m.monster_id} · ${m.name_en} · ระดับ ${m.tier} · เจอช่วง EC ${m.ec_min}–${m.ec_max}</span><br>${statLine(m)}`
+		+ `<br>ท่าประจำตัว: <b>${m.signature_tech || '—'}</b>${m.tech_effect ? ' <span class="muted">· ' + m.tech_effect + '</span>' : ''}`
+		+ (CLIPS['mon_' + id] ? '' : '<br><span class="muted">ยังไม่มีภาพ — เวทีแสดงบอสตัวที่มีภาพล่าสุดแทน</span>');
+}
+function buildBosses() {
+	const bs = DATA.bosses || [], box = $('bossList');
+	for (const m of bs) {
+		const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = m.monster_id;
+		const has = !!CLIPS['mon_' + m.monster_id];
+		b.innerHTML = `${m.monster_id} · ${m.name_th}<small>ระดับ ${m.tier} · HP ${m.hp}${has ? '' : ' · ยังไม่มีภาพ'}</small>`;
+		b.addEventListener('click', () => { if (has) pickClip('mon_' + m.monster_id); else bossCard(m.monster_id); });
+		box.append(b);
+	}
+	if (bs.length) bossCard(bs[0].monster_id);
 }
 function buildSkillRef() {
 	const refs = DATA.skill_ref || [], box = $('skRefPick');
@@ -1226,13 +1281,14 @@ function buildSpells() {
 	}
 	showSchool(ss[0]);
 }
+const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', weapons: 'Weapons', spells: 'Spells' };
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
-	$('tabClips').setAttribute('aria-pressed', String(t === 'clips')); $('tabSkills').setAttribute('aria-pressed', String(t === 'skills')); $('tabWeapons').setAttribute('aria-pressed', String(t === 'weapons')); $('tabSpells').setAttribute('aria-pressed', String(t === 'spells'));
-	$('paneClips').hidden = t !== 'clips'; $('paneSkills').hidden = t !== 'skills'; $('paneWeapons').hidden = t !== 'weapons'; $('paneSpells').hidden = t !== 'spells';
+	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }
 	if (t === 'weapons' && wPick) { S.clip = 'held_' + wPick; S.frame = 0; S.acc = 0; }
 	if (t === 'spells' && sPick) { S.clip = 'spell_' + sPick; S.frame = 0; S.acc = 0; }
-	if (t === 'clips' && (S.clip.startsWith('held_') || S.clip.startsWith('spell_'))) { S.clip = 'rion_walk_west'; S.frame = 0; press($('clipGroups'), S.clip); }
+	if (GROUP_BOX[t] && S.last[t] && CLIPS[S.clip].tab !== t) { S.clip = S.last[t]; S.frame = 0; S.acc = 0; press($(GROUP_BOX[t]), S.clip); }
+	if (t === 'monsters') monCard(CLIPS[S.clip].mon); if (t === 'bosses') bossCard(bossPick || CLIPS[S.clip].mon);
 	buildStrip(); setRead();
 }
 
@@ -1249,10 +1305,10 @@ function boot() {
 	$('segCount').onclick = e => { const v = e.target.dataset.v; if (v) { S.count = +v; press($('segCount'), v); } };
 	$('btnOnion').onclick = () => { S.onion = !S.onion; $('btnOnion').setAttribute('aria-pressed', String(S.onion)); };
 	$('btnGrid').onclick = () => { S.grid = !S.grid; $('btnGrid').setAttribute('aria-pressed', String(S.grid)); };
-	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); $('tabWeapons').onclick = () => setTab('weapons'); $('tabSpells').onclick = () => setTab('spells');
+	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); for (const [k, n] of Object.entries(TAB_IDS)) $('tab' + n).onclick = () => setTab(k);
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
-	buildSkillRef(); buildClips(); buildWeapons(); buildSpells(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	buildSkillRef(); buildClips(); buildBosses(); buildWeapons(); buildSpells(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
 	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_anim}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ

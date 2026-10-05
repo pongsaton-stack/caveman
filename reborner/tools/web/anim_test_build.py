@@ -95,6 +95,12 @@ def monsters(ids):
 				'weak', 'resist', 'immune', 'signature_tech')})
 	return out
 
+def bosses():
+	"""บอสทุกตัวใน monsters.csv (is_boss = 1) — มีภาพหรือไม่ก็แสดง"""
+	return [{k: r[k] for k in ('monster_id', 'name_th', 'name_en', 'tier', 'ec_min', 'ec_max', 'hp', 'atk', 'def', 'spd',
+		'weak', 'resist', 'immune', 'signature_tech', 'tech_effect')}
+		for r in csv.DictReader(open(os.path.join(ROOT, 'data/monsters.csv'), encoding='utf-8')) if r['is_boss'] == '1']
+
 def compendium():
 	f = os.path.join(SPR, 'compendium_draft/index.json')
 	return json.load(open(f, encoding='utf-8')) if os.path.exists(f) else []
@@ -125,6 +131,7 @@ def main(out_path):
 		'techs': techs(),
 		'fx': {k: v for k, v in json.load(open(os.path.join(ROOT, 'data/fx/ultimates.json'), encoding='utf-8')).items() if k != '_doc'},
 		'monsters': monsters(mon_ids),
+		'bosses': bosses(),
 		'draft_map': draft_map(),
 		'compendium': compendium(),
 		'weapons': [dict(w, school=f['school']) for f in json.load(open(os.path.join(ROOT, 'docs/art-bible/weapons/weapons_full.json'), encoding='utf-8'))['families'] for w in f['weapons']],
