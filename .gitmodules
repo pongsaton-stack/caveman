@@ -2,3 +2,7 @@
 	path = third_party/aseprite
 	url = https://github.com/aseprite/aseprite.git
 	shallow = true
+[submodule "third_party/godot-open-rpg"]
+	path = third_party/godot-open-rpg
+	url = https://github.com/gdquest-demos/godot-open-rpg.git
+	shallow = true
