@@ -279,48 +279,8 @@ def dog_poses():
 
 # ── เทียบจำนวนเฟรม (kwan ถาม "กี่เฟรมถึงสมูท") — เดิน 8 เฟรม · หายใจ 4 เฟรม ทำแบบเดียวกับชุดเดิม (rion_anim) แต่แบ่งช่วงละเอียดขึ้น ──
 import rion_anim as RA
-def walk8_side(src_dir, n, facing_left=True, split=30, hip=HIP, foot=63, kmax=4):
-	"""ข้าง 8 เฟรม: แตะ → ยุบ → ผ่าน(ขาหลังยก) → ลอย → แตะสลับ → ยุบ → ผ่าน → ลอย · ขาเฉือนทีละขั้น ตัวขึ้นลง 1px"""
-	im = RA.load(n, src_dir); N = RA.SIZE[0]
-	upper = RA.region(im, lambda x, y: y < hip)
-	front = RA.region(im, lambda x, y: y >= hip and (x < split if facing_left else x >= split))
-	back = RA.region(im, lambda x, y: y >= hip and (x >= split if facing_left else x < split))
-	sg = -1 if facing_left else 1
-	K = [kmax, kmax - 1, 0, -kmax // 2, -kmax, -(kmax - 1), 0, kmax // 2]
-	BOB = [0, 1, 0, -1, 0, 1, 0, -1]
-	out = []
-	for i, (k, b) in enumerate(zip(K, BOB)):
-		f = RA.blank()
-		lift_back, lift_front = (i == 2), (i == 6)
-		RA.paste(f, RA.shear(back, -sg * k, hip, foot), 0, -1 if lift_back else 0)
-		RA.paste(f, RA.shear(front, sg * k, hip, foot), 0, -1 if lift_front else 0)
-		if b > 0: RA.paste(f, RA.region(upper, lambda x, y: y >= hip - 1)); RA.paste(f, upper, 0, 1)
-		elif b < 0: RA.bob(f, upper, hip)
-		else: RA.paste(f, upper)
-		out.append(f)
-	return out
-
-def walk8_front(src_dir, n, split, hip=HIP, cut0=57, foot_end=61):
-	"""หน้า 8 เฟรม: ยืน → งอซ้าย 1 → งอซ้าย 2 → งอซ้าย 1 → ยืน → งอขวา 1 → 2 → 1 (ของเดิม 4 เฟรมกระโดดจาก 0 ไป 2)"""
-	im = RA.load(n, src_dir)
-	upper = RA.region(im, lambda x, y: y < hip)
-	L = RA.region(im, lambda x, y: y >= hip and x < split); Rr = RA.region(im, lambda x, y: y >= hip and x >= split)
-	out = []
-	for side, depth in ((None, 0), ('L', 1), ('L', 2), ('L', 1), (None, 0), ('R', 1), ('R', 2), ('R', 1)):
-		f = RA.blank(); RA.paste(f, upper)
-		RA.paste(f, RA.bend(L, cut0, cut0 + depth, foot_end) if side == 'L' and depth else L)
-		RA.paste(f, RA.bend(Rr, cut0, cut0 + depth, foot_end) if side == 'R' and depth else Rr)
-		out.append(f)
-	return out
-
-def idle4(im, head_cut, chest_cut):
-	"""หายใจ 4 เฟรม: ปกติ → อกลง 1 → อก 1 + หัวลงอีก 1 (หัวตามช้ากว่า) → อกลง 1"""
-	a = shift_part(im, lambda x, y: y < chest_cut, 0, 1)
-	b = shift_part(a, lambda x, y: y < head_cut + 1, 0, 1)
-	return [im, a, b, a]
-
 def walkN_side(src_dir, n_name, N, facing_left=True, split=30, hip=HIP, foot=63, kmax=4):
-	"""ข้าง N เฟรม: ระยะก้าว k = kmax·cos(2πt) · ตัวขึ้นลง = sin(4πt) · ปัดเป็นพิกเซลเต็ม (N=8 ได้ชุดเดียวกับ walk8_side)"""
+	"""ข้าง N เฟรม: ระยะก้าว k = kmax·cos(2πt) · ตัวขึ้นลง = sin(4πt) · ปัดเป็นพิกเซลเต็ม"""
 	im = RA.load(n_name, src_dir)
 	upper = RA.region(im, lambda x, y: y < hip)
 	front = RA.region(im, lambda x, y: y >= hip and (x < split if facing_left else x >= split))
@@ -370,43 +330,43 @@ def dedupe(frames):
 		order.append(seen[k])
 	return uniq, order
 
+COMPARE_N = (32, 64)   # kwan สั่ง 5 ต.ค.: เลิกเทียบ 4/8 เฟรม → เทียบ 32 กับ 64
+
 def compare_poses():
-	"""เทียบ: ชุดในเกม (old) · 8/4 เฟรม (frames) · 32 เฟรม (x) เล่นพร้อมกัน รอบเท่ากัน"""
+	"""เทียบจำนวนเฟรม: แต่ละท่าทำ 32 และ 64 เฟรมจากสูตรเดียวกัน เล่นพร้อมกัน รอบเท่ากัน"""
 	P = {}
 	for d, th, fl, sp in (('west', 'ซ้าย', True, 30), ('east', 'ขวา', False, 34)):
-		P['walk8_' + d] = ('เทียบจำนวนเฟรม', 'Rion เดิน' + th + ' 4 / 8 / 32 เฟรม', [rc(f) for f in walk8_side(R, d, fl, sp)], list(range(8)), 'walk8',
-			[rc(rion('%s_w%d' % (d, i))) for i in range(4)], [rc(f) for f in walkN_side(R, d, 32, fl, sp)])
+		P['walkN_' + d] = ('เทียบจำนวนเฟรม', 'Rion เดิน' + th, 'walk', {n: [rc(f) for f in walkN_side(R, d, n, fl, sp)] for n in COMPARE_N})
 	for d, th, sp in (('south', 'หน้า', 32), ('north', 'หลัง', 31)):
-		P['walk8_' + d] = ('เทียบจำนวนเฟรม', 'Rion เดิน' + th + ' 4 / 8 / 32 เฟรม', [rc(f) for f in walk8_front(R, d, sp)], list(range(8)), 'walk8',
-			[rc(rion('%s_w%d' % (d, i))) for i in range(4)], [rc(f) for f in walkN_front(R, d, 32, sp)])
+		P['walkN_' + d] = ('เทียบจำนวนเฟรม', 'Rion เดิน' + th, 'walk', {n: [rc(f) for f in walkN_front(R, d, n, sp)] for n in COMPARE_N})
 	for d in ('south', 'west'):
-		b = rion(d); P['idle4_' + d] = ('เทียบจำนวนเฟรม', 'Rion หายใจ ' + dict(DIRS)[d] + ' 2 / 4 / 32 เฟรม', [rc(f) for f in idle4(b, 31, 46)], list(range(4)), 'idle4',
-			[rc(b), rc(breathe(b, 40))], [rc(f) for f in idleN(b, 31, 46, 32)])
+		b = rion(d); P['idleN_' + d] = ('เทียบจำนวนเฟรม', 'Rion หายใจ ' + dict(DIRS)[d], 'idle', {n: [rc(f) for f in idleN(b, 31, 46, n)] for n in COMPARE_N})
 	return P
 
 def dog_compare():
 	P = {}
 	for d, th, fl in (('west', 'ซ้าย', True), ('east', 'ขวา', False)):
-		P['walk8_' + d] = ('เทียบจำนวนเฟรม', 'หมาเดิน' + th + ' 4 / 8 / 32 เฟรม', [dc(f) for f in walk8_side(D, d, fl, 17, DHIP, 32, 2)], list(range(8)), 'walk8',
-			[dc(dog('%s_w%d' % (d, i))) for i in range(4)], [dc(f) for f in walkN_side(D, d, 32, fl, 17, DHIP, 32, 2)])
-	b = dog('west'); P['idle4_west'] = ('เทียบจำนวนเฟรม', 'หมาหายใจ ซ้าย 2 / 4 / 32 เฟรม', [dc(f) for f in idle4(b, 18, 24)], list(range(4)), 'idle4',
-		[dc(b), dc(breathe(b, 18))], [dc(f) for f in idleN(b, 18, 24, 32)])
+		P['walkN_' + d] = ('เทียบจำนวนเฟรม', 'หมาเดิน' + th, 'walk', {n: [dc(f) for f in walkN_side(D, d, n, fl, 17, DHIP, 32, 2)] for n in COMPARE_N})
+	b = dog('west'); P['idleN_west'] = ('เทียบจำนวนเฟรม', 'หมาหายใจ ซ้าย', 'idle', {n: [dc(f) for f in idleN(b, 18, 24, n)] for n in COMPARE_N})
 	return P
+
+def save_compare(who, P, index):
+	"""เก็บเฉพาะภาพไม่ซ้ำของแต่ละชุด: <id>_s<n>_<i>.png + ลำดับเล่น"""
+	for pid, (group, label, timing, sets) in P.items():
+		row = {'id': '%s_%s' % (who, pid), 'who': who, 'group': group, 'label': label + ' ' + ' / '.join(map(str, sets)) + ' เฟรม', 'timing': timing, 'sets': []}
+		for n, frames in sets.items():
+			uniq, order = dedupe(frames)
+			for i, im in enumerate(uniq): im.save(os.path.join(OUT, '%s_%s_s%d_%d.png' % (who, pid, n, i)))
+			row['sets'].append({'n': n, 'unique': len(uniq), 'order': order})
+		row['n'] = max(sets); row['order'] = row['sets'][-1]['order']
+		index.append(row)
 
 def save(who, P, index):
 	for pid, val in P.items():
 		group, label, frames, order, sec = val[:5]
 		for i, im in enumerate(frames): im.save(os.path.join(OUT, '%s_%s_%d.png' % (who, pid, i)))
 		row = {'id': '%s_%s' % (who, pid), 'who': who, 'group': group, 'label': label, 'n': len(frames), 'order': order}
-		if isinstance(sec, str): row['timing'] = sec      # walk8 / idle4 → หน้าเว็บคิดจังหวะจากค่าคงที่ในเกม
-		else: row['sec'] = sec
-		if len(val) > 5:                                   # ชุดเดิมสำหรับเล่นคู่เทียบ
-			for i, im in enumerate(val[5]): im.save(os.path.join(OUT, '%s_%s_old%d.png' % (who, pid, i)))
-			row['old_n'] = len(val[5])
-		if len(val) > 6:                                   # ชุด 32 เฟรม: เก็บเฉพาะภาพไม่ซ้ำ + ลำดับ
-			uniq, xo = dedupe(val[6])
-			for i, im in enumerate(uniq): im.save(os.path.join(OUT, '%s_%s_x%d.png' % (who, pid, i)))
-			row['x_n'] = len(val[6]); row['x_order'] = xo; row['x_unique'] = len(uniq)
+		row['sec'] = sec
 		index.append(row)
 
 if __name__ == '__main__':
@@ -415,7 +375,7 @@ if __name__ == '__main__':
 	for f in os.listdir(OUT):
 		if f.endswith('.png'): os.remove(os.path.join(OUT, f))
 	index = []
-	save('rion', rion_poses(), index); save('rion', compare_poses(), index); save('dog', dog_poses(), index); save('dog', dog_compare(), index)
+	save('rion', rion_poses(), index); save_compare('rion', compare_poses(), index); save('dog', dog_poses(), index); save_compare('dog', dog_compare(), index)
 	json.dump({'_doc': 'อิริยาบถร่าง (tools/sprites/poses_anim.py) · sec = วินาทีต่อเฟรม (ร่าง ปรับได้) · order = ลำดับเฟรมที่เล่น', 'poses': index},
 		open(os.path.join(OUT, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 	print('ok', len(index), 'poses', sum(p['n'] for p in index), 'frames')
