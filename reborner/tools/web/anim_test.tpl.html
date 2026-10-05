@@ -339,6 +339,22 @@ const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชา�
 	POSE: [0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0],
 	SHAKE: { SL: 3, PC: 3, CR: 7, BD: 4, ST: 3, DV: 6 }, GRAV: { CR: 0.45 }, TARGET: { x: 58, foot: 90, key: 'mon/M01' },
 	TEXT: { SL: 'ฉัวะ!!', PC: 'ฉึก!!', CR: 'ตูมมม!!', BD: 'ตุบ ตุบ ตุบ!!', ST: 'ปัง!!', DV: 'ครืนนน!!' } };   // ตัวหนังสือเสียงชุดเดียวกับไม้ตาย (ultimates.json sfx_text)
+const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
+const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
+const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
+// แนว RS3 (Romancing SaGa 3 · kwan 5 ต.ค. "ทำแนว RS3 แต่เพิ่มความอลังการ"): ฉากปูไทล์ 240x120 แบบโหมด SaGa · ทีมเรียงทแยงขวา · มอนซ้าย
+// เฟรม: หลอดไฟประกาย 0–5 · กล่องชื่อท่า 4– · วิ่งเข้า 6–11 · ท่า (VFX เฟรม 0–29) 12–41 · วิ่งกลับ 42–47 · ยืน 48–53
+const RS3 = { N: 54, RUN: 6, ATK: 12, BACK: 42, IDLE: 48, HOME: [146, 42], FRONT_DX: 30,
+	TARGET: { x: 52, foot: 98, key: 'mon/M01' }, BACKFOE: { x: 22, foot: 72, key: 'mon/M15' },
+	PARTY: [{ key: 'mon/COMP-M06', x: 220, y: 60 }, { key: 'mon/COMP-M03', x: 218, y: 118 }] };
+function rs3Rion(it, f) {   // ตำแหน่งมุมซ้ายบน + ภาพของ Rion ที่เฟรม f
+	const front = RS3.TARGET.x + RS3.FRONT_DX, [hx, hy] = RS3.HOME;
+	if (f < RS3.RUN) return { x: hx, y: hy, key: 'rion/west' };
+	if (f < RS3.ATK) { const p = (f - RS3.RUN + 1) / (RS3.ATK - RS3.RUN); return { x: Math.round(lerp(hx, front, p)), y: hy, key: `rion/west_w${f % 4}` }; }
+	if (f < RS3.BACK) return { x: front, y: hy, key: 'rion/' + SKS.poses[it.family][VFX.POSE[f - RS3.ATK]] };
+	if (f < RS3.IDLE) { const p = (f - RS3.BACK + 1) / (RS3.IDLE - RS3.BACK); return { x: Math.round(lerp(front, hx, p)), y: hy, key: `rion/east_w${f % 4}` }; }
+	return { x: hx, y: hy, key: 'rion/west' };
+}
 const VFX_POSE_KEYS = it => VFX.POSE.map(p => 'rion/' + SKS.poses[it.family][p]);
 // สกิลจากชีต 173 ท่า (tools/sprites/skill_sheet_cut.py) — timeline/poses/ตำแหน่งมาจาก index.json ชุดเดียวกับสคริปต์
 const SKS = DATA.skill_sheet, SK_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล' };
@@ -351,12 +367,13 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // ตัวอย่า
 	const it = SKS.items.find(x => x.code === code); if (!it || !DATA.sprites['skf/' + code]) continue;
 	addClip('ตัวอย่าง VFX · สายละ 1 ท่า (รอ kwan ดูก่อนทาทั้ง 172)', 'vfx_' + code, code + ' · VFX', VFX_POSE_KEYS(it), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true });
 }
-{ const i = GROUPS.findIndex(g => g.name.startsWith('ตัวอย่าง VFX')); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
+for (const code of ((SKS || {}).vfx_samples || [])) {   // แนว RS3 — ท่าเดียวกับตัวอย่าง VFX
+	const it = SKS.items.find(x => x.code === code); if (!it || !DATA.sprites['skf/' + code]) continue;
+	addClip('แนว RS3 (Romancing SaGa 3) + VFX · สายละ 1 ท่า', 'rs3_' + code, code + ' · RS3', Array.from({ length: RS3.N }, (_, f) => rs3Rion(it, f).key), VFX.SEC, { tab: 'sksheet', skill: it, rs3: true });
+}
+for (const pre of ['ตัวอย่าง VFX', 'แนว RS3']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
 // ── VFX ซ้อนบนภาพชีต (kwan เลือก 5 ต.ค. · "อลังการกว่านี้พร้อมเสียง" · ตัวอย่างสายละ 1 ท่า = SKS.vfx_samples) ──
 // ทุกอย่างคิดจากเลขเฟรม (สุ่มแบบมี seed ตามรหัสท่า) → กดทีละเฟรมได้ ภาพเดิมทุกครั้ง · ค่าทั้งหมดเป็นค่าภาพ/เสียงในหน้าเทส ไม่ใช่ค่าเกม
-const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
-const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
-const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
 const vTime = f => f < VFX.HIT ? f : f < VFX.HIT + VFX.STOP ? VFX.HIT : f - VFX.STOP;   // หยุดภาพตอนกระทบ: เวลาของการเคลื่อนไหวค้างไว้ STOP เฟรม
 function vfxImg(img, x, y, sx, sy, a, alpha, add) {   // วางภาพเอฟเฟกต์กลาง (x, y) · add = บวกแสง
 	if (!img || alpha <= 0) return;
@@ -385,15 +402,18 @@ function vfxBurst(code, t0, f, x, y, n, col, opt = {}) {   // อนุภาค
 function vfxText(txt, x, y, f0, f, col) {   // ตัวหนังสือเสียงเด้งขึ้นแล้วจาง
 	const d = f - f0; if (d < 0 || d > 11) return;
 	const sc = d < 2 ? 1.6 - d * 0.3 : 1, a = d < 8 ? 1 : 1 - (d - 7) / 4;
-	ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y - d * 0.6); ctx.rotate(-0.12); ctx.scale(sc, sc);
-	ctx.font = '900 15px system-ui, "Noto Sans Thai", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+	ctx.save(); ctx.font = '900 15px system-ui, "Noto Sans Thai", sans-serif'; const hw = ctx.measureText(txt).width * sc / 2 + 4;
+	x = Math.max(hw, Math.min(cv.width - hw, x));   // ข้อความยาว (ตุบ ตุบ ตุบ!!) ไม่ล้นขอบจอ
+	ctx.globalAlpha = a; ctx.translate(x, y - d * 0.6); ctx.rotate(-0.12); ctx.scale(sc, sc);
+	ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 	ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#120a14'; ctx.strokeText(txt, 0, 0); ctx.fillStyle = col; ctx.fillText(txt, 0, 0);
 	ctx.lineWidth = 1; ctx.strokeStyle = '#ffffff'; ctx.globalAlpha = a * 0.6; ctx.strokeText(txt, 0, -1); ctx.restore();
 }
 const VFX_OC = document.createElement('canvas');
-function vfxView(c) {
-	const it = c.skill, f = S.frame, t = vTime(f), fam = it.family, [W0, H0] = SKS.stage, fx = IMG['skf/' + it.code], col = it.colors || ['#ffffff'];
-	const Hx = SKS.hand[0], Hy = SKS.hand[1], T = { x: VFX.TARGET.x, y: VFX.TARGET.foot - 22 }, HIT = VFX.HIT, REL = VFX.REL, rel = (t - REL) / (HIT - REL);
+const VFX_OC2 = document.createElement('canvas');
+function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (มุมซ้ายบนของ Rion) · pose · target · bg() · f (เฟรมของ VFX) · ตัวเลือกแนว RS3
+	const it = c.skill, f = L.f, t = vTime(f), fam = it.family, [W0, H0] = L.size, fx = IMG['skf/' + it.code], col = it.colors || ['#ffffff'];
+	const Hx = L.hand[0], Hy = L.hand[1], T = { x: L.target.x, y: L.target.foot - 22 }, HIT = VFX.HIT, REL = VFX.REL, rel = (t - REL) / (HIT - REL);
 	const hits = fam === 'BD' ? [HIT - 4, HIT - 2, HIT] : [HIT];
 	const since = Math.min(...hits.map(h => t >= h ? t - h : 99)), fsince = f >= HIT ? f - HIT : 99;   // fsince = เวลาจริง (นับรวมหยุดภาพ)
 	const fw = fx ? fx.width : 40, k80 = Math.min(1, 80 / fw);
@@ -402,13 +422,13 @@ function vfxView(c) {
 	// กล้อง: ซูมเข้าเป้าตอนกระทบ + จอสั่น
 	const zoom = fsince < 8 ? 1 + 0.16 * (1 - fsince / 8) : 1, sh = since < 5 ? VFX.SHAKE[fam] * (1 - since / 5) : 0, rs = vRng(vHash(it.code) + f * 31);
 	ctx.translate(T.x, T.y); ctx.scale(zoom, zoom); ctx.translate(-T.x + Math.round((rs() * 2 - 1) * sh), -T.y + Math.round((rs() * 2 - 1) * sh));
-	drawBg();
+	L.bg(); if (L.under) L.under(t, since);
 	// ฟ้าเปลี่ยนสีตามแสงของท่า + มืดลง
-	const dim = t < 3 ? 0 : t < REL ? 0.1 * (t - 2) : t < HIT + 12 ? 0.5 : t < HIT + 16 ? 0.5 * (1 - (t - HIT - 12) / 4) : 0;
-	if (dim) { ctx.fillStyle = `rgba(6,8,20,${dim})`; ctx.fillRect(-40, -40, W0 + 80, H0 + 80);
+	const dm = L.dim ?? 0.5, dim = t < 3 ? 0 : t < REL ? dm * 0.2 * (t - 2) : t < HIT + 12 ? dm : t < HIT + 16 ? dm * (1 - (t - HIT - 12) / 4) : 0;
+	if (dim) { ctx.fillStyle = L.dimCol ? L.dimCol(dim) : `rgba(6,8,20,${dim})`; ctx.fillRect(-40, -40, W0 + 80, H0 + 80);
 		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = dim * 0.35; ctx.fillStyle = col[col.length - 1]; ctx.fillRect(-40, -40, W0 + 80, H0 * 0.62 + 40); ctx.restore(); }
 	const cell = IMG['skc/' + it.code];
-	if (cell) { const k = 40 / cell.height; ctx.globalAlpha = 0.9; ctx.drawImage(cell, 2, 2, Math.round(cell.width * k), 40); ctx.globalAlpha = 1; }
+	if (L.cell && cell) { const k = 40 / cell.height; ctx.globalAlpha = 0.9; ctx.drawImage(cell, 2, 2, Math.round(cell.width * k), 40); ctx.globalAlpha = 1; }
 	// รัศมีแสงหมุนหลังเป้า (หลังกระทบ)
 	if (since < 14) vfxRays(T.x, T.y, 14, 70 + since * 3, t * 0.06, col[0], 0.22 * (1 - since / 14));
 	// เส้นความเร็วตอนปล่อย
@@ -416,14 +436,17 @@ function vfxView(c) {
 		for (let i = 0; i < 14; i++) { const y = 8 + r() * (H0 - 16), L = 18 + r() * 40, x = ((r() * W0 - (t - REL) * 34) % W0 + W0) % W0;
 			ctx.globalAlpha = 0.25 + r() * 0.3; ctx.fillStyle = i % 3 ? '#ffffff' : col[0]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(L), 1); } ctx.restore(); }
 	// เป้า: กระเด็นถอย + วาบขาว
-	const tg = IMG[VFX.TARGET.key];
+	const tg = IMG[L.target.key];
 	if (tg) {
-		const kb = since < 7 ? -[0, 5, 8, 7, 5, 3, 1][since] : 0, tx = T.x - (tg.width >> 1) + kb, ty = VFX.TARGET.foot - tg.height - (since < 4 ? [0, 3, 2, 1][since] : 0);
+		const kb = since < 7 ? -[0, 5, 8, 7, 5, 3, 1][since] : 0, tx = T.x - (tg.width >> 1) + kb, ty = L.target.foot - tg.height - (since < 4 ? [0, 3, 2, 1][since] : 0);
 		ctx.drawImage(tg, tx, ty);
-		if (since < 3) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = [1, 0.6, 0.3][since]; ctx.drawImage(tg, tx, ty); ctx.restore(); }
+		if (L.silhouette && since < 9) {   // แนว RS3: มอนกลายเป็นเงาสีแสงของท่า
+			const o = VFX_OC2; o.width = tg.width; o.height = tg.height; const x = o.getContext('2d'); x.drawImage(tg, 0, 0); x.globalCompositeOperation = 'source-atop'; x.fillStyle = since % 2 ? '#ffffff' : col[0]; x.fillRect(0, 0, o.width, o.height);
+			ctx.save(); ctx.globalAlpha = since < 6 ? 0.9 : 0.9 * (1 - (since - 5) / 4); ctx.drawImage(o, tx, ty); ctx.restore();
+		} else if (since < 3) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = [1, 0.6, 0.3][since]; ctx.drawImage(tg, tx, ty); ctx.restore(); }
 	}
 	// ออร่ารอบ Rion ตอนชาร์จ + ประกายลอยขึ้น
-	const rx = SKS.rion_at[0] + 32, ry = SKS.rion_at[1] + 40;
+	const rx = L.rion[0] + 32, ry = L.rion[1] + 40;
 	if (t >= VFX.CHG && t < HIT + 4) { const q = Math.min(1, (t - VFX.CHG) / (REL - VFX.CHG)), fade = t < HIT ? 1 : 1 - (t - HIT) / 4;
 		vfxRing(rx, ry + 20, 10 + q * 14, (10 + q * 14) * 0.3, col[0], 0.7 * fade, 2);
 		vfxDot(rx, ry, 18 + q * 8 + Math.sin(t * 1.7) * 2, col[col.length - 1], 0.18 * fade); vfxDot(rx, ry - 4, 10 + q * 4, col[0], 0.18 * fade);
@@ -449,18 +472,18 @@ function vfxView(c) {
 			vfxRing(T.x, T.y, 6 + q * 40, 6 + q * 40, col[0], 1 - q, 2); }
 	} else if (fam === 'CR') {   // ลูกไฟที่มือตอนง้าง → ระเบิดโผล่จากพื้น + เสาแสง + คลื่นพื้น 3 วง + หินกระเด็น
 		if (t >= 2 && t < REL + 3) vfxDot(Hx - 2, Hy - 18, 2 + (t - 2) * 1.0, col[1] || col[0], 0.8);
-		if (t >= HIT && t < HIT + 5) { const q = (t - HIT) / 4; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - q; ctx.fillStyle = col[0]; ctx.fillRect(T.x - 8 - q * 6, -10, 16 + q * 12, VFX.TARGET.foot + 10); ctx.restore(); }
+		if (t >= HIT && t < HIT + 5) { const q = (t - HIT) / 4; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - q; ctx.fillStyle = col[0]; ctx.fillRect(T.x - 8 - q * 6, -10, 16 + q * 12, L.target.foot + 10); ctx.restore(); }
 		if (t >= HIT && t < HIT + 11) { const q = (t - HIT) / 10, s = q < 0.35 ? lerp(0.4, 1.25, q / 0.35) : 1.25;
-			if (fx) vfxImg(fx, T.x, VFX.TARGET.foot - fx.height * s / 2, s, s, 0, q < 0.6 ? 1 : 1 - (q - 0.6) / 0.4, false);
-			if (fx) vfxImg(fx, T.x, VFX.TARGET.foot - fx.height * s / 2, s * 1.1, s * 1.1, 0, (1 - q) * 0.5, true);
-			for (const [k, w] of [[1, 3], [0.65, 2], [0.4, 1]]) vfxRing(T.x, VFX.TARGET.foot, (6 + q * 90) * k, (6 + q * 90) * k * 0.18, col[0], (1 - q) * (k === 1 ? 1 : 0.7), w); }
-		vfxBurst(it.code, HIT, t, T.x, VFX.TARGET.foot - 4, 14, ['#6b5444', '#8d735d', '#4a3b30'], { grav: 0.5, speed: 3.6, dir: -Math.PI / 2, spread: 1.0, life: 12, size: 3, salt: 3 });
+			if (fx) vfxImg(fx, T.x, L.target.foot - fx.height * s / 2, s, s, 0, q < 0.6 ? 1 : 1 - (q - 0.6) / 0.4, false);
+			if (fx) vfxImg(fx, T.x, L.target.foot - fx.height * s / 2, s * 1.1, s * 1.1, 0, (1 - q) * 0.5, true);
+			for (const [k, w] of [[1, 3], [0.65, 2], [0.4, 1]]) vfxRing(T.x, L.target.foot, (6 + q * 90) * k, (6 + q * 90) * k * 0.18, col[0], (1 - q) * (k === 1 ? 1 : 0.7), w); }
+		vfxBurst(it.code, HIT, t, T.x, L.target.foot - 4, 14, ['#6b5444', '#8d735d', '#4a3b30'], { grav: 0.5, speed: 3.6, dir: -Math.PI / 2, spread: 1.0, life: 12, size: 3, salt: 3 });
 	} else if (fam === 'BD') {   // รัวหมัด 3 ครั้ง แต่ละครั้งวงประกาย + ร่างแยกหมัดเรือง
 		for (const h of hits) { const d = t - h; if (d < 0 || d > 4) continue; const r = vRng(vHash(it.code) + h);
 			const ox = (r() * 2 - 1) * 9, oy = (r() * 2 - 1) * 7; vfxImg(fx, T.x + ox, T.y + oy, 0.6 + d * 0.1, 0.6 + d * 0.1, (r() - 0.5) * 0.6, 1 - d / 5, d > 0);
 			vfxRing(T.x + ox, T.y + oy, 4 + d * 8, 4 + d * 8, col[0], 1 - d / 5, 2); vfxRing(T.x + ox, T.y + oy, 2 + d * 4, 2 + d * 4, '#ffffff', 1 - d / 4, 1); }
 		if (t >= REL - 2 && t < HIT + 2) { vfxDot(Hx - 6, Hy, 3 + (t % 2) * 2, col[0], 0.85);
-			const ghost = IMG['rion/' + SKS.poses.BD[2]]; if (ghost) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.28; ctx.drawImage(ghost, SKS.rion_at[0] - 30 - (t % 3) * 8, SKS.rion_at[1]); ctx.restore(); } }
+			const ghost = IMG['rion/' + SKS.poses.BD[2]]; if (ghost) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.28; ctx.drawImage(ghost, L.rion[0] - 30 - (t % 3) * 8, L.rion[1]); ctx.restore(); } }
 		if (since < 10) vfxBurst(it.code, HIT, t, T.x, T.y, 26, col, { speed: 4.2, life: 10, streak: true, salt: 9 });
 	} else if (fam === 'DV') {   // ชาร์จลูกพลังดูดอนุภาค → ลำแสงยืดจากมือถึงเป้า กะพริบ + แกนขาว → ระเบิด + วง
 		if (t >= 1 && t < REL + 1) { const q = (t - 1) / REL; vfxDot(Hx - 6, Hy - 2, 3 + q * 9, col[0], 0.5 + q * 0.4); vfxDot(Hx - 6, Hy - 2, 1 + q * 4, '#ffffff', 0.85);
@@ -476,17 +499,53 @@ function vfxView(c) {
 	// ถ่านไฟลอยค้างหลังกระทบ
 	if (t > HIT && t < HIT + 18) { const r = vRng(vHash(it.code) + 21); for (let i = 0; i < 16; i++) { const ph = (t - HIT) / 18, sx0 = T.x - 40 + r() * 80, sp = 0.6 + r();
 		vfxDot(sx0 + Math.sin((t + i) * 0.5) * 3, T.y + 20 - ph * 40 * sp, 1, col[i % col.length], (1 - ph) * (0.5 + 0.5 * Math.sin(t * 1.3 + i))); } }
-	spr('rion/' + SKS.poses[fam][VFX.POSE[f]], SKS.rion_at[0], SKS.rion_at[1]);
-	vfxText(VFX.TEXT[fam], T.x + 8, T.y - 30, HIT, f, col[0]);
+	if (L.party) L.party(); spr(L.pose, L.rion[0], L.rion[1]);
 	ctx.restore();
+	vfxText(VFX.TEXT[fam], T.x + 8, T.y - 30, HIT, f, col[0]);   // นอกกล้อง: ไม่ซูม/ไม่สั่น จึงไม่ล้นขอบ
 	// หลังวาดฉาก: ภาพแยกสี RGB ตอนกระทบ + จอวาบ
 	if (fsince < 3) { VFX_OC.width = W0; VFX_OC.height = H0; VFX_OC.getContext('2d').drawImage(cv, 0, 0);
 		ctx.save(); ctx.globalAlpha = fsince ? 0.16 : 0.28;   // เงาซ้อนเหลื่อมซ้าย-ขวา (บวกแสงทั้งจอบนพื้นสว่างจะขาวโพลน)
 		ctx.drawImage(VFX_OC, -3 + fsince, 0); ctx.drawImage(VFX_OC, 3 - fsince, 0); ctx.restore(); }
 	if (fsince < 3) { ctx.fillStyle = `rgba(255,255,255,${[0.22, 0.1, 0.04][fsince]})`; ctx.fillRect(0, 0, W0, H0); }
+	if (L.over) L.over();
 	if (S.grid) drawGrid();
 }
 
+function vfxView(c) {   // แบบเวทีทดสอบ: Rion ขวา เป้า M01 ซ้าย ช่องต้นฉบับมุมซ้ายบน
+	const f = S.frame;
+	vfxScene(c, { f, size: SKS.stage, hand: SKS.hand, rion: SKS.rion_at, pose: 'rion/' + SKS.poses[c.skill.family][VFX.POSE[f]], target: VFX.TARGET, bg: drawBg, cell: true });
+}
+function rs3Bulb(x, y, f) {   // หลอดไฟประกาย (พิกเซล) เหนือหัว — แบบเดียวกับ bulb() ของโหมด SaGa
+	ctx.save(); ctx.fillStyle = '#fff6a0'; ctx.fillRect(x - 3, y - 8, 6, 6); ctx.fillRect(x - 4, y - 7, 8, 4); ctx.fillStyle = '#ffd040'; ctx.fillRect(x - 2, y - 3, 4, 1);
+	ctx.fillStyle = '#9aa0a8'; ctx.fillRect(x - 2, y - 2, 4, 2); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = f % 2 ? 0.4 : 1;
+	ctx.fillStyle = '#fff6a0'; for (const [dx, dy] of [[-7, -6], [7, -6], [0, -12], [-6, -1], [6, -1], [-9, -10], [9, -10]]) ctx.fillRect(x + dx, y + dy, 1, 2);
+	vfxDot(x, y - 5, 9 + (f % 3), '#fff6a0', 0.25); ctx.restore();
+}
+function rs3NameBox(text, alpha, W0) {   // กล่องชื่อท่ามุมขวาบน (กรอบน้ำเงินขอบขาวแบบ SNES)
+	ctx.save(); ctx.globalAlpha = alpha; ctx.font = '700 8px Sarabun, sans-serif'; const w = Math.ceil(ctx.measureText(text).width) + 12, x = W0 - w - 4, y = 4;
+	ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 1, y - 1, w + 2, 14); ctx.fillStyle = '#1a2a6a'; ctx.fillRect(x, y, w, 12);
+	ctx.fillStyle = '#2c47a8'; ctx.fillRect(x, y, w, 3); ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'middle'; ctx.fillText(text, x + 6, y + 6.5); ctx.restore();
+}
+function rs3View(c) {
+	const it = c.skill, f = S.frame, r = rs3Rion(it, f), col = it.colors || ['#ffffff'], lf = f - RS3.ATK;
+	const hex = col[0].replace('#', ''), cr = parseInt(hex.slice(0, 2), 16), cg = parseInt(hex.slice(2, 4), 16), cb = parseInt(hex.slice(4, 6), 16);
+	vfxScene(c, { f: lf, size: [240, 120], hand: [r.x + 18, r.y + 40], rion: [r.x, r.y], pose: r.key, target: RS3.TARGET, silhouette: true,
+		dim: 0.88, dimCol: d => `rgba(${cr * 0.12 | 0},${cg * 0.12 | 0},${cb * 0.18 | 0},${d})`,   // ไม้ตาย RS3: จอดับเป็นสีเข้มของแสงท่า
+		bg: () => { drawSagaBg(); },
+		under: () => { const bf = IMG[RS3.BACKFOE.key]; if (bf) ctx.drawImage(bf, RS3.BACKFOE.x - (bf.width >> 1), RS3.BACKFOE.foot - bf.height); },
+		party: () => { for (const m of RS3.PARTY) { const im = IMG[m.key]; if (im) { ctx.save(); ctx.translate(m.x + (im.width >> 1), m.y - im.height); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); ctx.restore(); } } },
+		over: () => {
+			if (f < RS3.RUN + 1) rs3Bulb(r.x + 32, r.y - 2 + (f % 2), f);
+			if (f >= 4 && f < RS3.IDLE + 2) rs3NameBox(it.code + ' · สาย' + it.school, f < 6 ? (f - 3) / 3 : f > RS3.IDLE - 1 ? Math.max(0, 1 - (f - RS3.IDLE + 1) / 3) : 1, 240);
+		} });
+}
+function rs3Sound(c, f) {
+	if (!S.sound || !AU) return;
+	if (f === 1) AU_SFX.glim();
+	if (f === 4) AU_SFX.blip();
+	if ((f >= RS3.RUN && f < RS3.ATK) || (f >= RS3.BACK && f < RS3.IDLE)) { if (f % 2 === 0) AU_SFX.step(); }
+	if (f >= RS3.ATK && f < RS3.BACK) vfxSound(c, f - RS3.ATK);
+}
 // ── เสียงประกอบ (Web Audio สังเคราะห์ในหน้า · ไม่มีไฟล์เสียง) ── เปิดด้วยปุ่ม "เสียง" (เบราว์เซอร์ให้เล่นได้หลังกดเท่านั้น)
 let AU = null;
 function auInit() { if (!AU) { try { const C = window.AudioContext || window.webkitAudioContext; const ac = new C(); const out = ac.createGain(); out.gain.value = 0.5; out.connect(ac.destination);
@@ -505,6 +564,9 @@ const AU_SFX = {
 		CR: () => auNoise(0.3, 'bandpass', 300, 1400, 0.45, 1.5), BD: () => auNoise(0.14, 'bandpass', 900, 3000, 0.35, 2), DV: () => { auTone(0.4, 'sawtooth', 110, 150, 0.16); auTone(0.4, 'square', 220, 300, 0.06); auNoise(0.4, 'bandpass', 1800, 2400, 0.12, 3); } },
 	hit: (fam, big) => { auTone(big ? 0.7 : 0.4, 'sine', big ? 120 : 160, 38, big ? 0.9 : 0.6); auNoise(big ? 0.6 : 0.3, 'lowpass', 2400, 120, big ? 0.8 : 0.55);
 		auNoise(0.08, 'highpass', 4000, 4000, 0.4); if (fam === 'SL' || fam === 'PC') auTone(0.5, 'triangle', 2600, 1800, 0.07, 0.03); },
+	glim: () => [0, 0.07, 0.14, 0.21, 0.3].forEach((d, i) => auTone(0.35, 'triangle', [880, 1109, 1319, 1760, 2217][i], [880, 1109, 1319, 1760, 2217][i], 0.09, d)),   // หลอดไฟประกาย: อาร์เปจโจ้ไต่ขึ้น
+	blip: () => { auTone(0.06, 'square', 1200, 1200, 0.05); auTone(0.06, 'square', 1600, 1600, 0.05, 0.06); },   // กล่องชื่อท่าเด้งขึ้น
+	step: () => auNoise(0.05, 'bandpass', 900, 500, 0.12, 2),
 	punch: () => { auTone(0.16, 'sine', 140, 50, 0.7); auNoise(0.09, 'bandpass', 1400, 400, 0.5, 1.2); },
 	tail: fam => { if (fam === 'CR' || fam === 'DV') auNoise(1.0, 'lowpass', 500, 60, 0.35); else [0, 0.06, 0.13, 0.21].forEach((d, i) => auTone(0.25, 'triangle', 1800 + i * 420, 2600 + i * 300, 0.05, d)); },
 };
@@ -517,6 +579,7 @@ function vfxSound(c, f) {   // เรียกเมื่อเฟรมเด�
 	if (f === VFX.HIT + VFX.STOP + 2) AU_SFX.tail(fam);
 }
 function sheetSkillView(c) {
+	if (c.rs3) return rs3View(c);
 	if (c.vfx) return vfxView(c);
 	const it = c.skill, t = SKS.timeline[S.frame], [W, H] = SKS.stage, fx = IMG['skf/' + it.code];
 	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false; drawBg();
@@ -1382,7 +1445,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.vfx) vfxSound(c, S.frame); }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) vfxSound(c, S.frame); }
 		}
 		clipView();
 	} else {
