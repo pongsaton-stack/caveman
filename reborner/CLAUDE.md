@@ -300,6 +300,10 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   เกณฑ์ผ่าน: exit 0 · ไม่มี SCRIPT ERROR · ไม่มีบรรทัด `FAIL …` · `FAILS n` ต้อง 0 · seed md5 ต้องเท่า tests/seed.md5 (พิสูจน์แล้วว่าจับเทสต์พังได้: exit 1)
   **เซฟเทสต์แยกไฟล์:** `SaveGame.PATH` อ่าน env `REBORNER_SAVE` (runner ตั้ง user://test_save.json) — เดิม demoend/demoload ล้าง/ทับเซฟจริง ถ้ารันบนเครื่อง kwan จะลบเซฟ · ตรวจแล้วไม่มีสคริปต์ไหนเขียนเซฟจริงเมื่อตั้ง env
   สคริปต์ภาพ: ภาพไป tests/out/<ชื่อ>_<i>.png (หรือ $SHOT) · battleshot/fxshot/ultshot มีค่าเริ่ม FOES=M01,M02 · TECH=bl4 (เดิมพังถ้าไม่ส่ง env) · export เว็บไม่รวม tests/ (exclude_filter)
+- 5 ต.ค. 2026 **สกิล ffmpeg-skill** (kwan สั่ง · github.com/kajisho5/ffmpeg-skill v2.5.1 · MIT) — คัดลอกตัวสกิลไว้ที่ `.claude/skills/ffmpeg-skill/` (SKILL.md · scripts 46 · references · templates · LICENSE · ไม่เอาไฟล์พัฒนา/รูปเดโม)
+  ตัดต่อวิดีโอ/เสียงด้วย ffmpeg ในเครื่อง: ตัด ต่อ ย่อ/ครอปแนวตั้ง ใส่คำบรรยาย (ไทยได้) โลโก้ ปรับเสียง ส่งออกตามแพลตฟอร์ม · Python ล้วน ไม่ต้องมีคีย์
+  **ต้องมี ffmpeg**: เครื่องคลาวด์ไม่มีมาให้ → `sudo apt-get install -y ffmpeg` ทุกเซสชันใหม่ (หรือใส่ในสคริปต์ตั้งค่า environment) · ตรวจด้วย `python3 .claude/skills/ffmpeg-skill/scripts/_contract.py doctor`
+  ลองแล้ว: Rion วิ่ง 64 เฟรม → mp4 + คำบรรยายไทย + contact sheet ผ่าน · ไม่อัปเดตเองเมื่อต้นทางออกรุ่นใหม่ ต้องคัดลอกใหม่
   แนวทางที่ให้ kwan: ขนาด 64px สมูทพอที่ 8-12 ภาพ/วินาที · เดิน 6-8 · วิ่ง 6 · หายใจ 4 · ฟัน 5-6 (มีค้างตอนง้าง/กระทบ) · โดนตี 2-3 · เกินนี้แทบไม่เห็นต่างเพราะขาขยับได้ทีละ 1px
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)
