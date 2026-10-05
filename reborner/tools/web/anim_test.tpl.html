@@ -29,10 +29,12 @@ h1{font:700 22px/1.2 var(--f-display);margin:0;letter-spacing:.02em}
 header p{margin:0;color:var(--muted);font-size:13px}
 .box{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:12px}
 .stagecol{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;min-width:0}
-#stage{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid var(--line);background:#000}
-.read{display:flex;flex-wrap:wrap;gap:4px 16px;overflow-wrap:anywhere;min-width:0;font-size:13px;color:var(--muted)}
+#stage{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain;image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid var(--line);background:#0e0d0b}   /* กรอบสัดส่วนตายตัว: เปลี่ยนคลิป/โหมดแล้วเวทีไม่ยืดหด หน้าไม่กระโดด */
+.read{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:2px 14px;min-width:0;font-size:13px;color:var(--muted)}   /* 2 แถวตายตัว ไม่ตัดบรรทัดตามชื่อท่า/ไฟล์ */
+.read>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#rdFrame,#rdMs{font-variant-numeric:tabular-nums}
 .read b{color:var(--text);font-weight:600}
-.read .path{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);word-break:break-all}
+.read .path{grid-column:1/-1;min-height:1.5em;line-height:1.5;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
 .transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .btn{background:#26221b;border:1px solid var(--line);border-radius:3px;padding:5px 10px;font-size:13px;min-height:32px}
 .btn:hover{border-color:var(--muted)}
@@ -104,7 +106,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 	</header>
 
 	<div class="stagecol">
-		<div class="box read" aria-live="polite">
+		<div class="box read">
 			<span>ท่า: <b id="rdClip">—</b></span>
 			<span>เฟรม: <b id="rdFrame">—</b></span>
 			<span>เฟรมละ: <b id="rdMs">—</b></span>
@@ -1166,7 +1168,7 @@ function press(group, v) { for (const b of group.querySelectorAll('button')) b.s
 function setRead(t) {
 	if (isClip()) {
 		const c = CLIPS[S.clip];
-		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
+		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
 		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', pose: 'poses_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
