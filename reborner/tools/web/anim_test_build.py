@@ -44,6 +44,12 @@ def sprites():
 		for f in sorted(os.listdir(sd)):
 			if f.endswith('.png'):
 				out['smp/' + f[:-4]] = png(os.path.join(sd, f))
+	# อาวุธ (tools/sprites/weapons.py) — ร่าง 30 ชิ้น
+	wd = os.path.join(SPR, 'weapons_draft')
+	if os.path.isdir(wd):
+		for f in sorted(os.listdir(wd)):
+			if f.endswith('.png'):
+				out['wpn/' + f[:-4]] = png(os.path.join(wd, f))
 	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
 	td = os.path.join(ROOT, 'assets/tiles_ll')
 	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
@@ -109,6 +115,7 @@ def main(out_path):
 		'monsters': monsters(mon_ids),
 		'draft_map': draft_map(),
 		'compendium': compendium(),
+		'weapons': [dict(w, school=f['school']) for f in json.load(open(os.path.join(ROOT, 'docs/art-bible/weapons/weapons_full.json'), encoding='utf-8'))['families'] for w in f['weapons']],
 		'skill_ref': skill_ref(),
 		'k': {
 			'MIT_K': const('core/Formulas.gd', 'MIT_K'),
