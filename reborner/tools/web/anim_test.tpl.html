@@ -22,15 +22,15 @@
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 var(--f-body);padding-inline:16px;padding-block:14px 28px}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.wrap{max-width:1180px;margin:0 auto;display:grid;gap:14px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 @media(min-width:920px){.wrap{grid-template-columns:minmax(0,7fr) minmax(320px,5fr);align-items:start}.stagecol{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}}
 header{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
 h1{font:700 22px/1.2 var(--f-display);margin:0;letter-spacing:.02em}
 header p{margin:0;color:var(--muted);font-size:13px}
 .box{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:12px}
-.stagecol{display:grid;gap:10px;min-width:0}
+.stagecol{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;min-width:0}
 #stage{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid var(--line);background:#000}
-.read{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--muted)}
+.read{display:flex;flex-wrap:wrap;gap:4px 16px;overflow-wrap:anywhere;min-width:0;font-size:13px;color:var(--muted)}
 .read b{color:var(--text);font-weight:600}
 .read .path{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);word-break:break-all}
 .transport{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -47,17 +47,19 @@ header p{margin:0;color:var(--muted);font-size:13px}
 .strip button{flex:0 0 auto;display:grid;justify-items:center;gap:2px;background:#26221b;border:1px solid var(--line);border-radius:3px;padding:4px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .strip button[aria-current="true"]{border-color:var(--gold);color:var(--gold)}
 .strip canvas{width:48px;height:48px;image-rendering:pixelated;background:#2e2a22}
-.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .tabs .btn{font:600 14px var(--f-display);padding:6px 14px}
-.side{display:grid;gap:12px;min-width:0}
+.side{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
 .clips{display:grid;gap:10px}
 .skref{margin-top:14px}.skref summary{cursor:pointer;font:600 14px var(--f-display);color:var(--gold)}
 .skref .muted{color:var(--muted);font-size:12px;margin:6px 0}.skwrap{overflow-x:auto;margin-top:8px}.skwrap img{max-width:100%;display:block;border-radius:6px}
 .wnote{color:var(--muted);font-size:12px;margin:0 0 8px}
 .wgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:8px}
 .wgrid .btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;font-size:11px;line-height:1.25;text-align:center}
-.wgrid img{width:48px;height:48px;image-rendering:pixelated}
+.wgrid img{width:48px;height:48px;max-width:100%;object-fit:contain;image-rendering:pixelated}
 .wgrid small{color:var(--muted);font-variant-numeric:tabular-nums}
+.sgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.sgrid img{width:72px;height:48px}
+@media(max-width:560px){.wgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .wcard{margin-top:10px;font-size:13px;line-height:1.5}.wcard b{color:var(--gold)}.wcard .muted{color:var(--muted)}
 .cgroup h3{font:600 14px var(--f-display);margin:0 0 6px;color:var(--gold)}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
@@ -129,6 +131,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" id="tabClips" aria-pressed="true">ท่าขยับ</button>
 			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
 			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
+			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
 		</div>
 
 		<section class="box" id="paneClips">
@@ -146,6 +149,13 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<div class="tabs" id="wSchool"></div>
 			<div class="wgrid" id="wGrid"></div>
 			<div class="wcard" id="wCard"></div>
+		</section>
+
+		<section class="box" id="paneSpells" hidden>
+			<p class="muted wnote">เวทย์ร่าง 16 คาถา (spells_full.json) · Rion ร่ายจากตำรา (GDD 7.2) · ท่าร่าย + เอฟเฟกต์ — ยังไม่เข้าเกม</p>
+			<div class="tabs" id="sSchool"></div>
+			<div class="wgrid sgrid" id="sGrid"></div>
+			<div class="wcard" id="sCard"></div>
 		</section>
 
 		<section class="box" id="paneSkills" hidden>
@@ -243,13 +253,17 @@ for (const w of (DATA.weapons || [])) {
 	if (!DATA.sprites['held/' + w.id + '_0']) continue;
 	CLIPS['held_' + w.id] = { id: 'held_' + w.id, label: `${w.id} · ${w.name}`, frames: [0, 0, 0, 1, 2, 3, 4, 0].map(i => `held/${w.id}_${i}`), sec: K.ATTACK_FRAME_SEC * 1.6, loop: true };
 }
+for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่าร่ายเวทย์ (tools/sprites/spells_anim.py) — แสดงในแท็บเวทย์มนต์เท่านั้น
+	if (!DATA.sprites['spl/' + sp.id + '_0']) continue;
+	CLIPS['spell_' + sp.id] = { id: 'spell_' + sp.id, label: `${sp.id} · ${sp.name}`, frames: [0, 1, 2, 3, 4, 5, 6, 7, 7].map(i => `spl/${sp.id}_${i}`), sec: K.ATTACK_FRAME_SEC * 1.6, loop: true };
+}
 
 // ── สถานะผู้ชม ──
-const isClip = () => S.tab === 'clips' || S.tab === 'weapons';
+const isClip = () => S.tab === 'clips' || S.tab === 'weapons' || S.tab === 'spells';
 const S = { tab: 'clips', clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
-try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || t === 'clips' || t === 'weapons') S.tab = t; } catch (e) {}
+try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || t === 'clips' || t === 'weapons' || t === 'spells') S.tab = t; } catch (e) {}
 
 // ── วาด ──
 const W = () => cv.width, H = () => cv.height;
@@ -1062,7 +1076,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1181,12 +1195,44 @@ function buildWeapons() {
 	}
 	showSchool(schools[0]);
 }
+const SPELL_SCOPE = { party: 'ทั้งทีม', single: 'เดี่ยว', row: 'ทั้งแถว', column: 'ทะลุแนว', all: 'ทุกตัว' };
+const POSE_TH = { cast_fwd: 'มือหลังถือตำรา · ยกมือรวมพลัง → ผลักฝ่ามือไปหน้า', cast_up: 'มือหลังถือตำรา · ชูฝ่ามือขึ้นสูง' };
+let sPick = null;
+function showSpell(id) {
+	const sc = (DATA.spells || []).find(x => x.spells.some(s => s.id === id)); if (!sc) return;
+	const sp = sc.spells.find(s => s.id === id);
+	sPick = id; S.clip = 'spell_' + id; S.frame = 0; S.acc = 0; S.playing = true; updPlay(); press($('sGrid'), id); buildStrip();
+	const nums = sp.power !== undefined ? ` · พลัง ${sp.power ?? 'ยังไม่กำหนด'}` : '';
+	$('sCard').innerHTML = `<b>${sp.name}</b> <span class="muted">${sp.id} · สาย${sc.name} (${sc.gdd} ${sc.version}) · ธาตุ ${sp.element} · ${SPELL_SCOPE[sp.scope] || sp.scope}</span><br>`
+		+ `${sp.effect}${nums}${sp.numbers_from ? ' <span class="muted">(ตาม ' + sp.numbers_from + ')</span>' : ''}<br>`
+		+ `<span class="muted">ภาพ: ${sp.look}<br>ท่าร่าย: ${POSE_TH[sc.pose]} · ตัวตนสาย: ${sc.identity}</span>`;
+}
+function buildSpells() {
+	const ss = DATA.spells || [];
+	if (!ss.length) { $('tabSpells').hidden = true; return; }
+	const showSchool = sc => {
+		press($('sSchool'), sc.school_id); const g = $('sGrid'); g.innerHTML = '';
+		for (const sp of sc.spells) {
+			const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = sp.id;
+			b.innerHTML = `<img src="${DATA.sprites['spl/' + sp.id + '_4']}" alt=""><span>${sp.name}</span><small>${sp.id}</small>`;
+			b.addEventListener('click', () => showSpell(sp.id)); g.append(b);
+		}
+		showSpell(sc.spells[0].id);
+	};
+	for (const sc of ss) {
+		const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = sc.school_id;
+		b.textContent = `${sc.name}${sc.version === 'v2' ? ' (v2)' : ''}`;
+		b.addEventListener('click', () => showSchool(sc)); $('sSchool').append(b);
+	}
+	showSchool(ss[0]);
+}
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
-	$('tabClips').setAttribute('aria-pressed', String(t === 'clips')); $('tabSkills').setAttribute('aria-pressed', String(t === 'skills')); $('tabWeapons').setAttribute('aria-pressed', String(t === 'weapons'));
-	$('paneClips').hidden = t !== 'clips'; $('paneSkills').hidden = t !== 'skills'; $('paneWeapons').hidden = t !== 'weapons';
+	$('tabClips').setAttribute('aria-pressed', String(t === 'clips')); $('tabSkills').setAttribute('aria-pressed', String(t === 'skills')); $('tabWeapons').setAttribute('aria-pressed', String(t === 'weapons')); $('tabSpells').setAttribute('aria-pressed', String(t === 'spells'));
+	$('paneClips').hidden = t !== 'clips'; $('paneSkills').hidden = t !== 'skills'; $('paneWeapons').hidden = t !== 'weapons'; $('paneSpells').hidden = t !== 'spells';
 	if (t === 'weapons' && wPick) { S.clip = 'held_' + wPick; S.frame = 0; S.acc = 0; }
-	if (t === 'clips' && S.clip.startsWith('held_')) { S.clip = 'rion_walk_west'; S.frame = 0; press($('clipGroups'), S.clip); }
+	if (t === 'spells' && sPick) { S.clip = 'spell_' + sPick; S.frame = 0; S.acc = 0; }
+	if (t === 'clips' && (S.clip.startsWith('held_') || S.clip.startsWith('spell_'))) { S.clip = 'rion_walk_west'; S.frame = 0; press($('clipGroups'), S.clip); }
 	buildStrip(); setRead();
 }
 
@@ -1203,10 +1249,10 @@ function boot() {
 	$('segCount').onclick = e => { const v = e.target.dataset.v; if (v) { S.count = +v; press($('segCount'), v); } };
 	$('btnOnion').onclick = () => { S.onion = !S.onion; $('btnOnion').setAttribute('aria-pressed', String(S.onion)); };
 	$('btnGrid').onclick = () => { S.grid = !S.grid; $('btnGrid').setAttribute('aria-pressed', String(S.grid)); };
-	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); $('tabWeapons').onclick = () => setTab('weapons');
+	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); $('tabWeapons').onclick = () => setTab('weapons'); $('tabSpells').onclick = () => setTab('spells');
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
-	buildSkillRef(); buildClips(); buildWeapons(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	buildSkillRef(); buildClips(); buildWeapons(); buildSpells(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
 	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_anim}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ

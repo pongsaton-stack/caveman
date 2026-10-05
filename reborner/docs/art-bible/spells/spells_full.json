@@ -1,0 +1,30 @@
+{
+  "_doc": "รายชื่อเวทย์ REBORNER ฉบับร่าง (Claude ร่าง 5 ต.ค. 2026 ตามที่ kwan สั่ง 'ครีเอตเวทย์มนต์ด้วย') · โครงตาม GDD หมวด 7: White = โล่ ไม่ใช่หมอ (ไม่มีคาถาเติม HP) · Black = ธาตุตรง/AoE ตามกริด/เจาะเกราะ · Red (v2) = คิวและสถานะ เรือธงคือใส่จุดอ่อนธาตุกายภาพ · Summoner (v2) = ครั้งเดียวต่อศึก เผา Insight ทั้งหมด · ร่ายจากตำรา (GDD 7.2) · ตัวเลขใส่เฉพาะที่ GDD ระบุ ที่เหลือ null · ชื่อคาถาอิงของใช้ในโลกที่ล่มสลาย",
+  "status": "ร่าง รอ kwan อนุมัติ",
+  "schools": [
+    {"school_id": "WH", "name": "ขาว", "gdd": "White", "version": "v1", "identity": "โล่ ไม่ใช่หมอ", "pose": "cast_up", "spells": [
+      {"id": "WH-1", "name": "กำแพงธาตุ", "element": "แสง", "scope": "party", "effect": "ลดดาเมจ 45% 3 เทิร์น", "numbers_from": "GDD 7.1", "look": "แผ่นกระจกหกเหลี่ยมเรียงเป็นกำแพงหน้าทีม"},
+      {"id": "WH-2", "name": "ปกป้องชีวิต", "element": "แสง", "scope": "single", "effect": "กันการล้ม 1 ครั้ง", "numbers_from": "GDD 7.1", "look": "วงแหวนสีทองหมุนรอบตัว แล้วซึมเข้าอก"},
+      {"id": "WH-3", "name": "ล้างสถานะ", "element": "แสง", "scope": "single", "effect": "ล้างสถานะผิดปกติ", "numbers_from": "GDD 7.1", "look": "ฟองสบู่แสงลอยขึ้นแล้วแตก"},
+      {"id": "WH-4", "name": "คืน LP", "element": "แสง", "scope": "single", "effect": "คืน LP ให้มอนร่วมทีม", "numbers_from": "GDD 7.1", "look": "หัวใจเย็บปะลอยลงมา"}
+    ]},
+    {"school_id": "BK", "name": "ดำ", "gdd": "Black", "version": "v1", "identity": "ดาเมจธาตุตรง · AoE ตามกริด · เจาะเกราะ", "pose": "cast_fwd", "spells": [
+      {"id": "BK-1", "name": "ไฟแช็กพ่น", "element": "ไฟ", "scope": "single", "effect": "ดาเมจไฟ", "power": null, "look": "เปลวไฟพ่นตรงจากฝ่ามือ"},
+      {"id": "BK-2", "name": "ลมตู้แช่", "element": "น้ำแข็ง", "scope": "row", "effect": "ดาเมจน้ำแข็งทั้งแถว", "power": null, "look": "ลมเย็นสีฟ้ากวาดแนวนอนพร้อมเกล็ดน้ำแข็ง"},
+      {"id": "BK-3", "name": "ไฟฉายแสงจ้า", "element": "แสง", "scope": "single", "effect": "ดาเมจแสง", "power": null, "look": "ลำแสงกรวยสีขาวเหลืองพุ่งไปหน้า"},
+      {"id": "BK-4", "name": "หลอดไฟดับ", "element": "มืด", "scope": "column", "effect": "ดาเมจมืดทะลุแถวหน้าถึงหลัง", "power": null, "look": "ควันเงาม่วงพุ่งเป็นเส้นตรง"},
+      {"id": "BK-5", "name": "ถังแก๊สระเบิด", "element": "ไฟ", "scope": "all", "effect": "ดาเมจไฟศัตรูทุกตัว", "power": null, "look": "ลูกไฟลอยไปแล้วระเบิดวงกว้าง"},
+      {"id": "BK-6", "name": "เข็มน้ำแข็งเจาะเกราะ", "element": "น้ำแข็ง", "scope": "single", "effect": "ดาเมจน้ำแข็ง เพิกเฉย DEF บางส่วน", "power": null, "ignore_def": null, "look": "เข็มน้ำแข็งยาวสามเล่มพุ่งเรียงกัน"}
+    ]},
+    {"school_id": "RD", "name": "แดง", "gdd": "Red", "version": "v2", "identity": "จัดการคิวและสถานะ · เรือธง = ใส่จุดอ่อน", "pose": "cast_fwd", "spells": [
+      {"id": "RD-1", "name": "นาฬิกาปลุกเร่ง", "element": "—", "scope": "single", "effect": "เร่งคิวพวกเดียวกัน", "look": "หน้าปัดนาฬิกาหมุนเร็ว"},
+      {"id": "RD-2", "name": "เทปกาวหน่วง", "element": "—", "scope": "single", "effect": "หน่วงคิวศัตรู", "look": "แถบเทปพันรอบเป้า"},
+      {"id": "RD-3", "name": "รอยปากกาแดง: ฟัน", "element": "ฟัน", "scope": "single", "effect": "ใส่จุดอ่อนธาตุฟัน (เรือธงของ Red · GDD 7.1)", "look": "วงกลมปากกาแดงขีดรอบเป้า มีเครื่องหมายมีด"},
+      {"id": "RD-4", "name": "รอยปากกาแดง: ทุบ", "element": "ทุบ", "scope": "single", "effect": "ใส่จุดอ่อนธาตุทุบ (GDD 7.1)", "look": "วงกลมปากกาแดง มีเครื่องหมายค้อน"},
+      {"id": "RD-5", "name": "ยางลบบัฟ", "element": "—", "scope": "single", "effect": "ลบบัฟของศัตรู", "look": "ยางลบสีชมพูถูไปมา เศษยางกระจาย"}
+    ]},
+    {"school_id": "SM", "name": "อัญเชิญ", "gdd": "Summoner", "version": "v2", "identity": "ครั้งเดียวต่อศึก · เผา Insight ทั้งหมด · พลัง = 110 + Insight × 2.8 (GDD 7.1)", "pose": "cast_up", "spells": [
+      {"id": "SM-1", "name": "ผู้เฝ้าเตาเถ้า", "element": "ไฟ", "scope": "all", "effect": "อัญเชิญ · พลัง 110 + Insight × 2.8", "numbers_from": "GDD 7.1", "look": "วงชอล์กบนพื้นเรืองส้ม ร่างเงาเตาหินยักษ์โผล่ขึ้นมาพ่นถ่าน"}
+    ]}
+  ]
+}
