@@ -268,6 +268,11 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   รอบเท่าชุดเดิม: เดิน 2×MOVE_TIME · ฟัน 4 / โดนตี 2 / ล้ม 3 × ATTACK_FRAME_SEC · ท่าร่างยาวเท่ารอบเดิม
   ภาพไม่ซ้ำน้อยในท่าที่ขยับน้อย (หายใจ 5 · พยักหน้า 3 · เดินหน้า 5) · มาก: ฟัน 63 · ล้ม 51 · หลบ 48 · ไอเท็ม 41 · หลับ 64
   กลุ่มเทียบ 32/64 ถูกแทนแล้ว · `poses_anim.py` เหลือแค่ตัวช่วย (ลบ poses_draft/) · หน้าเทส 8.6 MB
+- 5 ต.ค. 2026 **สกิล Aseprite** (kwan ส่งลิงก์ github.com/aseprite/aseprite → เลือกข้อ 1 "อ่าน/เขียน .aseprite") — `.claude/skills/aseprite/SKILL.md` (ที่ราก repo)
+  Aseprite เป็น EULA: คอมไพล์ใช้เองได้ ห้ามแจกจ่าย → **ห้ามใส่ตัวโปรแกรม/ซอร์สลง repo** · เขียนเองจากสเปกไฟล์ที่เปิดเผย (Python + zlib)
+  `tools/sprites/aseprite_io.py` (read/write) · `aseprite_export.py` → `docs/art-bible/aseprite/{game,poses64,spells,npcs}/` (103 ไฟล์ 1.8 MB · แท็กตามชื่อไฟล์ · จังหวะจากค่าคงที่เกม · เฟรมซ้ำ = linked cel)
+  `aseprite_import.py` → PNG + meta.json ไปที่ `docs/art-bible/aseprite/imported/` (เข้าเกมด้วย --into เมื่อ kwan อนุมัติเท่านั้น) · `aseprite_check.py` ไป-กลับ 4944 เฟรม mismatch 0
+  ตรวจตัวอ่านกับไฟล์ทดสอบ 20 ไฟล์ของ Aseprite เอง · ตรวจไฟล์ที่เขียนด้วย ase-parser (npm อิสระ) 103/103 เปิดได้ แท็ก/จังหวะ/พาเลตต์ถูก
   แนวทางที่ให้ kwan: ขนาด 64px สมูทพอที่ 8-12 ภาพ/วินาที · เดิน 6-8 · วิ่ง 6 · หายใจ 4 · ฟัน 5-6 (มีค้างตอนง้าง/กระทบ) · โดนตี 2-3 · เกินนี้แทบไม่เห็นต่างเพราะขาขยับได้ทีละ 1px
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)
