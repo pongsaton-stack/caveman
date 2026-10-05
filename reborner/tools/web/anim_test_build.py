@@ -68,10 +68,17 @@ def sprites():
 		for f in sorted(os.listdir(pd)):
 			if f.endswith('.png'):
 				out['pose/' + f[:-4]] = png(os.path.join(pd, f))
+	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
+	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
+		d = os.path.join(SPR, folder)
+		if os.path.isdir(d):
+			for f in sorted(os.listdir(d)):
+				if f.endswith('.png'):
+					out[pre + '/' + f[:-4]] = png(os.path.join(d, f))
 	# ไทล์ฉากหลังสำหรับจอศึกแบบ SaGa (พื้น + ของประดับ · เฉพาะชิ้นฐาน ไม่เอาชิ้นขอบ mask)
 	td = os.path.join(ROOT, 'assets/tiles_ll')
 	for n in ['ash_0', 'ash_1', 'ash_2', 'ash_3', 'grass_0', 'grass_1', 'grass_2', 'grass_3', 'stone_0', 'stone_1', 'stone_2', 'stone_3',
-			'ruins', 'rock', 'pine', 'bush', 'ruin_house', 'flowers']:
+			'ruins', 'rock', 'pine', 'bush', 'ruin_house', 'flowers', 'house', 'shop', 'tent', 'lamp', 'crate', 'barrel']:
 		f = os.path.join(td, n + '.png')
 		if os.path.exists(f):
 			out['tile/' + n] = png(f)
@@ -138,6 +145,10 @@ def main(out_path):
 		'fx': {k: v for k, v in json.load(open(os.path.join(ROOT, 'data/fx/ultimates.json'), encoding='utf-8')).items() if k != '_doc'},
 		'monsters': monsters(mon_ids),
 		'bosses': bosses(),
+		'items': json.load(open(os.path.join(SPR, 'items_draft/index.json'), encoding='utf-8'))['items'],
+		'structures': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/structures.json'), encoding='utf-8')),
+		'vehicles': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/vehicles.json'), encoding='utf-8')),
+		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
 		'poses': json.load(open(os.path.join(SPR, 'poses_draft/index.json'), encoding='utf-8'))['poses'] if os.path.exists(os.path.join(SPR, 'poses_draft/index.json')) else [],
 		'draft_map': draft_map(),
 		'compendium': compendium(),

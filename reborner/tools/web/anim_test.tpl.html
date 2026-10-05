@@ -61,6 +61,13 @@ header p{margin:0;color:var(--muted);font-size:13px}
 .wgrid small{color:var(--muted);font-variant-numeric:tabular-nums}
 .sgrid{grid-template-columns:repeat(4,minmax(0,1fr))}.sgrid img{width:72px;height:48px}
 @media(max-width:560px){.wgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.icards{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin-top:8px}
+.icard{display:grid;justify-items:center;gap:3px;padding:8px 6px 7px;border:1px solid var(--line);border-radius:6px;background:linear-gradient(#2e2920,#221e18);color:var(--ink);font-size:12px;line-height:1.25;text-align:center}
+.icard img{width:64px;height:64px;image-rendering:pixelated;background:radial-gradient(#3a342a,transparent 70%);border-radius:50%}
+.icard .cat{font-size:10px;letter-spacing:.04em;padding:1px 6px;border-radius:9px;background:#3a3329;color:var(--gold)}
+.icard small{color:var(--muted);font-size:10.5px}
+.icard[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.ggrid img{width:72px;height:56px;object-fit:contain}
 .wcard{margin-top:10px;font-size:13px;line-height:1.5}.wcard b{color:var(--gold)}.wcard .muted{color:var(--muted)}
 .cgroup h3{font:600 14px var(--f-display);margin:0 0 6px;color:var(--gold)}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
@@ -136,6 +143,10 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" id="tabArms" aria-pressed="false">อาวุธ</button>
 			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
 			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
+			<button class="btn" role="tab" id="tabItems" aria-pressed="false">ไอเท็ม</button>
+			<button class="btn" role="tab" id="tabStructs" aria-pressed="false">อาคาร · สิ่งก่อสร้าง</button>
+			<button class="btn" role="tab" id="tabVehicles" aria-pressed="false">ยานพาหนะ</button>
+			<button class="btn" role="tab" id="tabNpcs" aria-pressed="false">NPC ชาวบ้าน</button>
 		</div>
 
 		<section class="box" id="paneClips">
@@ -177,6 +188,34 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<div class="tabs" id="sSchool"></div>
 			<div class="wgrid sgrid" id="sGrid"></div>
 			<div class="wcard" id="sCard"></div>
+		</section>
+
+		<section class="box" id="paneItems" hidden>
+			<p class="muted wnote">การ์ดไอเท็ม — รายชื่อและตัวเลขจาก data/items.csv + ของดรอปใน data/monsters.csv · ไอคอนร่าง ยังไม่เข้าเกม</p>
+			<div class="tabs" id="itmFilt"></div>
+			<div class="icards" id="itmGrid"></div>
+			<div class="wcard" id="itmCard"></div>
+		</section>
+
+		<section class="box" id="paneStructs" hidden>
+			<p class="muted wnote">อาคาร · สิ่งก่อสร้าง — ร่างใหม่ + ของที่มีในเกมแล้ว (assets/tiles_ll) · ยังไม่เข้าเกม</p>
+			<div class="tabs" id="stcFilt"></div>
+			<div class="wgrid sgrid ggrid" id="stcGrid"></div>
+			<div class="wcard" id="stcCard"></div>
+		</section>
+
+		<section class="box" id="paneVehicles" hidden>
+			<p class="muted wnote">ยานพาหนะร่าง — GDD ยังไม่มีระบบยานพาหนะ ตอนนี้เป็นของประดับ/ข้อเสนอ</p>
+			<div class="tabs" id="vehFilt"></div>
+			<div class="wgrid sgrid ggrid" id="vehGrid"></div>
+			<div class="wcard" id="vehCard"></div>
+		</section>
+
+		<section class="box" id="paneNpcs" hidden>
+			<p class="muted wnote">NPC ชาวบ้านร่าง — ทำจากร่าง Rion เปลี่ยนสี + อุปกรณ์ · ยืนหายใจ · คุย · เดิน</p>
+			<div class="tabs" id="npcFilt"></div>
+			<div class="wgrid sgrid ggrid" id="npcGrid"></div>
+			<div class="wcard" id="npcCard"></div>
 		</section>
 
 		<section class="box" id="paneSkills" hidden>
@@ -288,7 +327,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 }
 
 // ── สถานะผู้ชม ──
-const CLIP_TABS = ['clips', 'monsters', 'bosses', 'arms', 'weapons', 'spells'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', arms: 'armGroups' };
+const CLIP_TABS = ['clips', 'monsters', 'bosses', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -338,7 +377,7 @@ function clipView() {
 		const pk = c.frames[(S.frame - 1 + c.frames.length) % c.frames.length], pim = IMG[pk];
 		if (pim) spr(pk, (96 - pim.width) / 2, 92 - pim.height, { alpha: 0.32 });
 	}
-	if (im) spr(key, (96 - im.width) / 2, 92 - im.height);
+	if (im) spr(key, (96 - im.width) / 2, Math.max(0, 92 - im.height));
 	if (S.grid) drawGrid();
 }
 
@@ -1106,7 +1145,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${S.frame + 1}/${c.frames.length}`;
 		$('rdMs').textContent = c.frames.length > 1 ? Math.round(c.sec * 1000) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', pose: 'poses_draft' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', pose: 'poses_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
@@ -1292,12 +1331,69 @@ function buildSpells() {
 	}
 	showSchool(ss[0]);
 }
-const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', arms: 'Arms', weapons: 'Weapons', spells: 'Spells' };
+// ── แกลเลอรี: ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC (ปุ่มกรอง → ตาราง → การ์ด + เล่นบนเวที) ──
+const GAL = {};
+const frameKeys = pre => { const out = []; for (let i = 0; DATA.sprites[pre + '_' + i]; i++) out.push(pre + '_' + i); return out.length ? out : [pre]; };
+function gallery(tab, p, list, opt) {
+	if (!list.length) { $('tab' + TAB_IDS[tab]).hidden = true; return; }
+	for (const it of list) CLIPS[tab + ':' + it.id] = { id: tab + ':' + it.id, label: it.name, tab, frames: opt.frames(it), sec: opt.sec || 0.3, loop: true };
+	const show = id => {
+		const it = list.find(x => x.id === id); GAL[tab] = id; S.clip = tab + ':' + id; S.frame = 0; S.acc = 0; S.playing = true; updPlay();
+		press($(p + 'Grid'), id); $(p + 'Card').innerHTML = opt.card(it); buildStrip(); setRead();
+	};
+	const filt = f => {
+		press($(p + 'Filt'), f); const g = $(p + 'Grid'); g.innerHTML = '';
+		const rows = list.filter(x => f === '*' || opt.group(x) === f);
+		for (const it of rows) {
+			const b = document.createElement('button'); b.type = 'button'; b.dataset.v = it.id; b.className = opt.cardBtn ? 'icard' : 'btn';
+			b.innerHTML = opt.thumb(it); b.addEventListener('click', () => show(it.id)); g.append(b);
+		}
+		show(rows[0].id);
+	};
+	const groups = ['*', ...new Set(list.map(opt.group))];
+	for (const f of groups) {
+		const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = f;
+		b.textContent = f === '*' ? `ทั้งหมด (${list.length})` : `${f} (${list.filter(x => opt.group(x) === f).length})`;
+		b.addEventListener('click', () => filt(f)); $(p + 'Filt').append(b);
+	}
+	filt('*');
+}
+const ITEM_USE = { 'ยา': '', 'ตำรา': 'อ่านที่จุดพักเพื่อปลดรากต้นไม้เวทย์ (GDD 7.2 · 7.4)', 'วัตถุดิบ': 'การใช้ยังไม่กำหนด — ชีตสินค้า 19 ชิ้นอยู่ในเวิร์กบุ๊ก ไม่อยู่ใน repo', 'ของสำคัญ': 'ของเนื้อเรื่อง', 'เงิน': 'ได้เงิน (จำนวนยังไม่กำหนดในไฟล์)' };
+function buildGalleries() {
+	const it = DATA.items || [];
+	gallery('items', 'itm', it, {
+		cardBtn: true, group: x => x.cat, frames: x => ['itm/' + x.id],
+		thumb: x => `<img src="${DATA.sprites['itm/' + x.id]}" alt=""><span class="cat">${x.cat}</span><b>${x.name}</b><small>${x.sources ? x.sources[0].monster_id + ' · ' + x.sources[0].rate + '%' : x.id + ' · ' + x.price + 'g'}</small>`,
+		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.cat}</span><br>`
+			+ (x.sources ? x.sources.map(s => `ดรอปจาก <b>${s.monster_id} ${s.monster}</b> <span class="muted">(${s.region})</span> · อัตรา <b>${s.rate}%</b>`).join('<br>')
+				: `ผล: ${x.note}<br>ราคา <b>${x.price}g</b> · สต๊อก <b>${x.stock}</b> · ค่า ${x.kind} = ${x.value}`)
+			+ (ITEM_USE[x.cat] ? `<br><span class="muted">${ITEM_USE[x.cat]}</span>` : '') + `<br><span class="muted">ที่มาข้อมูล: ${x.from}</span>` });
+	const st = DATA.structures || { items: [], in_game: [] };
+	const stl = st.items.map(x => Object.assign({ grp: 'ร่างใหม่' }, x)).concat(st.in_game.filter(x => DATA.sprites['tile/' + x.tile]).map(x => ({ id: 'tile-' + x.tile, name: x.name, tile: x.tile, grp: 'มีในเกมแล้ว', use: 'ไทล์ในเกม (assets/tiles_ll/' + x.tile + '.png)' })));
+	const pic = x => x.tile ? 'tile/' + x.tile : (x.pre || 'stc/') + x.id + '_0';
+	gallery('structs', 'stc', stl, {
+		group: x => x.grp, frames: x => x.tile ? ['tile/' + x.tile] : frameKeys('stc/' + x.id), sec: 0.22,
+		thumb: x => `<img src="${DATA.sprites[pic(x)]}" alt=""><span>${x.name}</span><small>${x.grp}</small>`,
+		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.grp}</span><br>${x.use}${x.source ? '<br><span class="muted">ที่มา: ' + x.source + '</span>' : ''}` });
+	const vh = (DATA.vehicles || { items: [] }).items.map(x => Object.assign({ pre: 'veh/' }, x));
+	gallery('vehicles', 'veh', vh, {
+		group: x => x.kind, frames: x => frameKeys('veh/' + x.id), sec: 0.16,
+		thumb: x => `<img src="${DATA.sprites['veh/' + x.id + '_0']}" alt=""><span>${x.name}</span><small>${x.kind}</small>`,
+		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.kind}</span><br>${x.use}<br><span class="muted">GDD ยังไม่มีระบบยานพาหนะ${x.source ? ' · ที่มา: ' + x.source : ''}</span>` });
+	const np = (DATA.npcs || { npcs: [] }).npcs;
+	gallery('npcs', 'npc', np, {
+		group: x => x.source.startsWith('STORY_DRAFT 5') ? 'NPC ร่วมทาง' : 'ชาวบ้าน',
+		frames: x => [0, 0, 1, 1, 0, 0, 1, 1, 2, 3, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7].map(i => `npc/${x.id}_${i}`), sec: 0.25,
+		thumb: x => `<img src="${DATA.sprites['npc/' + x.id + '_0']}" alt=""><span>${x.name}</span><small>${x.where}</small>`,
+		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.where}</span><br>${x.role}<br><span class="muted">ที่มา: ${x.source} · คลิป: ยืนหายใจ → คุย (...) → เดิน</span>` });
+}
+const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
 	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }
 	if (t === 'weapons' && wPick) { S.clip = 'held_' + wPick; S.frame = 0; S.acc = 0; }
 	if (t === 'spells' && sPick) { S.clip = 'spell_' + sPick; S.frame = 0; S.acc = 0; }
+	if (GAL[t]) { S.clip = t + ':' + GAL[t]; S.frame = 0; S.acc = 0; }
 	if (GROUP_BOX[t] && S.last[t] && CLIPS[S.clip].tab !== t) { S.clip = S.last[t]; S.frame = 0; S.acc = 0; press($(GROUP_BOX[t]), S.clip); }
 	if (t === 'monsters') monCard(CLIPS[S.clip].mon); if (t === 'bosses') bossCard(bossPick || CLIPS[S.clip].mon);
 	buildStrip(); setRead();
@@ -1319,7 +1415,7 @@ function boot() {
 	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); for (const [k, n] of Object.entries(TAB_IDS)) $('tab' + n).onclick = () => setTab(k);
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
-	buildSkillRef(); buildClips(); buildBosses(); buildWeapons(); buildSpells(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	buildSkillRef(); buildClips(); buildBosses(); buildWeapons(); buildSpells(); buildGalleries(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
 	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_anim}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ
