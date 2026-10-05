@@ -5,7 +5,7 @@ description: Move REBORNER sprites in and out of Aseprite (.aseprite/.ase files)
 
 # Aseprite ↔ REBORNER
 
-Aseprite itself is **not** in this repo and must never be added: its source is under an EULA (compile for personal use only, no distribution). Everything here works from the published file-format spec (`docs/ase-file-specs.md` in github.com/aseprite/aseprite) with pure Python (PIL + zlib). kwan runs Aseprite on their own machine.
+Aseprite's code must never be copied into this repo: it is under an EULA (compile for personal use only, no distribution) and this repo is public. Everything here works from the published file-format spec (`docs/ase-file-specs.md` in github.com/aseprite/aseprite) with pure Python (PIL + zlib). kwan runs Aseprite on their own machine.
 
 The repo carries the official source **only as a git submodule pointer** (`third_party/aseprite`, pinned to tag `v1.3.18.6`, outside `reborner/` so Godot never scans it). A submodule stores a link to github.com/aseprite/aseprite, not a copy of its code, so nothing is redistributed. Never vendor the files, commit a build, or add a release binary.
 
