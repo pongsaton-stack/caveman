@@ -285,9 +285,94 @@ for key, label, gl, gx, cyc, extra in (('surprise', '! ตกใจ', '!', 32, 1
 		('love', '♥ รัก', 'heart', 30, 1.2, {'tx': lambda t: 0})):
 	pose('dog_emo_' + key, 'dog', 'อารมณ์', label, cyc, lambda t, gl=gl, gx=gx, extra=extra: dict({k: f(t) for k, f in extra.items()}, dir='south', glyphs=emote(gl, gx, 4)(t)))
 
+# ── ตัวอย่างระดับ 2 (kwan เลือก 5 ต.ค.): ใส่สิ่งที่ภาพเดิมขาด ไม่วาดตัวใหม่ ──
+# แขนแกว่งสวนขา (แขนหน้าวาดใหม่ด้วย IK ไหล่→ศอก→มือ) · เป้ตามแรงช้ากว่าตัว · กะพริบตา · มีดมีภาพเบลอตามแนวฟัน · ท่าฟันมีจังหวะง้าง→ฟาด→ค้าง→ตาม→คืน
+DRAW, COMPARE = {}, {}
+EYE = [(23, y) for y in range(23, 27)] + [(24, 25), (24, 26)]             # ตา Rion หันซ้าย (วัดจากพิกเซล)
+SKIN_C, LID_C = (212, 176, 138, 255), (21, 15, 13, 255)
+PACK = lambda x, y: 35 <= x <= 47 and 31 <= y <= 51                          # เป้ด้านหลัง (หันซ้าย)
+
+def ik(sh, hand, l1=5.2, l2=5.2):
+	"""ศอกจากไหล่+มือ (แขนสองท่อน) · ศอกงอไปทางหลัง/ล่าง"""
+	dx, dy = hand[0] - sh[0], hand[1] - sh[1]; d = max(0.01, math.hypot(dx, dy))
+	if d >= l1 + l2: return (sh[0] + dx * l1 / d, sh[1] + dy * l1 / d)
+	a = (l1 * l1 - l2 * l2 + d * d) / (2 * d); h = math.sqrt(max(0.0, l1 * l1 - a * a))
+	px, py = sh[0] + dx * a / d, sh[1] + dy * a / d; nx, ny = -dy / d, dx / d
+	e1, e2 = (px + nx * h, py + ny * h), (px - nx * h, py - ny * h)
+	return e1 if (e1[0] + e1[1]) > (e2[0] + e2[1]) else e2
+
+def draw_arm_soft(im, sh, elbow, hand):
+	"""แขนหน้าแบบ rion_grips.draw_arm แต่เส้นขอบที่ทับตัวใช้เงาของสีข้างใต้ (ขอบดำทับเสื้อดูเป็นรู)"""
+	under = im.copy(); G.draw_arm(im, sh, elbow, hand)
+	u, p = under.load(), im.load(); o = G.OUTL
+	for y in range(64):
+		for x in range(64):
+			if p[x, y][:3] == o and u[x, y][3] and u[x, y][:3] != o:
+				c = u[x, y]; p[x, y] = (int(c[0] * 0.62), int(c[1] * 0.58), int(c[2] * 0.58), 255)
+	return im
+
+def blink(im):
+	p = im.load()
+	for x, y in EYE: p[x, y] = SKIN_C
+	for x in (22, 23, 24): p[x, 26] = LID_C
+	return im
+
+def rion_v2(p):
+	img = PA.rion(p.get('img', 'west'))
+	if p.get('blink'): blink(img)
+	img = G.remove_front_arm(img)
+	hx, hy = p['hand']; e = ik(G.SH_F, (hx, hy))
+	draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
+	if p.get('knife'):
+		ang, L = p['knife']
+		for k, (a2, al) in enumerate(p.get('smear', [])):                       # ภาพเบลอตามแนวฟัน (เก่าสุดจางสุด)
+			ghost = PA.blank(64, 64); RA.knife(ghost, ri(hx), ri(hy), a2, ri(L)); img = PA.put(img, ghost, 0, 0, al)
+		RA.knife(img, ri(hx), ri(hy), ang, ri(L))
+	if p.get('walk') is not None: img = legs_side(img, p['walk'], True, 30, HIP, 63, 4, 64)
+	if ri(p.get('squash', 0)): img = PA.squash(img, 57, ri(p['squash']))
+	ch, hd = ri(p.get('chest', 0)), ri(p.get('head', 0))
+	if ch: img = PA.shift_part(img, lambda x, y: y < 46, 0, ch)
+	if hd > ch: img = PA.shift_part(img, lambda x, y: y < 31 + ch, 0, hd - ch)
+	if ri(p.get('pack', 0)): img = PA.shift_part(img, PACK, 0, ri(p['pack']), keep=True)
+	if ri(p.get('lean', 0)): img = PA.lean(img, p['lean'], HIP, 8)
+	c = PA.blank(64, 64 + TOP)
+	if p.get('shadow'): PA.shadow(c, 32, 62 + TOP, ri(p['shadow']))
+	PA.put(c, img, ri(p.get('dx', 0)), TOP)
+	if p.get('fx'): p['fx'](c)
+	return c
+
+def walk_v2(t):
+	sw = cos(t)                                                               # ขาหน้าก้าวไปหน้า = แขนหน้าแกว่งไปหลัง
+	body = sin(t, 2); lag = sin(t - 0.12, 2)
+	return {'walk': t, 'hand': (23 + 3.5 * sw, 47 - 1.3 * abs(sw)), 'pack': max(-1, min(1, lag - body)), 'blink': 0.70 <= t < 0.74}
+
+def idle_v2(t):
+	b = breath(t); lag = 0.5 - 0.5 * cos(t - 0.1)
+	return dict(b, hand=(23 + 0.6 * sin(t), 47), pack=round(lag) - round(b['chest']), blink=0.55 <= t < 0.6 or 0.63 <= t < 0.67)
+
+ATK_HAND = [(0, (23, 47, 200, 9)), (0.16, (32, 40, -25, 9)), (0.22, (33, 40, -28, 9)), (0.32, (17, 45, -170, 10)),
+	(0.44, (16, 46, -185, 10)), (0.7, (19, 49, -220, 8)), (1.0, (23, 47, 200 - 360, 9))]
+def attack_v2(t):
+	hx, hy, ang, L = kf(t, ATK_HAND)
+	smear = []
+	if 0.22 < t < 0.4:                                                        # ช่วงฟาดเร็ว: ทิ้งภาพมีดย้อนหลัง 3 ชั้น
+		for k, dt in enumerate((0.03, 0.06, 0.09)):
+			smear.append((kf(max(0, t - dt), ATK_HAND)[2], 0.55 - 0.15 * k))
+	return {'hand': (hx, hy), 'knife': (ang, L), 'smear': smear,
+		'dx': kf(t, [(0, 0), (0.16, 3), (0.22, 3), (0.32, -5), (0.44, -5), (0.7, -2), (1, 0)]),
+		'lean': kf(t, [(0, 0), (0.16, 3), (0.22, 3), (0.32, -3), (0.44, -2), (0.7, -1), (1, 0)]),
+		'squash': kf(t, [(0, 0), (0.14, 2), (0.22, 2), (0.3, 0), (0.44, 1), (0.6, 0)]),
+		'pack': kf(t, [(0, 0), (0.18, -1), (0.32, 1), (0.5, 0)]), 'blink': 0.3 <= t < 0.34,
+		'fx': attack_fx(min(0.95, max(0.0, (t - 0.1) / 0.9)), 0) if 0.25 < t < 0.95 else None}
+
+for pid, label, cyc, fn, old in (('rion_walk_west_v2', 'เดินซ้าย · ระดับ 2', 'walk', walk_v2, 'rion_walk_west'),
+		('rion_attack_v2', 'ฟัน · ระดับ 2', 'attack', attack_v2, 'rion_attack'),
+		('rion_idle_west_v2', 'ยืนหายใจซ้าย · ระดับ 2', 1.6, idle_v2, 'rion_idle_west')):
+	pose(pid, 'rion', 'ตัวอย่างระดับ 2', label, cyc, fn); DRAW[pid] = rion_v2; COMPARE[pid] = old
+
 def render(pid):
 	who, group, label, cycle, fn, hold, clip_id = P[pid]
-	draw = rion_frame if who == 'rion' else dog_frame
+	draw = DRAW.get(pid) or (rion_frame if who == 'rion' else dog_frame)
 	frames = [draw(fn(i / (N - 1) if hold else i / N)) for i in range(N)]
 	return PA.dedupe(frames)
 
@@ -303,6 +388,7 @@ if __name__ == '__main__':
 		row['cycle' if not isinstance(cycle, str) else 'timing'] = cycle
 		if hold: row['hold'] = True
 		if clip_id: row['clip_id'] = clip_id
+		if pid in COMPARE: row['compare_with'] = COMPARE[pid]
 		index.append(row)
 	json.dump({'_doc': 'ทุกคลิปในแท็บท่าขยับแบบ 64 เฟรม (tools/sprites/poses64.py) · order = ลำดับภาพไม่ซ้ำที่เล่น · cycle = วินาทีต่อรอบ · timing = รอบจากค่าคงที่ในเกม (walk/idle/attack/hurt/ko)', 'poses': index},
 		open(os.path.join(OUT, 'index.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

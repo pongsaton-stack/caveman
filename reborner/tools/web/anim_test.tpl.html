@@ -273,8 +273,11 @@ function addClip(group, id, label, frames, sec, opt = {}) {
 const CYCLE = { walk: 2 * K.MOVE_TIME, idle: 2 * K.FOE_IDLE_SEC, attack: 4 * K.ATTACK_FRAME_SEC, hurt: 2 * K.ATTACK_FRAME_SEC, ko: 3 * K.ATTACK_FRAME_SEC };
 for (const p of DATA.poses64 || []) {
 	const group = p.clip_id ? p.group : `${p.who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`;
-	addClip(group, p.clip_id || 'pose_' + p.id, `${p.label}`, p.order.map(u => `p64/${p.id}_${u}`), (p.cycle || CYCLE[p.timing]) / p.n,
-		Object.assign({ unique: p.unique }, p.hold ? { hold: true } : {}));
+	const keys = p.order.map(u => `p64/${p.id}_${u}`);
+	const old = p.compare_with && (DATA.poses64 || []).find(x => x.id === p.compare_with);   // ตัวอย่างระดับ 2: เล่นคู่กับท่าเดิม
+	const panels = old ? [{ label: 'ตอนนี้', keys: old.order.map(u => `p64/${old.id}_${u}`) }, { label: 'ระดับ 2 (ใหม่)', keys }] : null;
+	addClip(group, p.clip_id || 'pose_' + p.id, `${p.label}`, keys, (p.cycle || CYCLE[p.timing]) / p.n,
+		Object.assign({ unique: p.unique }, p.hold ? { hold: true } : {}, panels ? { panels } : {}));
 }
 const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
 for (const key of Object.keys(DATA.sprites)) {
@@ -370,6 +373,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.panels) return panelView(c);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
 	drawBg();
 	if (S.onion && c.frames.length > 1) {
@@ -377,6 +381,19 @@ function clipView() {
 		if (pim) spr(pk, (96 - pim.width) / 2, 92 - pim.height, { alpha: 0.32 });
 	}
 	if (im) spr(key, (96 - im.width) / 2, Math.max(0, 92 - im.height));
+	if (S.grid) drawGrid();
+}
+
+// คู่เทียบ: แต่ละช่องเล่นชุดของตัวเองพร้อมกัน เฟรมเท่ากัน รอบเท่ากัน (ซ้าย = ท่าเดิม)
+function panelView(c) {
+	const n = c.panels.length; cv.width = 96 * n; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
+	ctx.font = '7px system-ui, sans-serif';
+	c.panels.forEach((p, k) => {
+		const key = p.keys[S.frame % p.keys.length], im = IMG[key];
+		if (im) spr(key, 96 * k + (96 - im.width) / 2, Math.max(0, 92 - im.height));
+		if (k) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(96 * k - 1, 0, 2, 96); }
+		ctx.fillStyle = '#1c1a16'; ctx.fillText(p.label, 96 * k + 4, 9);
+	});
 	if (S.grid) drawGrid();
 }
 
