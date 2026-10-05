@@ -309,6 +309,10 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   ลอง export_web แล้วเปิดใน Chromium: เกมขึ้นแผนที่ได้ · pck ตอนนี้ 2,457,416 (มี Dialogic) · **ยังไม่เผยแพร่**
 - 5 ต.ค. 2026 **CI บน GitHub** `.github/workflows/reborner.yml` — ทุก push/PR ที่แตะ reborner/: ติดตั้ง xvfb+Mesa → `tools/get_godot.sh` → `tools/run_tests.sh` · พังแล้วแนบ log (tests/out) · จำลองใน clone สะอาด + HOME ว่าง: 16/16 ผ่าน
   `docs/.gdignore`: Godot ไม่นำเข้า docs/ อีก (ไม่มีโค้ดเกมอ่าน docs) — ลบ .import ใน docs ที่เคย commit 40 ไฟล์ · .uid ของสคริปต์เทสต์ commit ตามแบบไฟล์อื่น
+- 5 ต.ค. 2026 **gdUnit4 v6.2.1** (MIT · ตัดโฟลเดอร์ test ของมันออก 2 MB) — `addons/gdUnit4/` + เปิดปลั๊กอินใน editor (แผงรันเทสต์) · ไม่อยู่ใน export เว็บ (exclude_filter · pck +32 ไบต์)
+  เว็บไซต์มันระบุรองรับถึง Godot 4.6.2 แต่ลองบน 4.7.1 แล้ว: import/editor ไม่มี error · เทสต์รันได้
+  เทสต์แบบ gdUnit อยู่ `tests/unit/test_*.gd` (extends GdUnitTestSuite) — ตัวแรก test_formulas.gd 10 ข้อ (สูตร mitigation/AV/threat/ตบทิ้ง · ค่าคาดหวังคิดจากค่าคงที่ ไม่พิมพ์เลข)
+  `tools/run_tests.sh` รัน gdUnit ด้วย (รายงาน tests/out/gdunit) → ตอนนี้ **ผ่าน 17** · พิสูจน์แล้ว assert ผิด = exit 100 → นับไม่ผ่าน
   แนวทางที่ให้ kwan: ขนาด 64px สมูทพอที่ 8-12 ภาพ/วินาที · เดิน 6-8 · วิ่ง 6 · หายใจ 4 · ฟัน 5-6 (มีค้างตอนง้าง/กระทบ) · โดนตี 2-3 · เกินนี้แทบไม่เห็นต่างเพราะขาขยับได้ทีละ 1px
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)

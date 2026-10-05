@@ -5,7 +5,7 @@
 #   GODOT=... tools/run_tests.sh --sim                  + รัน Sim เก็บผลไว้ tests/out/sim.txt
 #   GODOT=... tools/run_tests.sh --shots                + ถ่ายภาพจอจริงทุกสคริปต์ใน tests/shots → tests/out/
 #
-# เทสต์ใน tests/check/ ผ่านเมื่อ: ออกด้วย 0 · ไม่มี SCRIPT ERROR · ไม่มีบรรทัด "FAIL <...>" · ถ้ามี "FAILS n" ต้อง n = 0
+# tests/unit/ = gdUnit4 (ผ่านเมื่อ exit 0) · เทสต์ใน tests/check/ ผ่านเมื่อ: ออกด้วย 0 · ไม่มี SCRIPT ERROR · ไม่มีบรรทัด "FAIL <...>" · ถ้ามี "FAILS n" ต้อง n = 0
 # เทสต์ที่ต้องมีจอ (เปิดฉากจริง/ถ่ายภาพ) ใช้ xvfb-run ถ้ามี ไม่มีก็ข้ามแล้วบอก
 # seed: ลายนิ้วมือศึกที่ seed คงที่ ต้องเท่า tests/seed.md5 — เปลี่ยน core/ หรือ data/ แล้วเลขเปลี่ยน = ต้องอธิบายได้และอัปเดตไฟล์นี้พร้อมเหตุผล
 # เซฟของเทสต์แยกไฟล์ (REBORNER_SAVE) ไม่แตะเซฟจริงของผู้เล่น
@@ -41,6 +41,15 @@ for f in tests/check/*.gd; do
 	[ -n "$fl" ] && [ "$fl" != 0 ] && why="$why FAILS $fl"
 	if [ -z "$why" ]; then echo "ok   $n"; pass=$((pass+1)); else echo "FAIL $n —$why (ดู $log)"; fail=$((fail+1)); failed="$failed $n"; fi
 done
+
+# gdUnit4 (tests/unit/test_*.gd · extends GdUnitTestSuite) — ผ่านเมื่อ exit 0 · รายงาน HTML/XML ใน tests/out/gdunit
+if [ -d addons/gdUnit4 ] && ls tests/unit/test_*.gd >/dev/null 2>&1; then
+	timeout 600 "$G" --headless --path . -s res://addons/gdUnit4/bin/GdUnitCmdTool.gd --ignoreHeadlessMode \
+		-a res://tests/unit -c -rd res://tests/out/gdunit >"$OUT/gdunit.log" 2>&1; rc=$?
+	sum=$(grep -o "Overall Summary:.*" "$OUT/gdunit.log" | sed 's/\x1b\[[0-9;]*m//g' | head -1)
+	if [ $rc = 0 ]; then echo "ok   gdunit · ${sum#Overall Summary: }"; pass=$((pass+1))
+	else echo "FAIL gdunit — exit $rc · ${sum#Overall Summary: } (ดู $OUT/gdunit.log)"; fail=$((fail+1)); failed="$failed gdunit"; fi
+fi
 
 seed=$(timeout 300 "$G" --headless --path . -s tests/seedcheck.gd 2>/dev/null | grep '|' | md5sum | cut -d' ' -f1)
 want=$(cut -d' ' -f1 tests/seed.md5)

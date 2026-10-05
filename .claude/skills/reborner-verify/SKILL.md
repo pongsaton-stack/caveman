@@ -35,7 +35,7 @@ GODOT=$(tools/get_godot.sh --web | tail -1)  # + web export template, only befor
 GODOT=$GODOT tools/run_tests.sh
 ```
 
-Passes only with exit 0 and the last line `== ผ่าน N · ไม่ผ่าน 0`. It runs `tests/check/*` (OK/FAIL contract) and compares the fixed-seed battle fingerprint with `tests/seed.md5`.
+Passes only with exit 0 and the last line `== ผ่าน N · ไม่ผ่าน 0`. It runs `tests/check/*` (OK/FAIL contract), the gdUnit4 suites in `tests/unit/` (new focused tests go here: `test_*.gd`, `extends GdUnitTestSuite`, expected values derived from game constants), and compares the fixed-seed battle fingerprint with `tests/seed.md5`.
 
 - A seed change after touching `core/` or `data/` is expected only if you can explain it. Then update `tests/seed.md5` in the same commit and state old → new md5 and why. An unexplained change is a bug.
 - Tests use a separate save (`REBORNER_SAVE=user://test_save.json`); never point them at the real save.
