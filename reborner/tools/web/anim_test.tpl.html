@@ -277,8 +277,13 @@ for (const who of ['rion', 'dog']) for (const p of (DATA.poses || []).filter(x =
 	if (!DATA.sprites[`pose/${p.id}_0`]) continue;
 	// เทียบเฟรม: รอบเท่ากัน — เดิน 1 รอบ = 2 ช่อง (2 × MOVE_TIME) · หายใจ 1 รอบ = 2 × FOE_IDLE_SEC · ฝั่งซ้ายเล่นชุดเดิมเฟรมละ 2 จังหวะ
 	const cyc = { walk8: 2 * K.MOVE_TIME, idle4: 2 * K.FOE_IDLE_SEC }[p.timing];
-	addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, p.order.map(i => `pose/${p.id}_${i}`), cyc ? cyc / p.n : p.sec,
-		p.old_n ? { pair: p.order.map(i => `pose/${p.id}_old${Math.floor(i * p.old_n / p.n)}`), pairLabel: [`${p.old_n} เฟรม (ตอนนี้)`, `${p.n} เฟรม (ใหม่)`] } : {});
+	// ชุด 32 เฟรม: คลิปเดินตามลำดับ 32 · ช่องอื่นเลือกเฟรมตามสัดส่วนเวลา (รอบเท่ากันทุกช่อง)
+	const N = p.x_n || p.n, at = (n, i) => Math.floor(i * n / N);
+	const main = p.x_n ? p.x_order.map(i => `pose/${p.id}_x${i}`) : p.order.map(i => `pose/${p.id}_${i}`);
+	const panels = p.old_n ? [{ label: `${p.old_n} เฟรม (ตอนนี้)`, keys: main.map((_, i) => `pose/${p.id}_old${at(p.old_n, i)}`) },
+		{ label: `${p.n} เฟรม`, keys: main.map((_, i) => `pose/${p.id}_${p.order[at(p.n, i)]}`) }] : null;
+	if (panels && p.x_n) panels.push({ label: `${p.x_n} เฟรม (ภาพไม่ซ้ำ ${p.x_unique})`, keys: main });
+	addClip(`${who === 'rion' ? 'Rion' : 'หมา'} · ${p.group} (ร่าง)`, 'pose_' + p.id, p.label, main, cyc ? cyc / N : p.sec, panels ? { panels } : {});
 }
 const monName = Object.fromEntries(DATA.monsters.map(m => [m.monster_id, m.name_th]));
 for (const key of Object.keys(DATA.sprites)) {
@@ -374,7 +379,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
-	if (c.pair) return pairView(c, key, im);
+	if (c.panels) return panelView(c);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
 	drawBg();
 	if (S.onion && c.frames.length > 1) {
@@ -385,15 +390,16 @@ function clipView() {
 	if (S.grid) drawGrid();
 }
 
-// คู่เทียบ: ซ้าย = ชุดเดิม · ขวา = ชุดเฟรมละเอียด เล่นพร้อมกัน รอบเท่ากัน
-function pairView(c, key, im) {
-	cv.width = 192; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
-	const ok = c.pair[S.frame], oim = IMG[ok];
-	if (oim) spr(ok, (96 - oim.width) / 2, 92 - oim.height);
-	if (im) spr(key, 96 + (96 - im.width) / 2, 92 - im.height);
-	ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(95, 0, 2, 96);
-	ctx.font = '7px system-ui, sans-serif'; ctx.fillStyle = '#1c1a16';
-	ctx.fillText(c.pairLabel[0], 4, 9); ctx.fillText(c.pairLabel[1], 100, 9);
+// เทียบเฟรม: แต่ละช่องเล่นชุดของตัวเองพร้อมกัน รอบเท่ากัน (ซ้าย = ชุดในเกม)
+function panelView(c) {
+	const n = c.panels.length; cv.width = 96 * n; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
+	ctx.font = '7px system-ui, sans-serif';
+	c.panels.forEach((p, k) => {
+		const key = p.keys[S.frame], im = IMG[key];
+		if (im) spr(key, 96 * k + (96 - im.width) / 2, 92 - im.height);
+		if (k) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(96 * k - 1, 0, 2, 96); }
+		ctx.fillStyle = '#1c1a16'; ctx.fillText(p.label, 96 * k + 4, 9);
+	});
 	if (S.grid) drawGrid();
 }
 
