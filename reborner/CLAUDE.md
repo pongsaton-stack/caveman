@@ -307,6 +307,8 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - 5 ต.ค. 2026 **สกิล reborner-verify** (`.claude/skills/reborner-verify/SKILL.md`) — ขั้นตอนตรวจตามชนิดงาน (เทสต์ · seed · Sim ก่อน/หลัง · ภาพจริง · หน้า animation test · export เว็บ · สิ่งที่ต้องใส่ในรายงาน)
   `tools/get_godot.sh [dir] [--web]` โหลด Godot 4.7.1 (ตรวจแล้วไฟล์ตรงกับตัวที่ใช้) + template เว็บ · `tools/export_web.sh <out>` export + gzip + เปลี่ยนชื่อ + fileSizes ในสำเนา (ไม่แก้ tools/web/reborner.html)
   ลอง export_web แล้วเปิดใน Chromium: เกมขึ้นแผนที่ได้ · pck ตอนนี้ 2,457,416 (มี Dialogic) · **ยังไม่เผยแพร่**
+- 5 ต.ค. 2026 **CI บน GitHub** `.github/workflows/reborner.yml` — ทุก push/PR ที่แตะ reborner/: ติดตั้ง xvfb+Mesa → `tools/get_godot.sh` → `tools/run_tests.sh` · พังแล้วแนบ log (tests/out) · จำลองใน clone สะอาด + HOME ว่าง: 16/16 ผ่าน
+  `docs/.gdignore`: Godot ไม่นำเข้า docs/ อีก (ไม่มีโค้ดเกมอ่าน docs) — ลบ .import ใน docs ที่เคย commit 40 ไฟล์ · .uid ของสคริปต์เทสต์ commit ตามแบบไฟล์อื่น
   แนวทางที่ให้ kwan: ขนาด 64px สมูทพอที่ 8-12 ภาพ/วินาที · เดิน 6-8 · วิ่ง 6 · หายใจ 4 · ฟัน 5-6 (มีค้างตอนง้าง/กระทบ) · โดนตี 2-3 · เกินนี้แทบไม่เห็นต่างเพราะขาขยับได้ทีละ 1px
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)
