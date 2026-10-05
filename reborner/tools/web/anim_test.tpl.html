@@ -326,6 +326,14 @@ if (DATA.sprites['smp/slime_v3']) {
 	addClip('ตัวอย่างเจนรายตัว (ร่าง ยังไม่เข้าเกม)', 'smp_slime_v3_row', 'Slime v3 แถวท่า (ยืน·หายใจ·โจมตี·โดนตี)', [0, 1, 2, 3].map(i => 'smp/slime_v3_row' + i), 0.3, { tab: 'monsters' });
 }
 
+// อาวุธจากชีต "Weapon Collection 210" ของ kwan (ตัดทีละช่องด้วย tools/sprites/weapons_sheet_cut.py) — เล่นคู่ ขนาดชีต | 32px
+const WSH_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล', W: 'อาวุธเดิม W301–W310' };
+for (const w of (DATA.weapon_sheet || [])) {
+	const k = 'wsh/' + w.code;
+	if (!DATA.sprites[k]) continue;
+	addClip('ชีตอาวุธ 210 · ' + WSH_FAM[w.family] + ' (ร่าง ยังไม่เข้าเกม)', 'wsh_' + w.code, w.code + (w.tier ? ' · T' + w.tier : '') + (w.name ? ' ' + w.name : ''), [k], 1,
+		{ tab: 'arms', panels: [{ label: 'ขนาดชีต', keys: [k + '_src'] }, { label: '32px', keys: [k] }] });
+}
 // อาวุธร่าง (weapons_full.json · วาดด้วย tools/sprites/weapons.py) — ภาพนิ่ง กลุ่มละสาย
 for (const w of (DATA.weapons || [])) {
 	if (!DATA.sprites['wpn/' + w.id]) continue;
@@ -1174,7 +1182,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
