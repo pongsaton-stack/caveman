@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw
 import rion_grips as G
 import rion_anim as RA
 import poses_anim as PA
+import rion_parts as RP
 
 ROOT = G.ROOT
 OUT = os.path.join(ROOT, 'assets/sprites/poses64_draft')
@@ -72,6 +73,8 @@ def rion_frame(p):
 	if p.get('blink') and d == 'west' and not p.get('img'): blink(img)
 	if p.get('arm_hand') and not (p.get('arm') or p.get('barm')) and d == 'west' and not p.get('img'):   # แขนแกว่ง (ชั้นสมจริง) · ศอกจาก ik
 		img = G.remove_front_arm(img); hx, hy = p['arm_hand']; e = ik(G.SH_F, (hx, hy)); draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
+	if p.get('arm_swing') is not None and d in ('south', 'north', 'east') and not p.get('img'):   # แกว่งแขนทิศอื่น (rion_parts: แยกชิ้นแขนแล้วเฉือน)
+		img = RP.swing_arms(img, d, p['arm_swing'], p.get('arm_lift', 1.0))
 	if p.get('arm') or p.get('barm'):
 		img = G.remove_front_arm(img)
 		if p.get('barm'): b = p['barm']; G.draw_arm(img, G.SH_B, (ri(b[0]), ri(b[1])), (ri(b[2]), ri(b[3])), back=True)
@@ -380,7 +383,7 @@ for pid, label, cyc, fn, old in (('rion_walk_west_v2', 'เดินซ้าย
 # 1) แรงเฉื่อย: หัว / เป้ / หางหมา เป็นสปริงหน่วงต่อลำตัว — ตัวขยับ ส่วนเหล่านี้ค้างที่เดิมก่อน แล้วถูกดึงตาม เลยไปนิด แล้วเด้งกลับ (follow-through)
 #    ตำแหน่งลำตัวคิดจาก dx · dy · ย่อ · อก · เอน ของท่า · ท่าวน = จำลอง 2 รอบเอารอบหลัง · ท่าค้างท้าย = เริ่มนิ่ง · เปลี่ยนทิศ/หมุน/ล้ม = รีเซ็ต
 # 2) หายใจ: ท่าที่ไม่ได้กำหนดอกเอง (ไม่นอน ไม่หมุน) · ประมาณ 1 ครั้งต่อ BREATH_SEC · ถ่ายน้ำหนัก (เอนช้า ๆ) ตอนยืน
-# 3) กะพริบตา: ท่าหันซ้ายที่ยาวพอ · 4) แขนแกว่งสวนขา: เดิน/วิ่งหันซ้ายที่ไม่ได้กำหนดแขนเอง (ศอกจาก ik แบบริก)
+# 3) กะพริบตา: ท่าหันซ้ายที่ยาวพอ · 4) แขนแกว่งสวนขา: เดิน/วิ่งที่ไม่ได้กำหนดแขนเอง — หันซ้าย = ศอกจาก ik แบบริก · ทิศอื่น = แยกชิ้นแขน (rion_parts.swing_arms)
 # ค่าทั้งหมดเป็นค่าภาพ ไม่ใช่ค่าเกม
 SPRING_K, SPRING_C, LAG_MAX, BREATH_SEC = 0.32, 0.42, 2.0, 1.6
 CYCLE_SEC = {'walk': 0.6, 'idle': 1.6, 'attack': 0.4, 'hurt': 0.2, 'ko': 0.3}   # รอบโดยประมาณของท่าที่ใช้ค่าคงที่เกม (ใช้นับลมหายใจ/กะพริบเท่านั้น)
@@ -419,6 +422,9 @@ def realism(pid, who, cycle, hold, ps):
 			if p.get('walk') is not None and p.get('dir', 'west') == 'west' and not (p.get('arm') or p.get('barm')):
 				sw = cos(p['walk']); amp = 3.5 + 0.8 * (p.get('kmax', 4) - 4)
 				q['arm_hand'] = (23 + amp * sw, 47 - 1.3 * abs(sw) - (1 if p.get('kmax', 4) > 4 else 0))   # ขาหน้าก้าวไปหน้า = แขนหน้าแกว่งไปหลัง · วิ่ง = งอแขนสูงขึ้น
+			if p.get('walk') is not None and p.get('dir', 'west') in ('south', 'north', 'east') and not (p.get('arm') or p.get('barm')):
+				d = p['dir']; ph = p['walk'] % 1                                                       # เฟสเดียวกับขา: หันขวา legs_side (cos) · หน้า/หลัง legs_front (sin)
+				q['arm_swing'] = cos(ph) if d == 'east' else sin(ph); q['arm_lift'] = 1.5 if p.get('kmax', 4) > 4 else 1.0
 		else:
 			q['hx'] = q.get('hx', 0) + head[0][i] * 0.6; q['hy'] = q.get('hy', 0) + head[1][i] * 0.5
 			q['tx'] = q.get('tx', 0) + low[0][i] * 0.9; q['ty'] = q.get('ty', 0) + low[1][i] * 0.7
