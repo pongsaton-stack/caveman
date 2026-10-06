@@ -111,6 +111,11 @@ def sprites():
 		out['vxs/sheet'] = webp(os.path.join(ROOT, 'docs/art-bible/vfx/vfx_protagonist_sheet.png'), 85)
 		for f in sorted(os.listdir(vd)):
 			if f.startswith('atlas_') and f.endswith('.png'): out['vxs/' + f[:-4]] = webp(os.path.join(vd, f), 85)
+	# แสงจากชีต VFX ขนาดเกม (tools/sprites/vfx_game_fx.py) — พิกเซลอาร์ต png
+	gd2 = os.path.join(SPR, 'vfx_fx_draft')
+	if os.path.isdir(gd2):
+		for f in sorted(os.listdir(gd2)):
+			if f.endswith('.png'): out['vfg/' + f[:-4]] = png(os.path.join(gd2, f))
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -201,6 +206,7 @@ def main(out_path):
 		'sheet_cut': sheet_cut(),
 		'skill_sheet': json.load(open(os.path.join(SPR, 'skills_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'skills_sheet_draft/index.json')) else None,
 		'vfx_sheet': json.load(open(os.path.join(SPR, 'vfx_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_sheet_draft/index.json')) else None,
+		'vfx_fx': json.load(open(os.path.join(SPR, 'vfx_fx_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_fx_draft/index.json')) else None,
 		'weapon_stack': json.load(open(os.path.join(SPR, 'weapons_stack_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_stack_draft/index.json')) else None,
 		'weapon_sheet': json.load(open(os.path.join(SPR, 'weapons_sheet_draft/index.json'), encoding='utf-8'))['items'] if os.path.exists(os.path.join(SPR, 'weapons_sheet_draft/index.json')) else [],
 		'compendium': compendium(),
@@ -216,6 +222,9 @@ def main(out_path):
 			'MOVE_TIME': const('world/Overworld.gd', 'MOVE_TIME'),
 			'FX_SEC': const('world/BattleScreen.gd', 'FX_SEC'),
 			'ULT_PROF': const('world/BattleScreen.gd', 'ULT_PROF'),
+			'HERO_X': const('world/BattleScreen.gd', 'HERO_X'),
+			'STAGE_FEET_Y': const('world/BattleScreen.gd', 'STAGE_FEET_Y'),
+			'FOE_AREA': [float(v) for v in re.search(r'const FOE_AREA\s*:?=\s*Vector2\(([0-9.]+),\s*([0-9.]+)\)', open(os.path.join(ROOT, 'world/BattleScreen.gd'), encoding='utf-8').read()).groups()],
 		},
 	}
 	tpl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'anim_test.tpl.html'), encoding='utf-8').read()

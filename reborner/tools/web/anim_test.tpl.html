@@ -178,7 +178,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSksheet" hidden>
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
-			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button></p>
+			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button></p>
 			<div class="clips" id="skGroups"></div>
 		</section>
 
@@ -411,6 +411,54 @@ for (const p of ((VXS || {}).panels || [])) {   // ภาพนิ่งต่�
 	addClip('VFX ตัวเอก · ภาพนิ่ง (กดเลื่อนทีละชิ้น)', `vx_${p.id}`, `${p.name} · ${pcs.length} ชิ้น`, pcs.map(() => 'vxs/sheet'), VX.STILL_SEC, { tab: 'vxsheet', vx: p, pieces: pcs });
 }
 function IMG_OK(k) { return !!DATA.sprites[k]; }
+// ทดลองใส่เกม (kwan 6 ต.ค. เลือก "แสงโจมตี+โดนตี" · "เอาลงเทสก่อน"): เวทีขนาดจริงของจอสู้ 384×216 ตำแหน่งจากค่าคงที่ใน BattleScreen.gd
+// บน = ตอนนี้ในเกม (_fx_slash: โค้งเส้น 3 ชั้น ขยาย ×1.6 จางใน FX_SEC) · ล่าง = แสงจากชีตเป็นพิกเซล (vfx_game_fx.py) + ประกายย้อมสีสาย
+const VXG = { N: 30, SEC: 0.04, ATK: 4, HIT: 9, FLIP: 0.08, W: 384, H: 216 };
+if (DATA.vfx_fx && DATA.sprites['vfg/SL_hit_0']) {
+	addClip('ทดลองใส่เกม · ขนาดจริง 384×216 (ยังไม่เข้าเกม)', 'vxg_slash', 'คม · ตอนนี้ vs แสงจากชีต', Array.from({ length: VXG.N }, (_, f) => vxgRion(f)), VXG.SEC, { tab: 'vxsheet', vxg: 'slash' });
+	const g = GROUPS.pop(); GROUPS.splice(GROUPS.findIndex(x => x.tab === 'vxsheet'), 0, g);   // กลุ่มนี้ขึ้นหัวแท็บ
+}
+function vxgRion(f) {   // ท่าฟันของ Rion ในจอสู้ = west_a0–a3 ทีละ ATTACK_FRAME_SEC
+	if (f < VXG.ATK) return 'rion/west';
+	const i = Math.floor((f - VXG.ATK) * VXG.SEC / K.ATTACK_FRAME_SEC); return i < 4 ? `rion/west_a${i}` : 'rion/west';
+}
+function vxgView(c) {
+	const { W, H } = VXG, f = S.frame, t = (f - VXG.HIT) * VXG.SEC, p = t / K.FX_SEC, col = '#ff5a4a';   // สีสายคม = FX_COLOR["คม"]
+	cv.width = W; cv.height = H * 2; ctx.imageSmoothingEnabled = false;
+	const fim = IMG['mon/M01'], fw = fim ? fim.width : 48, fh = fim ? fim.height : 48;
+	const fx0 = K.FOE_AREA[0] + (K.FOE_AREA[1] - K.FOE_AREA[0] - fw) / 2, fy0 = K.STAGE_FEET_Y - fh, at = { x: fx0 + fw * 0.5, y: fy0 + fh * 0.55 };
+	[0, 1].forEach(k => {
+		ctx.save(); ctx.translate(0, H * k); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+		ctx.fillStyle = '#a7b5a0'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = '#d4b08a'; ctx.fillRect(0, K.STAGE_FEET_Y - 4, W, H); ctx.fillStyle = '#a2927b'; ctx.fillRect(0, K.STAGE_FEET_Y - 4, W, 1);
+		const ht = t >= 0 && t < 0.3 ? t / 0.3 : -1;   // _hit_flash: สว่างวาบ 0.25 วิ + สั่น 0.3 วิ
+		if (fim) spr('mon/M01', fx0 + (ht >= 0 ? Math.sin(ht * 40) * 3 * (1 - ht) : 0), fy0, { flash: t >= 0 && t < 0.25 ? 1.4 * (1 - t / 0.25) : 0 });
+		spr(c.frames[f], K.HERO_X, 34);
+		if (t >= 0 && p < 1) {
+			if (k === 0) {   // ตอนนี้: จำลอง _fx_slash ทีละเส้น (หันซ้าย d = -1 เพราะ Rion อยู่ขวาของเป้า)
+				const sc = 0.7 * (1 + 0.6 * p); ctx.save(); ctx.globalAlpha = 1 - p; ctx.lineCap = ctx.lineJoin = 'round';
+				for (const [cl, w, r] of [['#992f27', 9, 26], [col, 6, 26], ['rgba(255,255,255,.95)', 2, 25]]) {
+					ctx.strokeStyle = cl; ctx.lineWidth = w * sc; ctx.beginPath();
+					for (let i = 0; i < 9; i++) { const a = (-70 + i * 20) * Math.PI / 180, x = at.x + Math.cos(a) * r * sc, y = at.y + Math.sin(a) * r * sc; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+					ctx.stroke();
+				}
+				ctx.restore();
+			} else {   // ใหม่: เสี้ยวฟันจากชีต ทีละภาพ FLIP วิ แล้วภาพสุดท้ายค้างจาง · พลิกให้หันซ้าย · ขนาด 1:1 พิกเซลคม
+				const set = DATA.vfx_fx.sets.SL_hit, i = Math.min(set.frames.length - 1, Math.floor(t / VXG.FLIP)), im = vxsMap('vfg/' + set.frames[i], col);
+				const fade = t < VXG.FLIP * set.frames.length ? 1 : 1 - (t - VXG.FLIP * set.frames.length) / (K.FX_SEC - VXG.FLIP * set.frames.length);
+				if (im) { ctx.save(); ctx.globalAlpha = Math.max(0, fade); ctx.translate(Math.round(at.x + im.width / 2), Math.round(at.y - im.height / 2)); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0); ctx.restore(); }
+				const sp = vxsMap('vfg/' + DATA.vfx_fx.sets.spark.frames[0], col);
+				if (sp && t < 0.25) { const s2 = 1; ctx.save(); ctx.globalAlpha = 1 - t / 0.25;   // วาดปกติ 1:1 (บวกแสงบนพื้นสว่างของจอสู้ = ขาวโพลน)
+					ctx.drawImage(sp, Math.round(at.x - sp.width * s2 / 2), Math.round(at.y - sp.height * s2 / 2), sp.width * s2, sp.height * s2); ctx.restore(); }
+			}
+		}
+		ctx.fillStyle = 'rgba(20,18,24,.7)'; ctx.fillRect(0, 0, W, 14); ctx.font = '9px system-ui, sans-serif'; ctx.fillStyle = '#f0ece4';
+		ctx.fillText(k ? 'ใหม่ · แสงจากชีต (พิกเซล 1:1) + ประกาย ย้อมสีสาย' : 'ตอนนี้ในเกม · _fx_slash (เส้นโค้ด)', 5, 10);
+		ctx.restore();
+	});
+	ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(0, H - 1, W, 2);
+	if (S.grid) drawGrid();
+}
+
 function vxClip(x0, y0, w, h, fn) { ctx.save(); ctx.beginPath(); ctx.rect(x0, y0, w, h); ctx.clip(); fn(); ctx.restore(); }
 function vxCrop(fr, cx, feet, alpha, flipAt) {   // ครอปเฟรมจากชีต วางให้จุดยึด (ax) อยู่ที่ cx · ขอบล่างเฟรม = เท้า
 	const im = IMG['vxs/sheet'], [x0, y0, x1, y1] = fr.box, k = VX.K; if (!im || alpha <= 0) return;
@@ -496,6 +544,53 @@ function vfxText(txt, x, y, f0, f, col) {   // ตัวหนังสือเ
 }
 const VFX_OC = document.createElement('canvas');
 const VFX_OC2 = document.createElement('canvas');
+// ── แสงจากชีต VFX ตัวเอก ซ้อนในสกิลจากชีต (kwan 6 ต.ค. "นำแทป สกิลจากชีต กับ VFX ตัวเอก มาทำงานร่วมกันให้ออกมาเนียนที่สุด") ──
+// ชุดภาพโทนเทาจาก tools/sprites/vfx_game_fx.py ย้อมด้วยสีของท่าเอง (it.colors) → เข้ากับแสงสกิลทุกท่า · พิกเซล 1:1 · พลิกให้หันซ้าย (เป้าอยู่ซ้าย)
+const VXS_MAP = new Map();
+function vxsMap(key, col) {   // ไล่สีตามความสว่าง: มืด = สีท่าเข้ม · กลาง-สว่าง = สีท่า · แกนสว่างสุด (บนสุด 15%) = ขาว (ขาวเยอะกว่านี้ ซ้อนกับจอวาบแล้วขาวโพลน)
+	const id = key + col; if (VXS_MAP.has(id)) return VXS_MAP.get(id);
+	const im = IMG[key]; if (!im || !im.complete || !im.naturalWidth) return null;
+	const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+	const d = x.getImageData(0, 0, c.width, c.height), n = parseInt(col.slice(1), 16), C = [n >> 16, (n >> 8) & 255, n & 255];
+	for (let i = 0; i < d.data.length; i += 4) { if (!d.data[i + 3]) continue; const v = d.data[i] / 255;
+		for (let k = 0; k < 3; k++) d.data[i + k] = Math.round(v < 0.85 ? C[k] * (0.3 + 0.7 * v / 0.85) : C[k] + (255 - C[k]) * (v - 0.85) / 0.15); }
+	x.putImageData(d, 0, 0); VXS_MAP.set(id, c); return c;
+}
+function vxsDraw(set, i, col, x, y, o = {}) {   // วางภาพที่ i ของชุด · จุดยึด กลาง (หรือกลางล่างถ้า o.foot) · พลิกซ้าย-ขวา · o.glow = เรืองซ้อนแบบบวกแสง
+	const st = DATA.vfx_fx && DATA.vfx_fx.sets[set]; if (!st || o.a <= 0) return;
+	const im = vxsMap('vfg/' + st.frames[Math.max(0, Math.min(st.frames.length - 1, i))], col); if (!im) return;
+	const s = o.s || 1, w = im.width * s, h = im.height * s, X = Math.round(x - w / 2), Y = Math.round(o.foot ? y - h : y - h / 2);
+	ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = Math.min(1, o.a ?? 1);
+	ctx.translate(X + w, Y); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0, w, h);
+	if (o.glow) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, (o.a ?? 1) * o.glow); ctx.drawImage(im, 0, 0, w, h); }
+	ctx.restore();
+}
+const VXS_COL = {};
+function vxsCol(it, col) {   // สีย้อม = สีของท่าที่สว่าง×อิ่มตัวมากสุด ยกให้สว่างพอ (สีแรกในชุดบางท่าเป็นน้ำตาลเข้ม ย้อมแล้วกลืนพื้น)
+	if (VXS_COL[it.code]) return VXS_COL[it.code];
+	let best = col[0], bs = -1;
+	for (const h of col) { const n = parseInt(h.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255], mx = Math.max(...c), sc = mx * (mx - Math.min(...c)) / Math.max(1, mx); if (sc > bs) { bs = sc; best = c; } }
+	if (typeof best === 'string') return VXS_COL[it.code] = best;
+	const mx = Math.max(...best), k = mx < 220 ? 220 / Math.max(1, mx) : 1;
+	return VXS_COL[it.code] = '#' + best.map(v => Math.min(255, Math.round(v * k)).toString(16).padStart(2, '0')).join('');
+}
+function vxsLayer(it, t, Hx, Hy, T, foot, hits, col) {   // เวลา t = เฟรม VFX (หลังหยุดภาพ) · REL ปล่อย · HIT กระทบ
+	if (!S.vxs || !DATA.vfx_fx) return;
+	const fam = it.family, HIT = VFX.HIT + 1, REL = VFX.REL, c0 = vxsCol(it, col), flip = (set, t0, step, hold, x, y, o = {}) => {   // เล่นทีละภาพ step เฟรม แล้วภาพสุดท้ายค้างจางใน hold เฟรม
+		const d = t - t0, n = DATA.vfx_fx.sets[set].frames.length; if (d < 0 || d >= n * step + hold) return;
+		vxsDraw(set, Math.floor(d / step), c0, x, y, Object.assign({}, o, { a: d < n * step ? 1 : 1 - (d - n * step) / hold }));
+	};
+	if (fam === 'SL') flip('SL_hit', HIT, 2, 5, T.x, T.y, { glow: 0.12 });
+	else if (fam === 'PC') { const p = (t - REL) / (HIT - REL);
+		if (p >= 0 && t < HIT + 2) vxsDraw('PC_fly', Math.floor(Math.min(1, p) * 2.99), c0, lerp(Hx - 24, T.x + 8, p), lerp(Hy, T.y, p), { glow: 0.12, a: t < HIT ? 1 : 0.5 });
+		flip('PC_hit', HIT, 3, 4, T.x, T.y, { glow: 0.15 }); }
+	else if (fam === 'CR') flip('CR_hit', HIT, 2, 6, T.x, foot + 2, { foot: true, glow: 0.12 });
+	else if (fam === 'BD') hits.forEach((h, k) => flip('BD_hit', h, 1, 2, T.x + [-6, 6, 0][k], T.y + [-4, 4, 0][k], { glow: 0.12 }));
+	else if (fam === 'ST') { for (const m of [REL, REL + 2, REL + 4]) { const p = (t - m) / (HIT - REL); if (p >= 0 && p <= 1) vxsDraw('ST_fly', 0, c0, lerp(Hx - 10, T.x + 6, p), lerp(Hy - 3, T.y, p), { glow: 0.2 }); }
+		flip('ST_hit', HIT, 3, 5, T.x, T.y, { glow: 0.12 }); }
+	else if (fam === 'DV') flip('DV_hit', HIT, 3, 6, T.x, foot + 2, { foot: true, glow: 0.12 });
+	for (const h of hits) { const d = t - h - 1; if (d >= 0 && d < 5) vxsDraw('spark', 0, c0, T.x, T.y, { a: 1 - d / 5 }); }   // ประกายตอนโดนทุกครั้ง
+}
 function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (มุมซ้ายบนของ Rion) · pose · target · bg() · f (เฟรมของ VFX) · ตัวเลือกแนว RS3
 	const it = c.skill, f = L.f, t = vTime(f), fam = it.family, [W0, H0] = L.size, fx = IMG['skf/' + it.code], col = it.colors || ['#ffffff'];
 	const Hx = L.hand[0], Hy = L.hand[1], T = { x: L.target.x, y: L.target.foot - 22 }, HIT = VFX.HIT, REL = VFX.REL, rel = (t - REL) / (HIT - REL);
@@ -586,6 +681,7 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	// ถ่านไฟลอยค้างหลังกระทบ
 	if (t > HIT && t < HIT + 18) { const r = vRng(vHash(it.code) + 21); for (let i = 0; i < 16; i++) { const ph = (t - HIT) / 18, sx0 = T.x - 40 + r() * 80, sp = 0.6 + r();
 		vfxDot(sx0 + Math.sin((t + i) * 0.5) * 3, T.y + 20 - ph * 40 * sp, 1, col[i % col.length], (1 - ph) * (0.5 + 0.5 * Math.sin(t * 1.3 + i))); } }
+	vxsLayer(it, t, Hx, Hy, T, L.target.foot, hits, col);
 	if (L.party) L.party(); spr(L.pose, L.rion[0], L.rion[1]);
 	ctx.restore();
 	vfxText(VFX.TEXT[fam], T.x + 8, T.y - 30, HIT, f, col[0]);   // นอกกล้อง: ไม่ซูม/ไม่สั่น จึงไม่ล้นขอบ
@@ -1028,7 +1124,7 @@ const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
-	foe: 'M01', count: 3, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
+	foe: 'M01', count: 3, vxs: true, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
 
 // ── วาด ──
@@ -1068,6 +1164,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.vxg) return vxgView(c);
 	if (c.vx) return vxView(c);
 	if (c.panels) return panelView(c);
 	if (c.skill) return sheetSkillView(c);
@@ -2123,6 +2220,7 @@ function boot() {
 	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
+	$('btnVxs').onclick = () => { S.vxs = !S.vxs; $('btnVxs').setAttribute('aria-pressed', String(S.vxs)); };
 	$('btnGlim').onclick = () => { S.glim = !S.glim; $('btnGlim').setAttribute('aria-pressed', String(S.glim)); };
 	$('btnPlay').onclick = () => { S.playing = !S.playing; updPlay(); };
 	const step = d => { if (!isClip()) return; S.playing = false; updPlay(); const n = CLIPS[S.clip].frames.length; S.frame = (S.frame + d + n) % n; syncFrame(); };
