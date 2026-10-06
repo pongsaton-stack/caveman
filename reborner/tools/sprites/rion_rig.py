@@ -18,6 +18,9 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rion_grips as G
 import weapons_held as WH
+import poses_anim as PA
+import rion_anim as RA
+import poses64 as P64
 
 ROOT = G.ROOT
 SHEET = os.path.join(ROOT, 'assets/sprites/weapons_sheet_draft')
@@ -41,6 +44,19 @@ KEYS = {
 	'point': [(0.0, 0, 0, (24, 45), (23, 47), 0), (0.25, 0, 0, (24, 41), (23, 37), 0), (0.45, -2, 0, (20, 41), (15, 40), 0),
 		(0.7, -2, 0, (20, 41), (15, 40), 0), (1.0, 0, 0, (24, 45), (23, 47), 0)],
 }
+# สรีระต่อคีย์ (kwan 6 ต.ค. "ร่างกายแข็ง ไม่เป็นธรรมชาติ ปรับสรีระให้เข้ากับทุกแอกชั่น") — เวลาเดียวกับ KEYS ทีละตัว
+#   lean เอนช่วงบน (+ = ไปหลัง/ขวา − = โถมไปหน้า) · sq ย่อเข่า (แถว) · st ก้าวขา (+1 = ขาหน้าก้าวไปหน้าเต็ม −1 = ถอยขาหน้า) ·
+#   ch อกลง · hd หัวลง (หัวตามทีหลังอก) · hx หัวไปหน้า (−) · pk เป้กระเด้ง (+ ลง) · ทุกท่าหายใจเบา ๆ ตอนยืน + กะพริบตาตอนฟาด
+Z = dict(lean=0, sq=0, st=0.25, ch=0, hd=0, hx=0, pk=0)
+def B(**k): return dict(Z, **k)
+BODY = {
+	'slash': [Z, Z, B(lean=3, sq=2, st=-0.5, ch=1, pk=-1), B(lean=-3, sq=2, st=1, hd=1, hx=-1, pk=1), B(lean=-2, sq=1, st=1, hd=1, pk=1), Z],
+	'thrust': [Z, Z, B(lean=3, sq=1, st=-0.6, ch=1, pk=-1), B(lean=-4, sq=2, st=1, hx=-1, pk=1), B(lean=-3, sq=2, st=1, hd=1), Z],
+	'swing2': [Z, Z, B(lean=4, sq=2, st=-0.5, ch=1, pk=-1), B(lean=-4, sq=3, st=1, hd=1, hx=-1, pk=1), B(lean=-3, sq=3, st=1, hd=1, pk=1), B(lean=-1, sq=1, st=0.6), Z],
+	'aim': [Z, B(sq=1, st=0.6), B(lean=1, sq=1, st=0.8, hx=-1), B(lean=3, sq=1, st=0.8, hd=1, pk=1), B(lean=1, sq=1, st=0.8, hx=-1), Z],
+	'punch': [B(sq=1, st=0.5), B(sq=1, st=0.5), B(lean=2, sq=2, st=-0.3, ch=1, pk=-1), B(lean=-3, sq=1, st=1, hx=-1, pk=1), B(lean=-2, sq=1, st=1, hd=1), B(sq=1, st=0.5)],
+	'point': [Z, B(lean=1, st=0.4, ch=-1), B(lean=-2, sq=1, st=0.9, hx=-1, pk=1), B(lean=-2, sq=1, st=0.9), Z],
+}
 # มือหลังจับด้ามด้วยในท่าสองมือ (ชดเชยจากมือหน้า) · ประทับปืน มือหลังประคองใต้ลำ
 BACK = {'swing2': (5, 0), 'aim': (5, 1)}
 BEHIND_ANG = (15, 110)   # อาวุธชี้ขึ้น/ไปหลัง (มุมจอในช่วงนี้) = อยู่หลังตัว (พาดบ่า · ง้าง) · รอบแรกใช้ช่วงเวลา แล้วอาวุธหายหลังหัว
@@ -55,13 +71,45 @@ def lerp_ang(a, b, t):
 	d = (b - a + 540) % 360 - 180; return a + d * t
 
 def pose_at(group, t):
-	ks = KEYS[group]
-	for (t0, *a), (t1, *b) in zip(ks, ks[1:]):
+	"""คืน (dx, dy, ศอก, มือ, มุม, สรีระ) ที่เวลา t · ช่วงสั้น (ฟาด ≤ 0.15) = เร็วคงที่ · ช่วงยาว = นุ่มหัวท้าย"""
+	ks, bs = KEYS[group], BODY[group]
+	for k in range(len(ks) - 1):
+		(t0, *a), (t1, *b) = ks[k], ks[k + 1]
 		if t0 <= t <= t1:
-			u = ease((t - t0) / max(1e-6, t1 - t0)) if t1 - t0 > 0.15 else (t - t0) / max(1e-6, t1 - t0)   # ช่วงสั้น (ฟาด) = เร็วคงที่ ช่วงยาว = นุ่ม
+			u = ease((t - t0) / max(1e-6, t1 - t0)) if t1 - t0 > 0.15 else (t - t0) / max(1e-6, t1 - t0)
 			lp = lambda x, y: x + (y - x) * u
-			return (lp(a[0], b[0]), lp(a[1], b[1]), (lp(a[2][0], b[2][0]), lp(a[2][1], b[2][1])), (lp(a[3][0], b[3][0]), lp(a[3][1], b[3][1])), lerp_ang(a[4], b[4], u))
+			body = {n: lp(bs[k][n], bs[k + 1][n]) for n in Z}
+			return (lp(a[0], b[0]), lp(a[1], b[1]), (lp(a[2][0], b[2][0]), lp(a[2][1], b[2][1])), (lp(a[3][0], b[3][0]), lp(a[3][1], b[3][1])), lerp_ang(a[4], b[4], u), body)
 	return pose_at(group, ks[-1][0])
+
+ri = lambda v: int(round(v))
+HIP, SQ_AT, LEAN_TOP = PA.HIP, 57, 8
+
+def stance(im, st, kmax=4):
+	"""ขาหน้า/หลังเฉือนตามก้าว (เหมือน poses64.legs_side แต่ไม่ยกเท้า ไม่เด้งตัว) · หันซ้าย ขาหน้า = x < 30"""
+	RA.SIZE[0] = 64; k = ri(kmax * st)
+	if not k: return im
+	upper = RA.region(im, lambda x, y: y < HIP); front = RA.region(im, lambda x, y: y >= HIP and x < 30); back = RA.region(im, lambda x, y: y >= HIP and x >= 30)
+	f = RA.blank(); RA.paste(f, RA.shear(back, k, HIP, 63)); RA.paste(f, RA.shear(front, -k, HIP, 63)); RA.paste(f, upper); return f
+
+def body_pose(im, b):
+	"""ลำตัวตามสรีระ: ก้าวขา → ย่อเข่า → เอน → อก → หัว → เป้ (ลำดับเดียวกับ poses64.rion_frame)"""
+	im = stance(im, b['st'])
+	if ri(b['sq']): im = PA.squash(im, SQ_AT, ri(b['sq']))
+	if ri(b['lean']): im = PA.lean(im, b['lean'], HIP, LEAN_TOP)
+	ch, hd = ri(b['ch']), ri(b['hd'])
+	if ch: im = PA.shift_part(im, lambda x, y: y < 46, 0, ch)
+	if hd or ri(b['hx']): im = PA.shift_part(im, lambda x, y: y < 31 + ch, ri(b['hx']), hd, keep=True)
+	if ri(b['pk']): im = PA.shift_part(im, P64.PACK, 0, ri(b['pk']), keep=True)
+	return im
+
+def body_pt(pt, b):
+	"""จุดบนลำตัว (ไหล่/ศอก/มือ) หลังผ่าน body_pose — ให้แขนกับอาวุธวาดตามตัวที่เอน/ย่อแล้ว"""
+	x, y = pt; n = ri(b['sq'])
+	if n and y < SQ_AT: y += n
+	if ri(b['lean']) and y < HIP: x += ri(b['lean'] * (HIP - y) / (HIP - LEAN_TOP))
+	if ri(b['ch']) and y < 46: y += ri(b['ch'])
+	return (x, y)
 
 def axis(icon):
 	"""แกนหลักของรูป (PCA ของพิกเซลทึบ) → (จุดจับ, ทิศในไอคอน องศา, ความยาวรูป) · ด้าม = ปลายล่างซ้าย เข้ามา 3 จุด"""
@@ -110,28 +158,34 @@ def render(code, icon):
 	grip, idir, ilen = axis(icon) if fam not in ('BD', 'DV') else ((0, 0), 0, 0)
 	L = max(12.0, ilen * LEN_K.get(fam, 0.8))
 	for i in range(N):
-		t = i / N; dx, dy, elbow, hand, ang = pose_at(group, t); dxi, dyi = int(round(dx)), int(round(dy))
-		body = G.shift(base, dxi)
+		t = i / N; dx, dy, elbow, hand, ang, bd = pose_at(group, t)
+		bd['ch'] += 0.6 * math.sin(t * math.tau) if t < 0.15 or t > 0.85 else 0   # หายใจตอนยืน
+		dxi, dyi = int(round(dx)), int(round(dy))
+		raw = base.copy()
+		if 0.46 <= t < 0.54: P64.blink(raw)   # กะพริบ/หรี่ตาตอนออกแรง
+		body = G.shift(body_pose(raw, bd), dxi)
 		if dyi: body = body.transform(body.size, Image.AFFINE, (1, 0, 0, 0, 1, -dyi), Image.NEAREST)
-		el = (round(elbow[0]), round(elbow[1] + dyi)); hd = (round(hand[0]), round(hand[1] + dyi)); sh = (G.SH_F[0] + dxi, G.SH_F[1] + dyi)
+		mv = lambda q: (lambda r: (ri(r[0]) + dxi, ri(r[1]) + dyi))(body_pt(q, bd))
+		sh, el, hd = mv(G.SH_F), mv(elbow), mv(hand)
+		el = P64.ik(sh, hd) if fam not in ('BD', 'DV') else el; el = (ri(el[0]), ri(el[1]))   # ศอกหาเองจากไหล่-มือ (แขนยาวคงที่ ไม่ยืดหด)
 		out = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
 		if fam == 'DV':   # โดรนลอยหลังไหล่ → พุ่งไปหน้าตอน Rion ชี้ → กลับ
 			k = math.sin(min(1, max(0, (t - 0.2) / 0.5)) * math.pi)
 			dr = icon.crop(icon.getbbox())
 			dr = dr.resize((max(1, dr.width * 3 // 4), max(1, dr.height * 3 // 4)), Image.NEAREST)   # ลอยหลังไหล่ ไม่ทับหมวก
 			x = int(round(56 - k * 46)) - dr.width // 2; y = int(round(12 + math.sin(t * math.tau * 2) * 1.5 + k * 14)) - dr.height // 2
-			out.alpha_composite(body); G.draw_arm(out, sh, el, hd); out.alpha_composite(WH.outline(dr), (x, y))
+			out.alpha_composite(body); P64.draw_arm_soft(out, sh, el, hd); out.alpha_composite(WH.outline(dr), (x, y))
 		elif fam == 'BD':
-			out.alpha_composite(body); G.draw_arm(out, sh, el, hd); glove(out, icon, hd, 0.42 <= t <= 0.7)
+			out.alpha_composite(body); P64.draw_arm_soft(out, sh, el, hd); glove(out, icon, hd, 0.42 <= t <= 0.7)
 		else:
 			spr, (cx, cy) = weapon_sprite(icon, grip, idir, L, ang); at = (int(round(hd[0] - cx)), int(round(hd[1] - cy)))
-			behind = BEHIND_ANG[0] < ang % 360 < BEHIND_ANG[1]
+			behind = BEHIND_ANG[0] < ang % 360 < BEHIND_ANG[1] or math.cos(math.radians(ang)) > 0.05   # ชี้ไปหลัง (ขวา) ทุกมุม = หลังตัว (ค้อนช้อนผ่านล่างไปหลังเคยลอยทับกลางตัว)
 			if behind: out.alpha_composite(spr, at)
 			out.alpha_composite(body)
 			if group in BACK:
-				bx, by = BACK[group]; G.draw_arm(out, (G.SH_B[0] + dxi, G.SH_B[1] + dyi), (el[0] + bx, el[1] + by), (hd[0] + bx, hd[1] + by), back=True)
+				bx, by = BACK[group]; sb = mv(G.SH_B); hb = (hd[0] + bx, hd[1] + by); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True)
 			if not behind: out.alpha_composite(spr, at)
-			G.draw_arm(out, sh, el, hd)
+			P64.draw_arm_soft(out, sh, el, hd)
 			if prev is not None and abs((ang - prev + 540) % 360 - 180) > SMEAR_DEG: smear(out, hd, prev, ang, L)
 			prev = ang
 		frames.append(out)
