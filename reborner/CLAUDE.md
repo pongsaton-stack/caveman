@@ -465,6 +465,11 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
       ik แขนสองท่อน 4.6+4.6 (เดิม 5.2+5.2) · ต้นแขนหนา 3 จุด (draw_arm w_upper) · แกว่งเดินซ้าย ±2 จุด (เดิม ±3.5) · **ห้ามตั้งมือไกลกว่า REACH อีก**
     **ยังไม่ดี**: แขนหันขวาบางเฟรมพิกเซลแตก 1–2 จุดตอนเฉือน · ชิ้นยังไม่ได้ใช้กับท่าอื่นนอกจากเดิน/วิ่ง (โบกมือ/เชียร์ทิศหน้ายังใช้ภาพเดิม)
   **ข้อจำกัดก่อนทำครบ 183 ชิ้น** (ชีตชื่อ 210 แต่ตัดได้ 183): 183 × 12 เฟรม ≈ +9 MB หน้าเทสเกิน 16 MB → ต้องรวมเป็นแผ่นต่อชิ้น/ลดเฟรม/แยกหน้า · ช่วงง้างฟันมีบางเฟรมใบมีดยังหลบหลังหัว
+- 6 ต.ค. 2026 **ติดตั้ง BMAD-METHOD v6.12.1** (kwan: "ติดตั้ง https://github.com/bmad-code-org/BMAD-METHOD") — ชุด agent วางแผน/พัฒนาแบบ agile (วิเคราะห์ · PM · สถาปนิก · UX · dev · รีวิว · sprint)
+  คำสั่ง: `npx -y bmad-method@6.12.1 install --directory . --modules bmm --tools claude-code --yes --user-name kwan --communication-language Thai --document-output-language Thai --set core.project_name=REBORNER --set bmm.project_knowledge=docs` (รันใน reborner/)
+  ผล: `reborner/_bmad/` (แกน + config) · `reborner/.claude/skills/bmad-*` 29 skill (Claude Code โหลดเป็น skill ของโฟลเดอร์ reborner) · เอกสารที่ agent สร้างไป `reborner/_bmad-output/` · ความรู้โปรเจกต์ = `reborner/docs` (GDD ฯลฯ)
+  ใส่ `.gdignore` ใน `_bmad/` และ `.claude/` (Godot ไม่สแกน) · ตั้งค่าส่วนตัว `_bmad/config.user.toml` (ชื่อ kwan · คุยไทย) · อัปเดต: รันคำสั่งเดิมพร้อม `--action update`
+  เริ่มใช้: เรียก skill `bmad-help` แล้วถามว่าควรเริ่มอะไร · BMAD เป็นตัวช่วยวางแผน **กฎใน CLAUDE.md นี้ยังมาก่อนเสมอ** (ห้ามแต่งตัวเลขเกม · GDD ขัดกันต้องรายงาน · ตัวอย่างก่อนงานใหญ่)
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)
 2. ให้ Pongsaton กด F5 เล่นแผนที่เอง (ความรู้สึกต้องมาจากมือคน ไม่ใช่ตัวเลข)
