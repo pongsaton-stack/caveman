@@ -64,7 +64,8 @@ func usable(a: Actor) -> Array[Tech]:
 	if techs == null: return out
 	for n in a.learned:
 		var t: Tech = techs.get_tech(n)
-		if t != null: out.append(t)
+		# ตัวเอกใช้ได้เฉพาะท่าสายของอาวุธที่ถือ (kwan 6 ต.ค. 2026) · ท่าสายอื่นที่เรียนแล้วเก็บไว้ ใช้ได้เมื่อถือสายนั้น
+		if t != null and (not a.is_hero or t.school == a.school): out.append(t)
 	for n in a.seized:   # ท่าที่ยึดมา (GDD 5.2) — อยู่ใน TechDb แต่ไม่อยู่ในต้นไม้ท่า
 		var t: Tech = techs.get_tech(n)
 		if t != null: out.append(t)

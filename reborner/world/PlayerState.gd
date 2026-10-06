@@ -15,8 +15,11 @@ var learned: Array[String] = []
 var cell := Vector2i.ZERO
 var rest_cell := Vector2i.ZERO
 var ec := 0                 # Event Counter — ใช้ตอนมีเควส (สัปดาห์ 3)
-var school := "คม"
-var steer := "เขี้ยว"
+var school := "คม"          # สายท่า = สายของอาวุธที่ถือ (data/weapons.csv) — ศึกใช้ได้เฉพาะท่าสายนี้ + ท่ายึด · ประกายในสายนี้
+var steer := "เขี้ยว"        # กิ่งที่อาวุธชี้ทาง (×2 ตอนประกาย · GDD 6.3) — "" = อาวุธไม่ชี้ทาง
+var weapon_id := "SL-1"       # แถวใน data/weapons.csv
+var weapons_owned: Array[String] = ["SL-1"]   # อาวุธที่มี (สลับในเมนู)
+var schools_held: Array[String] = []          # สายที่เคยถือ (ได้ท่ารากแล้ว) — ใช้แยก "ยังไม่เคยประกาย"
 var opened: Array[String] = []    # หีบที่เปิดแล้ว (key "x,y") — ไม่เกิดใหม่
 var defeated: Array[String] = []  # บอสที่ชนะแล้ว (key "x,y") — ไม่เกิดใหม่
 
@@ -42,9 +45,8 @@ func init_new(techs: TechDb, start: Vector2i) -> void:
 	learned.clear()
 	reads.clear()
 	insight = 0.0
-	var root := techs.root_of(school)
-	if root != null:
-		learned.append(root.name)
+	schools_held.clear()
+	_learn_root(techs)
 	cell = start
 	rest_cell = start
 	hp = max_hp()
@@ -79,6 +81,59 @@ func forget(monster_id: String) -> void:
 	for i in range(seized.size() - 1, -1, -1):
 		if str(seized[i].get("id", "")) == monster_id:
 			seized.remove_at(i)
+
+# ── อาวุธ (kwan 6 ต.ค. 2026: "ปรับอาวุธชี้ทางให้ตรงสกิลและประกาย ตามสายของอาวุธ") ──
+static var _weapons := {}
+## data/weapons.csv (สร้างจาก docs/art-bible/weapons/weapons_full.json ด้วย tools/data/weapons_csv.py) · weapon_id → แถว
+static func weapon_table() -> Dictionary:
+	if _weapons.is_empty() and FileAccess.file_exists("res://data/weapons.csv"):
+		_weapons = CsvDb.index_by(CsvDb.load_csv("res://data/weapons.csv"), "weapon_id")
+	return _weapons
+
+## หาแถวอาวุธจากรหัสใหม่ (SL-1) หรือรหัสเดิมใน workbook (W23 ที่ chests.csv ใช้) · ไม่เจอ = {}
+static func weapon_row(id: String) -> Dictionary:
+	var t := weapon_table()
+	if t.has(id):
+		return t[id]
+	for k in t:
+		if str(t[k].get("existing_id", "")) == id:
+			return t[k]
+	return {}
+
+## ถืออาวุธชิ้นนี้ — สายท่าและกิ่งชี้ทางเปลี่ยนตามอาวุธ · ถือสายใหม่ครั้งแรกได้ท่ารากของสายนั้น · ท่าสายอื่นที่เรียนแล้วไม่หาย
+## base = ค่าอาวุธ (weapons.csv ยังว่างเกือบทุกชิ้น · kwan ยังไม่กำหนด → ใช้ค่าจากหีบที่ให้มา)
+func equip(row: Dictionary, techs: TechDb, base: int = -1) -> void:
+	weapon_id = str(row["weapon_id"])
+	weapon_name = str(row["name"])
+	school = str(row["school"])
+	steer = str(row.get("steer", ""))
+	var wb = row.get("weapon_base", "")
+	if base >= 0:
+		weapon_base = base
+	elif str(wb) != "":
+		weapon_base = int(wb)
+	if not weapons_owned.has(weapon_id):
+		weapons_owned.append(weapon_id)
+	_learn_root(techs)
+
+func _learn_root(techs: TechDb) -> void:
+	if not schools_held.has(school):
+		schools_held.append(school)
+	var root := techs.root_of(school)
+	if root != null and not learned.has(root.name):
+		learned.append(root.name)
+
+## หลังโหลดเซฟ: สาย/กิ่งตามอาวุธที่ถือเสมอ (เซฟเก่าเก็บไม้เบสบอลแต่สายยังเป็น คม) · ไม่มี weapon_id = หาจากชื่อ
+func sync_weapon(techs: TechDb) -> void:
+	var row := weapon_row(weapon_id)
+	if row.is_empty() or str(row["name"]) != weapon_name:
+		for k in weapon_table():
+			if str(weapon_table()[k]["name"]) == weapon_name:
+				row = weapon_table()[k]
+	if row.is_empty():
+		_learn_root(techs)
+		return
+	equip(row, techs, weapon_base)
 
 ## ติดตั้งท่าหลบได้พร้อมกัน = ช่องความจำท่า ÷ 2 (kwan 6 ต.ค. 2026)
 func read_slots() -> int:
@@ -132,8 +187,8 @@ func make_hero() -> Actor:
 	a.learned.clear()
 	for n in learned:
 		a.learned.append(n)
-	# ยังไม่เคยประกาย = รู้แค่ท่ารากที่ได้ตอน init_new (ท่ายึดแยกอยู่ใน seized ไม่นับ)
-	a.first_glimmer_pending = learned.size() <= 1
+	# ยังไม่เคยประกาย = รู้แค่ท่ารากของสายที่เคยถือ (ท่ายึดแยกอยู่ใน seized ไม่นับ)
+	a.first_glimmer_pending = learned.size() <= maxi(schools_held.size(), 1)
 	a.seized.clear()
 	for sz in seized:
 		a.seized.append(str(sz.get("name", "")))
@@ -332,7 +387,8 @@ func to_dict() -> Dictionary:
 		"opened": op, "defeated": df,
 		"hp": hp, "sp": sp, "learned": names,
 		"cell": [cell.x, cell.y], "rest_cell": [rest_cell.x, rest_cell.y],
-		"ec": ec, "school": school, "steer": steer,
+		"ec": ec, "school": school, "steer": steer, "weapon_id": weapon_id,
+		"weapons_owned": weapons_owned.duplicate(), "schools_held": schools_held.duplicate(),
 		"party": party.duplicate(true), "party_seeded": party_seeded, "lost": lost.duplicate(),
 		"met_species": met_species.duplicate(), "rest_count": rest_count,
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
@@ -351,6 +407,13 @@ func from_dict(d: Dictionary) -> void:
 	school = str(d.get("school", school))
 	steer = str(d.get("steer", steer))
 	weapon_name = str(d.get("weapon_name", weapon_name))
+	weapon_id = str(d.get("weapon_id", ""))   # เซฟเก่าไม่มี → sync_weapon หาจากชื่อ
+	weapons_owned.clear()
+	for w in d.get("weapons_owned", ["SL-1"]):   # เซฟเก่า: มีดทำครัวคือของเริ่มเกมเสมอ
+		weapons_owned.append(str(w))
+	schools_held.clear()
+	for s in d.get("schools_held", [school]):
+		schools_held.append(str(s))
 	learned.clear()
 	for n in d.get("learned", []):
 		learned.append(str(n))

@@ -53,7 +53,8 @@ func _render() -> void:
 	left.add_theme_constant_override("separation", 0)
 	_body.add_child(left)
 	left.add_child(UiKit.label("Rion · ความชำนาญ %d" % ps.prof, 8, UiKit.C_TEXT))
-	left.add_child(UiKit.label("%s (ค่าอาวุธ %d)" % [ps.weapon_name, ps.weapon_base], 7, UiKit.C_MUTED))
+	left.add_child(UiKit.label("%s (ค่าอาวุธ %d) · สาย%s%s" % [ps.weapon_name, ps.weapon_base, ps.school,
+		(" · ชี้ทาง " + ps.steer) if ps.steer != "" else ""], 7, UiKit.C_MUTED))
 	left.add_child(UiKit.label("HP %d/%d · SP %d/%d · เงิน %d" % [ps.hp, ps.max_hp(), ps.sp, ps.max_sp(), ps.gold], 7, UiKit.C_TEXT))
 	var used := 0
 	for m in ps.active_members(slots):
@@ -150,6 +151,10 @@ func _show_actions() -> void:
 		var rb := _add(UiKit.button("ท่าหลบ %d/%d" % [ps.reads_on(), ps.read_slots()], 123))
 		rb.pressed.connect(_pick_read)
 		rb.focus_entered.connect(func(): _info.text = "อ่านทางท่าเด่นมอน หลบได้ตาม % · ครบ 100% แล้วถอด/ติดตั้งได้ · ติดตั้งพร้อมกัน = ช่องความจำ ÷ 2")
+	if ps.weapons_owned.size() > 1:
+		var wb := _add(UiKit.button("อาวุธ", 123))
+		wb.pressed.connect(_pick_weapon)
+		wb.focus_entered.connect(func(): _info.text = "ถืออาวุธสายไหน = ใช้ท่าและประกายสายนั้น · ท่าสายอื่นที่เรียนแล้วไม่หาย")
 	var lab := _add(UiKit.button("ทดลองท่า", 123))
 	lab.pressed.connect(_pick_practice_school)
 	lab.focus_entered.connect(func(): _info.text = "ศึกทดลอง: Rion ใช้ได้ทุกท่าในสาย รวมไม้ตาย · ผลไม่บันทึก")
@@ -199,6 +204,33 @@ func _pick_forget() -> void:
 			first = btn
 	var back := _add(UiKit.button("ย้อนกลับ", 123))
 	back.pressed.connect(_show_actions)
+	first.grab_focus()
+
+## เปลี่ยนอาวุธ (kwan 6 ต.ค. 2026) — สายท่า/กิ่งชี้ทางตามอาวุธ · ค่าอาวุธมาจาก weapons.csv
+## ชิ้นที่ kwan ยังไม่กำหนดค่าอาวุธ (ช่องว่าง) กดไม่ได้ — ตอนนี้มีค่าแค่ มีดทำครัว 14 · ไม้เบสบอลอลูมิเนียม 28
+func _pick_weapon() -> void:
+	_clear_menu()
+	_picking_lp = true
+	_info.text = "ถืออาวุธชิ้นไหน?"
+	var first: Button = null
+	for id in ps.weapons_owned:
+		var row := PlayerState.weapon_row(id)
+		if row.is_empty():
+			continue
+		var held := id == ps.weapon_id
+		var btn := _add(UiKit.button("%s%s (%s)" % ["▶ " if held else "", row["name"], row["school"]], 123))
+		btn.disabled = held or str(row.get("weapon_base", "")) == ""
+		btn.pressed.connect(func():
+			ps.equip(row, techs)
+			_info.text = "ถือ %s แล้ว · สาย%s%s" % [row["name"], ps.school, (" · ชี้ทาง " + ps.steer) if ps.steer != "" else ""]
+			_render()
+			_show_actions())
+		if first == null and not btn.disabled:
+			first = btn
+	var back := _add(UiKit.button("ย้อนกลับ", 123))
+	back.pressed.connect(_show_actions)
+	if first == null:
+		first = back
 	first.grab_focus()
 
 func _read_label(r: Dictionary) -> String:

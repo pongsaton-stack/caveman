@@ -69,7 +69,7 @@ func sweep(mid: String, label: String, profs: Array, count: int = 1) -> void:
 			% [r["uses"], r["rand_rate"] * 100.0, r["counters"], r["reads"], r["dodges"]])
 	print("")
 
-func batch(mid: String, prof: int, count: int, weapon: int = WEAPON_BASE) -> Dictionary:
+func batch(mid: String, prof: int, count: int, weapon: int = WEAPON_BASE, school: String = SCHOOL, steer: String = STEER) -> Dictionary:
 	var wins := 0
 	var tot := {"rounds": 0, "time": 0.0, "dealt": 0, "taken": 0, "glimmers": 0,
 		"tech_uses": 0, "statuses": 0, "guards": 0, "fills": 0,
@@ -78,7 +78,7 @@ func batch(mid: String, prof: int, count: int, weapon: int = WEAPON_BASE) -> Dic
 	for i in BATTLES:
 		var b := Battle.new()
 		b.techs = techs
-		b.actors.append(make_hero(prof, weapon))
+		b.actors.append(make_hero(prof, weapon, school, steer))
 		for m in make_party():
 			b.actors.append(m)
 		for j in count:
@@ -117,23 +117,26 @@ func boss_sweep() -> void:
 			boss_ids.append(str(r["monster_ids"]))
 	var weapons: Array[Dictionary] = []
 	var start := PlayerState.new()
-	weapons.append({"name": start.weapon_name, "base": start.weapon_base})
+	weapons.append({"name": start.weapon_name, "base": start.weapon_base, "school": start.school, "steer": start.steer})
+	# อาวุธจากหีบใช้สาย/กิ่งของมันเอง (data/weapons.csv) เหมือนในเกม — ไม้เบสบอล = สาย ทุบ
 	for r in CsvDb.load_csv("res://data/chests.csv"):
-		weapons.append({"name": str(r["label"]), "base": int(r["weapon_base"])})
+		var wr := PlayerState.weapon_row(str(r["weapon_id"]))
+		weapons.append({"name": str(r["label"]), "base": int(r["weapon_base"]),
+			"school": str(wr.get("school", SCHOOL)), "steer": str(wr.get("steer", ""))})
 	for mid in boss_ids:
 		if not by_id.has(mid):
 			push_warning("ไม่พบ %s" % mid)
 			continue
 		print("── บอส %s (%s tier %d) x1 ──" % [by_id[mid]["name_th"], mid, int(by_id[mid]["tier"])])
 		for w in weapons:
-			print("  อาวุธ: %s (ค่า %d)" % [w["name"], w["base"]])
+			print("  อาวุธ: %s (ค่า %d · สาย%s)" % [w["name"], w["base"], w["school"]])
 			print("  prof   ชนะ  เวลา AV  ออก/เข้า  ประกาย%  Insight เต็ม  คอมโบ  เปิดท่า  ขัด  สถานะ  ตั้งรับ%")
 			for p in BOSS_PROFS:
-				var r := batch(mid, p, 1, int(w["base"]))
+				var r := batch(mid, p, 1, int(w["base"]), str(w["school"]), str(w["steer"]))
 				print("  %4d  %3d%%  %6.0f   %6.2f   %6.2f%%     %5.2f     %5.2f   %5.2f  %5.2f  %5.2f   %5.1f%%"
 					% [p, int(r["win"] * 100.0), r["time"], r["ratio"], r["glim_rate"] * 100.0,
 					   r["fills"], r["combos"], r["tels"], r["ints"], r["status"], r["guard_rate"] * 100.0])
-		print("  เป้า: อาวุธ 28 prof 16/20/22 ~55/84/91% · มีดทำครัว ~5-10/20/30-40% (ประตูอาวุธ · GDD 11.29)\n")
+		print("  เป้า: อาวุธ 28 prof 16/20/22 ~55/84/91% · มีดทำครัว ~5-10/20/30-40% (ประตูอาวุธ · GDD 11.29 · ไม้เบสบอลสาย ทุบ ต่ำกว่าเป้า GDD 11.34)\n")
 
 ## ตัวเอกสู้ต่อเนื่องหลายศึก — ดูว่าต้นไม้ท่าคลี่ออกยังไง
 func tech_progression() -> void:
@@ -198,7 +201,7 @@ func make_party() -> Array[Actor]:
 		out.append(m)
 	return out
 
-func make_hero(prof: int, weapon: int = WEAPON_BASE) -> Actor:
+func make_hero(prof: int, weapon: int = WEAPON_BASE, school: String = SCHOOL, steer: String = STEER) -> Actor:
 	var h := Actor.new()
 	h.id = "hero"
 	h.name = "Rion"
@@ -212,9 +215,9 @@ func make_hero(prof: int, weapon: int = WEAPON_BASE) -> Actor:
 	h.atk = Formulas.hero_atk(prof, weapon)
 	h.def_val = Formulas.hero_def(prof)
 	h.spd = 120
-	h.school = SCHOOL
-	h.steer_branch = STEER
-	var root := techs.root_of(SCHOOL)
+	h.school = school
+	h.steer_branch = steer
+	var root := techs.root_of(school)
 	h.learned.clear()
 	if root != null:
 		h.learned.append(root.name)

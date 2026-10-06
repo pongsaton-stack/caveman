@@ -96,6 +96,7 @@ func _ready() -> void:
 	var loaded := SaveGame.load_into(ps)
 	if not loaded:
 		ps.init_new(techs, map.start)
+	ps.sync_weapon(techs)   # สายท่า/กิ่งชี้ทางตามอาวุธที่ถือ (แก้เซฟเก่าที่ถือไม้เบสบอลแต่สายยังเป็น คม)
 	# เซฟเก่า (v1) ไม่มีปาร์ตี้/ร้าน — ตั้งให้ครั้งเดียว
 	ps.seed_party(companion_rows)
 	if ps.shop_stock.is_empty():
@@ -501,11 +502,19 @@ func _open_chest(key: String) -> void:
 	ps.opened.append(key)
 	var base := int(row["weapon_base"])
 	var label := str(row["label"])
+	var wrow := PlayerState.weapon_row(str(row["weapon_id"]))
 	if base > ps.weapon_base:
 		var old := ps.weapon_name
-		ps.weapon_base = base
-		ps.weapon_name = label
-		_show("🎁 ได้ %s! (%s → %s · ค่าอาวุธ %d)" % [label, old, label, base], 2.0)
+		var old_school := ps.school
+		if wrow.is_empty():
+			ps.weapon_base = base
+			ps.weapon_name = label
+		else:
+			ps.equip(wrow, techs, base)
+		var msg := "🎁 ได้ %s! (%s → %s · ค่าอาวุธ %d)" % [label, old, label, base]
+		if ps.school != old_school:
+			msg += "\nสายท่าเปลี่ยนเป็น %s · ท่าสาย%sยังอยู่ สลับกลับได้ที่เมนู > อาวุธ" % [ps.school, old_school]
+		_show(msg, 2.6)
 	else:
 		ps.gold += 50
 		_show("🎁 %s — อาวุธที่มีดีกว่าแล้ว ขายได้ +50 เงิน" % label, 1.6)
