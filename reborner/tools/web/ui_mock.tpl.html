@@ -1,0 +1,351 @@
+<title>REBORNER UI Kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Chakra+Petch:wght@500;700&display=swap">
+<style>
+/* หน้าโชว์ UI ในเกม: ทุกจอวาดที่ 384×216 (จอฐานของเกม) แล้วขยายทั้งก้อน — เห็นจริงว่าอะไรล้นจอ
+   สองหน้าตา: "ทอง" = โทน UiKit ในเกมตอนนี้ + โครงเมนู RS3 · "น้ำเงิน" = ชีต UI ที่ kwan ส่ง */
+:root{
+  color-scheme:dark;
+  --page:#0f0d0a; --ink:#e8d9b5; --ink2:#a89b80; --gold:#c9a24a; --line:#3a3329; --bad:#b5553f; --good:#6b7d4a;
+  --f-ui:"Sarabun","Noto Sans Thai",system-ui,sans-serif; --f-num:"Chakra Petch","Sarabun",system-ui,sans-serif;
+}
+body{background:var(--page);color:var(--ink);font-family:var(--f-ui);margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px;border-bottom:1px solid var(--line);padding-bottom:14px}
+header.top h1{font-family:var(--f-num);font-size:28px;margin:0;letter-spacing:.04em;color:var(--gold)}
+header.top p{margin:0;color:var(--ink2);max-width:62ch;font-size:14px;line-height:1.6}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.ctl button{font:600 13px var(--f-ui);background:#1d1a15;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:6px 12px;cursor:pointer}
+.ctl button[aria-pressed="true"]{background:var(--gold);color:#15130f;border-color:var(--gold)}
+.ctl button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+nav.jump{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:8px 0 18px}
+nav.jump a{color:var(--ink2);text-decoration:none;border-bottom:1px dotted var(--line)}
+nav.jump a:hover{color:var(--gold)}
+section.scr{margin:26px 0 34px}
+section.scr h2{font-size:18px;margin:0 0 4px;text-wrap:balance}
+section.scr .sub{color:var(--ink2);font-size:13px;margin:0 0 10px;max-width:80ch;line-height:1.55}
+.frame{width:100%;max-width:100%;aspect-ratio:384/216;position:relative;overflow:hidden;border:1px solid var(--line);background:#000}
+.g{position:absolute;left:0;top:0;width:384px;height:216px;transform-origin:0 0;font-family:var(--f-ui);font-size:7px;line-height:1.25;color:var(--t)}
+.g img{image-rendering:pixelated;position:absolute}
+.notes{margin-top:8px;font-size:12.5px;color:var(--ink2);display:grid;gap:3px;max-width:90ch}
+.notes b{color:var(--ink)}
+.conf{border:1px solid var(--line);border-radius:6px;padding:12px 14px;margin:20px 0;background:#17140f}
+.conf h2{margin:0 0 8px;font-size:17px;color:var(--gold)}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;font-size:13px;min-width:560px;width:100%}
+.tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tbl th{color:var(--ink2);font-weight:600}
+.tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:3px;background:#2a241b;color:var(--gold)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── ชิ้นส่วนในจอเกม (หน่วย px = พิกเซลจอเกม 384×216) ── */
+.g{--t:#e8d9b5;--t2:#a89b80;--acc:#c9a24a;--win:rgba(28,24,18,.86);--winB:#8a6b35;--winB2:#e8c877;--hp:#c4503e;--sp:#4f8fc4;--ins:#e8c34a;--lp:#d96b5f;--bg1:#4a3b26;--bg2:#2a2116;--sel:rgba(232,200,119,.18)}
+.g.blue{--t:#e6f0ff;--t2:#8fa7c7;--acc:#5fd0ff;--win:rgba(10,22,44,.88);--winB:#1d4f86;--winB2:#5fd0ff;--hp:#e0434f;--sp:#3f8cff;--ins:#ffd24a;--lp:#ff6b8a;--bg1:#0d2340;--bg2:#06101f;--sel:rgba(95,208,255,.16)}
+.bgp{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 40%,var(--bg1),var(--bg2))}
+.g:not(.blue) .bgp::after{content:"";position:absolute;inset:6px;border:2px solid #6d5430;outline:1px solid #2a2116;box-shadow:inset 0 0 0 1px #a8874a}
+.g.blue .bgp::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(95,208,255,.04) 0 1px,transparent 1px 4px)}
+.w{position:absolute;background:var(--win);border:1px solid var(--winB);box-shadow:inset 0 0 0 1px rgba(0,0,0,.6);border-radius:2px}
+.g.blue .w{box-shadow:0 0 4px rgba(95,208,255,.35),inset 0 0 0 1px rgba(95,208,255,.15);border-radius:3px}
+.w.hd::before{content:attr(data-h);position:absolute;left:4px;top:-5px;font-size:6px;font-weight:700;padding:0 3px;background:var(--bg2);color:var(--acc);line-height:9px;border:1px solid var(--winB)}
+.lbl{position:absolute;white-space:nowrap}
+.mut{color:var(--t2)} .acc{color:var(--acc)} .b{font-weight:700}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.bar{position:absolute;height:3px;background:#0008;border:1px solid #000}
+.bar i{display:block;height:100%}
+.chip{position:absolute;font-size:5.5px;line-height:7px;padding:0 2px;border-radius:1px;white-space:nowrap}
+.btn{position:absolute;font-size:7px;font-weight:700;text-align:center;line-height:13px;height:13px;border:1px solid var(--winB2);background:linear-gradient(#5a4321,#2e2213);color:#f3e2b3;border-radius:2px}
+.g.blue .btn{background:linear-gradient(#123b66,#0a1f38);color:#dff4ff}
+.row{position:absolute;height:11px;line-height:11px;white-space:nowrap}
+.row.sel{background:var(--sel)}
+.hand{position:absolute;width:10px;height:10px}
+.pop{position:absolute;font-family:var(--f-num);font-weight:700;text-shadow:1px 0 #000,-1px 0 #000,0 1px #000,0 -1px #000;white-space:nowrap}
+.dots{letter-spacing:.5px;color:var(--lp)}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <h1>REBORNER · UI Kit</h1>
+  <p>ร่างหน้าจอ HUD และเมนูในเกม วาดที่ขนาดจอจริงของเกม 384×216 แล้วขยายให้ดู ค่าทุกตัวบนจอมาจากเกมจริง (สูตร + ข้อมูลใน repo) ตัวอย่างนี้คือ Rion ความชำนาญ 20 ถือไม้เบสบอลอลูมิเนียม สู้บอสราชาหนอนเถ้า · ร่าง ยังไม่เข้าเกม</p>
+</header>
+<div class="ctl" role="group" aria-label="หน้าตา">
+  <button id="lookGold" aria-pressed="true">หน้าตาทอง (โทนในเกม + โครง RS3)</button>
+  <button id="lookBlue" aria-pressed="false">หน้าตาน้ำเงิน (ตามชีต UI)</button>
+</div>
+<nav class="jump" id="jump"></nav>
+<div id="screens"></div>
+
+<div class="conf" id="conflicts">
+  <h2>ที่ชีต UI ขัดกับเกม (ยังไม่ตัดสิน · จอข้างบนใช้แบบของเกมไว้ก่อน)</h2>
+  <div class="tbl"><table><thead><tr><th>ในชีต UI</th><th>ในเกม / GDD ตอนนี้</th><th>จอข้างบนทำแบบ</th></tr></thead><tbody id="confBody"></tbody></table></div>
+</div>
+</div>
+
+<script>
+const D = /*DATA*/null;
+const IMG = D.img;
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SCH = {'คม':'SL','แทง':'PC','ทุบ':'CR','มือเปล่า':'BD','ยิง':'ST','กล':'DV'};
+const SCH_ORDER = ['คม','ทุบ','แทง','ยิง','กล','มือเปล่า'];
+const icon = sc => IMG['W' + SCH[sc] + '-1'];
+const M = D.mons;
+
+// ── ชิ้นส่วน ──
+const L = (x, y, t, cls = '', st = '') => `<div class="lbl ${cls}" style="left:${x}px;top:${y}px;${st}">${t}</div>`;
+const W = (x, y, w, h, head = '') => `<div class="w${head ? ' hd' : ''}" ${head ? `data-h="${esc(head)}"` : ''} style="left:${x}px;top:${y}px;width:${w}px;height:${h}px"></div>`;
+const BAR = (x, y, w, v, max, col) => `<div class="bar" style="left:${x}px;top:${y}px;width:${w}px"><i style="width:${Math.round(100 * v / max)}%;background:${col}"></i></div>`;
+const SPR = (k, x, y, s = 1) => `<img src="${IMG[k]}" alt="" style="left:${x}px;top:${y}px;transform:scale(${s});transform-origin:0 0">`;
+const HAND = (x, y) => `<img class="hand" src="${IMG['WBD-1']}" alt="" style="left:${x}px;top:${y}px;width:12px;height:12px;transform:scaleX(-1)">`;
+const BTN = (x, y, w, t) => `<div class="btn" style="left:${x}px;top:${y}px;width:${w}px">${t}</div>`;
+const CHIP = (x, y, t, bg, fg = '#fff') => `<div class="chip" style="left:${x}px;top:${y}px;background:${bg};color:${fg}">${t}</div>`;
+const lp = (n, max = 3) => '●'.repeat(n) + '○'.repeat(max - n);
+const aff = sc => { const g = [], b = []; for (const r of D.affinity) if (r.school === sc) (+r.sign > 0 ? g : b).push(r.body); return { g, b }; };
+const techsOf = sc => D.techs.filter(t => t.school === sc);
+const learned = new Set(D.learned);
+
+// ค่าตัวอย่างระหว่างศึก (สถานะชั่วขณะ ไม่ใช่ค่าเกม): HP/SP ที่ลดไปแล้ว · Insight ตอนนี้
+const NOW = { hp: Math.round(D.hp * .72), sp: D.sp - 12, ins: 26, boss: Math.round(M.B1.hp * .68), c03: Math.round(D.comp_hp * .55), c06: D.comp_hp6 };
+
+const SCREENS = [];
+function screen(id, title, sub, draw, notes) { SCREENS.push({ id, title, sub, draw, notes }); }
+
+// 1 ── จอศึก ──
+screen('battle', 'จอศึก (HUD + คำสั่ง)', 'ผังแบบ A ในเกม: ศัตรูซ้าย ทีมขวา · แถบคิวบนสุด · บอสมีหลอดขัดจังหวะ (Break ในชีต) · แผงทีมล่างซ้าย · หน้าต่างคำสั่งล่างขวาแบบรายการ RS3', () => {
+  const B = M.B1, intr = Math.round(B.hp * 0.15), af = aff(D.school);
+  let h = `<div class="bgp" style="background:linear-gradient(#a7b5a0 0 44%,#a2927b 44% 47%,#d4b08a 47%)"></div>`;
+  // แถบคิว
+  h += W(4, 4, 196, 16) + L(8, 8, 'ลำดับ', 'mut');
+  const q = ['rion_s', 'B1', 'C06', 'M06', 'C03', 'rion_s', 'B1', 'C06'];
+  q.forEach((k, i) => h += `<div style="position:absolute;left:${30 + i * 21}px;top:6px;width:19px;height:12px;border:1px solid ${i === 0 ? 'var(--winB2)' : 'var(--winB)'};background:#0006"><img src="${IMG[k]}" style="position:static;width:100%;height:100%;object-fit:contain"></div>`);
+  // บอส
+  h += W(204, 4, 176, 34, 'บอส');
+  h += L(209, 10, `<span class="b">${B.name}</span> <span class="mut">tier ${B.tier}</span>`);
+  h += L(209, 18, `HP`, 'mut') + BAR(222, 20, 108, NOW.boss, B.hp, 'var(--hp)') + L(333, 18, `<span class="num">${NOW.boss}/${B.hp}</span>`);
+  h += L(209, 27, `ขัด`, 'mut') + BAR(222, 29, 108, 96, intr, 'var(--acc)') + L(333, 27, `<span class="num">96/${intr}</span>`, 'acc');
+  h += CHIP(296, 9, `ร่างกาย: ${B.body}`, '#5b4a2e') + CHIP(342, 9, '▼ แผ่นดินสั่น', '#7a2d22');
+  // ศัตรู + ทีม
+  h += SPR('B1', 40, 60, 1) + SPR('M06', 128, 66, 1);
+  h += SPR('rion_w', 222, 74, 1) + SPR('C06', 268, 64) + SPR('C03', 276, 96);
+  // ป๊อปอัป
+  h += `<div class="pop" style="left:70px;top:60px;font-size:13px;color:#ffe08a">129!</div>` + CHIP(70, 76, 'เข้าทาง ×1.2', '#4d6b2e');
+  h += `<div class="pop" style="left:232px;top:68px;font-size:9px;color:#8af0c0">หลบ!</div>`;
+  h += `<div class="pop" style="left:120px;top:44px;font-size:9px;color:var(--ins)">★ ประกาย! Rion · ${D.learned[D.learned.length - 1]}</div>`;
+  // แผงทีม
+  h += W(4, 142, 210, 70, 'ทีม');
+  h += L(9, 148, `<span class="b">Rion</span> <span class="mut">ความชำนาญ</span> <span class="num">${D.prof}</span>`);
+  h += L(9, 157, 'HP', 'mut') + BAR(24, 159, 70, NOW.hp, D.hp, 'var(--hp)') + L(97, 157, `<span class="num">${NOW.hp}/${D.hp}</span>`);
+  h += L(130, 157, 'SP', 'mut') + BAR(143, 159, 40, NOW.sp, D.sp, 'var(--sp)') + L(186, 157, `<span class="num">${NOW.sp}</span>`);
+  h += L(9, 166, 'Insight', 'mut') + BAR(36, 168, 147, NOW.ins, 40, 'var(--ins)') + L(186, 166, `<span class="num">${NOW.ins}/40</span>`);
+  h += `<div style="position:absolute;left:${36 + Math.round(147 * 14 / 40)}px;top:166px;width:1px;height:7px;background:#fff"></div>`;
+  h += L(9, 178, `หนอนหิน <span class="mut">HP</span>`) + BAR(60, 180, 60, NOW.c03, D.comp_hp, 'var(--hp)') + L(123, 178, `<span class="num">${NOW.c03}</span> <span class="dots">${lp(3)}</span> <span class="mut">เชื่อใจ 3</span>`);
+  h += L(9, 188, `ค้างคาวเงา <span class="mut">HP</span>`) + BAR(60, 190, 60, NOW.c06, D.comp_hp6, 'var(--hp)') + L(123, 188, `<span class="num">${NOW.c06}</span> <span class="dots">${lp(2)}</span> <span class="mut">เชื่อใจ 1</span>`);
+  h += L(9, 200, `อ่านทาง ผลุบผลับ 2/3 · หลบ 67%`, 'mut');
+  // คำสั่ง
+  h += W(218, 142, 162, 70, `คำสั่ง · สาย${D.school}`);
+  const cmds = [['หักเกราะ', techsOf(D.school).find(t => t.name === 'หักเกราะ').sp + ' SP'], ['ทุบ', '0 SP'], ['โจมตี', ''], ['คอมโบ + หนอนหิน', '10 SP'], ['ตั้งรับ', ''], ['จับตา', '']];
+  cmds.forEach(([n, c], i) => h += `<div class="row${i === 0 ? ' sel' : ''}" style="left:236px;top:${148 + i * 10}px;width:140px">${n}<span class="mut" style="position:absolute;right:4px">${c}</span></div>`);
+  h += HAND(222, 148);
+
+  return h;
+}, ['หลอด <b>ขัด</b> = ดาเมจสะสมถึง 15% ของ HP บอส (ค่า INTERRUPT_PCT ในเกม) ใช้แทน "Break" ของชีต',
+   'หลอด <b>Insight</b> มีขีดขาว = ส่วนที่ค้างมาจากศึกก่อน (ระบบ Insight ค้างข้ามศึก)',
+   'ป้าย <b>เข้าทาง ×1.2</b> ใต้ตัวเลข = ความเข้ากับร่างกาย (ทุบ × เกราะ) ที่ยังไม่มีในจอเกมตอนนี้',
+   'มอนในทีมแสดง <b>LP ●●○</b> และความเชื่อใจ แทนตัวละครคน Lv. ในชีต']);
+
+// 2 ── เมนูหลัก ──
+screen('menu', 'เมนูหลัก (กด Esc บนแผนที่)', 'โครง RS3: รายชื่อทีมซ้าย (รูป + HP + LP) · รายการเมนูขวาในกล่องโปร่ง · ที่อยู่และเงินใต้เมนู · ปุ่มมุมล่าง', () => {
+  let h = `<div class="bgp"></div>`;
+  h += W(14, 14, 190, 170);
+  const rows = [['rion_s', 'Rion', `ความชำนาญ ${D.prof}`, `HP ${D.hp} · SP ${D.sp}`, ''],
+    ['C03', 'หนอนหิน', 'มอน · เชื่อใจ 3', `HP ${D.comp_hp}`, lp(3)],
+    ['C06', 'ค้างคาวเงา', 'มอน · เชื่อใจ 1', `HP ${D.comp_hp6}`, lp(2)]];
+  rows.forEach((r, i) => {
+    const y = 20 + i * 52;
+    h += `<div style="position:absolute;left:20px;top:${y}px;width:46px;height:46px;overflow:hidden"><img src="${IMG[r[0]]}" style="position:absolute;left:${r[0] === 'rion_s' ? -9 : -1}px;top:${r[0] === 'rion_s' ? -8 : -1}px"></div>`;
+    h += L(72, y + 6, `<span class="b" style="font-size:9px">${r[1]}</span>`) + L(72, y + 18, r[2], 'mut');
+    h += L(72, y + 28, `<span class="num">${r[3]}</span>` + (r[4] ? ` <span class="mut">LP</span> <span class="dots">${r[4]}</span>` : ''));
+  });
+  h += W(216, 14, 152, 130);
+  const items = ['อาวุธ', 'ท่า', 'ท่าหลบ', 'ท่าที่ยึด', 'ไอเท็ม', 'จัดทีม', 'ทดลองท่า', 'บันทึก'];
+  const side = ['', '', `1/${D.read_slots}`, `0/${D.mem}`, '', '', '', ''];
+  items.forEach((t, i) => h += `<div class="row${i === 1 ? ' sel' : ''}" style="left:238px;top:${20 + i * 15}px;width:124px;font-size:8.5px;height:14px;line-height:14px">${t}<span class="mut num" style="position:absolute;right:4px;font-size:7px">${side[i]}</span></div>`);
+  h += HAND(224, 36);
+  h += L(220, 152, `<span class="acc">◆</span> ที่ราบเถ้า · ทุ่งเถ้า`, '', 'font-size:8px');
+  h += L(220, 164, `<span class="acc">●</span> เงิน <span class="num">600</span> · EC <span class="num">1</span>`, '', 'font-size:8px');
+  h += BTN(10, 196, 76, 'สมุดบันทึก') + BTN(300, 196, 74, 'กลับ (Esc)');
+  return h;
+}, ['เมนูในเกมตอนนี้ (MenuScreen.gd) เป็นปุ่มเรียงตาราง 3 คอลัมน์ · ร่างนี้เปลี่ยนเป็นรายการแนวตั้ง + มือชี้ แบบ RS3',
+   '"สมุดบันทึก" = ระบบที่ยังไม่มี (สัปดาห์ 4 ใน CLAUDE.md) ใส่ปุ่มไว้ตามตำแหน่ง Adventure Log ของ RS3']);
+
+// 3 ── เลือกสายท่า ──
+screen('skills', 'ท่า · เลือกสาย', 'โครง RS3 Skill: หัวจอบอกอาวุธที่ถือ + SP · ตารางสาย 2 คอลัมน์ พร้อมไอคอนอาวุธของสาย · ท้ายตาราง = ท่าหลบ และ ลืมท่า', () => {
+  let h = `<div class="bgp"></div>`;
+  h += BTN(16, 12, 46, 'ท่า') + L(70, 13, 'ใช้ท่าสายไหน?', '', 'font-size:9px');
+  h += L(268, 13, 'ถือ:', '', 'font-size:8px') + `<img src="${IMG['WCR-2']}" style="left:288px;top:6px;width:20px;height:20px">` + L(310, 13, D.weapon.replace('ไม้เบสบอล', 'ไม้เบสบอล<br>'), 'mut', 'font-size:6px;line-height:7px');
+  h += `<div style="position:absolute;left:150px;top:28px;width:34px;height:34px;overflow:hidden"><img src="${IMG.rion_s}" style="position:absolute;left:-15px;top:-10px;transform:scale(.95)"></div>`;
+  h += L(188, 32, '<span class="b" style="font-size:9px">Rion</span>') + L(188, 44, `SP <span class="num" style="color:var(--sp)">${NOW.sp}</span><span class="num"> / ${D.sp}</span>`, '', 'font-size:8px');
+  h += W(40, 66, 304, 118);
+  SCH_ORDER.forEach((sc, i) => {
+    const x = i % 2 ? 196 : 58, y = 72 + Math.floor(i / 2) * 22, held = sc === D.school;
+    const n = techsOf(sc).filter(t => learned.has(t.name)).length;
+    h += `<img src="${icon(sc)}" style="left:${x}px;top:${y}px;width:18px;height:18px;${held ? '' : 'opacity:.55'}">`;
+    h += L(x + 22, y + 4, `สาย${sc} <span class="mut num">${n}/7</span>`, held ? 'b' : 'mut', `font-size:8.5px`);
+    if (held) h += HAND(x - 14, y + 4);
+  });
+  h += L(80, 142, 'ท่าหลบ', '', 'font-size:8.5px') + L(218, 142, 'ท่าที่ยึด', '', 'font-size:8.5px');
+  h += L(58, 164, 'สายที่ไม่ได้ถือ = ดูได้ แต่ใช้ในศึกไม่ได้ (ต้องเปลี่ยนอาวุธ)', 'mut');
+  h += BTN(10, 196, 58, 'ปิด') + BTN(160, 196, 64, 'ตกลง') + BTN(316, 196, 58, 'กลับ');
+  return h;
+}, ['ตัวเลข <b>n/7</b> = ท่าที่รู้ในสายนั้น (ต้นไม้ 7 ท่าต่อสาย) แทนระดับสกิล LV ของ RS3 — เกมนี้ไม่มีเลเวลสกิล',
+   'ไอคอนสาย = อาวุธชิ้นแรกของแต่ละตระกูลจากชุดร่าง 30 ชิ้น']);
+
+// 4 ── ต้นไม้ท่า ──
+screen('tree', 'ท่า · ต้นไม้สายที่ถือ', 'สายทุบ: ราก + 3 กิ่ง × 2 ท่า · ท่าที่รู้แล้วสว่าง · ท่าที่ประกายได้ตอนนี้มีดาว · ท่าที่ความชำนาญยังไม่ถึงบอกเลขที่ต้องการ · แถบล่างบอกร่างกายที่สายนี้เข้าทาง', () => {
+  const sc = D.school, ts = techsOf(sc), root = ts.find(t => !t.parent), af = aff(sc);
+  let h = `<div class="bgp"></div>`;
+  h += `<img src="${icon(sc)}" style="left:14px;top:10px;width:18px;height:18px">` + L(36, 13, `<span class="b" style="font-size:10px">สาย${sc}</span> <span class="mut">ชี้ทาง: ${D.steer || 'อาวุธนี้ไม่ชี้ทาง'}</span>`);
+  h += W(10, 32, 364, 128);
+  const br = [...new Set(ts.filter(t => t.branch).map(t => t.branch))];
+  const card = (t, x, y) => {
+    const has = learned.has(t.name), par = !t.parent || learned.has(t.parent), can = !has && par && D.prof >= t.req;
+    const st = has ? 'var(--t)' : 'var(--t2)';
+    let s = `<div style="position:absolute;left:${x}px;top:${y}px;width:104px;height:26px;border:1px solid ${has ? 'var(--winB2)' : 'var(--winB)'};background:${has ? 'var(--sel)' : '#0004'};border-radius:2px"></div>`;
+    s += L(x + 4, y + 3, `${can ? '<span style="color:var(--ins)">★</span> ' : ''}<span class="b" style="color:${st};font-size:8px">${t.name}</span>`);
+    s += L(x + 4, y + 14, has ? `<span class="num">${t.sp} SP</span> · พลัง <span class="num">${t.power}</span>` : can ? 'ประกายได้แล้ว' : `ต้องความชำนาญ <span class="num">${t.req}</span>`, 'mut');
+    return s;
+  };
+  h += card(root, 18, 82);
+  br.forEach((b, i) => {
+    const x = 138 + i * 0, y = 38 + i * 40;
+    const a = ts.find(t => t.branch === b && t.parent === root.name), c = ts.find(t => t.branch === b && t.parent !== root.name);
+    h += `<div style="position:absolute;left:122px;top:95px;width:12px;height:1px;background:var(--winB)"></div>`;
+    h += card(a, 138, y) + L(208, y + 4, `กิ่ง${b}`, 'acc', 'font-size:5.5px') + `<div style="position:absolute;left:242px;top:${y + 13}px;width:12px;height:1px;background:var(--winB)"></div>` + card(c, 256, y);
+  });
+  h += W(10, 166, 364, 30);
+  h += L(16, 171, `<span class="acc">เข้าทาง ×1.2:</span> ${af.g.join(' · ')}`) + L(16, 182, `<span style="color:var(--bad)">ไม่ค่อยเข้า ×0.8:</span> ${af.b.join(' · ')}`);
+  h += BTN(316, 200, 58, 'กลับ');
+  return h;
+}, ['★ = ท่าที่พ่อแม่เรียนแล้ว + ความชำนาญถึง (เงื่อนไขเดียวกับ TechDb.candidates ในเกม)',
+   'แถบล่างดึงจาก data/body_affinity.csv — บอกผู้เล่นว่าสายนี้เหมาะกับมอนแบบไหน']);
+
+// 5 ── สถานะ ──
+screen('status', 'สถานะ Rion', 'โครง RS3 Status: รายชื่อซ้าย · ค่าสถานะกลาง · แผงสายอาวุธขวา (แทนช่อง LV สกิล) · มีค่าที่ระบบเกมนี้ใช้จริง: ความจำท่า ช่องท่าหลบ Insight ค้าง', () => {
+  let h = `<div class="bgp"></div>`;
+  h += W(12, 12, 110, 172);
+  [['rion_s', 'Rion', `HP ${D.hp}`], ['C03', 'หนอนหิน', `HP ${D.comp_hp} LP ${lp(3)}`], ['C06', 'ค้างคาวเงา', `HP ${D.comp_hp6} LP ${lp(2)}`]].forEach((r, i) => {
+    const y = 18 + i * 40;
+    h += `<div style="position:absolute;left:16px;top:${y}px;width:32px;height:34px;overflow:hidden"><img src="${IMG[r[0]]}" style="position:absolute;left:${r[0] === 'rion_s' ? -16 : -8}px;top:${r[0] === 'rion_s' ? -12 : -7}px;transform:scale(.95)"></div>`;
+    h += L(52, y + 8, `<span class="b" style="font-size:8px">${r[1]}</span>`, i ? 'mut' : '') + L(52, y + 19, `<span class="num">${r[2]}</span>`, 'mut', 'font-size:6px');
+  });
+  h += HAND(2, 26);
+  h += L(132, 14, '<span class="b" style="font-size:11px">Rion</span>');
+  const st = [['ความชำนาญ', D.prof], ['HP', `${D.hp} / ${D.hp}`], ['SP', `${D.sp} / ${D.sp}`], ['ATK', D.atk], ['DEF', D.def], ['SPD', D.spd], ['Insight ค้าง', '14 / 40'], ['ความจำท่า', `0 / ${D.mem}`], ['ช่องท่าหลบ', `1 / ${D.read_slots}`]];
+  st.forEach(([k, v], i) => h += L(134, 32 + i * 16, k, 'mut', 'font-size:8px') + L(196, 32 + i * 16, `<span class="num">: ${v}</span>`, '', 'font-size:8.5px'));
+  h += W(276, 14, 98, 170, 'สายท่า');
+  SCH_ORDER.forEach((sc, i) => {
+    const y = 22 + i * 26, n = techsOf(sc).filter(t => learned.has(t.name)).length, held = sc === D.school;
+    h += `<div style="position:absolute;left:282px;top:${y}px;width:86px;height:22px;border:1px solid ${held ? 'var(--winB2)' : 'var(--winB)'};background:#0005;border-radius:2px"></div>`;
+    h += `<img src="${icon(sc)}" style="left:284px;top:${y + 1}px;width:20px;height:20px">` + L(306, y + 6, `สาย${sc}`, held ? 'b' : 'mut', 'font-size:6.5px') + L(350, y + 4, `<span class="num" style="font-size:9px">${n}</span><span class="mut">/7</span>`);
+  });
+  h += BTN(10, 196, 58, 'ปิด') + BTN(316, 196, 58, 'กลับ');
+  return h;
+}, ['ATK/DEF/HP/SP มาจากสูตร hero_atk/def/hp/sp ที่ความชำนาญ 20 + ค่าอาวุธ 28 · ไม่มี MDF/STR/DEX ฯลฯ แบบ RS3 เพราะเกมนี้ไม่มีค่าเหล่านั้น',
+   'ไม่มี CRIT แบบชีต UI (ระบบต่อสู้ไม่มีคริติคอล)']);
+
+// 6 ── อาวุธ / ไอเท็ม ──
+screen('inventory', 'อาวุธและไอเท็ม', 'โครง RS3 คลังสองฝั่ง: ซ้ายอาวุธที่มี (สลับถือได้) · ขวาไอเท็ม · กล่องล่างบอกรายละเอียดของที่ชี้อยู่', () => {
+  let h = `<div class="bgp"></div>`;
+  h += W(10, 12, 178, 150, 'อาวุธ') + W(196, 12, 178, 150, 'ไอเท็ม');
+  D.owned.forEach((id, i) => {
+    const w = D.weapons.find(x => x.weapon_id === id), y = 20 + i * 18, held = w.name === D.weapon;
+    h += `<img src="${IMG['W' + id]}" style="left:28px;top:${y - 2}px;width:16px;height:16px">` + `<div class="row${held ? ' sel' : ''}" style="left:46px;top:${y}px;width:136px;font-size:8px">${held ? '▶ ' : ''}${w.name}<span class="mut num" style="position:absolute;right:4px">${w.weapon_base}</span></div>`;
+  });
+  h += HAND(14, 38);
+  for (let i = D.owned.length; i < 7; i++) h += L(46, 20 + i * 18, '· · · · · · · · ·', 'mut');
+  D.items.forEach((it, i) => {
+    const y = 20 + i * 18;
+    h += `<img src="${IMG[it.item_id]}" style="left:204px;top:${y - 2}px;width:16px;height:16px">` + `<div class="row" style="left:222px;top:${y}px;width:146px;font-size:8px">${it.name}<span class="mut num" style="position:absolute;right:4px">x2</span></div>`;
+  });
+  for (let i = D.items.length; i < 7; i++) h += L(222, 20 + i * 18, '· · · · · · · · ·', 'mut');
+  const w = D.weapons.find(x => x.weapon_id === 'CR-2');
+  h += W(10, 168, 364, 26);
+  h += L(16, 172, `<span class="b">${w.name}</span> · ค่าอาวุธ <span class="num">${w.weapon_base}</span> · สาย${w.school} · ชี้ทาง ${w.steer || '—'}`);
+  h += L(16, 182, 'ถือ = ใช้ท่าและประกายสาย ทุบ · ท่าสายอื่นที่เรียนแล้วไม่หาย', 'mut');
+  h += BTN(316, 200, 58, 'กลับ');
+  return h;
+}, ['จำนวนยาในกล่องขวา (x2) เป็นค่าตัวอย่างหน้าจอ', 'ชีต UI มีช่องอุปกรณ์ 6 ช่อง (+5 +3 …) — GDD 6.1 ช่องอุปกรณ์ 5 และอาวุธ "เปลี่ยนกฎ" ไม่ใช่ +N · ยังไม่มีระบบอุปกรณ์อื่นนอกจากอาวุธ']);
+
+// 7 ── จบศึก ──
+screen('result', 'จบศึก: ชนะ / ล้ม', 'ซ้าย = ชนะ (ความชำนาญ · เงิน · ของดรอป · ท่าที่ประกาย) · ขวา = Rion ล้ม — ไม่มี EXP เพราะเกมไม่มีเลเวล', () => {
+  let h = `<div class="bgp"></div>`;
+  h += W(10, 14, 176, 176, 'ชนะ');
+  h += L(52, 26, 'ชนะ!', 'b acc', 'font-family:var(--f-num);font-size:22px');
+  h += L(20, 62, `ความชำนาญ <span class="num">${D.prof} → ${D.prof + 1}</span>`, '', 'font-size:8.5px');
+  h += L(20, 76, `เงิน <span class="num">+${M.B1.tier * 1}</span>`, '', 'font-size:8.5px');
+  h += L(20, 90, `<span style="color:var(--ins)">★</span> ประกาย: หักเกราะ`, '', 'font-size:8.5px');
+  h += L(20, 104, `อ่านทาง: ผลุบผลับ 2/3`, 'mut', 'font-size:8px');
+  h += `<img src="${IMG['DB1']}" style="left:20px;top:122px;width:16px;height:16px">` + L(40, 126, 'ตำรา White "คืน LP"', '', 'font-size:7.5px');
+  h += BTN(54, 168, 80, 'ไปต่อ');
+  h += `<div style="position:absolute;left:198px;top:14px;width:176px;height:176px;background:linear-gradient(#2a0d0d,#120606);border:1px solid #7a2d22"></div>`;
+  h += L(232, 30, 'Rion ล้ม', 'b', 'font-size:18px;color:#e2604f');
+  h += L(214, 64, 'ทีมหยุดสู้ — มอนที่ล้มเสีย LP 1', 'mut', 'font-size:7.5px');
+  h += L(214, 78, `หนอนหิน <span class="dots">${lp(2)}</span>`, '', 'font-size:8px');
+  h += BTN(232, 140, 108, 'กลับจุดพัก') + BTN(232, 158, 108, 'โหลดเซฟ');
+  return h;
+}, ['ค่าในจอชนะเป็นตัวอย่างตำแหน่ง (เงิน = tier × จำนวนศัตรู ตามสูตรใน Overworld) · ของดรอปบอส B1 = ตำรา White "คืน LP" ตามข้อมูล',
+   '<b>ยังไม่รู้</b>: เกมทำอะไรเมื่อ Rion ล้ม — ปุ่ม "กลับจุดพัก/โหลดเซฟ" เป็นข้อเสนอ ต้องให้ kwan ตัดสิน']);
+
+// 8 ── บทพูด / แจ้งเตือน ──
+screen('dialog', 'บทพูด · แจ้งเตือน · คำแนะนำ', 'กล่องบทพูดล่างจอ (ไม่เกิน 2 บรรทัด ตามกฎ UX ข้อ 5) · แจ้งเตือนมุมขวาบน · กล่องคำแนะนำ', () => {
+  let h = `<div class="bgp" style="background:linear-gradient(#a7b5a0 0 55%,#d4b08a 55%)"></div>`;
+  h += SPR('rion_s', 168, 70, 1) + SPR('B1', 30, 50, 1);
+  h += W(248, 8, 128, 14) + L(254, 11, '🎁 ได้ ตำรา White "คืน LP"', '', 'font-size:7px');
+  h += W(248, 26, 128, 14) + L(254, 29, `◇ อ่านทาง ผลุบผลับ 2/3`, '', 'font-size:7px');
+  h += W(8, 10, 150, 30, 'คำแนะนำ') + L(14, 17, 'ทุบเข้าทางมอนเกราะ กระดูก หิน', '', 'font-size:7px') + L(14, 27, 'เปลี่ยนอาวุธได้ที่ เมนู › อาวุธ', 'mut', 'font-size:7px');
+  h += W(8, 158, 368, 52);
+  h += `<div style="position:absolute;left:14px;top:164px;width:40px;height:40px;border:1px solid var(--winB);background:#0006;display:grid;place-items:center;color:var(--t2);font-size:16px">?</div>`;
+  h += L(60, 162, '???', 'acc b', 'font-size:8px');
+  h += L(60, 175, D.dialogue[0].text, '', 'font-size:10px');
+  h += L(60, 189, D.dialogue[1].text, '', 'font-size:10px');
+  h += L(360, 198, '▼', 'acc');
+  return h;
+}, ['บทพูดสองบรรทัดมาจาก data/dialogue.csv (ฉากจบเดโม · เสียงปริศนาจากฉาก 0 ไม่ใช่ Rion จึงขึ้น ???) · ชีต UI มีบทของ Mio/Kai/Lyn ซึ่งไม่มีในเกม']);
+
+const CONF = [
+  ['Lv. 32 / EXP 520', 'ไม่มีเลเวล · ใช้ "ความชำนาญ" (GDD 4.1)', 'ความชำนาญ · จอชนะไม่มี EXP'],
+  ['MP', 'SP (ท่า) · เวทย์ยังไม่อยู่ในศึก', 'SP'],
+  ['ทีม Rion / Mio / Kai / Lyn (คน)', 'ทีม = มอนร่วมทีม มี LP ●●● + ความเชื่อใจ (GDD 5)', 'มอน + LP'],
+  ['สกิล Lv.1–5 · ชื่อท่า พันเฉือน คมวายุ ฯลฯ', 'ต้นไม้ท่า 42 ท่า ไม่มีเลเวลสกิล · ชื่อตาม techs.csv', 'ท่าจริง + รู้ n/7'],
+  ['แท็บ SL PC CR BD ST DV', 'ตรงกับ 6 ตระกูลอาวุธ = 6 สาย ✓', 'ใช้ตามนั้น'],
+  ['Break gauge บอส', 'ขัดจังหวะ = ดาเมจสะสม 15% maxHP ระหว่างที่บอสเปิดท่า (GDD 3.8)', 'หลอด "ขัด"'],
+  ['Weak ไอคอนธาตุ', 'จุดอ่อนธาตุ + ร่างกาย (ความเข้ากับร่างกาย)', 'ป้ายร่างกาย + ท่าที่เปิด'],
+  ['CRITICAL / ดาเมจ 1205', 'ไม่มีคริติคอล · ดาเมจหลักสิบ–ร้อยต้น', 'ตัวเลขเหลือง ! = จุดอ่อน · ป้ายเข้าทาง'],
+  ['อุปกรณ์ 6 ช่อง +N · CRIT 15%', 'ยังมีแค่อาวุธ · GDD: อาวุธเปลี่ยนกฎ ไม่ใช่ +N', 'แค่อาวุธ'],
+  ['Mini Map · เข็มทิศ · พิกัด X/Y · เควส', 'ยังไม่มีระบบเควส/มินิแมพ', 'ยังไม่วาด (รอรูป/ตัดสิน)'],
+  ['Achievement · Language · Resolution 3840', 'ยังไม่มี · จอเกม 384×216', 'ยังไม่วาด'],
+];
+$('#confBody').innerHTML = CONF.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td><span class="tag">${r[2]}</span></td></tr>`).join('');
+
+// ── ประกอบหน้า ──
+let look = 'gold';
+try { look = localStorage.getItem('ui_look') || 'gold'; } catch (e) {}
+function render() {
+  $('#screens').innerHTML = SCREENS.map(s => `
+    <section class="scr" id="${s.id}">
+      <h2>${s.title}</h2><p class="sub">${s.sub}</p>
+      <div class="frame"><div class="g${look === 'blue' ? ' blue' : ''}">${s.draw()}</div></div>
+      <div class="notes">${s.notes.map(n => `<div>· ${n}</div>`).join('')}</div>
+    </section>`).join('');
+  $('#jump').innerHTML = SCREENS.map(s => `<a href="#${s.id}">${s.title}</a>`).join('') + '<a href="#conflicts">ที่ขัดกับเกม</a>';
+  $('#lookGold').setAttribute('aria-pressed', look === 'gold');
+  $('#lookBlue').setAttribute('aria-pressed', look === 'blue');
+  fit();
+}
+function fit() {
+  document.querySelectorAll('.frame').forEach(f => { f.firstElementChild.style.transform = `scale(${f.clientWidth / 384})`; });
+}
+$('#lookGold').onclick = () => { look = 'gold'; try { localStorage.setItem('ui_look', look); } catch (e) {} render(); };
+$('#lookBlue').onclick = () => { look = 'blue'; try { localStorage.setItem('ui_look', look); } catch (e) {} render(); };
+new ResizeObserver(fit).observe(document.body);
+render();
+</script>
