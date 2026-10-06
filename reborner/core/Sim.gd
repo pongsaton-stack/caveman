@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	# บรรทัดนี้บอกว่ากำลังรันไฟล์เวอร์ชันไหนอยู่ — กันสับสนเวลาไฟล์ไม่ถูกทับ
 	print("เวอร์ชัน: %s" % VERSION)
-	print("Insight: สู้บอส %.0f · เพื่อนล้ม %.0f · เพื่อนเจ็บ %.0f · เกณฑ์ %.0f"
+	print("Insight: สู้บอส %.1f · เพื่อนล้ม %.1f · เพื่อนเจ็บ %.1f · เกณฑ์ %.0f"
 		% [Insight.FIGHTING_BOSS, Insight.ALLY_DOWN, Insight.ALLY_HURT, Insight.THRESHOLD])
 	print("มอนสเตอร์ %d ตัว · ท่า %d ท่า · %d สาย · จำลองศึกละ %d ครั้ง\n"
 		% [rows.size(), techs.all.size(), techs.schools().size(), BATTLES])
@@ -65,13 +65,16 @@ func sweep(mid: String, label: String, profs: Array, count: int = 1) -> void:
 		print("  %4d  %3d%%  %6.0f   %6.2f   %6.2f%%     %5.2f     %5.2f   %5.2f  %5.2f  %5.2f   %5.1f%%"
 			% [p, int(r["win"] * 100.0), r["time"], r["ratio"], r["glim_rate"] * 100.0,
 			   r["fills"], r["combos"], r["tels"], r["ints"], r["status"], r["guard_rate"] * 100.0])
+		print("        ใช้ท่า/ศึก %.2f · ประกายสุ่ม %.2f%% · สวนกลับ %.3f/ศึก · อ่านทางใหม่ %.3f/ศึก · หลบได้ %.3f/ศึก"
+			% [r["uses"], r["rand_rate"] * 100.0, r["counters"], r["reads"], r["dodges"]])
 	print("")
 
 func batch(mid: String, prof: int, count: int, weapon: int = WEAPON_BASE) -> Dictionary:
 	var wins := 0
 	var tot := {"rounds": 0, "time": 0.0, "dealt": 0, "taken": 0, "glimmers": 0,
 		"tech_uses": 0, "statuses": 0, "guards": 0, "fills": 0,
-		"combos": 0, "telegraphs": 0, "interrupts": 0}
+		"combos": 0, "telegraphs": 0, "interrupts": 0, "from_fill": 0,
+		"counters": 0, "reads": 0, "dodges": 0}
 	for i in BATTLES:
 		var b := Battle.new()
 		b.techs = techs
@@ -95,6 +98,8 @@ func batch(mid: String, prof: int, count: int, weapon: int = WEAPON_BASE) -> Dic
 		"ratio": float(tot["dealt"]) / maxf(float(tot["taken"]), 1.0),
 		"glim_rate": float(tot["glimmers"]) / maxf(float(tot["tech_uses"]), 1.0),
 		"fills": tot["fills"] / n,
+		"counters": tot["counters"] / n, "reads": tot["reads"] / n, "dodges": tot["dodges"] / n,
+		"uses": tot["tech_uses"] / n, "rand_rate": float(tot["glimmers"] - tot["from_fill"]) / maxf(float(tot["tech_uses"]), 1.0),
 		"combos": tot["combos"] / n,
 		"tels": tot["telegraphs"] / n,
 		"ints": tot["interrupts"] / n,
@@ -157,6 +162,7 @@ func tech_progression() -> void:
 		hero.insight_lock = 0
 		# ความชำนาญโตตามสูตรจริง
 		hero.tier += Formulas.prof_gain(f.tier, hero.tier)
+		hero.read_slots = Formulas.tech_slots(hero.tier) / 2
 		hero.atk = Formulas.hero_atk(hero.tier, WEAPON_BASE)
 		hero.max_hp = Formulas.hero_hp(hero.tier)
 		hero.max_sp = Formulas.hero_sp(hero.tier, 0)
@@ -164,6 +170,11 @@ func tech_progression() -> void:
 	for line in learned_at:
 		print("  " + line)
 	print("  ท่าที่มีตอนจบ: %s" % ", ".join(hero.learned))
+	var rd: Array[String] = []
+	for k in hero.reads:
+		var r: Dictionary = hero.reads[k]
+		rd.append("%s %d/%d%s" % [r["name"], r["p"], r["need"], "" if r["on"] else " (ไม่ได้ติดตั้ง)"])
+	print("  ท่าหลบที่อ่านได้ (ติดตั้ง %d ช่อง): %s" % [hero.read_slots, ", ".join(rd) if not rd.is_empty() else "—"])
 	print("  ความชำนาญตอนจบ: %d\n" % hero.tier)
 
 func make_party() -> Array[Actor]:
@@ -206,4 +217,5 @@ func make_hero(prof: int, weapon: int = WEAPON_BASE) -> Actor:
 	h.learned.clear()
 	if root != null:
 		h.learned.append(root.name)
+	h.read_slots = Formulas.tech_slots(prof) / 2
 	return h

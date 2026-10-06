@@ -53,6 +53,30 @@ var sig_effect: Dictionary = {}  # แถวจาก sig_effects.csv ของ�
 var once_used: Array[String] = []   # ชื่อท่าแบบ "ครั้งเดียวต่อการต่อสู้" ที่ใช้ไปแล้ว
 var seized: Array[String] = []   # ตัวเอก: ชื่อท่าที่ยึดมา (แยกจาก learned — ไม่นับในต้นไม้ท่า/โอกาสประกาย)
 
+# ── อ่านทางหลบ (ตัวเอกเท่านั้น · kwan 6 ต.ค. 2026) ──
+# โดนท่าเด่นมอน → โรลสูตรประกาย → ติด = เริ่มอ่านทางท่านั้น · โดนซ้ำ +1 (ตั้งรับ +2) จนครบความเข้าใจของมอน (comprehension)
+# หลบได้ = แต้ม/ที่ต้องครบ (ครบ = 100%) · ใช้ได้เฉพาะอันที่ติดตั้ง · ติดตั้งพร้อมกันได้ read_slots อัน (= ช่องความจำท่า ÷ 2)
+# อ่านใหม่ติดตั้งเองถ้ายังมีช่องว่าง · ครบ 100% แล้วถอด/ติดตั้งได้เหมือนท่าโจมตี (PlayerState.toggle_read)
+var reads: Dictionary = {}       # monster_id → {"name": ชื่อท่าเด่น, "p": แต้มที่อ่านได้, "need": แต้มที่ต้องครบ, "on": ติดตั้งอยู่ไหม}
+var read_slots: int = 0
+var counter_used: bool = false   # ประกายสวนกลับได้ครั้งเดียวต่อการตั้งรับหนึ่งครั้ง
+
+func reads_on() -> int:
+	var n := 0
+	for k in reads:
+		if bool(reads[k].get("on", false)):
+			n += 1
+	return n
+
+## โอกาสหลบท่าเด่นของมอนตัวนี้ (0 ถ้ายังไม่อ่าน หรืออ่านแล้วแต่ไม่ได้ติดตั้ง)
+func dodge_chance(monster_id: String) -> float:
+	if not reads.has(monster_id):
+		return 0.0
+	var r: Dictionary = reads[monster_id]
+	if not bool(r.get("on", false)):
+		return 0.0
+	return clampf(float(r.get("p", 0)) / maxf(float(r.get("need", 1)), 1.0), 0.0, 1.0)
+
 static var _sig_table := {}
 static func sig_table() -> Dictionary:
 	if _sig_table.is_empty() and FileAccess.file_exists("res://data/sig_effects.csv"):

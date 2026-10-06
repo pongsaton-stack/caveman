@@ -662,6 +662,9 @@ func _strike_fx(e: Dictionary, ult: bool, nth: int) -> void:
 	if e.has("buff"):   # ท่าเสริมตัวเอง (เช่น เกราะแข็ง) — ไม่มีดาเมจ ไม่ลอยเลข 0
 		_float_number(to, str(e["buff"]), Color("8ad0f0"))
 		return
+	if e.get("dodge", false):   # อ่านทางหลบท่าเด่นได้ — ไม่มีดาเมจ ไม่วาบโดนตี
+		_float_number(to, "หลบ!", Color("8af0c0"))
+		return
 	var from := _actor_point(e["src"])
 	var col: Color = Color("f2c94c") if e["glimmer"] or str(e["tech"]).begins_with("คอมโบ") else FX_COLOR.get(e["school"], FX_DEFAULT)
 	match str(e["school"]):

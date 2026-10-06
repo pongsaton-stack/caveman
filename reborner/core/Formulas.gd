@@ -8,7 +8,7 @@ const AV_NUM       := 10000.0 # AV = AV_NUM / SPD
 const WEAK_MULT    := 1.5
 const RESIST_MULT  := 0.5
 const PUSH_MULT    := 0.75    # ตีจุดอ่อน -> AV ถัดไปคูณค่านี้
-const GLIM_BASE    := 0.032
+const GLIM_BASE    := 0.048   # 0.032 → 0.048 (6 ต.ค. 2026 kwan "ให้สนุก อย่าให้เบื่อ" · Sim 1000 ศึก: ศึกสูสีประกายสุ่ม 2.5% → 4–8% · มอนขยะยัง ≤3.7%)
 const INSIGHT_MAX  := 40.0
 const THREAT_SLOPE := 0.08
 const THREAT_MIN   := 0.2

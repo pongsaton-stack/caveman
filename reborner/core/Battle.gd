@@ -27,6 +27,9 @@ var glimmers := 0
 var glimmers_from_fill := 0   # ประกายที่มาจาก Insight เต็ม (ไม่ใช่การสุ่ม)
 var fills := 0                # จำนวนครั้งที่ Insight เต็ม
 var glimmer_log: Array[String] = []
+var counter_glimmers := 0     # ประกายสวนกลับ (ตั้งรับแล้วโดนตี · ไม่นับใน glimmers เพื่อให้อัตราประกายต่อการใช้ท่าเทียบกับของเดิมได้)
+var read_glimmers := 0        # ประกายหลบ — เริ่มอ่านทางท่าเด่นมอนใหม่
+var dodges := 0               # หลบท่าเด่นได้ด้วยการอ่านทาง
 var tech_uses := 0
 var statuses_applied := 0
 var guards := 0
@@ -366,6 +369,7 @@ func understanding_of(f: Actor) -> Array[int]:
 func _do_guard(a: Actor) -> void:
 	a.guarding = true
 	a.windup = true
+	a.counter_used = false
 	guards += 1
 	for k in a.tick_statuses(1):
 		_log("    ตั้งรับสลัด%sออกได้" % k)
@@ -450,17 +454,8 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 		if guaranteed or randf() < p:
 			var g: Tech = techs.roll_glimmer(cur.learned, cur.school, cur.tier, tech, cur.steer_branch)
 			if g != null:
-				cur.learned.append(g.name)
-				cur.first_glimmer_pending = false
 				glimmers += 1
-				glimmer_log.append(g.name)
-				if guaranteed:
-					glimmers_from_fill += 1
-					cur.insight = 0.0
-					cur.insight_lock = Insight.LOCK_ROUNDS
-					_log("    ★★ ประกาย! %s เรียนรู้ %s (Insight เต็ม)" % [cur.name, g.name])
-				else:
-					_log("    ★ ประกาย! %s เรียนรู้ %s (สุ่มติด %.1f%%)" % [cur.name, g.name, p * 100.0])
+				_learn_glimmer(cur, g, guaranteed, p, "")
 				tech = g
 				free = true
 			elif guaranteed:
@@ -511,7 +506,81 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 	if tech.target_av_mult != 1.0 and not target.down:
 		target.av *= tech.target_av_mult
 
+## เรียนท่าจากประกาย — ใช้ร่วมกันระหว่างประกายตอนใช้ท่ากับประกายสวนกลับ
+func _learn_glimmer(cur: Actor, g: Tech, guaranteed: bool, p: float, kind: String) -> void:
+	cur.learned.append(g.name)
+	cur.first_glimmer_pending = false
+	glimmer_log.append(g.name)
+	if guaranteed:
+		glimmers_from_fill += 1
+		cur.insight = 0.0
+		cur.insight_lock = Insight.LOCK_ROUNDS
+		_log("    ★★ ประกาย%s! %s เรียนรู้ %s (Insight เต็ม)" % [kind, cur.name, g.name])
+	else:
+		_log("    ★ ประกาย%s! %s เรียนรู้ %s (สุ่มติด %.1f%%)" % [kind, cur.name, g.name, p * 100.0])
+
+# ── อ่านทางหลบ (kwan 6 ต.ค. 2026) ─────────────────────────
+## ท่าเด่นมอนกำลังจะลงตัวเอก — คืน true ถ้าหลบได้ (ไม่โดนดาเมจ)
+## ลำดับ: หลบด้วยแต้มก่อนหน้า → ยังไม่เคยอ่าน = โรลสูตรประกาย → โดน/เห็นท่าอีกครั้ง = แต้ม +1 (ตั้งรับ +2)
+func _read_signature(src: Actor, tgt: Actor) -> bool:
+	if not allow_glimmer or techs == null:
+		return false
+	var dodged := false
+	var ch := tgt.dodge_chance(src.id)
+	if ch > 0.0 and (ch >= 1.0 or randf() < ch):
+		dodged = true
+	if not tgt.reads.has(src.id):
+		var p := Formulas.glimmer_chance(src.tier, tgt.tier, 0.0, tgt.luck)
+		if randf() >= p:
+			return false
+		var on := tgt.reads_on() < tgt.read_slots
+		tgt.reads[src.id] = {"name": src.signature, "p": 0, "need": maxi(1, src.comprehension), "on": on}
+		read_glimmers += 1
+		_log("    ★ ประกายหลบ! %s เริ่มอ่านทาง %s ของ %s (สุ่มติด %.1f%%)%s" % [tgt.name, src.signature, src.name,
+			p * 100.0, "" if on else " · ช่องเต็ม ยังไม่ติดตั้ง"])
+	var r: Dictionary = tgt.reads[src.id]
+	var need := int(r["need"])
+	if int(r["p"]) < need:
+		r["p"] = mini(need, int(r["p"]) + (2 if tgt.guarding else 1))
+		_log("    ◇ อ่านทาง %s %d/%d (หลบได้ %d%%)" % [src.signature, r["p"], need,
+			int(round(100.0 * float(r["p"]) / float(need)))])
+	return dodged
+
+# ── ประกายสวนกลับ (kwan 6 ต.ค. 2026) ──────────────────────
+## ตั้งรับแล้วโดนตี → โรลสูตรประกาย (Insight เต็ม = แน่นอน) → ติด = เรียนท่าใหม่แล้วสวนทันที นอกคิว
+## ไม่เสีย SP · แรง x1.5 เหมือนประกายปกติ · ครั้งเดียวต่อการตั้งรับหนึ่งครั้ง
+func _counter_glimmer(src: Actor, h: Actor) -> void:
+	if not allow_glimmer or techs == null or h.counter_used or src.down or h.down:
+		return
+	h.counter_used = true
+	var guaranteed := h.insight >= Insight.THRESHOLD
+	var learned_ratio: float = float(h.learned.size()) / maxf(float(_school_size(h)), 1.0)
+	var p := Formulas.glimmer_chance(src.tier, h.tier, learned_ratio, h.luck)
+	if not guaranteed and randf() >= p:
+		return
+	var g: Tech = techs.roll_glimmer(h.learned, h.school, h.tier, null, h.steer_branch)
+	if g == null:
+		return
+	counter_glimmers += 1
+	_learn_glimmer(h, g, guaranteed, p, "สวนกลับ")
+	var prev := _fx_glimmer
+	_fx_glimmer = true
+	for _i in g.hits:
+		for t in _resolve_scope(g, src):
+			if not t.down:
+				_strike(h, t, g, 1.5)
+	_fx_glimmer = prev
+
 func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
+	var is_sig := src.side == "foe" and tgt.is_hero and tech.name == src.signature and src.id != ""
+	if is_sig and _read_signature(src, tgt):
+		dodges += 1
+		_log("  รอบ %2d  %s → %s [%s] : หลบได้! (อ่านทางออก)" % [rounds, src.name, tgt.name, tech.name])
+		if capture:
+			events.append({"src": src, "tgt": tgt, "tech": tech.name, "school": tech.school, "dmg": 0,
+				"weak": false, "glimmer": false, "dodge": true})
+		_note_understanding(src, tgt)
+		return
 	var elem: float = tgt.elem_mult(tech.element)
 	var pos := 1.0
 	if tgt.row == "หลัง" and not (tech.ignore_pos or tech.free_row):
@@ -562,6 +631,8 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 				_gain_insight(tgt, Insight.HP_LOW, "HP ต่ำ")
 		elif ratio < Insight.ALLY_HURT_RATIO:
 			_gain_insight(hero(), Insight.ALLY_HURT, "เพื่อนเจ็บหนัก")
+		if tgt.is_hero and tgt.guarding and src.side == "foe":
+			_counter_glimmer(src, tgt)
 
 	if src.side == "foe" and tgt.side == "ally" and tech.name == src.signature and src.id != "":
 		_note_understanding(src, tgt)
@@ -688,6 +759,7 @@ func _result() -> Dictionary:
 		"downs": downs, "kills": kills, "hits_on_kill": hits_on_kill,
 		"glimmers": glimmers, "glimmer_log": glimmer_log, "tech_uses": tech_uses,
 		"fills": fills, "from_fill": glimmers_from_fill,
+		"counters": counter_glimmers, "reads": read_glimmers, "dodges": dodges,
 		"statuses": statuses_applied, "guards": guards, "status_deaths": status_deaths,
 		"combos": combos, "telegraphs": telegraphs, "interrupts": interrupts,
 		"ambush": ambush,
