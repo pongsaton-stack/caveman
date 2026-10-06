@@ -67,6 +67,23 @@ def rot_ground(im, ang, pivot, ground):
 	out = Image.new('RGBA', im.size); out.alpha_composite(r, (0, 0)) if not bb else out.paste(r, (0, ground - bb[3]), r); return out
 
 # ── ตัวเรนเดอร์ Rion: params → ภาพ 64x76 ──
+def _rot_pt(pt, deg, c):
+	a = math.radians(deg); x, y = pt[0] - c[0], pt[1] - c[1]
+	return (c[0] + x * math.cos(a) + y * math.sin(a), c[1] - x * math.sin(a) + y * math.cos(a))
+BOW_PIVOT = (31, HIP)
+def bow(im, deg):
+	"""โค้งตัว: หมุนช่วงบน (เหนือ HIP) รอบสะโพก · + = ก้มไปหน้า (หันซ้าย) · ขาอยู่ที่เดิม"""
+	upper = PA.part(im, lambda x, y: y < HIP); lower = PA.part(im, lambda x, y: y >= HIP)
+	return PA.put(lower, upper.rotate(deg, Image.NEAREST, center=BOW_PIVOT))
+def body_pt(pt, p):
+	"""จุดบนลำตัว (ไหล่ · มือที่ท่ากำหนด) หลังขยับตัวแบบเดียวกับ rion_frame: ย่อ → เอน → โค้ง → อก"""
+	x, y = pt; n = ri(p.get('squash', 0))
+	if n and y < p.get('sq_at', 57): y += n
+	if ri(p.get('lean', 0)) and y < HIP: x += ri(p['lean'] * (HIP - y) / (HIP - 8))
+	if abs(p.get('bow', 0)) >= 1 and y < HIP: x, y = _rot_pt((x, y), p['bow'], BOW_PIVOT)
+	if ri(p.get('chest', 0)) and y < 46: y += ri(p['chest'])
+	return (x, y)
+
 FLOP_DIRS = ['south', 'west', 'north', 'east']
 def rion_frame(p):
 	d = p.get('dir', 'west'); img = PA.rion(p.get('img', d))
@@ -75,21 +92,26 @@ def rion_frame(p):
 		img = G.remove_front_arm(img); hx, hy = reach(G.SH_F, p['arm_hand']); e = ik(G.SH_F, (hx, hy)); draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
 	if p.get('arm_swing') is not None and d in ('south', 'north', 'east') and not p.get('img'):   # แกว่งแขนทิศอื่น (rion_parts: แยกชิ้นแขนแล้วเฉือน)
 		img = RP.swing_arms(img, d, p['arm_swing'], p.get('arm_lift', 1.0))
-	if p.get('arm') or p.get('barm'):
-		img = G.remove_front_arm(img)
-		if p.get('barm'): b = p['barm']; G.draw_arm(img, G.SH_B, (ri(b[0]), ri(b[1])), (ri(b[2]), ri(b[3])), back=True)
-		a = p.get('arm') or (24, 44, 23, 47); G.draw_arm(img, G.SH_F, (ri(a[0]), ri(a[1])), (ri(a[2]), ri(a[3])))
-		if p.get('item'): PA.item(img, ri(a[2]), ri(a[3]) - 1)
+	arms = (p.get('arm') or p.get('barm')) and d == 'west' and not p.get('img')
+	if arms: img = G.remove_front_arm(img)   # แขนที่ท่ากำหนดเอง: วาดหลังขยับตัวเสร็จ (ด้านล่าง) ไหล่จึงอยู่ตามตัวที่ย่อ/เอน/โค้งแล้ว
 	if p.get('walk') is not None:
 		img = legs_side(img, p['walk'], d == 'west', 30 if d == 'west' else 34, HIP, 63, p.get('kmax', 4), 64) if d in ('west', 'east') \
 			else legs_front(img, p['walk'], 32 if d == 'south' else 31, HIP, 57, 61, 64)
 	if p.get('feet'): f = ri(p['feet']); img = PA.put(PA.put(PA.part(img, lambda x, y: y < 59), PA.part(img, lambda x, y: y >= 59 and x < 32), -f, 0), PA.part(img, lambda x, y: y >= 59 and x >= 32), f, 0)
 	if ri(p.get('squash', 0)): img = PA.squash(img, p.get('sq_at', 57), ri(p['squash']))
 	if ri(p.get('lean', 0)): img = PA.lean(img, p['lean'], HIP, 8)
+	if abs(p.get('bow', 0)) >= 1: img = bow(img, p['bow'])
 	ch, hd = ri(p.get('chest', 0)), ri(p.get('head', 0))
 	if ch: img = PA.shift_part(img, lambda x, y: y < 46, 0, ch)
 	if hd > ch: img = PA.shift_part(img, lambda x, y: y < 31 + ch, 0, hd - ch)
 	if ri(p.get('hx', 0)) or ri(p.get('hy', 0)): img = PA.shift_part(img, lambda x, y: y < 31, ri(p.get('hx', 0)), ri(p.get('hy', 0)))
+	if arms:   # ไหล่/มือผ่านการขยับตัวชุดเดียวกัน → มือดึงเข้าไม่เกินความยาวแขน (REACH) → ศอกจาก ik
+		if p.get('barm'):
+			b = p['barm']; sb = body_pt(G.SH_B, p); hb = reach(sb, body_pt((b[2], b[3]), p)); eb = ik(sb, hb)
+			G.draw_arm(img, (ri(sb[0]), ri(sb[1])), (ri(eb[0]), ri(eb[1])), (ri(hb[0]), ri(hb[1])), back=True, w_upper=3)
+		a = p.get('arm') or (24, 44, 23, 47); sf = body_pt(G.SH_F, p); hf = reach(sf, body_pt((a[2], a[3]), p)); ef = ik(sf, hf)
+		draw_arm_soft(img, (ri(sf[0]), ri(sf[1])), (ri(ef[0]), ri(ef[1])), (ri(hf[0]), ri(hf[1])))
+		if p.get('item'): PA.item(img, ri(hf[0]), ri(hf[1]) - 1)
 	if ri(p.get('lag_hx', 0)) or ri(p.get('lag_hy', 0)): img = PA.shift_part(img, lambda x, y: y < 31 + ch, ri(p.get('lag_hx', 0)), ri(p.get('lag_hy', 0)), keep=True)   # หัวตามแรงเฉื่อย
 	if ri(p.get('pack', 0)) and d in ('west', 'east') and not p.get('img'):
 		img = PA.shift_part(img, PACK if d == 'west' else (lambda x, y: PACK(63 - x, y)), 0, ri(p['pack']), keep=True)   # เป้ตามแรงเฉื่อย
@@ -225,10 +247,11 @@ pose('rion_kneel', 'rion', 'ท่าทาง', 'คุกเข่า (ซ้�
 pose('rion_sleep', 'rion', 'ท่าทาง', 'นอนหลับ', 2.4, lambda t: {'img': 'west_k1', 'chest': 0, 'glyphs': zzz(t, 44, TOP + 30)})
 pose('rion_wave', 'rion', 'ท่าทาง', 'โบกมือทักทาย', 1.1, lambda t: {'arm': (21, 35, 17.5 + 2.5 * sin(t, 2), 29 - abs(sin(t, 2)))} if 0.12 < t < 0.9 else
 	{'arm': kf(t, [(0, (24, 44, 23, 47)), (0.12, (21, 35, 17.5, 29)), (0.9, (21, 35, 17.5, 29)), (1, (24, 44, 23, 47))])})
-pose('rion_pickup', 'rion', 'ท่าทาง', 'ก้มเก็บของ → ชูขึ้น', 1.44, lambda t: {'squash': kf(t, [(0, 0), (0.15, 4), (0.4, 4), (0.55, 0)]), 'sq_at': 56,
-	'arm': kf(t, [(0, (24, 44, 23, 47)), (0.15, (21, 47, 17, 52)), (0.3, (20, 50, 15, 56)), (0.42, (20, 50, 15, 56)), (0.6, (21, 35, 16, 31)), (1, (21, 35, 16, 31))]),
+pose('rion_pickup', 'rion', 'ท่าทาง', 'ก้มเก็บของ → ชูขึ้น', 1.44, lambda t: {'squash': kf(t, [(0, 0), (0.15, 4), (0.42, 4), (0.55, 0)]), 'sq_at': 56,
+	'bow': kf(t, [(0, 0), (0.18, 26), (0.42, 26), (0.56, 0)]),   # ย่อเข่า + โค้งตัวก้มลงไปหาของ (เดิมยืดแขนลงพื้น ยาวเกินแขนจริง 2 เท่า)
+	'arm': kf(t, [(0, (24, 44, 23, 47)), (0.15, (21, 47, 18, 52)), (0.3, (19, 50, 14, 58)), (0.42, (19, 50, 14, 58)), (0.6, (21, 35, 16, 31)), (1, (21, 35, 16, 31))]),
 	'item': t > 0.33, 'glyphs': sparkles(t, [(9, 20), (21, 18)], 0.6, 1.0)})
-pose('rion_push', 'rion', 'ท่าทาง', 'ผลักลัง', 0.88, lambda t: {'walk': t, 'kmax': 3, 'lean': -3, 'arm': (19, 42, 14, 42), 'barm': (22, 44, 15, 45), 'crate': -4 * t})
+pose('rion_push', 'rion', 'ท่าทาง', 'ผลักลัง', 0.88, lambda t: {'walk': t, 'kmax': 3, 'lean': -3, 'arm': (19, 45, 15, 48), 'barm': (22, 46, 16, 49), 'crate': 4 - 4 * t})   # ลังชิดมือ (แขนยาวเท่าจริงแล้ว เอื้อมไม่ถึงที่เดิม)
 pose('rion_nod', 'rion', 'ท่าทาง', 'พยักหน้า', 1.0, lambda t: {'dir': 'south', 'hy': 2 * max(0, sin(t * 1.25, 2)) if t < 0.8 else 0})
 pose('rion_shake', 'rion', 'ท่าทาง', 'ส่ายหน้า', 1.0, lambda t: {'dir': 'south', 'hx': 1.4 * sin(t * 1.25, 2) if t < 0.8 else 0})
 EMO = [('surprise', '! ตกใจ', '!', 47, 1.05, {'dy': lambda t: kf(t, [(0.12, 0), (0.2, -3), (0.3, 0)])}),
