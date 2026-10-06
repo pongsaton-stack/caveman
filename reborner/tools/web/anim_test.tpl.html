@@ -178,7 +178,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSksheet" hidden>
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
-			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button></p>
+			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></p>
 			<div class="clips" id="skGroups"></div>
 		</section>
 
@@ -253,7 +253,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<div class="row"><span class="seg" id="segStyle" role="group" aria-label="แบบจอศึก"><button class="btn" data-v="game">แบบในเกมตอนนี้</button><button class="btn" data-v="cine" aria-pressed="true">ซินีมา</button><button class="btn" data-v="saga">SaGa</button></span>
 				<button class="btn" id="btnGlim" aria-pressed="false">ประกาย 💡</button></div>
 			<p class="lbl" style="margin-top:12px">ไม้ตาย 6 สาย × แสงจากชีต VFX ตัวเอก (ร่าง)</p>
-			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button></div>
+			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></div>
 			<p class="note" id="styleNote">ซินีมา = คัตอิน · มุมกล้อง · ร่างแยก (6 สาย) · SaGa = แนว Romancing SaGa 3: ฉากเต็มจอ · ทีมเรียงทแยง · วิ่งเข้าตี · กล่องชื่อท่ามุมขวาบน · ไม้ตายเปลี่ยนสีทั้งจอ (ตัวอย่าง: คม · ยิง)</p>
 			<p class="lbl" style="margin-top:12px">สาย (techs.csv)</p>
 			<div class="schools" id="schoolPick"></div>
@@ -363,14 +363,34 @@ function rs3Rion(it, f) {   // ตำแหน่งมุมซ้ายบน 
 	if (f < RS3.RUN) return { x: hx, y: hy, key: heldPose(it, 0) };
 	if (f < RS3.SHOUT) { const p = (f - RS3.RUN + 1) / (RS3.SHOUT - RS3.RUN); return { x: Math.round(lerp(hx, front, p)), y: hy, key: `rion/west_w${f % 4}` }; }
 	if (f < RS3.ATK) return { x: front, y: hy - ((f >> 2) % 2), key: heldPose(it, 1) };   // ประกาศชื่อท่า: ท่าง้าง ตัวกระตุกขึ้นลงทีละ 1px
-	if (f < RS3.BACK) return { x: front, y: hy, key: heldPose(it, VFX.POSE[f - RS3.ATK]) };
+	if (f < RS3.BACK) { const w = RIG_ON && rigWeapon(it); return { x: front, y: hy, key: w ? rigKey(w, rigVfx(f - RS3.ATK)) : heldPose(it, VFX.POSE[f - RS3.ATK]) }; }
 	if (f < RS3.IDLE) { const p = (f - RS3.BACK + 1) / (RS3.IDLE - RS3.BACK); return { x: Math.round(lerp(front, hx, p)), y: hy, key: `rion/east_w${f % 4}` }; }
 	return { x: hx, y: hy, key: heldPose(it, 0) };
 }
 // อาวุธที่ถือตรงกับสายของท่า (kwan 5 ต.ค.): ภาพ Rion ถืออาวุธร่าง weapons_held/<สาย>-<ระดับ>_<0–4> (ยืน · ง้าง · ฟาด · ตาม · คืน = ช่องเดียวกับ VFX.POSE)
 // ระดับอาวุธ = ตำแหน่งของท่าในสายของมัน (ต้นสาย = ระดับ 1 · ท้ายสาย = ระดับ 5) — เป็นการจับคู่เพื่อดูภาพ ไม่ใช่กฎเกม
 function heldWeapon(it) { const fam = SKS.items.filter(x => x.family === it.family), i = Math.max(0, fam.indexOf(it)); return `${it.family}-${Math.min(5, 1 + Math.floor(i * 5 / fam.length))}`; }
-function heldPose(it, p) { const k = `held/${heldWeapon(it)}_${p}`; return DATA.sprites[k] ? k : 'rion/' + SKS.poses[it.family][p]; }
+function heldPose(it, p) { const w = RIG_ON && rigWeapon(it); if (w) return rigKey(w, RIG_POSE[p]);
+	const k = `held/${heldWeapon(it)}_${p}`; return DATA.sprites[k] ? k : 'rion/' + SKS.poses[it.family][p]; }
+// ริก Rion (rion_rig.py · kwan 6 ต.ค. "apply กับ skill และท่าไม้ตายด้วย") — ใช้แทนภาพถือ 5 ท่าเดิมเมื่อเปิดปุ่ม 🦴
+// ท่าละ 12 เฟรม: 0 ยืน · 1–4 ง้าง · 5 ปล่อย · 6 ฟาด (จุดกระทบ) · 7 ตามแรง · 8–11 คืน · อาวุธ = ชิ้นที่อบไว้ (ตัวอย่าง 14 ชิ้น) ของสายเดียวกัน
+const RIG = DATA.rion_rig, RIG_POSE = [0, 4, 6, 7, 10], RIG_HIT = 6;
+let RIG_ON = true;   // ปุ่ม 🦴 (ตัวแปรแยกจาก S: heldPose ถูกเรียกตอนลงทะเบียนคลิป ก่อนประกาศ S)
+const RIG_FAM = { 'คม': 'SL', 'แทง': 'PC', 'ทุบ': 'CR', 'ยิง': 'ST', 'มือเปล่า': 'BD', 'กล': 'DV' };
+const rigCodes = fam => ((RIG || {}).items || []).filter(x => x.family === fam).map(x => x.code).sort();
+const rigKey = (code, i) => `rig/${code}_${Math.max(0, Math.min(RIG.n - 1, i))}`;
+function rigWeapon(it) {   // ท่าต้นสาย = อาวุธชิ้นแรก · ท้ายสาย = ชิ้นท้าย (ภาพประกอบ ไม่ใช่กฎเกม)
+	const L = rigCodes(it.family); if (!L.length || !SKS) return null;
+	const fam = SKS.items.filter(x => x.family === it.family), i = Math.max(0, fam.indexOf(it)); return L[Math.min(L.length - 1, Math.floor(i * L.length / fam.length))];
+}
+function rigVfx(f) {   // เฟรม VFX (ชาร์จ CHG · ปล่อย REL · กระทบ HIT · หยุดภาพ) → เฟรมริก ให้ "ฟาด" ตรงจังหวะกระทบ
+	const t = f < VFX.HIT ? f : f < VFX.HIT + VFX.STOP ? VFX.HIT : f - VFX.STOP;   // = vTime (ประกาศทีหลัง แต่ฟังก์ชันนี้ถูกเรียกตอนลงทะเบียนคลิป RS3)
+	if (t < VFX.CHG) return 0;
+	if (t < VFX.REL) return 1 + Math.min(3, Math.floor(4 * (t - VFX.CHG) / (VFX.REL - VFX.CHG)));
+	if (t < VFX.HIT) return 5;
+	if (t < VFX.HIT + 6) return t < VFX.HIT + 2 ? RIG_HIT : 7;
+	return Math.min(11, 8 + Math.floor((t - VFX.HIT - 6) / 3));
+}
 const VFX_POSE_KEYS = it => VFX.POSE.map(p => heldPose(it, p));
 // สกิลจากชีต 173 ท่า (tools/sprites/skill_sheet_cut.py) — timeline/poses/ตำแหน่งมาจาก index.json ชุดเดียวกับสคริปต์
 const SKS = DATA.skill_sheet, SK_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล' };
@@ -698,7 +718,8 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 
 function vfxView(c) {   // แบบเวทีทดสอบ: Rion ขวา เป้า M01 ซ้าย ช่องต้นฉบับมุมซ้ายบน
 	const f = S.frame;
-	vfxScene(c, { f, size: SKS.stage, hand: SKS.hand, rion: SKS.rion_at, pose: heldPose(c.skill, VFX.POSE[f]), target: VFX.TARGET, bg: drawBg, cell: true });
+	const rw = RIG_ON && rigWeapon(c.skill);
+	vfxScene(c, { f, size: SKS.stage, hand: SKS.hand, rion: SKS.rion_at, pose: rw ? rigKey(rw, rigVfx(f)) : heldPose(c.skill, VFX.POSE[f]), target: VFX.TARGET, bg: drawBg, cell: true });
 }
 function rs3Bulb(x, y, f) {   // หลอดไฟประกาย (พิกเซล) เหนือหัว — แบบเดียวกับ bulb() ของโหมด SaGa
 	ctx.save(); ctx.fillStyle = '#fff6a0'; ctx.fillRect(x - 3, y - 8, 6, 6); ctx.fillRect(x - 4, y - 7, 8, 4); ctx.fillStyle = '#ffd040'; ctx.fillRect(x - 2, y - 3, 4, 1);
@@ -1076,7 +1097,7 @@ function sheetSkillView(c) {
 		if (t.flash) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = t.flash; ctx.drawImage(fx, fx.width - cw, 0, cw, fx.height, x, y, cw, fx.height); ctx.globalCompositeOperation = 'source-over'; }
 		ctx.globalAlpha = 1;
 	}
-	spr(c.frames[S.frame], SKS.rion_at[0], SKS.rion_at[1]);
+	spr(RIG_ON && rigWeapon(it) ? heldPose(it, t.pose) : c.frames[S.frame], SKS.rion_at[0], SKS.rion_at[1]);
 	if (S.grid) drawGrid();
 }
 // sprite stack (tools/sprites/weapons_stack.py): วางราบ หมุนทุกชั้น nearest ที่ความละเอียดจริง หดแกนลึกด้วย tilt ชั้นละ 1px ขึ้น — เหมือน render() ในสคริปต์
@@ -1134,7 +1155,7 @@ const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
-	foe: 'M01', count: 3, vxs: true, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
+	foe: 'M01', count: 3, vxs: true, rigW: null, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
 
 // ── วาด ──
@@ -1712,7 +1733,7 @@ function runOp(op, i, n, pts, A, school) {
 		const from = op.from ? P(op.from, op.from_off, rp.fjx, rp.fjy) : null, to = op.to && typeof op.to === 'string' ? P(op.to, op.to_off, rp.tjx, rp.tjy) : null;
 		if (from && rp.ring) { const ang = -Math.PI / 2 + i * Math.PI * 2 / n; from.x += Math.cos(ang) * rp.ring[0]; from.y += Math.sin(ang) * rp.ring[1]; }
 		switch (op.op) {
-			case 'ghost': ghost(col, op.life, op.frame ? FRAMES[op.frame] : undefined, at ? { x: at.x - SPRITE_C.x, y: at.y - SPRITE_C.y } : undefined); break;
+			case 'ghost': ghost(col, op.life, op.frame ? (S.rigW ? rigKey(S.rigW, RIG_HIT) : FRAMES[op.frame]) : undefined, at ? { x: at.x - SPRITE_C.x, y: at.y - SPRITE_C.y } : undefined); break;
 			case 'hero_move': heroTo(heroTarget(op.to, A), op.sec, op.ease === 'in' ? easeIn : easeOut); break;
 			case 'hero_set': S.hero = heroTarget(op.to, A); break;
 			case 'crescent': crescent(at, r, rot, col, op.life, op.grow || 1.3); break;
@@ -1890,8 +1911,11 @@ function bounceNum(at, text, col) { fx(1.0, (p, t) => { const b = t < 0.25 ? Mat
 	ctx.save(); ctx.globalAlpha = a; ctx.font = '700 8px Sarabun, sans-serif'; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 2; ctx.strokeStyle = '#000';
 	ctx.strokeText(text, at.x, at.y + 14 - b); ctx.fillStyle = col; ctx.fillText(text, at.x, at.y + 14 - b); ctx.restore(); }); }
 // ท่าเดิน (วิ่ง) ระหว่างย้ายตัว: สลับเฟรมเดินตามทิศ
+const RIG_SEC = () => K.ATTACK_FRAME_SEC * 8 / RIG.n;   // 12 เฟรมใน 2 รอบท่าฟันของเกม (เท่าคลิปแท็บอาวุธ)
+const rigRest = () => S.rigW ? rigKey(S.rigW, 0) : 'rion/west';
+function rigSeq(from, sec) { return { frames: Array.from({ length: RIG.n - from }, (_, i) => rigKey(S.rigW, from + i)), i: 0, acc: 0, sec, rest: rigRest() }; }
 function runAnim(dir, sec) { const fr = [0, 1, 2, 3].map(i => `rion/${dir}_w${i}`); S.fx.push({ t: 0, dur: sec, draw: () => {}, step: p => { S.heroFrame = fr[Math.floor(p * sec / 0.06) % 4]; } }); }
-function attackAnim(delay, rest = 'rion/west') { const fr = [0, 1, 2, 3].map(i => `rion/west_a${i}`); S.fx.push({ t: -delay, dur: 0.32, draw: () => {}, step: p => { S.heroFrame = fr[Math.min(3, Math.floor(p * 4))]; }, then: () => { S.heroFrame = rest; } }); }
+function attackAnim(delay, rest = 'rion/west') { const fr = S.rigW ? [3, 4, 5, 6, 7, 8, 9].map(i => rigKey(S.rigW, i)) : [0, 1, 2, 3].map(i => `rion/west_a${i}`); if (S.rigW && rest === 'rion/west') rest = rigRest(); S.fx.push({ t: -delay, dur: 0.32, draw: () => {}, step: p => { S.heroFrame = fr[Math.min(fr.length - 1, Math.floor(p * fr.length))]; }, then: () => { S.heroFrame = rest; } }); }
 // จอดับ/หรี่ทั้งฉาก (ใต้ตัวละคร) · สีทั้งจอ (ทับทุกอย่าง แบบ palette)
 function blackout(col, a, life, fadeIn = 0.1, fadeOut = 0.25) { under(life, (p, t) => { const k = t < fadeIn ? t / fadeIn : t > life - fadeOut ? (life - t) / fadeOut : 1; ctx.save(); ctx.globalAlpha = a * Math.max(0, k); ctx.fillStyle = col; ctx.fillRect(-10, -10, W() + 20, H() + 20); ctx.restore(); }); }
 function palette(col, a, life, mode = 'multiply') { S.fx.push({ t: 0, dur: life, ui: true, draw: (p, t) => { const k = t < 0.1 ? t / 0.1 : t > life - 0.2 ? (life - t) / 0.2 : 1; ctx.save(); ctx.globalCompositeOperation = mode; ctx.globalAlpha = a * Math.max(0, k); ctx.fillStyle = col; ctx.fillRect(0, 0, W(), H()); ctx.restore(); } }); }
@@ -1915,7 +1939,7 @@ function sagaPlay(t) {
 		switch (t.school) { case 'คม': fxSlash(g, col, -1); break; case 'แทง': fxPierce(g, col, -1); break; case 'ทุบ': fxCrush(g, col); break; case 'ยิง': fxShoot(heroPt(), g, col); break; default: fxClaw(g, col, -1); }
 		hitFlash('f' + g.i); bounceNum(g, numTxt, numCol); }); });
 	later(T + 0.7, () => { runAnim('east', 0.24); heroTo({ x: HERO.x, y: HERO.y }, 0.24, p => p); });
-	later(T + 0.95, () => { S.heroFrame = 'rion/west'; });
+	later(T + 0.95, () => { S.heroFrame = rigRest(); });
 }
 
 // ไม้ตายแบบ SaGa — ตัวอย่าง 2 สาย
@@ -1937,7 +1961,7 @@ const SAGA = {
 				ctx.beginPath(); ctx.ellipse(0, 0, 70 * easeOut(Math.min(1, p / 0.3)), 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#ff9a6a'; ctx.beginPath(); ctx.ellipse(0, 0, 60 * easeOut(Math.min(1, p / 0.3)), 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); });
 			for (const g of tg) { hitFlash('f' + g.i); bounceNum(g, num, numCol); } shake(3, 0.3); });
 		later(1.45, () => { S.hero = { x: HERO.x, y: -70 }; heroTo({ x: HERO.x, y: HERO.y }, 0.2, easeIn); });
-		later(1.7, () => { S.heroFrame = 'rion/west'; });
+		later(1.7, () => { S.heroFrame = rigRest(); });
 	},
 	// ยิง (แนว スコール): จอหรี่ดำ-น้ำเงิน → ฝนลูกศรเฉียงตกทั้งจอ ~1 วิ → มอนกะพริบน้ำเงิน → ลูกศรปักรอบเป้า
 	'ยิง': (tg, col, num, numCol) => {
@@ -1973,6 +1997,7 @@ function playTech(t) {
 		setRead(t); return;
 	}
 	if (t.effect === 'av_cut') later(0.3, () => floatNum(heroPt(), 'AV×' + (1 - t.value).toFixed(2), '#8ad0f0', 1));
+	S.rigW = RIG_ON ? rigCodes(RIG_FAM[t.school]).slice(-1)[0] || null : null;   // ท่าในแท็บสกิล = อาวุธชิ้นแรงสุดของสาย
 	if (S.saga) { sagaPlay(t); setRead(t); return; }
 	const m = DATA.monsters.find(x => x.monster_id === S.foe);
 	const ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
@@ -1986,7 +2011,8 @@ function playTech(t) {
 		const T0 = cutIn(t.name_th, col);
 		const r0 = cine(tg.map(f => ({ ...f.pt, i: f.i })), col, T0);
 		impact = r0.impact; S.dimT = 0; S.dimTotal = r0.total;
-		later(T0, () => { S.seq = { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), i: 0, acc: 0, sec: K.ATTACK_FRAME_SEC, rest: 'rion/west' }; });
+		if (S.rigW) { const sec = RIG_SEC(); later(Math.max(T0, r0.impact - RIG_HIT * sec), () => { S.seq = rigSeq(0, sec); }); }   // เฟรมฟาดของริกตรงจุดกระทบของไม้ตาย
+		else later(T0, () => { S.seq = { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), i: 0, acc: 0, sec: K.ATTACK_FRAME_SEC, rest: 'rion/west' }; });
 	} else if (ult) { S.dimT = 0; S.shake = 0.35; S.shakeAmp = 3; S.shakeDur = 0.35; sig(t, tg.map(f => f.pt), from, col); }
 	const r = dmgRange(t, m); let nth = 0;
 	const hitsFx = () => {
@@ -1998,9 +2024,10 @@ function playTech(t) {
 			floatNum(at, r.e === K.WEAK_MULT ? r.mid + '!' : String(r.mid), r.e === K.WEAK_MULT ? '#ffe08a' : '#fff', nth++);
 		}
 	};
+	if (!cine && S.rigW) impact = (RIG_HIT - 3) * RIG_SEC();   // ท่าธรรมดา: ริกเริ่มที่ท้ายท่าง้าง ดาเมจขึ้นตอนเฟรมฟาด
 	if (impact > 0) later(impact, hitsFx); else hitsFx();
-	if (!cine) { S.seq = { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), i: 0, acc: 0, sec: K.ATTACK_FRAME_SEC, rest: 'rion/west' }; S.heroFrame = S.seq.frames[0]; }
-	else S.heroFrame = 'rion/west';
+	if (!cine) { S.seq = S.rigW ? rigSeq(3, RIG_SEC()) : { frames: [0, 1, 2, 3].map(i => `rion/west_a${i}`), i: 0, acc: 0, sec: K.ATTACK_FRAME_SEC, rest: 'rion/west' }; S.heroFrame = S.seq.frames[0]; }
+	else S.heroFrame = rigRest();
 	setRead(t);
 }
 
@@ -2307,6 +2334,7 @@ function boot() {
 	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
+	for (const b of document.querySelectorAll('.rigBtn')) b.onclick = () => { RIG_ON = !RIG_ON; for (const x of document.querySelectorAll('.rigBtn')) x.setAttribute('aria-pressed', String(RIG_ON)); };
 	for (const b of document.querySelectorAll('.vxsBtn')) b.onclick = () => { S.vxs = !S.vxs; for (const x of document.querySelectorAll('.vxsBtn')) x.setAttribute('aria-pressed', String(S.vxs)); };
 	for (const sc of Object.keys(FXDB.by_school)) {   // ไม้ตายสายละท่า: ท่าแรกใน techs.csv ที่ความชำนาญถึงขั้นไม้ตาย · เล่นแบบซินีมา
 		const t = DATA.techs.find(x => x.school === sc && +x.req_prof >= K.ULT_PROF); if (!t) continue;
@@ -2334,6 +2362,12 @@ function boot() {
 	requestAnimationFrame(tick);
 }
 
-const loads = Object.entries(DATA.sprites).map(([k, src]) => new Promise(res => { const im = new Image(); im.onload = () => { IMG[k] = im; res(); }; im.onerror = res; im.src = src; }));
-Promise.all([...loads, document.fonts ? document.fonts.ready.catch(() => {}) : 0]).then(boot);
+// ภาพอยู่ในไฟล์ก้อน (DATA.sprite_chunks · anim_test_build.py) → โหลดก้อนก่อน แทนที่ค่าในตาราง แล้วค่อยโหลดภาพและเริ่มหน้า
+function loadingNote(t) { const f = $('foot'); if (f) f.textContent = t; }
+loadingNote('กำลังโหลดภาพ…');
+Promise.all((DATA.sprite_chunks || []).map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); })))
+	.then(cs => { for (const c of cs) Object.assign(DATA.sprites, c);
+		const loads = Object.entries(DATA.sprites).map(([k, src]) => new Promise(res => { const im = new Image(); im.onload = () => { IMG[k] = im; res(); }; im.onerror = res; im.src = src; }));
+		return Promise.all([...loads, document.fonts ? document.fonts.ready.catch(() => {}) : 0]); })
+	.then(boot).catch(e => loadingNote('โหลดภาพไม่สำเร็จ: ' + e.message));
 </script>

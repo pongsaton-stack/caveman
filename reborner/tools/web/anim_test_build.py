@@ -1,10 +1,15 @@
 # tools/web/anim_test_build.py — สร้างหน้า "animation test" จากข้อมูลเกมปัจจุบัน
 # อ่านสไปรต์จาก assets/ + techs.csv + monsters.csv + ค่าคงที่จาก Formulas.gd / BattleScreen.gd / Overworld.gd
-# แล้วฝังทั้งหมดลงไฟล์ HTML เดียว (Artifact ห้ามโหลดไฟล์ภายนอก) · รัน: python3 tools/web/anim_test_build.py <out.html>
+# ข้อมูลฝังในไฟล์ HTML · ภาพแยกเป็นก้อน JSON ข้างหน้าเว็บ (อัปโหลดเป็นไฟล์ประกอบของ Artifact) · รัน: python3 tools/web/anim_test_build.py <out.html>
 import glob, base64, csv, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPR = os.path.join(ROOT, 'assets/sprites')
+
+CHUNK_BYTES = 12_000_000     # ต่อก้อนภาพ (Artifact รับไฟล์ละ ≤ 16 MB)
+FILE_LIMIT = 15_500_000      # ทุกไฟล์ (หน้าเว็บ + แต่ละก้อน)
+TOTAL_LIMIT = 100_000_000    # รวมทั้งชุด (kwan กำหนด 100 MB · Artifact รับได้ถึง 256 MB ต่อเวอร์ชัน)
+V2_AT = 0.85                 # ใช้เกิน 85% ของ TOTAL_LIMIT → หยุด ให้งานใหม่แยกไปหน้า "animation test V2" (kwan 6 ต.ค.: "แยกเป็นเทส V2 หากใกล้เต็มลิมิต")
 
 def webp(path, q=80):
 	"""ภาพที่ไม่ใช่พิกเซลอาร์ต (เอฟเฟกต์เรืองแสง · ช่องจากชีต jpg) → webp เล็กกว่า png หลายเท่า หน้าไม่เกิน 16 MB"""
@@ -233,10 +238,30 @@ def main(out_path):
 			'FOE_AREA': [float(v) for v in re.search(r'const FOE_AREA\s*:?=\s*Vector2\(([0-9.]+),\s*([0-9.]+)\)', open(os.path.join(ROOT, 'world/BattleScreen.gd'), encoding='utf-8').read()).groups()],
 		},
 	}
+	# ภาพสไปรต์แยกเป็นไฟล์ก้อน <ชื่อหน้า>_sprites_<i>.json ข้างหน้าเว็บ (kwan 6 ต.ค. "เพิ่มลิมิตหน้าเทสเป็น 100 MB")
+	# Artifact รับไฟล์ละ ≤ 16 MB แต่หลายไฟล์ต่อหน้าได้ → หน้าเว็บเก็บแค่ชื่อภาพ แล้วโหลดก้อนภาพด้วย fetch ก่อนเริ่ม
+	# อัปโหลด: Artifact publish ด้วย files = {ชื่อก้อน: path} ทุกก้อน (พิมพ์รายชื่อไว้ท้ายผล) · เปิดในเครื่องต้องผ่าน http server (file:// โหลด fetch ไม่ได้)
+	stem = os.path.splitext(os.path.basename(out_path))[0]; out_dir = os.path.dirname(os.path.abspath(out_path))
+	for old in glob.glob(os.path.join(out_dir, stem + '_sprites_*.json')): os.remove(old)
+	chunks, cur, size = [], {}, 0
+	for k, v in spr.items():
+		if cur and size + len(v) > CHUNK_BYTES: chunks.append(cur); cur, size = {}, 0
+		cur[k] = v; size += len(v) + len(k) + 6
+	if cur: chunks.append(cur)
+	names = []
+	for i, c in enumerate(chunks):
+		n = f'{stem}_sprites_{i}.json'; open(os.path.join(out_dir, n), 'w', encoding='utf-8').write(json.dumps(c, separators=(',', ':'))); names.append(n)
+	data['sprites'] = {k: 1 for k in spr}; data['sprite_chunks'] = names
 	tpl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'anim_test.tpl.html'), encoding='utf-8').read()
 	html = tpl.replace('/*__DATA__*/null', json.dumps(data, ensure_ascii=False, separators=(',', ':')))
 	open(out_path, 'w', encoding='utf-8').write(html)
-	print(out_path, len(html), 'bytes ·', len(spr), 'sprites ·', len(data['techs']), 'techs ·', len(data['monsters']), 'monsters')
+	sizes = [len(html)] + [os.path.getsize(os.path.join(out_dir, n)) for n in names]
+	if max(sizes) > FILE_LIMIT or sum(sizes) > TOTAL_LIMIT:
+		raise SystemExit(f'เกินลิมิต: ไฟล์ใหญ่สุด {max(sizes)} (≤ {FILE_LIMIT}) · รวม {sum(sizes)} (≤ {TOTAL_LIMIT})')
+	if sum(sizes) > TOTAL_LIMIT * V2_AT:
+		raise SystemExit(f'ใกล้เต็มลิมิต ({sum(sizes)} / {TOTAL_LIMIT} = {sum(sizes) / TOTAL_LIMIT:.0%}) → แยกงานใหม่ไปหน้า animation test V2 (Artifact ลิงก์ใหม่) แทนการเพิ่มในหน้านี้')
+	print(out_path, len(html), 'bytes + ภาพ', len(names), 'ก้อน', sum(sizes[1:]), 'bytes · รวม', sum(sizes), '/', TOTAL_LIMIT, f'({sum(sizes) / TOTAL_LIMIT:.0%} · แยก V2 ที่ {V2_AT:.0%})', '·', len(spr), 'sprites ·', len(data['techs']), 'techs ·', len(data['monsters']), 'monsters')
+	print('ก้อนภาพ:', ' '.join(names))
 
 if __name__ == '__main__':
 	main(sys.argv[1] if len(sys.argv) > 1 else 'anim_test.html')
