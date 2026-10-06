@@ -158,7 +158,7 @@ func tech_progression() -> void:
 		var res := b.run()
 		for g in res["glimmer_log"]:
 			learned_at.append("ศึกที่ %2d vs %s → %s" % [i + 1, f.name, g])
-		hero.insight = 0.0
+		hero.insight *= Insight.CARRY_BATTLE   # ค้างข้ามศึกเหมือน PlayerState.absorb
 		hero.insight_lock = 0
 		# ความชำนาญโตตามสูตรจริง
 		hero.tier += Formulas.prof_gain(f.tier, hero.tier)

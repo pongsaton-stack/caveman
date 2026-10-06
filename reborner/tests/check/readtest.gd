@@ -47,6 +47,14 @@ func _initialize() -> void:
 	check(not ps.toggle_read("M2"), "ช่องเต็ม (%d/%d) ติดตั้งเพิ่มไม่ได้" % [ps.reads_on(), ps.read_slots()])
 	var ps2 := PlayerState.new(); ps2.from_dict(ps.to_dict())
 	check(ps2.reads.size() == 3 and int(ps2.reads["M1"]["p"]) == 1 and not bool(ps2.reads["M2"]["on"]), "เซฟ/โหลดท่าหลบครบ")
+	# Insight ค้างข้ามศึก (Insight.CARRY_BATTLE) · เซฟ/โหลดได้ · เริ่มเกมใหม่ = 0
+	var keep := ps2.reads.duplicate(true)
+	var ins := Actor.new(); ins.insight = 30.0
+	ps2.absorb(ins)
+	check(is_equal_approx(ps2.insight, 30.0 * Insight.CARRY_BATTLE), "Insight ค้างข้ามศึก (%.1f)" % ps2.insight)
+	var ps3 := PlayerState.new(); ps3.from_dict(ps2.to_dict())
+	check(is_equal_approx(ps3.insight, ps2.insight) and is_equal_approx(ps3.make_hero().insight, ps2.insight), "เซฟ/โหลด Insight แล้วเข้าศึกต่อ")
+	ps2.reads = keep
 	var h0 := ps2.make_hero()
 	check(h0.reads.size() == 3 and h0.read_slots == ps2.read_slots(), "make_hero ส่งท่าหลบเข้าศึก")
 

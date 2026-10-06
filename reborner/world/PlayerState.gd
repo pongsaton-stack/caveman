@@ -33,6 +33,7 @@ var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: �
 var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
 var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
 var seized: Array[Dictionary] = []     # ท่าที่ยึดจากมอน (GDD 5.2): {id, name, slots} — สลับได้ (ลืมแล้วยึดใหม่)
+var insight := 0.0                     # Insight ที่ค้างจากศึกก่อน (Insight.CARRY_BATTLE)
 var reads: Dictionary = {}             # อ่านทางหลบ: monster_id -> {name, p, need, on} (Actor.reads · kwan 6 ต.ค. 2026)
 var falls := 0                         # ตัวเอกล้มกี่ครั้ง (STORY_DRAFT: ไม่เคยล้ม → เบาะแส "อีกแล้ว" ย้ายมาหลังชนะบอส)
 var demo_end_seen := false             # เห็นฉากจบเดโมแล้ว — ไม่แสดงซ้ำ
@@ -40,6 +41,7 @@ var demo_end_seen := false             # เห็นฉากจบเดโม
 func init_new(techs: TechDb, start: Vector2i) -> void:
 	learned.clear()
 	reads.clear()
+	insight = 0.0
 	var root := techs.root_of(school)
 	if root != null:
 		learned.append(root.name)
@@ -137,6 +139,7 @@ func make_hero() -> Actor:
 		a.seized.append(str(sz.get("name", "")))
 	a.reads = reads.duplicate(true)
 	a.read_slots = read_slots()
+	a.insight = insight
 	return a
 
 ## รับผลจากศึกกลับมา — ท่าที่ประกาย · ความชำนาญโบนัสจาก Insight · HP/SP ที่เหลือ
@@ -148,6 +151,7 @@ func absorb(a: Actor) -> void:
 	for n in a.learned:
 		learned.append(n)
 	reads = a.reads.duplicate(true)
+	insight = a.insight * Insight.CARRY_BATTLE
 
 static func key_of(c: Vector2i) -> String:
 	return "%d,%d" % [c.x, c.y]
@@ -332,7 +336,7 @@ func to_dict() -> Dictionary:
 		"met_species": met_species.duplicate(), "rest_count": rest_count,
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
 		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true),
-		"seized": seized.duplicate(true), "reads": reads.duplicate(true),
+		"seized": seized.duplicate(true), "reads": reads.duplicate(true), "insight": insight,
 		"falls": falls, "demo_end_seen": demo_end_seen,
 	}
 
@@ -394,6 +398,7 @@ func from_dict(d: Dictionary) -> void:
 	for sz in d.get("seized", []):
 		var sd: Dictionary = sz
 		seized.append({"id": str(sd.get("id", "")), "name": str(sd.get("name", "")), "slots": int(sd.get("slots", 1))})
+	insight = float(d.get("insight", 0.0))
 	reads.clear()
 	var rd: Dictionary = d.get("reads", {})
 	for k in rd:

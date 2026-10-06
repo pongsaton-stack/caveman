@@ -31,7 +31,7 @@ func _initialize() -> void:
 			counters += res["counters"]; dodges += res["dodges"]; reads += res["reads"]
 			for k in at.keys():
 				if i + 1 == k: at[k] += got
-			hero.insight = 0.0; hero.insight_lock = 0
+			hero.insight *= Insight.CARRY_BATTLE; hero.insight_lock = 0
 			hero.tier += Formulas.prof_gain(f.tier, hero.tier)
 			hero.read_slots = Formulas.tech_slots(hero.tier) / 2
 			hero.atk = Formulas.hero_atk(hero.tier, sim.WEAPON_BASE)
