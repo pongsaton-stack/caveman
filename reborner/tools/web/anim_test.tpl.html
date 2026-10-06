@@ -178,7 +178,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSksheet" hidden>
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
-			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button></p>
+			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button></p>
 			<div class="clips" id="skGroups"></div>
 		</section>
 
@@ -252,6 +252,8 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<p class="lbl" style="margin-top:12px">แบบจอศึก</p>
 			<div class="row"><span class="seg" id="segStyle" role="group" aria-label="แบบจอศึก"><button class="btn" data-v="game">แบบในเกมตอนนี้</button><button class="btn" data-v="cine" aria-pressed="true">ซินีมา</button><button class="btn" data-v="saga">SaGa</button></span>
 				<button class="btn" id="btnGlim" aria-pressed="false">ประกาย 💡</button></div>
+			<p class="lbl" style="margin-top:12px">ไม้ตาย 6 สาย × แสงจากชีต VFX ตัวเอก (ร่าง)</p>
+			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button></div>
 			<p class="note" id="styleNote">ซินีมา = คัตอิน · มุมกล้อง · ร่างแยก (6 สาย) · SaGa = แนว Romancing SaGa 3: ฉากเต็มจอ · ทีมเรียงทแยง · วิ่งเข้าตี · กล่องชื่อท่ามุมขวาบน · ไม้ตายเปลี่ยนสีทั้งจอ (ตัวอย่าง: คม · ยิง)</p>
 			<p class="lbl" style="margin-top:12px">สาย (techs.csv)</p>
 			<div class="schools" id="schoolPick"></div>
@@ -1747,13 +1749,90 @@ function runOp(op, i, n, pts, A, school) {
 			case 'arrow': arrow(from, to, col, op.life); break;
 			case 'mech_ally': mechAlly(at, col, op.life); break;
 			case 'cannon': cannon(from, to, col, op.w, op.life); break;
+			case 'sheet': vxsFx(op.set, at, col, op, i); break;               // หน้าเทสเท่านั้น (ULT_SHEET) — ไม่มีใน ultimates.json ของเกม
+			case 'sheet_fly': vxsFly(op.set, from, to, col, op, i); break;
 			default: console.warn('fx: ไม่รู้จักคำสั่ง', op.op);
 		}
 	}
 }
+// ── ไม้ตาย × แสงจากชีต VFX ตัวเอก (kwan 6 ต.ค. "ขอลองกับท่าไม้ตายแต่ละสาย เอาคอนเซปนี้ ขออลังการสุดๆ") ──
+// ชุดภาพโทนเทาจาก vfx_game_fx.py ย้อมสีสาย · ขยายเป็นจำนวนเต็ม (1–2 เท่า: 3 เท่า + กล้องซูมไม้ตาย 1.8 = ก้อนพิกเซลใหญ่เกิน · ตัวที่ซ้ำหลายครั้งใช้ 1 เท่า) · ซ้อนบนไม้ตายเดิมตามเวลาของท่า (impact เดิม ไม่แตะค่าใน ultimates.json)
+// sheet: วางชุดภาพที่ at · s ขยาย · life อายุ · foot = จุดยึดกลางล่าง · mirror = สลับพลิกบน-ล่างครั้งคี่ · glow บวกแสง · grow ขยายตอนจาง (ไม่เกิน 1 ขั้น)
+// sheet_fly: ภาพแรกของชุดพุ่งจาก from → to หมุนตามทิศ · ระหว่างทางเล่นชุดภาพ
+function vxsFrameImg(set, k, col) { const st = DATA.vfx_fx && DATA.vfx_fx.sets[set]; return st ? vxsMap('vfg/' + st.frames[Math.max(0, Math.min(st.frames.length - 1, k))], vxsBright(col)) : null; }
+function vxsBright(col) { const n = parseInt(col.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255], mx = Math.max(...c), k = mx < 220 ? 220 / Math.max(1, mx) : 1;
+	return '#' + c.map(v => Math.min(255, Math.round(v * k)).toString(16).padStart(2, '0')).join(''); }
+function vxsFx(set, at, col, op, i) {
+	const st = DATA.vfx_fx && DATA.vfx_fx.sets[set]; if (!st || !at) return;
+	const n = st.frames.length, life = op.life || 0.4, s0 = op.s || 1, mir = op.mirror && i % 2 ? -1 : 1, flipX = op.face === 'right' ? 1 : -1;
+	fx(life, p => {
+		const k = Math.min(n - 1, Math.floor(p * n * 1.6)), im = vxsFrameImg(set, k, col); if (!im) return;   // ชุดภาพจบใน ~60% แรก แล้วภาพสุดท้ายค้างจาง
+		const s = s0 + (op.grow && p > 0.6 ? 1 : 0), a = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4, w = im.width * s, h = im.height * s;
+		ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = a;
+		ctx.translate(Math.round(at.x), Math.round(op.foot ? at.y - h / 2 : at.y)); ctx.scale(flipX, mir); ctx.drawImage(im, -Math.round(w / 2), -Math.round(h / 2), w, h);
+		if (op.glow) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a * op.glow; ctx.drawImage(im, -Math.round(w / 2), -Math.round(h / 2), w, h); }
+		ctx.restore();
+	});
+}
+function vxsFly(set, from, to, col, op, i) {
+	if (!from || !to) return;
+	const life = op.life || 0.3, ang = Math.atan2(to.y - from.y, to.x - from.x), s = op.s || 1, n = (DATA.vfx_fx.sets[set] || { frames: [0] }).frames.length;
+	fx(life, p => {
+		const im = vxsFrameImg(set, Math.min(n - 1, Math.floor(p * n)), col); if (!im) return; const e = easeIn(p), x = lerp(from.x, to.x, e), y = lerp(from.y, to.y, e);
+		ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = p < 0.85 ? 1 : (1 - p) / 0.15;
+		ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(ang + Math.PI); ctx.scale(-1, 1);   // ภาพในชุดชี้ขวา (หลังพลิก = ชี้ซ้าย) → หมุนให้ชี้ไปทาง to
+		ctx.drawImage(im, -Math.round(im.width * s / 2), -Math.round(im.height * s / 2), im.width * s, im.height * s);
+		if (op.glow) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha *= op.glow; ctx.drawImage(im, -Math.round(im.width * s / 2), -Math.round(im.height * s / 2), im.width * s, im.height * s); }
+		ctx.restore();
+	});
+}
+// เวลาอิงจุดกระทบ (impact) ของแต่ละท่าใน ultimates.json · ค่าทั้งหมดเป็นค่าภาพในหน้าเทส ไม่ใช่ค่าเกม
+const ULT_SHEET = {
+	moon_blades: [   // คม · impact 1.55
+		{ t: 0.1, op: 'sheet', set: 'SL_hit', at: 'hero_pt', color: 'school', life: 0.45, mirror: true, repeat: { n: 6, every: 0.12, ring: [22, 14] } },
+		{ t: 1.1, op: 'sheet', set: 'SL_hit', at: 'center', color: 'school', life: 0.28, mirror: true, glow: 0.15, repeat: { n: 14, every: 0.03, jx: [13, 41, 20], jy: [7, 25, 12] } },
+		{ t: 1.55, op: 'sheet', set: 'SL_hit', at: 'center', color: 'school', life: 0.75, glow: 0.12 },   // กล้องซูม 1.8 ตอนนี้อยู่แล้ว → 1 เท่า
+		{ t: 1.6, op: 'sheet', set: 'SL_hit', at: 'center', off: [-6, 0], color: 'school', life: 0.5, mirror: true, repeat: { n: 2, every: 0.0 } },
+		{ t: 1.55, op: 'sheet', set: 'spark', at: 'each', color: 'school', life: 0.35 },
+		{ t: 1.95, op: 'sheet', set: 'SL_hit', at: 'each', color: 'school', s: 2, life: 0.5, mirror: true, glow: 0.15 }],
+	sky_hammer: [   // ทุบ · impact 0.58
+		{ t: 0.1, op: 'sheet', set: 'CR_hit', at: 'hero_pt', off: [0, 30], foot: true, color: 'school', life: 0.35 },
+		{ t: 0.58, op: 'sheet', set: 'CR_hit', at: 'ground', foot: true, color: 'school', s: 2, life: 0.9, glow: 0.12 },
+		{ t: 0.62, op: 'sheet', set: 'CR_hit', at: 'ground', foot: true, color: 'school', s: 1, life: 0.6, repeat: { n: 6, every: 0.05, jx: [37, 121, 60] } },
+		{ t: 0.58, op: 'sheet', set: 'spark', at: 'center', color: '#ffffff', s: 2, life: 0.3 },
+		{ t: 1.0, op: 'sheet', set: 'CR_hit', at: 'ground', foot: true, color: 'school', s: 1, life: 0.5, repeat: { n: 10, every: 0.04, jx: [29, 141, 70] } }],
+	needle_storm: [   // แทง · impact 1.15
+		{ t: 0.1, op: 'sheet', set: 'PC_hit', at: 'hero_pt', off: [-16, 2], color: 'school', life: 0.5, glow: 0.3 },
+		{ t: 0.6, op: 'sheet_fly', set: 'PC_fly', from: 'hero_pt', from_off: [-18, 2], to: 'center', color: 'school', life: 0.22, glow: 0.2, repeat: { n: 16, every: 0.032, tjy: [7, 23, 11], tjx: [5, 15, 7], fjy: [3, 9, 4] } },
+		{ t: 1.15, op: 'sheet', set: 'PC_hit', at: 'each', color: 'school', life: 0.5, glow: 0.12 },   // กล้องซูม 1.8
+		{ t: 1.15, op: 'sheet_fly', set: 'PC_fly', from: 'right_edge', to: 'left_edge', color: '#ffffff', s: 2, life: 0.25 },
+		{ t: 2.15, op: 'sheet', set: 'PC_hit', at: 'each', color: 'school', s: 1, life: 0.45, repeat: { n: 3, every: 0.07, jx: [9, 21, 10], jy: [7, 15, 7] } }],
+	meteor_rain: [   // ยิง · impact 1.2
+		{ t: 0.05, op: 'sheet', set: 'ST_fly', at: 'hero_pt', off: [-6, -20], color: 'school', s: 2, life: 0.3, glow: 0.12 },
+		{ t: 0.4, op: 'sheet_fly', set: 'ST_fly', from: 'sky', to: 'center', color: 'school', s: 1, life: 0.4, glow: 0.3, repeat: { n: 30, every: 0.025, fjx: [23, 121, 60], tjx: [17, 61, 30], tjy: [5, 17, 8] } },
+		{ t: 0.45, op: 'sheet', set: 'ST_hit', at: 'ground', off: [0, -8], color: 'school', life: 0.35, repeat: { n: 14, every: 0.05, jx: [17, 81, 40], jy: [5, 13, 6] } },
+		{ t: 1.2, op: 'sheet', set: 'ST_hit', at: 'center', color: 'school', s: 2, life: 0.75, glow: 0.12 },
+		{ t: 1.2, op: 'sheet', set: 'spark', at: 'each', color: '#ffffff', s: 2, life: 0.3 }],
+	thousand_fists: [   // มือเปล่า · impact 0.82
+		{ t: 0.15, op: 'sheet', set: 'BD_hit', at: 'center', color: 'school', life: 0.18, glow: 0.2, mirror: true, repeat: { n: 22, every: 0.028, jx: [11, 33, 16], jy: [7, 21, 10] } },
+		{ t: 0.82, op: 'sheet', set: 'BD_hit', at: 'center', color: 'school', s: 2, life: 0.6, glow: 0.12 },
+		{ t: 0.82, op: 'sheet', set: 'spark', at: 'center', color: '#ffffff', s: 2, life: 0.3 },
+		{ t: 0.9, op: 'sheet', set: 'BD_hit', at: 'each', color: 'school', s: 2, life: 0.4, mirror: true }],
+	waking_machine: [   // กล · impact 2.35
+		{ t: 0.4, op: 'sheet', set: 'DV_hit', at: 'mech', off: [-24, 34], foot: true, color: 'school', life: 0.6, glow: 0.2 },
+		{ t: 1.55, op: 'sheet_fly', set: 'ST_fly', from: 'mech_gun', to: 'center', color: 'school', s: 1, life: 0.18, glow: 0.4, repeat: { n: 12, every: 0.06, tjy: [5, 17, 8] } },
+		{ t: 2.0, op: 'sheet', set: 'DV_hit', at: 'ground', foot: true, color: 'school', s: 1, life: 0.6, repeat: { n: 5, every: 0.06, jx: [41, 121, 60] } },
+		{ t: 2.35, op: 'sheet', set: 'DV_hit', at: 'ground', foot: true, color: 'school', life: 0.9, glow: 0.12 },   // กล้องซูม 1.7
+		{ t: 2.35, op: 'sheet', set: 'ST_hit', at: 'center', color: 'school', life: 0.4 },
+		{ t: 2.4, op: 'sheet', set: 'spark', at: 'each', color: 'school', life: 0.35 }],
+};
 function playMove(id, pts, school, T0) {
 	const mv = FXDB.moves[id], A = anchors(pts);
 	for (const op of mv.timeline) {
+		const n = op.repeat ? op.repeat.n : 1, every = op.repeat ? op.repeat.every : 0;
+		for (let i = 0; i < n; i++) later(T0 + op.t + i * every, () => runOp(op, i, n, pts, anchors(pts), school));
+	}
+	if (S.vxs && ULT_SHEET[id]) for (const op of ULT_SHEET[id]) {   // แสงจากชีต VFX ตัวเอก ซ้อนบนไม้ตายเดิม (ปุ่ม ✨ ปิดได้)
 		const n = op.repeat ? op.repeat.n : 1, every = op.repeat ? op.repeat.every : 0;
 		for (let i = 0; i < n; i++) later(T0 + op.t + i * every, () => runOp(op, i, n, pts, anchors(pts), school));
 	}
@@ -2220,7 +2299,13 @@ function boot() {
 	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
-	$('btnVxs').onclick = () => { S.vxs = !S.vxs; $('btnVxs').setAttribute('aria-pressed', String(S.vxs)); };
+	for (const b of document.querySelectorAll('.vxsBtn')) b.onclick = () => { S.vxs = !S.vxs; for (const x of document.querySelectorAll('.vxsBtn')) x.setAttribute('aria-pressed', String(S.vxs)); };
+	for (const sc of Object.keys(FXDB.by_school)) {   // ไม้ตายสายละท่า: ท่าแรกใน techs.csv ที่ความชำนาญถึงขั้นไม้ตาย · เล่นแบบซินีมา
+		const t = DATA.techs.find(x => x.school === sc && +x.req_prof >= K.ULT_PROF); if (!t) continue;
+		const b = document.createElement('button'); b.className = 'btn'; b.textContent = sc + ' · ' + t.name_th;
+		b.onclick = () => { S.style = 'cine'; S.cine = true; S.saga = false; setHome(); press($('segStyle'), 'cine'); playTech(t); };
+		$('ultPick').append(b);
+	}
 	$('btnGlim').onclick = () => { S.glim = !S.glim; $('btnGlim').setAttribute('aria-pressed', String(S.glim)); };
 	$('btnPlay').onclick = () => { S.playing = !S.playing; updPlay(); };
 	const step = d => { if (!isClip()) return; S.playing = false; updPlay(); const n = CLIPS[S.clip].frames.length; S.frame = (S.frame + d + n) % n; syncFrame(); };
