@@ -72,7 +72,7 @@ def rion_frame(p):
 	d = p.get('dir', 'west'); img = PA.rion(p.get('img', d))
 	if p.get('blink') and d == 'west' and not p.get('img'): blink(img)
 	if p.get('arm_hand') and not (p.get('arm') or p.get('barm')) and d == 'west' and not p.get('img'):   # แขนแกว่ง (ชั้นสมจริง) · ศอกจาก ik
-		img = G.remove_front_arm(img); hx, hy = p['arm_hand']; e = ik(G.SH_F, (hx, hy)); draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
+		img = G.remove_front_arm(img); hx, hy = reach(G.SH_F, p['arm_hand']); e = ik(G.SH_F, (hx, hy)); draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
 	if p.get('arm_swing') is not None and d in ('south', 'north', 'east') and not p.get('img'):   # แกว่งแขนทิศอื่น (rion_parts: แยกชิ้นแขนแล้วเฉือน)
 		img = RP.swing_arms(img, d, p['arm_swing'], p.get('arm_lift', 1.0))
 	if p.get('arm') or p.get('barm'):
@@ -301,9 +301,15 @@ EYE = [(23, y) for y in range(23, 27)] + [(24, 25), (24, 26)]             # ต�
 SKIN_C, LID_C = (212, 176, 138, 255), (21, 15, 13, 255)
 PACK = lambda x, y: 35 <= x <= 47 and 31 <= y <= 51                          # เป้ด้านหลัง (หันซ้าย)
 
-def ik(sh, hand, l1=5.2, l2=5.2):
+REACH = 8.5   # ไหล่ → มือ ไกลสุด = ความยาวแขนในภาพต้นฉบับ (west: ไหล่ 26,39 → มือ 23,47) · เกินนี้แขนเส้นบางยื่นยาวเหมือนแขนผี (kwan 6 ต.ค. "มือเหมือนแม่นาก แก้ด่วน")
+def reach(sh, hand, lim=REACH):
+	"""ดึงมือเข้าหาไหล่ถ้าเกินความยาวแขน (ทุกที่ที่วาดแขนใหม่ต้องผ่านตรงนี้)"""
+	dx, dy = hand[0] - sh[0], hand[1] - sh[1]; d = math.hypot(dx, dy)
+	return hand if d <= lim else (sh[0] + dx * lim / d, sh[1] + dy * lim / d)
+
+def ik(sh, hand, l1=4.6, l2=4.6):
 	"""ศอกจากไหล่+มือ (แขนสองท่อน) · ศอกงอไปทางหลัง/ล่าง"""
-	dx, dy = hand[0] - sh[0], hand[1] - sh[1]; d = max(0.01, math.hypot(dx, dy))
+	hand = reach(sh, hand); dx, dy = hand[0] - sh[0], hand[1] - sh[1]; d = max(0.01, math.hypot(dx, dy))
 	if d >= l1 + l2: return (sh[0] + dx * l1 / d, sh[1] + dy * l1 / d)
 	a = (l1 * l1 - l2 * l2 + d * d) / (2 * d); h = math.sqrt(max(0.0, l1 * l1 - a * a))
 	px, py = sh[0] + dx * a / d, sh[1] + dy * a / d; nx, ny = -dy / d, dx / d
@@ -312,7 +318,7 @@ def ik(sh, hand, l1=5.2, l2=5.2):
 
 def draw_arm_soft(im, sh, elbow, hand):
 	"""แขนหน้าแบบ rion_grips.draw_arm แต่เส้นขอบที่ทับตัวใช้เงาของสีข้างใต้ (ขอบดำทับเสื้อดูเป็นรู)"""
-	under = im.copy(); G.draw_arm(im, sh, elbow, hand)
+	under = im.copy(); G.draw_arm(im, sh, elbow, hand, w_upper=3)   # ต้นแขนหนา 3 เท่าแขนเดิม (2 จุดแล้วแขนดูผอมยาว)
 	u, p = under.load(), im.load(); o = G.OUTL
 	for y in range(64):
 		for x in range(64):
@@ -330,7 +336,7 @@ def rion_v2(p):
 	img = PA.rion(p.get('img', 'west'))
 	if p.get('blink'): blink(img)
 	img = G.remove_front_arm(img)
-	hx, hy = p['hand']; e = ik(G.SH_F, (hx, hy))
+	hx, hy = reach(G.SH_F, p['hand']); e = ik(G.SH_F, (hx, hy))
 	draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
 	if p.get('knife'):
 		ang, L = p['knife']
@@ -420,7 +426,7 @@ def realism(pid, who, cycle, hold, ps):
 			if sec >= 0.9 and (p.get('dir', 'west') == 'west'):                              # กะพริบ 1 ครั้งต่อ ~2.6 วิ (อย่างน้อยครั้งเดียวต่อรอบ)
 				blinks = max(1, round(sec / 2.6)); q['blink'] = q.get('blink') or ((t * blinks) % 1) > 0.62 and ((t * blinks) % 1) < 0.62 + 0.09 / max(sec / blinks, 0.9)
 			if p.get('walk') is not None and p.get('dir', 'west') == 'west' and not (p.get('arm') or p.get('barm')):
-				sw = cos(p['walk']); amp = 3.5 + 0.8 * (p.get('kmax', 4) - 4)
+				sw = cos(p['walk']); amp = 2.0 + 0.5 * (p.get('kmax', 4) - 4)   # เดิม 3.5 (มือไปไกลเกินตัว)
 				q['arm_hand'] = (23 + amp * sw, 47 - 1.3 * abs(sw) - (1 if p.get('kmax', 4) > 4 else 0))   # ขาหน้าก้าวไปหน้า = แขนหน้าแกว่งไปหลัง · วิ่ง = งอแขนสูงขึ้น
 			if p.get('walk') is not None and p.get('dir', 'west') in ('south', 'north', 'east') and not (p.get('arm') or p.get('barm')):
 				d = p['dir']; ph = p['walk'] % 1                                                       # เฟสเดียวกับขา: หันขวา legs_side (cos) · หน้า/หลัง legs_front (sin)

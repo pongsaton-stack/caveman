@@ -77,8 +77,8 @@ def thick_line(pix, a, b, col, w=2):
 			for oy in range(w): pts.add((int(round(x - 0.5 + ox)), int(round(y - 0.5 + oy))))
 	return pts
 
-def draw_arm(im, shoulder, elbow, hand, back=False):
-	p = im.load(); upper = thick_line(p, shoulder, elbow, None); lower = thick_line(p, elbow, hand, None)
+def draw_arm(im, shoulder, elbow, hand, back=False, w_upper=2):
+	p = im.load(); upper = thick_line(p, shoulder, elbow, None, w_upper); lower = thick_line(p, elbow, hand, None)
 	fist = {(hand[0] + dx, hand[1] + dy) for dx in (-1, 0) for dy in (-1, 0)}
 	body = upper | lower | fist
 	sk = SKIN_D if back else SKIN

@@ -167,6 +167,7 @@ def render(code, icon):
 		if dyi: body = body.transform(body.size, Image.AFFINE, (1, 0, 0, 0, 1, -dyi), Image.NEAREST)
 		mv = lambda q: (lambda r: (ri(r[0]) + dxi, ri(r[1]) + dyi))(body_pt(q, bd))
 		sh, el, hd = mv(G.SH_F), mv(elbow), mv(hand)
+		if fam not in ('DV',): hd = tuple(ri(v) for v in P64.reach(sh, hd))   # มือไม่เกินความยาวแขน (อาวุธติดตามมือ)
 		el = P64.ik(sh, hd) if fam not in ('BD', 'DV') else el; el = (ri(el[0]), ri(el[1]))   # ศอกหาเองจากไหล่-มือ (แขนยาวคงที่ ไม่ยืดหด)
 		out = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
 		if fam == 'DV':   # โดรนลอยหลังไหล่ → พุ่งไปหน้าตอน Rion ชี้ → กลับ
@@ -183,7 +184,7 @@ def render(code, icon):
 			if behind: out.alpha_composite(spr, at)
 			out.alpha_composite(body)
 			if group in BACK:
-				bx, by = BACK[group]; sb = mv(G.SH_B); hb = (hd[0] + bx, hd[1] + by); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True)
+				bx, by = BACK[group]; sb = mv(G.SH_B); hb = tuple(ri(v) for v in P64.reach(sb, (hd[0] + bx, hd[1] + by))); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True, w_upper=3)
 			if not behind: out.alpha_composite(spr, at)
 			P64.draw_arm_soft(out, sh, el, hd)
 			if prev is not None and abs((ang - prev + 540) % 360 - 180) > SMEAR_DEG: smear(out, hd, prev, ang, L)
