@@ -154,11 +154,12 @@ func tech_progression() -> void:
 			b.actors.append(m)
 		var pick: String = ladder[mini(int(i / 10.0), ladder.size() - 1)]
 		var f := Actor.from_csv(by_id[pick])
+		var ins0 := hero.insight
 		b.actors.append(f)
 		var res := b.run()
 		for g in res["glimmer_log"]:
 			learned_at.append("ศึกที่ %2d vs %s → %s" % [i + 1, f.name, g])
-		hero.insight *= Insight.CARRY_BATTLE   # ค้างข้ามศึกเหมือน PlayerState.absorb
+		hero.insight = Insight.carry(ins0, hero.insight, f.tier, hero.tier)   # ค้างข้ามศึกเหมือน PlayerState.absorb
 		hero.insight_lock = 0
 		# ความชำนาญโตตามสูตรจริง
 		hero.tier += Formulas.prof_gain(f.tier, hero.tier)

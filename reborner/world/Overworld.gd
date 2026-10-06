@@ -764,7 +764,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	elif ambush == "foe":
 		lines.append("◆ ถูกลอบตี — ศัตรูได้ทำก่อน")
 	if res["won"]:
-		ps.absorb(hero)
+		ps.absorb(hero, max_tier)
 		ps.prof += Formulas.prof_gain(max_tier, ps.prof)
 		var loot := max_tier * rows.size()
 		ps.gold += loot

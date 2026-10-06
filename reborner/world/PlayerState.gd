@@ -143,7 +143,9 @@ func make_hero() -> Actor:
 	return a
 
 ## รับผลจากศึกกลับมา — ท่าที่ประกาย · ความชำนาญโบนัสจาก Insight · HP/SP ที่เหลือ
-func absorb(a: Actor) -> void:
+## enemy_tier = tier สูงสุดของศัตรูในศึก (ใช้คิดว่า Insight ที่ได้ค้างต่อเท่าไร · Insight.carry)
+func absorb(a: Actor, enemy_tier: int) -> void:
+	insight = Insight.carry(insight, a.insight, enemy_tier, prof)
 	prof = a.tier
 	hp = a.hp
 	sp = a.sp
@@ -151,7 +153,6 @@ func absorb(a: Actor) -> void:
 	for n in a.learned:
 		learned.append(n)
 	reads = a.reads.duplicate(true)
-	insight = a.insight * Insight.CARRY_BATTLE
 
 static func key_of(c: Vector2i) -> String:
 	return "%d,%d" % [c.x, c.y]

@@ -24,7 +24,7 @@ func _initialize() -> void:
 				if res["glimmers"] > 0 and first < 0: first = i + 1
 				rnd += res["glimmers"] - res["from_fill"]; fill += res["from_fill"]
 				gain += maxf(hero.insight - before, 0.0) if res["from_fill"] == 0 else 0.0
-				hero.insight *= Insight.CARRY_BATTLE; hero.insight_lock = 0
+				hero.insight = Insight.carry(before, hero.insight, Actor.from_csv(sim.by_id[spec[0]]).tier, hero.tier); hero.insight_lock = 0
 				# ความชำนาญไม่โต — ผู้เล่นฟาร์มที่ระดับเดิม (มอนอ่อนให้ prof แทบไม่ได้อยู่แล้ว)
 			if first < 0: never += 1
 			else: first_sum += first

@@ -33,7 +33,7 @@ func _run() -> void:
 			by_fight[i][2] += Formulas.glimmer_chance(mt, ps.prof, float(hero.learned.size())/7.0, 0)
 			got += res["glimmers"]
 			if res["won"]:
-				ps.absorb(hero); ps.prof += Formulas.prof_gain(mt, ps.prof)
+				ps.absorb(hero, mt); ps.prof += Formulas.prof_gain(mt, ps.prof)
 			ps.rest()
 		if got > 0: any_g += 1
 		if r == 0: print("รอบแรก จบที่ prof ", ps.prof, " learned ", ps.learned)

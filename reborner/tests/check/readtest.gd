@@ -49,9 +49,20 @@ func _initialize() -> void:
 	check(ps2.reads.size() == 3 and int(ps2.reads["M1"]["p"]) == 1 and not bool(ps2.reads["M2"]["on"]), "เซฟ/โหลดท่าหลบครบ")
 	# Insight ค้างข้ามศึก (Insight.CARRY_BATTLE) · เซฟ/โหลดได้ · เริ่มเกมใหม่ = 0
 	var keep := ps2.reads.duplicate(true)
-	var ins := Actor.new(); ins.insight = 30.0
-	ps2.absorb(ins)
-	check(is_equal_approx(ps2.insight, 30.0 * Insight.CARRY_BATTLE), "Insight ค้างข้ามศึก (%.1f)" % ps2.insight)
+	var ins := Actor.new(); ins.insight = 30.0; ins.tier = ps2.prof
+	ps2.absorb(ins, ps2.prof)
+	check(is_equal_approx(ps2.insight, 30.0 * Insight.CARRY_BATTLE), "ศึกสูสี Insight ค้างข้ามศึกเต็ม (%.1f)" % ps2.insight)
+	# ศัตรูอ่อนกว่ามาก: ส่วนที่ได้ในศึกนั้นค้างแค่บางส่วน · ส่วนที่ค้างมาก่อนไม่ถูกหัก
+	ins.insight = 40.0 - 0.001
+	ps2.absorb(ins, 0)
+	var tf := (Formulas.threat(0, ps2.prof) - Formulas.THREAT_MIN) / (1.0 - Formulas.THREAT_MIN)
+	var want := 30.0 + (10.0 - 0.001) * tf
+	check(is_equal_approx(ps2.insight, want * Insight.CARRY_BATTLE), "ศัตรูอ่อน: ค้างเฉพาะส่วนน้อย ของเดิมไม่หาย (%.2f · TF %.2f)" % [ps2.insight, tf])
+	# ใช้ Insight เต็มไปแล้วในศึก (จบน้อยกว่าตอนเริ่ม) = ที่เหลือได้มาในศึกนี้ทั้งหมด
+	var held := ps2.insight
+	ins.insight = 5.0
+	ps2.absorb(ins, 0)
+	check(is_equal_approx(ps2.insight, 5.0 * tf * Insight.CARRY_BATTLE) and held > 5.0, "ใช้ Insight เต็มแล้ว เศษที่เหลือคิดเป็นของศึกนี้")
 	var ps3 := PlayerState.new(); ps3.from_dict(ps2.to_dict())
 	check(is_equal_approx(ps3.insight, ps2.insight) and is_equal_approx(ps3.make_hero().insight, ps2.insight), "เซฟ/โหลด Insight แล้วเข้าศึกต่อ")
 	ps2.reads = keep

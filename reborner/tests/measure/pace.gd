@@ -22,6 +22,7 @@ func _initialize() -> void:
 			for m in sim.make_party(): b.actors.append(m)
 			var f := Actor.from_csv(sim.by_id[ladder[mini(int(i / 10.0), ladder.size() - 1)]])
 			b.actors.append(f)
+			var ins0 := hero.insight
 			var res := b.run()
 			var n: int = res["glimmer_log"].size() + int(res["reads"])
 			if n > 0:
@@ -31,7 +32,7 @@ func _initialize() -> void:
 			counters += res["counters"]; dodges += res["dodges"]; reads += res["reads"]
 			for k in at.keys():
 				if i + 1 == k: at[k] += got
-			hero.insight *= Insight.CARRY_BATTLE; hero.insight_lock = 0
+			hero.insight = Insight.carry(ins0, hero.insight, f.tier, hero.tier); hero.insight_lock = 0
 			hero.tier += Formulas.prof_gain(f.tier, hero.tier)
 			hero.read_slots = Formulas.tech_slots(hero.tier) / 2
 			hero.atk = Formulas.hero_atk(hero.tier, sim.WEAPON_BASE)
