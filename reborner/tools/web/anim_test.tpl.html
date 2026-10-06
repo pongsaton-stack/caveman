@@ -143,6 +143,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" id="tabBosses" aria-pressed="false">บอส</button>
 			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
 			<button class="btn" role="tab" id="tabSksheet" aria-pressed="false">สกิลจากชีต</button>
+			<button class="btn" role="tab" id="tabVxsheet" aria-pressed="false">VFX ตัวเอก</button>
 			<button class="btn" role="tab" id="tabArms" aria-pressed="false">อาวุธ</button>
 			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
 			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
@@ -179,6 +180,14 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
 			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button></p>
 			<div class="clips" id="skGroups"></div>
+		</section>
+
+		<section class="box" id="paneVxsheet" hidden>
+			<p class="muted wnote">ตัดจากชีต "Reborner VFX – Protagonist" ของ kwan (tools/sprites/vfx_sheet_cut.py) · ร่าง ยังไม่เข้าเกม ·
+				แผงท่าเล่น 3 ช่องพร้อมกัน: <b>ต้นฉบับ</b> = เฟรมในชีตเรียงตามลำดับ (ตัวเอกในชีตขนาด/ท่า/ตำแหน่งไม่เท่ากันทุกเฟรม จึงกระตุก) ·
+				<b>จัดตัวนิ่ง + เฟด</b> = เลื่อนทุกเฟรมให้ตัวเอกอยู่จุดเดียวกัน แล้วค่อย ๆ เฟดต่อกัน ·
+				<b>ปรับแล้ว</b> = Rion ตัวจริงของเกมถืออาวุธตามสาย + แสงที่ดึงจากชีต (หันซ้ายแบบจอสู้ · เฟดต่อกัน · เรืองแสง) · แผงภาพนิ่งกดเลื่อนทีละชิ้น</p>
+			<div class="clips" id="vxGroups"></div>
 		</section>
 
 		<section class="box" id="paneArms" hidden>
@@ -377,6 +386,77 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // แนว RS3 — ท
 	addClip('แนว RS3 (Romancing SaGa 3) + VFX · สายละ 1 ท่า', 'rs3_' + code, code + ' · RS3', Array.from({ length: RS3.N }, (_, f) => rs3Rion(it, f).key), VFX.SEC, { tab: 'sksheet', skill: it, rs3: true });
 }
 for (const pre of ['ตัวอย่าง VFX', 'แนว RS3']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
+// ── ชีต VFX Protagonist (kwan 6 ต.ค. "ตัดมาใส่ในเทสแยกแทป เชคดูถ้าไม่เนียน จัดการให้สวยงาม") ──
+// แผงท่า: แถวละ 1 คลิป · เฟรมในชีต = ภาพหลัก แต่ละภาพแตกเป็น SUB เฟรมย่อยไว้เฟด · ค่าทั้งหมดเป็นค่าดูในหน้าเทส ไม่ใช่ค่าเกม
+const VXS = DATA.vfx_sheet, VX = { SUB: 3, KEY_SEC: 0.12, K: 1.6, PW: 150, PH: 120, STILL_SEC: 1.2,
+	LABEL: ['ต้นฉบับ', 'จัดตัวนิ่ง + เฟด', 'ปรับแล้ว'] };
+const vxItem = fam => ((SKS || {}).items || []).find(x => x.family === fam);
+function vxPose(pose, ki, n, f) {   // ภาพ Rion ของเฟรมหลัก ki จาก n · ท่าโจมตี = ง้าง → ฟาด → ตาม → คืน (ช่องเดียวกับ heldPose)
+	if (pose === 'DASH') return `rion/west_w${(f >> 1) % 4}`;
+	if (pose === 'HIT') return `rion/west_h${ki % 2}`;
+	if (pose === 'IDLE') return 'rion/west';
+	const it = vxItem(pose); if (!it) return 'rion/west';
+	return heldPose(it, n < 2 ? 2 : ki === 0 ? 1 : ki === n - 1 ? 4 : ki < n / 2 ? 2 : 3);
+}
+for (const p of ((VXS || {}).panels || [])) {
+	if (!IMG_OK('vxs/sheet')) break;
+	if (p.kind === 'anim') p.rows.forEach((row, i) => {
+		const n = row.length, frames = Array.from({ length: n * VX.SUB }, (_, f) => vxPose(p.pose, Math.floor(f / VX.SUB), n, f));
+		addClip('VFX ตัวเอก · ' + p.name, `vx_${p.id}_${i}`, `แถว ${i + 1} · ${n} ภาพ`, frames, VX.KEY_SEC / VX.SUB, { tab: 'vxsheet', vx: p, row });
+	});
+}
+for (const p of ((VXS || {}).panels || [])) {   // ภาพนิ่งต่อท้ายแผงท่า
+	if (p.kind !== 'still' || !IMG_OK('vxs/sheet')) continue;
+	const pcs = p.rows.flat();
+	addClip('VFX ตัวเอก · ภาพนิ่ง (กดเลื่อนทีละชิ้น)', `vx_${p.id}`, `${p.name} · ${pcs.length} ชิ้น`, pcs.map(() => 'vxs/sheet'), VX.STILL_SEC, { tab: 'vxsheet', vx: p, pieces: pcs });
+}
+function IMG_OK(k) { return !!DATA.sprites[k]; }
+function vxClip(x0, y0, w, h, fn) { ctx.save(); ctx.beginPath(); ctx.rect(x0, y0, w, h); ctx.clip(); fn(); ctx.restore(); }
+function vxCrop(fr, cx, feet, alpha, flipAt) {   // ครอปเฟรมจากชีต วางให้จุดยึด (ax) อยู่ที่ cx · ขอบล่างเฟรม = เท้า
+	const im = IMG['vxs/sheet'], [x0, y0, x1, y1] = fr.box, k = VX.K; if (!im || alpha <= 0) return;
+	ctx.save(); ctx.globalAlpha = alpha; ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+	ctx.drawImage(im, x0, y0, x1 - x0, y1 - y0, cx + (x0 - fr.ax) * k, feet - (y1 - y0) * k, (x1 - x0) * k, (y1 - y0) * k); ctx.restore();
+}
+function vxGlow(p, fr, cx, feet, alpha, bloom) {   // ชั้นแสงจาก atlas · พลิกซ้าย-ขวารอบจุดยึด (ตัวเอกในชีตหันขวา · Rion หันซ้าย) · วาดแบบบวกแสง
+	const im = IMG['vxs/' + p.atlas]; if (!im || !fr.fx || alpha <= 0) return;
+	const [ax, ay, w, h] = fr.fx, k = VX.K, x0 = fr.box[0];
+	ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+	ctx.translate(cx, feet); ctx.scale(-k, k);
+	if (bloom) { ctx.filter = 'blur(2px)'; ctx.globalAlpha = Math.min(1, alpha * 0.7); ctx.drawImage(im, ax, ay, w, h, x0 - fr.ax, -h, w, h); ctx.filter = 'none'; }
+	ctx.globalAlpha = Math.min(1, alpha); ctx.drawImage(im, ax, ay, w, h, x0 - fr.ax, -h, w, h); ctx.restore();
+}
+function vxView(c) {
+	const p = c.vx, bg = `rgb(${p.bg.join(',')})`;
+	if (c.pieces) {   // ภาพนิ่ง: ชิ้นที่ S.frame ขยายให้พอดีเวที
+		const b = c.pieces[S.frame].box, w = b[2] - b[0], h = b[3] - b[1], W0 = 300, H0 = 180, k = Math.min(4, (W0 - 16) / w, (H0 - 26) / h);
+		cv.width = W0; cv.height = H0; ctx.fillStyle = bg; ctx.fillRect(0, 0, W0, H0);
+		ctx.imageSmoothingEnabled = k < 2; ctx.drawImage(IMG['vxs/sheet'], b[0], b[1], w, h, Math.round((W0 - w * k) / 2), Math.round(20 + (H0 - 20 - h * k) / 2), w * k, h * k);
+		ctx.font = '9px system-ui, sans-serif'; ctx.fillStyle = '#d8dde8'; ctx.fillText(`${p.name} · ${S.frame + 1}/${c.pieces.length}`, 6, 12);
+		if (S.grid) drawGrid(); return;
+	}
+	const row = c.row, n = row.length, ki = Math.floor(S.frame / VX.SUB), a = (S.frame % VX.SUB) / VX.SUB, fr = row[ki], nx = row[(ki + 1) % n];
+	const { PW, PH } = VX, feet = PH - 10, ease = a * a * (3 - 2 * a);
+	cv.width = PW * 3; cv.height = PH; ctx.fillStyle = bg; ctx.fillRect(0, 0, cv.width, PH);
+	// ช่อง 1 ต้นฉบับ: ทีละเฟรม วางกลางกรอบเฟรมตรง ๆ ไม่จัดตัว ไม่เฟด
+	vxClip(0, 0, PW, PH, () => vxCrop(Object.assign({}, fr, { ax: (fr.box[0] + fr.box[2]) / 2 }), PW / 2, feet, 1));
+	// ช่อง 2 จัดตัวนิ่ง + เฟด: ตัวเอกทุกเฟรมอยู่จุดเดียวกัน (จุดยึด ax) · ภาพถัดไปค่อย ๆ ซ้อนขึ้น
+	vxClip(PW, 0, PW, PH, () => { vxCrop(fr, PW + PW / 2, feet, 1 - ease); vxCrop(nx, PW + PW / 2, feet, ease); });
+	// ช่อง 3 ปรับแล้ว: เงา + Rion (ภาพของเฟรมย่อยนี้) + แสงจากชีต เฟดต่อกัน + เรืองแสง
+	vxClip(PW * 2, 0, PW, PH, () => {
+		const cx = PW * 2 + PW / 2 + 10, key = c.frames[S.frame], im = IMG[key];
+		const bob = p.pose === 'IDLE' ? Math.round(Math.sin(S.frame / c.frames.length * Math.PI * 4)) : 0, kb = p.pose === 'HIT' ? Math.round((1 - a) * 3 * (ki % 2)) : 0;
+		ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(cx, feet, 14, 3, 0, 0, 7); ctx.fill();
+		if (p.pose === 'DASH') for (let g = 3; g >= 1; g--) spr(c.frames[Math.max(0, S.frame - g)], cx - 32 + g * 9, feet - 63, { alpha: 0.12 * (4 - g) });   // ภาพติดตา
+		const around = p.pose === 'HIT' || p.pose === 'IDLE';   // ออร่า/แสงโดนตี: เต็มที่หลังตัว + บาง ๆ ทับหน้า (ทับเต็มแล้ว Rion ขาวโพลน)
+		if (around) { vxGlow(p, fr, cx, feet, 1 - ease, true); vxGlow(p, nx, cx, feet, ease, true); }
+		if (im) spr(key, cx - 32 + kb, feet - 63 + bob);
+		const k2 = around ? 0.3 : 1; vxGlow(p, fr, cx, feet, (1 - ease) * k2, !around); vxGlow(p, nx, cx, feet, ease * k2, !around);
+	});
+	ctx.font = '9px system-ui, sans-serif'; ctx.fillStyle = 'rgba(8,10,16,.55)'; ctx.fillRect(0, 0, cv.width, 16);   // แถบป้ายอ่านออกแม้แสงใหญ่ทับ
+	VX.LABEL.forEach((t, k) => { if (k) { ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.fillRect(PW * k - 1, 0, 1, PH); } ctx.fillStyle = '#d8dde8'; ctx.fillText(t, PW * k + 5, 12); });
+	ctx.fillStyle = 'rgba(216,221,232,.6)'; ctx.fillText(`ภาพ ${ki + 1}/${n}`, PW * 3 - 46, 12);
+	if (S.grid) drawGrid();
+}
 // ── VFX ซ้อนบนภาพชีต (kwan เลือก 5 ต.ค. · "อลังการกว่านี้พร้อมเสียง" · ตัวอย่างสายละ 1 ท่า = SKS.vfx_samples) ──
 // ทุกอย่างคิดจากเลขเฟรม (สุ่มแบบมี seed ตามรหัสท่า) → กดทีละเฟรมได้ ภาพเดิมทุกครั้ง · ค่าทั้งหมดเป็นค่าภาพ/เสียงในหน้าเทส ไม่ใช่ค่าเกม
 const vTime = f => f < VFX.HIT ? f : f < VFX.HIT + VFX.STOP ? VFX.HIT : f - VFX.STOP;   // หยุดภาพตอนกระทบ: เวลาของการเคลื่อนไหวค้างไว้ STOP เฟรม
@@ -944,7 +1024,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 }
 
 // ── สถานะผู้ชม ──
-const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', arms: 'armGroups' };
+const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -988,6 +1068,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.vx) return vxView(c);
 	if (c.panels) return panelView(c);
 	if (c.skill) return sheetSkillView(c);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
@@ -1778,8 +1859,9 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
-		$('rdFile').textContent = `assets/sprites/${fold}/${k.split('/')[1]}.png`;
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		$('rdFile').textContent = c.vx ? `${VXS.sheet} · ${c.pieces ? 'กรอบ ' + c.pieces[S.frame].box.join(',') : 'แถว ' + c.label + ' · แสง ' + fold + '/' + c.vx.atlas + '.png'}`
+			: `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
 		$('rdClip').textContent = tt ? 'สกิล · ' + tt.name_th : 'สกิล — เลือกท่าด้านขวา';
@@ -1797,7 +1879,9 @@ function buildStrip() {
 	c.frames.forEach((k, i) => {
 		const b = document.createElement('button'); b.dataset.i = i; b.type = 'button';
 		const t = document.createElement('canvas'); t.width = 96; t.height = 96; const x = t.getContext('2d'); x.imageSmoothingEnabled = false;
-		const im = IMG[k]; if (im) { const s = Math.min(1, 96 / Math.max(im.width, im.height)) * (im.width <= 48 ? 2 : 1); x.drawImage(im, (96 - im.width * s) / 2, (96 - im.height * s) / 2, im.width * s, im.height * s); }
+		const im = IMG[k], pc = c.pieces && c.pieces[i];
+		if (pc && im) { const [x0, y0, x1, y1] = pc.box, s = Math.min(3, 92 / Math.max(x1 - x0, y1 - y0)); x.drawImage(im, x0, y0, x1 - x0, y1 - y0, (96 - (x1 - x0) * s) / 2, (96 - (y1 - y0) * s) / 2, (x1 - x0) * s, (y1 - y0) * s); }   // ภาพนิ่งจากชีต VFX: ครอปชิ้นนั้น
+		else if (im) { const s = Math.min(1, 96 / Math.max(im.width, im.height)) * (im.width <= 48 ? 2 : 1); x.drawImage(im, (96 - im.width * s) / 2, (96 - im.height * s) / 2, im.width * s, im.height * s); }
 		b.append(t, `#${i + 1} · ${Math.round(c.sec * 1000)}ms`);
 		b.addEventListener('click', () => { if (!isClip()) return; S.playing = false; updPlay(); S.frame = i; S.acc = 0; syncFrame(); });
 		box.append(b);
@@ -2020,7 +2104,7 @@ function buildGalleries() {
 		thumb: x => `<img src="${DATA.sprites['npc/' + x.id + '_0']}" alt=""><span>${x.name}</span><small>${x.where}</small>`,
 		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.where}</span><br>${x.role}<br><span class="muted">ที่มา: ${x.source} · คลิป: ยืนหายใจ → คุย (...) → เดิน</span>` });
 }
-const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', sksheet: 'Sksheet', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
+const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', sksheet: 'Sksheet', vxsheet: 'Vxsheet', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
 	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }

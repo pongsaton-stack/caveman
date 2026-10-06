@@ -105,6 +105,12 @@ def sprites():
 		for f in sorted(os.listdir(kd)):
 			if f.endswith('_fx.png'): out['skf/' + f[:-7]] = webp(os.path.join(kd, f))
 			elif f.endswith('_cell.png'): out['skc/' + f[:-9]] = webp(os.path.join(kd, f), 60)
+	# ชีต VFX Protagonist (tools/sprites/vfx_sheet_cut.py) — ชีตทั้งแผ่น (หน้าเทสครอปเอง) + ชั้นแสงต่อแผงท่า (webp มีโปร่งใส)
+	vd = os.path.join(SPR, 'vfx_sheet_draft')
+	if os.path.isdir(vd):
+		out['vxs/sheet'] = webp(os.path.join(ROOT, 'docs/art-bible/vfx/vfx_protagonist_sheet.png'), 85)
+		for f in sorted(os.listdir(vd)):
+			if f.startswith('atlas_') and f.endswith('.png'): out['vxs/' + f[:-4]] = webp(os.path.join(vd, f), 85)
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -194,6 +200,7 @@ def main(out_path):
 		'draft_map': draft_map(),
 		'sheet_cut': sheet_cut(),
 		'skill_sheet': json.load(open(os.path.join(SPR, 'skills_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'skills_sheet_draft/index.json')) else None,
+		'vfx_sheet': json.load(open(os.path.join(SPR, 'vfx_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_sheet_draft/index.json')) else None,
 		'weapon_stack': json.load(open(os.path.join(SPR, 'weapons_stack_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_stack_draft/index.json')) else None,
 		'weapon_sheet': json.load(open(os.path.join(SPR, 'weapons_sheet_draft/index.json'), encoding='utf-8'))['items'] if os.path.exists(os.path.join(SPR, 'weapons_sheet_draft/index.json')) else [],
 		'compendium': compendium(),
