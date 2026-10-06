@@ -50,6 +50,7 @@ var basic_status_chance: float = 0.0
 var base_def: int = 0            # DEF ก่อนบัฟ (ใช้คืนค่าตอนบัฟหมด)
 var buffs: Dictionary = {}       # "def_up" -> เทิร์นที่เหลือ
 var sig_effect: Dictionary = {}  # แถวจาก sig_effects.csv ของมอนตัวนี้ ({} = ท่าเด่นเป็นการตีแรงแบบเดิม)
+var body: String = ""            # ร่างกายมอน (data/monster_body.csv) — "" = ไม่มีผลความเข้ากับร่างกาย
 var once_used: Array[String] = []   # ชื่อท่าแบบ "ครั้งเดียวต่อการต่อสู้" ที่ใช้ไปแล้ว
 var seized: Array[String] = []   # ตัวเอก: ชื่อท่าที่ยึดมา (แยกจาก learned — ไม่นับในต้นไม้ท่า/โอกาสประกาย)
 
@@ -76,6 +77,22 @@ func dodge_chance(monster_id: String) -> float:
 	if not bool(r.get("on", false)):
 		return 0.0
 	return clampf(float(r.get("p", 0)) / maxf(float(r.get("need", 1)), 1.0), 0.0, 1.0)
+
+static var _body_table := {}
+static var _affinity := {}
+## ความเข้ากับร่างกาย: สาย × ร่างกาย → +1 / -1 / 0 (data/body_affinity.csv · ไม่มีแถว = ปกติ)
+static func body_sign(school: String, body_name: String) -> int:
+	if school == "" or body_name == "":
+		return 0
+	if _affinity.is_empty() and FileAccess.file_exists("res://data/body_affinity.csv"):
+		for r in CsvDb.load_csv("res://data/body_affinity.csv"):
+			_affinity[str(r["school"]) + "|" + str(r["body"])] = int(r["sign"])
+	return int(_affinity.get(school + "|" + body_name, 0))
+
+static func body_of(monster_id: String) -> String:
+	if _body_table.is_empty() and FileAccess.file_exists("res://data/monster_body.csv"):
+		_body_table = CsvDb.index_by(CsvDb.load_csv("res://data/monster_body.csv"), "monster_id")
+	return str(_body_table.get(monster_id, {}).get("body", ""))
 
 static var _sig_table := {}
 static func sig_table() -> Dictionary:
@@ -154,5 +171,6 @@ static func from_csv(row_data: Dictionary) -> Actor:
 	a.basic_status = str(row_data.get("status", ""))
 	a.basic_status_chance = float(row_data.get("status_chance", 0.0))
 	a.sig_effect = sig_table().get(a.id, {})
+	a.body = body_of(a.id)
 	a.reset_av()
 	return a

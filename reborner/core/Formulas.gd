@@ -8,6 +8,11 @@ const AV_NUM       := 10000.0 # AV = AV_NUM / SPD
 const WEAK_MULT    := 1.5
 const RESIST_MULT  := 0.5
 const PUSH_MULT    := 0.75    # ตีจุดอ่อน -> AV ถัดไปคูณค่านี้
+# ความเข้ากับร่างกาย (kwan เลือก 6 ต.ค. 2026 · ชั้นแยกจากแพ้/ต้านธาตุ): สายของท่า × ร่างกายมอน (data/body_affinity.csv)
+# ปรับแค่ดาเมจ ไม่ดันคิว ไม่นับเป็นจุดอ่อน (จุดอ่อนธาตุยังเป็นเครื่องยนต์ดันคิว · คาถา Red "ใส่จุดอ่อน" ยังมีค่า)
+# ⚠ 1.0 = ปิดอยู่ — รอ kwan เลือกค่าจากผลกวาด Sim (GDD 3.x ความเข้ากับร่างกาย) ห้ามใส่ค่าเอง
+const BODY_GOOD    := 1.0
+const BODY_BAD     := 1.0
 const GLIM_BASE    := 0.048   # 0.032 → 0.048 (6 ต.ค. 2026 kwan "ให้สนุก อย่าให้เบื่อ" · Sim 1000 ศึก: ศึกสูสีประกายสุ่ม 2.5% → 4–8% · มอนขยะยัง ≤3.7%)
 const INSIGHT_MAX  := 40.0
 const THREAT_SLOPE := 0.08
@@ -73,6 +78,12 @@ static func prof_gain(enemy_tier: float, prof: float) -> int:
 ## โอกาสประกายจากการสุ่ม
 static func glimmer_chance(enemy_tier: float, prof: float, learned_ratio: float, luck: int) -> float:
 	return GLIM_BASE * threat(enemy_tier, prof) * (1.0 - learned_ratio) * (1.0 + luck * 0.015)
+
+## ตัวคูณความเข้ากับร่างกาย จากเครื่องหมายในตาราง (+1 เข้าดี · -1 เข้าน้อย · 0 ปกติ)
+static func body_mult(sign: int) -> float:
+	if sign > 0: return BODY_GOOD
+	if sign < 0: return BODY_BAD
+	return 1.0
 
 ## สูตรความเสียหาย — GDD 3.2
 ## elem: 1.5 จุดอ่อน / 1.0 ปกติ / 0.5 ต้านทาน / 0.0 ภูมิคุ้มกัน

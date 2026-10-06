@@ -587,8 +587,9 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 	if tgt.row == "หลัง" and not (tech.ignore_pos or tech.free_row):
 		pos = 0.7
 	var guard_mult := 0.5 if tgt.guarding else 1.0
+	var bsign := Actor.body_sign(tech.school, tgt.body)   # ความเข้ากับร่างกาย — ดาเมจอย่างเดียว ไม่ดันคิว
 	var dmg := Formulas.damage(src.atk, tech.power, tgt.def_val,
-		elem, pos, bonus * guard_mult, tech.ignore_def)
+		elem, pos, bonus * guard_mult * Formulas.body_mult(bsign), tech.ignore_def)
 	tgt.hp = maxi(0, tgt.hp - dmg)
 	tgt.hits += 1
 	tgt.last_hit = dmg
@@ -609,12 +610,14 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 		tag = "  ภูมิคุ้มกัน"
 	if tgt.guarding:
 		tag += "  (ตั้งรับ -50%)"
+	if bsign != 0 and Formulas.body_mult(bsign) != 1.0:
+		tag += "  เข้าทาง%s" % tgt.body if bsign > 0 else "  ไม่ค่อยเข้า%s" % tgt.body
 
 	_log("  รอบ %2d  %s → %s [%s] : %d (เหลือ %d/%d)%s"
 		% [rounds, src.name, tgt.name, tech.name, dmg, tgt.hp, tgt.max_hp, tag])
 	if capture:
 		events.append({"src": src, "tgt": tgt, "tech": tech.name, "school": tech.school, "dmg": dmg,
-			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer})
+			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer, "body": bsign})
 
 	# ฝ่ายเราโดนตี = สะสม Insight
 	# ศัตรูเล็งตัวที่ HP น้อยที่สุด มอนร่วมทีมจึงเป็นแท้งก์และตัวเอกแทบไม่โดน
