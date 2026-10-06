@@ -1096,6 +1096,14 @@ function drawStack(code, n, angle, x, y) {   // วาดที่ 48px แล�
 	L.forEach((lay, z) => { o.save(); o.translate(24, 30 - z); o.scale(1, STACK_TILT); o.rotate(angle); o.drawImage(lay, -16, -16); o.restore(); });
 	ctx.drawImage(STACK_OC, x, y, 96, 96);
 }
+// ริก Rion + อาวุธจากชีต (kwan 6 ต.ค. "เอา RIG มาช่วย" → ข้อ 1) — เฟรมอบจาก rion_rig.py · เล่นคู่ ไอคอนในชีต | Rion ถือ (12 เฟรม: ยืน → ง้าง → ฟาด → ตามแรง → คืน)
+// 12 เฟรมใน 2 รอบท่าฟันของเกม (4 × ATTACK_FRAME_SEC × 2) — ค่าดูในหน้าเทส
+for (const it of ((DATA.rion_rig || {}).items || [])) {
+	const keys = Array.from({ length: it.frames }, (_, i) => `rig/${it.code}_${i}`);
+	addClip('ริก Rion + อาวุธจากชีต (ตัวอย่าง · ร่าง ยังไม่เข้าเกม)', 'rig_' + it.code, `${it.code}${it.name ? ' ' + it.name : ''} · ท่า${{ slash: 'ฟัน', thrust: 'แทง', swing2: 'เหวี่ยงสองมือ', aim: 'ประทับยิง', punch: 'ต่อย', point: 'ชี้สั่งโดรน' }[it.pose]}`,
+		keys, K.ATTACK_FRAME_SEC * 8 / it.frames, { tab: 'arms', panels: [{ label: 'ในชีต', keys: keys.map(() => 'wsh/' + it.code) }, { label: 'ริก', keys }] });
+}
+{ const i = GROUPS.findIndex(g => g.name.startsWith('ริก Rion')); if (i > 0) { const g = GROUPS.splice(i, 1)[0]; GROUPS.splice(GROUPS.findIndex(x => x.tab === 'arms'), 0, g); } }
 const WSH_FAM = { SL: 'SL ฟัน', PC: 'PC แทง', CR: 'CR ทุบ', BD: 'BD ร่างกาย', ST: 'ST ยิง', DV: 'DV สายกล', W: 'อาวุธเดิม W301–W310' };
 for (const w of (DATA.weapon_sheet || [])) {
 	const k = 'wsh/' + w.code;
@@ -2035,7 +2043,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = c.vx ? `${VXS.sheet} · ${c.pieces ? 'กรอบ ' + c.pieces[S.frame].box.join(',') : 'แถว ' + c.label + ' · แสง ' + fold + '/' + c.vx.atlas + '.png'}`
 			: `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {

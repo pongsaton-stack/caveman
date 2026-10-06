@@ -116,6 +116,11 @@ def sprites():
 	if os.path.isdir(gd2):
 		for f in sorted(os.listdir(gd2)):
 			if f.endswith('.png'): out['vfg/' + f[:-4]] = png(os.path.join(gd2, f))
+	# ริก Rion + อาวุธจากชีต (tools/sprites/rion_rig.py) — เฟรมที่อบแล้ว 64x64
+	rd = os.path.join(SPR, 'rion_rig_draft')
+	if os.path.isdir(rd):
+		for f in sorted(os.listdir(rd)):
+			if f.endswith('.png'): out['rig/' + f[:-4]] = png(os.path.join(rd, f))
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
 	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
 		d = os.path.join(SPR, folder)
@@ -207,6 +212,7 @@ def main(out_path):
 		'skill_sheet': json.load(open(os.path.join(SPR, 'skills_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'skills_sheet_draft/index.json')) else None,
 		'vfx_sheet': json.load(open(os.path.join(SPR, 'vfx_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_sheet_draft/index.json')) else None,
 		'vfx_fx': json.load(open(os.path.join(SPR, 'vfx_fx_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_fx_draft/index.json')) else None,
+		'rion_rig': json.load(open(os.path.join(SPR, 'rion_rig_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'rion_rig_draft/index.json')) else None,
 		'weapon_stack': json.load(open(os.path.join(SPR, 'weapons_stack_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_stack_draft/index.json')) else None,
 		'weapon_sheet': json.load(open(os.path.join(SPR, 'weapons_sheet_draft/index.json'), encoding='utf-8'))['items'] if os.path.exists(os.path.join(SPR, 'weapons_sheet_draft/index.json')) else [],
 		'compendium': compendium(),
