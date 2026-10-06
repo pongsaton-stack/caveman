@@ -36,6 +36,13 @@ section.scr .sub{color:var(--ink2);font-size:13px;margin:0 0 10px;max-width:80ch
 .tbl th,.tbl td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
 .tbl th{color:var(--ink2);font-weight:600}
 .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:3px;background:#2a241b;color:var(--gold)}
+.mapb{margin:22px 0 30px}
+.mapb canvas{width:100%;max-width:100%;aspect-ratio:384/216;image-rendering:pixelated;background:#000;border:1px solid var(--line);display:block}
+.mapb .bar2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.mapb .bar2 button{font:600 13px var(--f-ui);background:#1d1a15;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:6px 12px;cursor:pointer}
+.mapb .bar2 button[aria-pressed="true"]{background:var(--gold);color:#15130f;border-color:var(--gold)}
+.mapb .bar2 button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.mapb .logl{font-size:12.5px;color:var(--ink2);min-height:2.6em;font-family:var(--f-ui);line-height:1.45}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ── ชิ้นส่วนในจอเกม (หน่วย px = พิกเซลจอเกม 384×216) ── */
@@ -72,6 +79,18 @@ section.scr .sub{color:var(--ink2);font-size:13px;margin:0 0 10px;max-width:80ch
   <button id="lookBlue" aria-pressed="false">หน้าตาน้ำเงิน (ตามชีต UI · เก็บไว้เทียบ)</button>
 </div>
 <nav class="jump" id="jump"></nav>
+<section class="mapb" id="mapbattle">
+  <h2 style="font-size:18px;margin:0 0 4px">ศึกบนแผนที่แบบ RS3 · เล่นได้</h2>
+  <p class="sub" style="color:var(--ink2);font-size:13px;margin:0 0 10px;max-width:84ch;line-height:1.55">สู้ตรงจุดที่เจอบอสบนแผนที่จริง (ภาพจากเกม) · จอโล่ง หน้าต่างคำสั่งขึ้นเฉพาะตาของ Rion · กด "HP/LP" เพื่อดูตัวเลขเหนือหัว · ทุกเทิร์นเล่นตามบันทึกจาก Battle.gd ตัวจริง (seed <span id="mbSeed"></span>) ไม่ได้คิดผลใหม่ในหน้าเว็บ</p>
+  <canvas id="mb" width="384" height="216" aria-label="ศึกบนแผนที่"></canvas>
+  <div class="bar2" role="group" aria-label="ควบคุม">
+    <button id="mbPlay">⏸ หยุด</button><button id="mbRe">⟲ เริ่มใหม่</button>
+    <button id="mbHp" aria-pressed="false">HP/LP</button>
+    <button id="mbSpd">ความเร็ว ×1</button>
+    <span class="mut" id="mbTurn" style="font-size:13px;color:var(--ink2)"></span>
+  </div>
+  <div class="logl" id="mbLog"></div>
+</section>
 <div id="screens"></div>
 
 <div class="conf" id="conflicts">
@@ -336,7 +355,7 @@ function render() {
       <div class="frame"><div class="g${look === 'blue' ? ' blue' : ''}">${s.draw()}</div></div>
       <div class="notes">${s.notes.map(n => `<div>· ${n}</div>`).join('')}</div>
     </section>`).join('');
-  $('#jump').innerHTML = SCREENS.map(s => `<a href="#${s.id}">${s.title}</a>`).join('') + '<a href="#conflicts">ที่ขัดกับเกม</a>';
+  $('#jump').innerHTML = '<a href="#mapbattle">ศึกบนแผนที่ (เล่นได้)</a>' + SCREENS.map(s => `<a href="#${s.id}">${s.title}</a>`).join('') + '<a href="#conflicts">ที่ขัดกับเกม</a>';
   $('#lookGold').setAttribute('aria-pressed', look === 'gold');
   $('#lookBlue').setAttribute('aria-pressed', look === 'blue');
   fit();
@@ -348,4 +367,213 @@ $('#lookGold').onclick = () => { look = 'gold'; try { localStorage.setItem('ui_l
 $('#lookBlue').onclick = () => { look = 'blue'; try { localStorage.setItem('ui_look', look); } catch (e) {} render(); };
 new ResizeObserver(fit).observe(document.body);
 render();
+
+// ── ศึกบนแผนที่แบบ RS3 (เล่นภาพตามบันทึกจาก Battle.gd) ──
+(() => {
+  const R = D.rec, cv = $('#mb'), cx = cv.getContext('2d');
+  cx.imageSmoothingEnabled = false;
+  $('#mbSeed').textContent = R.seed;
+  const im = {}; for (const k in IMG) { const i = new Image(); i.src = IMG[k]; im[k] = i; }
+  // ตำแหน่งยืน (พิกัดจอ 384×216 · เท้า) — บอสในห้องหินขวา ทีมหน้าทางเข้าซ้าย (สู้ตรงที่ยืนจริง)
+  const HOME = R.roster.map(a => a.hero ? {x: 140, y: 152} : a.side === 'foe' ? {x: 292, y: 162} : a.id === 'M06' ? {x: 100, y: 128} : {x: 84, y: 168});
+  const SPRK = a => a.hero ? null : a.side === 'foe' ? ['B1', 'B1i'] : a.id === 'M06' ? ['C06', 'C06i'] : ['C03', 'C03i'];
+  let st, T, playing = true, spd = 1, showHp = false, acts = [], ai = 0, tAct = 0, tAll = 0;
+  const reset = () => {
+    st = R.start.map((s, i) => ({ ...s, x: HOME[i].x, y: HOME[i].y, pose: 'idle', flash: 0, alpha: 1 }));
+    acts = build(); ai = 0; tAct = 0; tAll = 0; pops.length = 0;
+  };
+  const pops = [];
+  const nameOf = i => R.roster[i].name;
+  const techRow = n => D.techs.find(t => t.name === n);
+  const SC = {single: 'ศัตรู 1', row: 'แถว', all: 'ศัตรูทั้งหมด'};
+  // แปลงบันทึกเป็นลำดับฉาก: [ชนิด, เวลา ms, ข้อมูล]
+  function build() {
+    const out = [];
+    R.turns.forEach((t, ti) => {
+      const a = R.roster[t.cur], ev = t.events, logs = t.log.join(' · ');
+      const intr = t.log.some(l => l.includes('ขัดจังหวะ'));
+      const glim = ev.some(e => e.glimmer) && t.log.some(l => l.includes('ประกาย!'));
+      const tech = ev.length ? ev[0].tech : '';
+      const combo = tech.startsWith('คอมโบ');
+      if (a.hero) out.push(['menu', 1100, {t, tech, combo}]);
+      if (glim) out.push(['glim', 900, {t, tech}]);
+      if (intr) out.push(['intr', 900, {t}]);
+      else if (ev.length) {
+        const partner = combo ? R.roster.findIndex(r => tech.includes(r.name) && !r.hero) : -1;
+        out.push([a.side === 'foe' ? 'foe' : 'hit', a.side === 'foe' ? 1000 : 1150, {t, tech, partner, sig: tech === R.roster[t.cur].sig}]);
+      }
+      out.push(['settle', 250, {t}]);
+      out[out.length - 1][2].log = logs; out[out.length - 1][2].ti = ti;
+    });
+    out.push(['win', 3600, {}]);
+    return out;
+  }
+  // ── วาด ──
+  const off = document.createElement('canvas'), ox = off.getContext('2d');
+  const spr = (img, x, y, flip, alpha = 1, white = 0, w, h) => {
+    if (!img || !img.complete) return;
+    w = w || img.width; h = h || img.height;
+    let src = img;
+    if (white > 0) {   // วาบขาวเฉพาะตัวสไปรต์ (วาดบนผืนแยก แล้วค่อยลงจอ)
+      off.width = img.width; off.height = img.height; ox.drawImage(img, 0, 0);
+      ox.globalCompositeOperation = 'source-atop'; ox.globalAlpha = white; ox.fillStyle = '#fff'; ox.fillRect(0, 0, off.width, off.height);
+      ox.globalCompositeOperation = 'source-over'; ox.globalAlpha = 1; src = off;
+    }
+    cx.save(); cx.globalAlpha = alpha;
+    if (flip) { cx.translate(Math.round(x + w), Math.round(y)); cx.scale(-1, 1); cx.drawImage(src, 0, 0, w, h); }
+    else cx.drawImage(src, Math.round(x), Math.round(y), w, h);
+    cx.restore();
+  };
+  const txt = (s, x, y, col = '#fff', size = 7, align = 'left', bold = true) => {
+    cx.font = `${bold ? 700 : 400} ${size}px Sarabun, sans-serif`; cx.textAlign = align; cx.textBaseline = 'top';
+    cx.lineWidth = 1.5; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(0,0,0,.85)'; cx.strokeText(s, x, y); cx.fillStyle = col; cx.fillText(s, x, y);
+  };
+  const box = (x, y, w, h, a = .88) => { cx.fillStyle = `rgba(16,24,44,${a})`; cx.fillRect(x, y, w, h); cx.strokeStyle = '#e8eefc'; cx.lineWidth = 1; cx.strokeRect(x + .5, y + .5, w - 1, h - 1); };
+  const goldbox = (x, y, w, h) => { cx.fillStyle = 'rgba(28,24,18,.9)'; cx.fillRect(x, y, w, h); cx.strokeStyle = '#c9a24a'; cx.lineWidth = 1; cx.strokeRect(x + .5, y + .5, w - 1, h - 1); };
+  function drawActor(i, now, dim) {
+    const a = R.roster[i], s = st[i];
+    if (s.down && a.side === 'foe' && s.alpha <= 0) return;
+    const bob = Math.floor(now / 450) % 2;
+    if (a.hero) {
+      let k = 'r_east';
+      if (s.pose === 'run') k = 'r_east_w' + (Math.floor(now / 70) % 4);
+      else if (s.pose === 'back') k = 'r_east_w' + (Math.floor(now / 70) % 4);
+      else if (s.pose.startsWith('atk')) k = 'r_west_a' + s.pose.slice(3);
+      else if (s.pose === 'hurt') k = 'r_west_h0';
+      else if (s.down) k = 'r_west_k1';
+      const flip = k.startsWith('r_west');
+      spr(im[k], s.x - 32, s.y - 60, flip, s.alpha, s.flash);
+    } else {
+      const ks = SPRK(a), img = im[ks[bob]], w = img.width || 48, h = img.height || 48;
+      const flip = a.side === 'foe';   // ศัตรูวาดหันขวา → ในฉากนี้บอสอยู่ขวา ต้องหันซ้าย · มอนฝั่งเราวาดหันซ้าย → พลิกหันขวา
+      spr(img, s.x - w / 2, s.y - h, a.side !== 'foe' ? true : flip, s.down ? .35 : s.alpha, s.flash);
+    }
+  }
+  function frame(now) {
+    cx.setTransform(1, 0, 0, 1, 0, 0);
+    const act = acts[Math.min(ai, acts.length - 1)];
+    const k = act ? Math.min(tAct / act[1], 1) : 1;
+    let shake = 0, dark = 0;
+    if (act && act[0] === 'foe' && act[2].sig) { dark = k < .25 ? k / .25 * .8 : k > .8 ? (1 - k) / .2 * .8 : .8; if (k > .45 && k < .7) shake = 3; }
+    if (act && act[0] === 'glim') dark = .5 * Math.sin(Math.PI * k);
+    if (shake) cx.translate((Math.random() - .5) * shake * 2, (Math.random() - .5) * shake);
+    if (im.map.complete) cx.drawImage(im.map, 0, 0);
+    if (dark) { cx.fillStyle = `rgba(0,0,0,${dark})`; cx.fillRect(0, 0, 384, 216); }
+    const order = R.roster.map((_, i) => i).sort((p, q) => st[p].y - st[q].y);
+    for (const i of order) drawActor(i, now, dark);
+    // ท่าที่บอสเปิดไว้ + หลอดขัด (ข้อมูลเกม: ดาเมจสะสม / 15% maxHP)
+    R.roster.forEach((a, i) => {
+      if (a.side !== 'foe' || st[i].down || !st[i].tel) return;
+      const need = Math.round(a.max_hp * .15), w = 60;
+      txt('▼ ' + st[i].tel, st[i].x, st[i].y - 104, '#ff9a8a', 7, 'center');
+      cx.fillStyle = '#000a'; cx.fillRect(st[i].x - w / 2, st[i].y - 94, w, 3); cx.fillStyle = '#c9a24a'; cx.fillRect(st[i].x - w / 2, st[i].y - 94, w * Math.min(1, st[i].telDmg / need), 3);
+    });
+    // HP/LP เหนือหัว (กดดู · แบบ RS3)
+    if (showHp) R.roster.forEach((a, i) => {
+      const s = st[i], y = a.side === 'foe' ? s.y - 116 : a.hero ? s.y - 78 : s.y - (a.id === 'M06' ? 62 : 52);
+      if (a.side === 'foe') { txt(a.name, s.x, s.y + 2, '#fff', 7, 'center'); txt(`${s.hp}/${a.max_hp}`, s.x, y, '#fff', 7, 'center'); return; }
+      txt(`${s.hp}/${a.max_hp}`, s.x, y, s.down ? '#ff7a6a' : '#fff', 7, 'center');
+      txt(a.hero ? `SP ${s.sp} · Insight ${Math.round(s.ins)}/40` : `LP ${a.lp - (s.down ? 1 : 0)}/3`, s.x, y + 8, '#cfe0ff', 6, 'center', false);
+    });
+    // ตัวเลขลอย
+    for (const p of pops) {
+      const age = (tAll - p.t0) / 900; if (age < 0 || age > 1) continue;
+      const y = p.y - 10 * Math.min(age * 3, 1) + (age > .3 ? 0 : 0);
+      txt(p.s, p.x, y, p.col, p.size, 'center');
+      if (p.sub) txt(p.sub, p.x, y + p.size + 1, p.subc, 5.5, 'center', false);
+    }
+    // ฉากเฉพาะ
+    if (act) overlay(act, k);
+  }
+  function overlay(act, k) {
+    const [kind, , d] = act;
+    if (kind === 'menu') {
+      // หน้าต่างคำสั่งแบบ RS3: ซ้ายบน หมวด ◀ ▶ + รายการท่า · ขวาบน ชื่อ + SP · ล่าง คำอธิบาย
+      const t = d.t, hero = R.roster[t.cur], sp = st[t.cur].sp;
+      const list = t.usable.map(u => [u.name, u.sp]); list.push(['ตั้งรับ', '']); list.push(['จับตา', '']);
+      if (d.combo) list.unshift([d.tech.replace('Rion+', '+ '), 10]);
+      const pick = d.combo ? 0 : Math.max(0, list.findIndex(l => l[0] === d.tech));
+      txt('◀', 6, 6, '#e8c877', 9); box(16, 4, 92, 14); txt(`สาย${D.school}`, 62, 6, '#fff', 8, 'center'); txt('▶', 110, 6, '#e8c877', 9);
+      box(6, 20, 132, 10 + list.length * 10);
+      list.forEach(([n, c], i) => { if (i === pick && Math.floor(tAll / 260) % 2) { cx.fillStyle = 'rgba(232,200,119,.22)'; cx.fillRect(8, 24 + i * 10, 128, 10); } txt(n, 22, 24 + i * 10, '#fff', 7, 'left', false); if (c !== '') txt(`${c}`, 132, 24 + i * 10, '#cfe0ff', 7, 'right', false); });
+      spr(im['WBD-1'], 8, 23 + pick * 10, true, 1, 0, 12, 12);
+      box(290, 4, 88, 14); txt(hero.name, 296, 6, '#fff', 8); box(318, 20, 60, 14); txt(`${sp} / ${hero.max_sp}`, 372, 22, '#fff', 8, 'right');
+      const tr = techRow(d.tech);
+      const desc = d.combo ? 'คอมโบกับมอนในทีม · ทั้งคู่จ่าย SP 10' : tr ? `[${tr.scope === 'single' ? 'ประชิด' : 'กว้าง'}/${SC[tr.scope] || tr.scope}] พลัง ${tr.power} · หนัก ${tr.weight}` : '';
+      box(40, 196, 304, 16); txt(desc, 46, 199, '#fff', 7, 'left', false);
+      cx.fillStyle = 'rgba(80,140,255,.18)'; cx.fillRect(0, 180, 384, 36);
+    }
+    if (kind === 'glim') {
+      const s = st[d.t.cur];
+      // หลอดไฟเหนือหัว + กล่องชื่อท่า
+      cx.fillStyle = '#ffe14a'; cx.beginPath(); cx.arc(s.x, s.y - 74, 4 + 2 * Math.sin(k * 20), 0, Math.PI * 2); cx.fill();
+      cx.fillStyle = '#fff8'; cx.fillRect(s.x - 1, s.y - 70, 2, 4);
+      box(122, 8, 140, 16); txt(`★ ประกาย! ${d.tech}`, 192, 11, '#ffe14a', 8, 'center');
+    }
+    if (kind === 'intr') { const b = R.roster.findIndex(r => r.side === 'foe'); txt('✂ ขัดจังหวะ!', st[b].x, st[b].y - 70 - 6 * k, '#ffe08a', 10, 'center'); }
+    if ((kind === 'hit' || kind === 'foe') && d.tech && !d.tech.startsWith('โจมตี')) { box(132, 8, 120, 15, .82); txt(d.tech.replace('Rion+', '+ '), 192, 10, '#fff', 8, 'center'); }
+    if (kind === 'win') {
+      const h = R.roster.findIndex(r => r.hero), s = st[h];
+      const msgs = [`ความชำนาญ +${R.prof_gain}`, ...R.glimmer_log.map(g => `★ ได้ท่า ${g}`), `เงิน +${R.loot}`];
+      msgs.forEach((m, i) => { if (k * 4 > i) { box(s.x - 44, s.y - 104 + i * 15, 88, 13); txt(m, s.x, s.y - 102 + i * 15, '#fff', 7, 'center'); } });
+      R.roster.forEach((a, i) => { if (!a.hero && a.side === 'ally' && st[i].down && k > .3) { box(st[i].x - 30, st[i].y - 70, 60, 13); txt(`LP ${a.lp} → ${a.lp - 1}`, st[i].x, st[i].y - 68, '#ffb0a8', 7, 'center'); } });
+    }
+  }
+  // ── เดินเวลา ──
+  function step(act, k, first) {
+    const [kind, , d] = act;
+    if (kind === 'hit') {
+      const t = d.t, ev = t.events, me = t.cur, tgt = ev[0].tgt, P = d.partner;
+      const movers = [me].concat(P >= 0 ? [P] : []);
+      movers.forEach((m, j) => {
+        const s = st[m], h = HOME[m], ex = st[tgt].x - 50 - j * 14, ey = st[tgt].y - (R.roster[m].id === 'M06' ? 40 : 0) - j * 6;
+        if (k < .3) { const u = k / .3; s.x = h.x + (ex - h.x) * u; s.y = h.y + (ey - h.y) * u; s.pose = 'run'; }
+        else if (k < .6) { s.x = ex; s.y = ey; s.pose = 'atk' + Math.min(3, Math.floor((k - .3) / .3 * 4)); }
+        else { const u = Math.min(1, (k - .6) / .35); s.x = ex + (h.x - ex) * u; s.y = ey + (h.y - ey) * u; s.pose = u >= 1 ? 'idle' : 'back'; }
+      });
+      if (k >= .45 && !act.hitDone) { act.hitDone = true; hitPops(t); }
+      st[tgt].flash = k > .46 && k < .52 ? .5 : 0;
+    }
+    if (kind === 'foe') {
+      const t = d.t, me = t.cur, s = st[me], h = HOME[me];
+      const lunge = k > .35 && k < .6 ? -12 * Math.sin((k - .35) / .25 * Math.PI) : 0;
+      s.x = h.x + lunge; s.flash = d.sig && k > .25 && k < .45 ? .8 : 0;
+      if (k >= .5 && !act.hitDone) { act.hitDone = true; hitPops(t); }
+      t.events.forEach(e => { const q = st[e.tgt]; if (R.roster[e.tgt].hero) q.pose = k > .5 && k < .8 ? 'hurt' : 'idle'; });
+    }
+    if (kind === 'intr') { const b = R.roster.findIndex(r => r.side === 'foe'); st[b].x = HOME[b].x + (k < .5 ? 6 * Math.sin(k * 40) : 0); }
+    if (kind === 'settle' && first) {
+      const t = d.t; t.after.forEach((a, i) => Object.assign(st[i], { hp: a.hp, down: a.down, tel: a.tel, telDmg: a.telDmg, sp: a.sp, ins: a.ins, flash: 0, pose: 'idle', x: HOME[i].x, y: HOME[i].y }));
+      st.forEach((s, i) => { if (s.down && R.roster[i].side === 'foe') s.alpha = 0; });
+      $('#mbLog').textContent = d.log; $('#mbTurn').textContent = `เทิร์น ${d.ti + 1}/${R.turns.length} · ${nameOf(d.t.cur)}`;
+    }
+  }
+  function hitPops(t) {
+    t.events.forEach((e, j) => {
+      const s = st[e.tgt], a = R.roster[e.tgt], top = a.side === 'foe' ? 80 : a.hero ? 64 : 40;
+      if (e.dodge) pops.push({ s: 'หลบ!', x: s.x, y: s.y - top, col: '#8af0c0', size: 8, t0: tAll + j * 120 });
+      else if (e.buff) pops.push({ s: e.buff, x: s.x, y: s.y - top, col: '#8ad0f0', size: 7, t0: tAll });
+      else pops.push({ s: e.weak ? e.dmg + '!' : String(e.dmg), x: s.x + j * 6, y: s.y - top, col: e.weak ? '#ffe08a' : '#fff', size: 9, t0: tAll + j * 120,
+        sub: e.body > 0 ? 'เข้าทาง' : e.body < 0 ? 'ไม่ค่อยเข้า' : '', subc: e.body > 0 ? '#b8f08a' : '#ffb0a8' });
+    });
+  }
+  let last = performance.now();
+  function loop(now) {
+    const dt = Math.min(50, now - last) * spd; last = now;
+    if (playing && acts.length) {
+      const act = acts[ai]; const first = tAct === 0;
+      tAct += dt; tAll += dt;
+      if (act) step(act, Math.min(tAct / act[1], 1), first);
+      if (act && tAct >= act[1]) { ai++; tAct = 0; if (ai >= acts.length) { ai = 0; reset(); } }
+    }
+    frame(now);
+    requestAnimationFrame(loop);
+  }
+  $('#mbPlay').onclick = () => { playing = !playing; $('#mbPlay').textContent = playing ? '⏸ หยุด' : '▶ เล่น'; };
+  $('#mbRe').onclick = () => reset();
+  $('#mbHp').onclick = () => { showHp = !showHp; $('#mbHp').setAttribute('aria-pressed', showHp); };
+  $('#mbSpd').onclick = () => { spd = spd === 1 ? 2 : spd === 2 ? .5 : 1; $('#mbSpd').textContent = `ความเร็ว ×${spd}`; };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { spd = .5; $('#mbSpd').textContent = 'ความเร็ว ×0.5'; }
+  reset(); requestAnimationFrame(loop);
+})();
 </script>

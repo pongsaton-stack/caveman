@@ -28,6 +28,17 @@ def dump():
 def rows(path):
 	return list(csv.DictReader(open(os.path.join(ROOT, path), encoding='utf-8')))
 
+def record():
+	"""ศึก B1 จาก Battle.gd จริง (tools/web/ui_battle_record.gd · seed แรกที่เข้าเงื่อนไข)"""
+	g = os.environ.get('GODOT', 'godot')
+	env = dict(os.environ, REBORNER_SAVE='user://test_save.json')
+	out = subprocess.run([g, '--headless', '--path', ROOT, '-s', 'tools/web/ui_battle_record.gd'],
+		capture_output=True, text=True, timeout=300, env=env).stdout
+	for line in out.splitlines():
+		if line.startswith('REC:'):
+			return json.loads(line[4:])
+	sys.exit('ui_battle_record.gd ไม่คืนบันทึกศึก')
+
 def main():
 	out = sys.argv[1] if len(sys.argv) > 1 else 'ui_mock.html'
 	data = dump()
@@ -35,6 +46,7 @@ def main():
 	data['affinity'] = rows('data/body_affinity.csv')
 	data['items'] = rows('data/items.csv')
 	data['dialogue'] = rows('data/dialogue.csv')
+	data['rec'] = record()
 	img = {
 		'rion_s': 'rion_lastlight_draft/south.png', 'rion_w': 'rion_lastlight_draft/west.png',
 		'B1': 'monsters_ll/B1.png', 'M06': 'monsters_ll/M06.png', 'M03': 'monsters_ll/M03.png',
@@ -42,9 +54,15 @@ def main():
 		'C03': 'monsters_ll/COMP-M03.png', 'C06': 'monsters_ll/COMP-M06.png',
 		'I01': 'items_draft/I01.png', 'L01': 'items_draft/L01.png', 'DB1': 'items_draft/D-B1.png',
 	}
+	# ศึกบนแผนที่: ฉากหลัง = ภาพแผนที่จริงรอบบอส (tools/web/ui_map_shot.gd ต้องมีจอเสมือน · เก็บผลไว้ใน docs/art-bible/ui/)
+	for k in ['east_w0', 'east_w1', 'east_w2', 'east_w3', 'west_a0', 'west_a1', 'west_a2', 'west_a3', 'west_h0', 'west_h1', 'west_k0', 'west_k1', 'east']:
+		img['r_' + k] = 'rion_lastlight_draft/%s.png' % k
+	img.update({'B1i': 'monsters_ll/B1_idle1.png', 'C03i': 'monsters_ll/COMP-M03_idle1.png', 'C06i': 'monsters_ll/COMP-M06_idle1.png'})
 	for w in data['weapons']:
 		img['W' + w['weapon_id']] = 'weapons_draft/%s.png' % w['weapon_id']
 	data['img'] = {k: b64(v) for k, v in img.items()}
+	with open(os.path.join(ROOT, 'docs/art-bible/ui/map_b1_384.png'), 'rb') as f:
+		data['img']['map'] = 'data:image/png;base64,' + base64.b64encode(f.read()).decode()
 	html = open(TPL, encoding='utf-8').read().replace('/*DATA*/null', json.dumps(data, ensure_ascii=False))
 	open(out, 'w', encoding='utf-8').write(html)
 	print(out, len(html), 'bytes ·', len(img), 'รูป ·', len(data['techs']), 'ท่า')
