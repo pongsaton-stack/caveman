@@ -69,6 +69,9 @@ def rot_ground(im, ang, pivot, ground):
 FLOP_DIRS = ['south', 'west', 'north', 'east']
 def rion_frame(p):
 	d = p.get('dir', 'west'); img = PA.rion(p.get('img', d))
+	if p.get('blink') and d == 'west' and not p.get('img'): blink(img)
+	if p.get('arm_hand') and not (p.get('arm') or p.get('barm')) and d == 'west' and not p.get('img'):   # แขนแกว่ง (ชั้นสมจริง) · ศอกจาก ik
+		img = G.remove_front_arm(img); hx, hy = p['arm_hand']; e = ik(G.SH_F, (hx, hy)); draw_arm_soft(img, G.SH_F, (ri(e[0]), ri(e[1])), (ri(hx), ri(hy)))
 	if p.get('arm') or p.get('barm'):
 		img = G.remove_front_arm(img)
 		if p.get('barm'): b = p['barm']; G.draw_arm(img, G.SH_B, (ri(b[0]), ri(b[1])), (ri(b[2]), ri(b[3])), back=True)
@@ -84,6 +87,9 @@ def rion_frame(p):
 	if ch: img = PA.shift_part(img, lambda x, y: y < 46, 0, ch)
 	if hd > ch: img = PA.shift_part(img, lambda x, y: y < 31 + ch, 0, hd - ch)
 	if ri(p.get('hx', 0)) or ri(p.get('hy', 0)): img = PA.shift_part(img, lambda x, y: y < 31, ri(p.get('hx', 0)), ri(p.get('hy', 0)))
+	if ri(p.get('lag_hx', 0)) or ri(p.get('lag_hy', 0)): img = PA.shift_part(img, lambda x, y: y < 31 + ch, ri(p.get('lag_hx', 0)), ri(p.get('lag_hy', 0)), keep=True)   # หัวตามแรงเฉื่อย
+	if ri(p.get('pack', 0)) and d in ('west', 'east') and not p.get('img'):
+		img = PA.shift_part(img, PACK if d == 'west' else (lambda x, y: PACK(63 - x, y)), 0, ri(p['pack']), keep=True)   # เป้ตามแรงเฉื่อย
 	if p.get('turn', 1) < 1: img = turn(img, p['turn'])
 	if abs(p.get('rot', 0)) >= 0.5: img = rot_ground(img, p['rot'], (32, 36), 62)   # หมุนรอบกลางตัว (แบบเดียวกับท่าล้มเดิม west_k1) ไม่ล้นขอบ
 	c = PA.blank(64, 64 + TOP)
@@ -370,10 +376,63 @@ for pid, label, cyc, fn, old in (('rion_walk_west_v2', 'เดินซ้าย
 		('rion_idle_west_v2', 'ยืนหายใจซ้าย · ระดับ 2', 1.6, idle_v2, 'rion_idle_west')):
 	pose(pid, 'rion', 'ตัวอย่างระดับ 2', label, cyc, fn); DRAW[pid] = rion_v2; COMPARE[pid] = old
 
+# ── ชั้นความสมจริง (kwan 6 ต.ค. "apply กับท่าขยับทั้งหมด ทำให้สมจริงมากที่สุด") — ใส่ทับทุกท่าอัตโนมัติ จากการเคลื่อนที่ของท่านั้นเอง ──
+# 1) แรงเฉื่อย: หัว / เป้ / หางหมา เป็นสปริงหน่วงต่อลำตัว — ตัวขยับ ส่วนเหล่านี้ค้างที่เดิมก่อน แล้วถูกดึงตาม เลยไปนิด แล้วเด้งกลับ (follow-through)
+#    ตำแหน่งลำตัวคิดจาก dx · dy · ย่อ · อก · เอน ของท่า · ท่าวน = จำลอง 2 รอบเอารอบหลัง · ท่าค้างท้าย = เริ่มนิ่ง · เปลี่ยนทิศ/หมุน/ล้ม = รีเซ็ต
+# 2) หายใจ: ท่าที่ไม่ได้กำหนดอกเอง (ไม่นอน ไม่หมุน) · ประมาณ 1 ครั้งต่อ BREATH_SEC · ถ่ายน้ำหนัก (เอนช้า ๆ) ตอนยืน
+# 3) กะพริบตา: ท่าหันซ้ายที่ยาวพอ · 4) แขนแกว่งสวนขา: เดิน/วิ่งหันซ้ายที่ไม่ได้กำหนดแขนเอง (ศอกจาก ik แบบริก)
+# ค่าทั้งหมดเป็นค่าภาพ ไม่ใช่ค่าเกม
+SPRING_K, SPRING_C, LAG_MAX, BREATH_SEC = 0.32, 0.42, 2.0, 1.6
+CYCLE_SEC = {'walk': 0.6, 'idle': 1.6, 'attack': 0.4, 'hurt': 0.2, 'ko': 0.3}   # รอบโดยประมาณของท่าที่ใช้ค่าคงที่เกม (ใช้นับลมหายใจ/กะพริบเท่านั้น)
+IDLE_IDS = ('idle', 'stand', 'ready', 'lowhp', 'kneel')
+def _body(p, y_at):
+	"""ตำแหน่งลำตัวที่ระดับ y (หัว ~20 · เป้ ~40) หลังท่า: เลื่อน + เอน (เฉือนช่วงบน) + ย่อ + อก"""
+	x = p.get('dx', 0) + p.get('lean', 0) * max(0, HIP - y_at) / (HIP - 8)
+	y = p.get('dy', 0) + p.get('squash', 0) + p.get('chest', 0)
+	return x, y
+def _spring(targets, cyclic, resets):
+	"""offset ต่อเฟรม ของส่วนที่ตามด้วยสปริงหน่วง · targets = ตำแหน่งลำตัวต่อเฟรม"""
+	n = len(targets); o, v = 0.0, 0.0; out = [0.0] * n
+	for loop in range(2 if cyclic else 1):
+		for i in range(n):
+			if i in resets: o, v = 0.0, 0.0
+			d = targets[i] - targets[i - 1] if (i or (cyclic and loop)) else 0.0
+			o -= d; v += -SPRING_K * o - SPRING_C * v; o = max(-LAG_MAX, min(LAG_MAX, o + v)); out[i] = o
+	return out
+def realism(pid, who, cycle, hold, ps):
+	n = len(ps); cyc = not hold; sec = CYCLE_SEC.get(cycle, 1.0) if isinstance(cycle, str) else cycle
+	resets = {i for i in range(n) if ps[i].get('dir', 'west') != ps[i - 1].get('dir', 'west') or abs(ps[i].get('rot', 0)) >= 0.5 or ps[i].get('turn', 1) < 1}
+	head = (_spring([_body(p, 20)[0] for p in ps], cyc, resets), _spring([_body(p, 20)[1] for p in ps], cyc, resets))
+	low = (_spring([_body(p, 40)[0] for p in ps], cyc, resets), _spring([_body(p, 40)[1] for p in ps], cyc, resets))
+	breaths = max(1, round(sec / BREATH_SEC)); idle = any(k in pid for k in IDLE_IDS)
+	out = []
+	for i, p in enumerate(ps):
+		q = dict(p); t = i / n
+		if who == 'rion':
+			q['lag_hx'] = q.get('lag_hx', 0) + head[0][i] * 0.8; q['lag_hy'] = q.get('lag_hy', 0) + head[1][i] * 0.6
+			q['pack'] = q.get('pack', 0) + low[1][i] * 0.9
+			still = 'chest' not in p and not p.get('img') and 'rot' not in p and p.get('walk') is None
+			if still: q.update({k: q.get(k, 0) + v * 0.7 for k, v in breath((t * breaths) % 1).items()})
+			if idle and 'lean' not in p: q['lean'] = 0.7 * sin(t, max(1, breaths // 2))     # ถ่ายน้ำหนักช้า ๆ
+			if sec >= 0.9 and (p.get('dir', 'west') == 'west'):                              # กะพริบ 1 ครั้งต่อ ~2.6 วิ (อย่างน้อยครั้งเดียวต่อรอบ)
+				blinks = max(1, round(sec / 2.6)); q['blink'] = q.get('blink') or ((t * blinks) % 1) > 0.62 and ((t * blinks) % 1) < 0.62 + 0.09 / max(sec / blinks, 0.9)
+			if p.get('walk') is not None and p.get('dir', 'west') == 'west' and not (p.get('arm') or p.get('barm')):
+				sw = cos(p['walk']); amp = 3.5 + 0.8 * (p.get('kmax', 4) - 4)
+				q['arm_hand'] = (23 + amp * sw, 47 - 1.3 * abs(sw) - (1 if p.get('kmax', 4) > 4 else 0))   # ขาหน้าก้าวไปหน้า = แขนหน้าแกว่งไปหลัง · วิ่ง = งอแขนสูงขึ้น
+		else:
+			q['hx'] = q.get('hx', 0) + head[0][i] * 0.6; q['hy'] = q.get('hy', 0) + head[1][i] * 0.5
+			q['tx'] = q.get('tx', 0) + low[0][i] * 0.9; q['ty'] = q.get('ty', 0) + low[1][i] * 0.7
+			if 'chest' not in p and 'squash' not in p and p.get('walk') is None and 'rear' not in p:
+				q.update({k: q.get(k, 0) + v * 0.6 for k, v in breath((t * breaths) % 1).items()})
+		out.append(q)
+	return out
+
 def render(pid):
 	who, group, label, cycle, fn, hold, clip_id = P[pid]
 	draw = DRAW.get(pid) or (rion_frame if who == 'rion' else dog_frame)
-	frames = [draw(fn(i / (N - 1) if hold else i / N)) for i in range(N)]
+	ps = [fn(i / (N - 1) if hold else i / N) for i in range(N)]
+	if pid not in DRAW: ps = realism(pid, who, cycle, hold, ps)   # ตัวอย่างระดับ 2 (DRAW เอง) ตั้งค่าครบแล้ว
+	frames = [draw(p) for p in ps]
 	return PA.dedupe(frames)
 
 if __name__ == '__main__':
