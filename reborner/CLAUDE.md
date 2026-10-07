@@ -529,6 +529,13 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   (ที่โฮสต์รับแค่ชนิดไฟล์มาตรฐานและไฟล์ละ ≤15MB) · หน้าเว็บคือ `tools/web/reborner.html` ซึ่งดัก fetch แปลงชื่อกลับ + ปุ่มลูกศรบนจอสัมผัส
   เผยแพร่ทับลิงก์เดิมด้วย Artifact `url` ข้างบน
 
+## Blender MCP (เครื่องคลาวด์ · kwan 7 ต.ค. 2026 "เชื่อมกับ blender mcp" → เลือก "เครื่องคลาวด์นี้")
+- Blender 4.0.2 (apt) รันใต้จอเสมือน `xvfb-run` + ปลั๊กอินจากแพ็กเกจ `mcp-for-blender==2.1.9` (MIT · ชื่อเดิม blender-mcp · ไม่คัดลอกโค้ดลง repo) เปิดพอร์ต 9876
+- เปิด: `tools/blender/start_blender_mcp.sh` (ติดตั้งที่ขาดเอง: blender · python3-requests · uv tool · เรียกซ้ำได้) · ปิด: `--stop` · log `/tmp/blender_mcp.log`
+- Claude Code ต่อผ่าน `.mcp.json` ที่ราก repo (server `blender` = `uvx mcp-for-blender==2.1.9` · ปิดสถิติ + ปิดเช็กอัปเดต) · เครื่องมือ 9 ตัว: get_scene_info · execute_blender_code · look · search_assets/import_asset/generate_3d (ต่อเน็ต ใช้เมื่อสั่งเท่านั้น) ฯลฯ
+- **ต้องรู้**: เครื่องมือ MCP ขึ้นตอนเริ่ม session ใหม่ (Claude Code ถามอนุญาต server จาก .mcp.json ครั้งแรก) · เครื่องคลาวด์ใหม่ทุก session → **ต้องรัน start script ก่อน** (ใส่ hook อัตโนมัติใน .claude/settings.json ถูกระบบความปลอดภัยปฏิเสธ — kwan ใส่เองได้)
+- ตรวจแล้ว 7 ต.ค.: ส่งคำสั่งทางพอร์ต (ข้อมูลฉาก + รันโค้ดสร้างโมเดล + render PNG) ผ่าน · ต่อผ่าน stdio ของ mcp-for-blender: initialize · tools/list 9 ตัว · get_scene_info ผ่าน · kwan เห็นได้แค่ภาพที่ render ไม่เห็นหน้าต่าง Blender
+
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม
 - ทุกจอวาดที่ 384×216 จริงแล้วขยาย · สองหน้าตา: ทอง (โทน UiKit ในเกม + โครง RS3) / น้ำเงิน (ตามชีต UI ของ kwan) · ค่าบนจอมาจากเกม (Rion ความชำนาญ 20 ถือไม้เบสบอล vs B1)
