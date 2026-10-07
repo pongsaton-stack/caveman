@@ -40,13 +40,27 @@ func _initialize() -> void:
 	# PlayerState: ช่อง = ช่องความจำ ÷ 2 · ถอด/ติดตั้งได้เมื่อครบ 100% · เซฟกลับมาเหมือนเดิม
 	var ps := PlayerState.new()
 	check(ps.read_slots() == ps.memory_slots() / 2, "ช่องท่าหลบ = ช่องความจำ ÷ 2 (%d)" % ps.read_slots())
+	# kwan 7 ต.ค. 2026: ถอดได้ทุกเมื่อ % ค้าง · ติดตั้งต้องมีช่อง · ครบ 100% ฝาก/ถอนคลังได้เฉพาะที่จุดพัก
 	ps.reads = {"M1": {"name": "x", "p": 1, "need": 4, "on": true}, "M2": {"name": "y", "p": 4, "need": 4, "on": true}}
-	check(not ps.toggle_read("M1"), "ยังไม่ครบ ถอดไม่ได้")
-	check(ps.toggle_read("M2") and not bool(ps.reads["M2"]["on"]), "ครบแล้ว ถอดได้")
-	ps.reads["M3"] = {"name": "z", "p": 2, "need": 2, "on": true}
-	check(not ps.toggle_read("M2"), "ช่องเต็ม (%d/%d) ติดตั้งเพิ่มไม่ได้" % [ps.reads_on(), ps.read_slots()])
+	check(ps.toggle_read("M1") and not bool(ps.reads["M1"]["on"]) and int(ps.reads["M1"]["p"]) == 1, "ยังไม่ครบ ถอดได้ % ค้างไว้")
+	check(ps.toggle_read("M1") and bool(ps.reads["M1"]["on"]), "ติดตั้งคืนได้เมื่อมีช่อง")
+	ps.reads["M3"] = {"name": "z", "p": 2, "need": 2, "on": false}
+	check(not ps.toggle_read("M3"), "ช่องเต็ม (%d/%d) ติดตั้งเพิ่มไม่ได้" % [ps.reads_on(), ps.read_slots()])
+	ps.cell = ps.rest_cell + Vector2i(1, 0)
+	check(not ps.store_read("M2"), "ไม่อยู่ที่จุดพัก ฝากคลังไม่ได้")
+	ps.cell = ps.rest_cell
+	check(not ps.store_read("M1"), "ยังไม่ครบ 100% ฝากคลังไม่ได้")
+	check(ps.store_read("M2") and bool(ps.reads["M2"]["stored"]) and not bool(ps.reads["M2"]["on"]), "ครบแล้ว ฝากคลังที่จุดพักได้ · ถอดออกจากช่อง")
+	check(not ps.toggle_read("M2"), "อยู่ในคลัง ติดตั้งจากเมนูไม่ได้")
+	check(ps.toggle_read("M3"), "ฝากคลังแล้วคืนช่องให้ท่าอื่น")
+	ps.cell = ps.rest_cell + Vector2i(1, 0)
+	check(not ps.retrieve_read("M2"), "ไม่อยู่ที่จุดพัก ถอนคลังไม่ได้")
+	ps.cell = ps.rest_cell
+	ps.toggle_read("M3")
+	check(ps.retrieve_read("M2") and not bool(ps.reads["M2"]["stored"]) and bool(ps.reads["M2"]["on"]), "ถอนคลังที่จุดพัก ติดตั้งเองเมื่อมีช่อง")
+	ps.store_read("M2")
 	var ps2 := PlayerState.new(); ps2.from_dict(ps.to_dict())
-	check(ps2.reads.size() == 3 and int(ps2.reads["M1"]["p"]) == 1 and not bool(ps2.reads["M2"]["on"]), "เซฟ/โหลดท่าหลบครบ")
+	check(ps2.reads.size() == 3 and int(ps2.reads["M1"]["p"]) == 1 and bool(ps2.reads["M2"]["stored"]) and not bool(ps2.reads["M3"]["on"]), "เซฟ/โหลดท่าหลบ + คลังครบ")
 	# Insight ค้างข้ามศึก (Insight.CARRY_BATTLE) · เซฟ/โหลดได้ · เริ่มเกมใหม่ = 0
 	var keep := ps2.reads.duplicate(true)
 	var ins := Actor.new(); ins.insight = 30.0; ins.tier = ps2.prof
@@ -79,13 +93,28 @@ func _initialize() -> void:
 
 	# ศึก: ยังไม่ครบ โดนท่าเด่น = แต้ม +1 · ตั้งรับ +2 · ไม่เกินที่ต้องครบ
 	s = setup(); b = s[0]; h = s[1]; f = s[2]
-	h.reads["M99"] = {"name": f.signature, "p": 0, "need": 3, "on": false}
+	h.reads["M99"] = {"name": f.signature, "p": 0, "need": 3, "on": true}
 	b._strike(f, h, b._signature_tech(f), 1.0)
 	check(int(h.reads["M99"]["p"]) == 1, "โดนท่าเด่น แต้มอ่าน +1")
 	h.guarding = true; h.counter_used = true
 	b._strike(f, h, b._signature_tech(f), 1.0)
 	b._strike(f, h, b._signature_tech(f), 1.0)
 	check(int(h.reads["M99"]["p"]) == 3, "ตั้งรับ +2 และไม่เกินที่ต้องครบ")
+
+	# ไม่ได้ติดตั้ง (ศึกก่อน) = โดนซ้ำก็ไม่ได้แต้ม · อ่านได้ในศึกนี้ (fresh) = สะสมได้แม้ไม่ติดตั้ง
+	s = setup(); b = s[0]; h = s[1]; f = s[2]
+	h.reads["M99"] = {"name": f.signature, "p": 1, "need": 3, "on": false}
+	b._strike(f, h, b._signature_tech(f), 1.0)
+	check(int(h.reads["M99"]["p"]) == 1, "ไม่ได้ติดตั้ง โดนท่าเด่นไม่ได้แต้ม")
+	h.reads["M99"]["fresh"] = true
+	b._strike(f, h, b._signature_tech(f), 1.0)
+	check(int(h.reads["M99"]["p"]) == 2, "อ่านได้ในศึกนี้ ไม่ติดตั้งก็สะสมแต้มได้")
+	var psf := PlayerState.new(); psf.absorb(h, h.tier)
+	check(not psf.reads["M99"].has("fresh"), "จบศึก ป้าย 'อ่านในศึกนี้' หาย")
+	h.reads["M99"] = {"name": f.signature, "p": 3, "need": 3, "on": false, "stored": true}
+	var hp0 := h.hp
+	b._strike(f, h, b._signature_tech(f), 1.0)
+	check(h.hp < hp0, "อยู่ในคลัง หลบไม่ได้")
 
 	# ศึก: ไม่เคยอ่าน + โอกาสสูงสุด = เริ่มอ่าน ติดตั้งเองเมื่อมีช่อง
 	var learned_any := false

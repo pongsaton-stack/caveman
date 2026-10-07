@@ -37,7 +37,7 @@ var materials: Dictionary = {}         # ชื่อของดรอป -> �
 var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
 var seized: Array[Dictionary] = []     # ท่าที่ยึดจากมอน (GDD 5.2): {id, name, slots} — สลับได้ (ลืมแล้วยึดใหม่)
 var insight := 0.0                     # Insight ที่ค้างจากศึกก่อน (Insight.CARRY_BATTLE)
-var reads: Dictionary = {}             # อ่านทางหลบ: monster_id -> {name, p, need, on} (Actor.reads · kwan 6 ต.ค. 2026)
+var reads: Dictionary = {}             # อ่านทางหลบ: monster_id -> {name, p, need, on, stored} (Actor.reads · kwan 6–7 ต.ค. 2026)
 var falls := 0                         # ตัวเอกล้มกี่ครั้ง (STORY_DRAFT: ไม่เคยล้ม → เบาะแส "อีกแล้ว" ย้ายมาหลังชนะบอส)
 var demo_end_seen := false             # เห็นฉากจบเดโมแล้ว — ไม่แสดงซ้ำ
 
@@ -146,12 +146,12 @@ func reads_on() -> int:
 			n += 1
 	return n
 
-## ถอด/ติดตั้งท่าหลบ — ทำได้เมื่ออ่านครบ 100% แล้วเท่านั้น · ติดตั้งต้องมีช่องว่าง · คืน true ถ้าเปลี่ยนได้
+## ถอด/ติดตั้งท่าหลบ (kwan 7 ต.ค. 2026) — ถอดได้ทุกเมื่อ % ค้างไว้ · ติดตั้งต้องมีช่องว่าง · อยู่ในคลังติดตั้งไม่ได้ · คืน true ถ้าเปลี่ยนได้
 func toggle_read(monster_id: String) -> bool:
 	if not reads.has(monster_id):
 		return false
 	var r: Dictionary = reads[monster_id]
-	if int(r.get("p", 0)) < int(r.get("need", 1)):
+	if bool(r.get("stored", false)):
 		return false
 	if bool(r.get("on", false)):
 		r["on"] = false
@@ -159,6 +159,30 @@ func toggle_read(monster_id: String) -> bool:
 	if reads_on() >= read_slots():
 		return false
 	r["on"] = true
+	return true
+
+## ยืนอยู่ที่จุดพัก (ช่อง R ที่พักล่าสุด) — ฝาก/ถอนคลังท่าหลบได้เฉพาะตอนนี้
+func at_rest() -> bool:
+	return cell == rest_cell
+
+func read_full(monster_id: String) -> bool:
+	var r: Dictionary = reads.get(monster_id, {})
+	return not r.is_empty() and int(r.get("p", 0)) >= int(r.get("need", 1))
+
+## คลังท่าหลบ (kwan 7 ต.ค. 2026): ท่าที่ครบ 100% ฝาก/ถอนได้เฉพาะที่จุดพัก · ในคลังไม่กินช่อง ไม่หลบ ไม่สะสมแต้ม
+func store_read(monster_id: String) -> bool:
+	if not at_rest() or not read_full(monster_id) or bool(reads[monster_id].get("stored", false)):
+		return false
+	reads[monster_id]["on"] = false
+	reads[monster_id]["stored"] = true
+	return true
+
+## ถอนจากคลัง → ติดตั้งเองถ้ามีช่องว่าง
+func retrieve_read(monster_id: String) -> bool:
+	if not at_rest() or not reads.has(monster_id) or not bool(reads[monster_id].get("stored", false)):
+		return false
+	reads[monster_id]["stored"] = false
+	reads[monster_id]["on"] = reads_on() < read_slots()
 	return true
 
 func max_hp() -> int:
@@ -208,6 +232,8 @@ func absorb(a: Actor, enemy_tier: int) -> void:
 	for n in a.learned:
 		learned.append(n)
 	reads = a.reads.duplicate(true)
+	for k in reads:
+		reads[k].erase("fresh")
 
 static func key_of(c: Vector2i) -> String:
 	return "%d,%d" % [c.x, c.y]
@@ -468,7 +494,7 @@ func from_dict(d: Dictionary) -> void:
 	for k in rd:
 		var r: Dictionary = rd[k]
 		reads[str(k)] = {"name": str(r.get("name", "")), "p": int(r.get("p", 0)),
-			"need": maxi(1, int(r.get("need", 1))), "on": bool(r.get("on", false))}
+			"need": maxi(1, int(r.get("need", 1))), "on": bool(r.get("on", false)), "stored": bool(r.get("stored", false))}
 	falls = int(d.get("falls", 0))
 	demo_end_seen = bool(d.get("demo_end_seen", false))
 	shop_stock.clear()

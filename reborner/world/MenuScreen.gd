@@ -150,7 +150,7 @@ func _show_actions() -> void:
 	if not ps.reads.is_empty():
 		var rb := _add(UiKit.button("ท่าหลบ %d/%d" % [ps.reads_on(), ps.read_slots()], 123))
 		rb.pressed.connect(_pick_read)
-		rb.focus_entered.connect(func(): _info.text = "อ่านทางท่าเด่นมอน หลบได้ตาม % · ครบ 100% แล้วถอด/ติดตั้งได้ · ติดตั้งพร้อมกัน = ช่องความจำ ÷ 2")
+		rb.focus_entered.connect(func(): _info.text = "อ่านทางท่าเด่นมอน หลบได้ตาม % · ต้องติดตั้งจึงหลบและสะสมแต้ม · ครบ 100% ฝากคลังได้ที่จุดพัก")
 	if ps.weapons_owned.size() > 1:
 		var wb := _add(UiKit.button("อาวุธ", 123))
 		wb.pressed.connect(_pick_weapon)
@@ -235,26 +235,39 @@ func _pick_weapon() -> void:
 
 func _read_label(r: Dictionary) -> String:
 	var pct := int(round(100.0 * float(r.get("p", 0)) / maxf(float(r.get("need", 1)), 1.0)))
-	return "%s %d%%%s" % [str(r.get("name", "")), pct, "" if bool(r.get("on", false)) else " (ถอด)"]
+	var tag := " (คลัง)" if bool(r.get("stored", false)) else ("" if bool(r.get("on", false)) else " (ถอด)")
+	return "%s %d%%%s" % [str(r.get("name", "")), pct, tag]
 
-## ท่าหลบ (kwan 6 ต.ค. 2026): ครบ 100% แล้วถอด/ติดตั้งได้ · ยังไม่ครบ = ปุ่มกดไม่ได้
+## ท่าหลบ (kwan 7 ต.ค. 2026): ถอดได้ทุกเมื่อ (% ค้างไว้) · ติดตั้งต้องมีช่อง · ครบ 100% ฝาก/ถอนคลังได้เฉพาะที่จุดพัก
 func _pick_read() -> void:
 	_clear_menu()
 	_picking_lp = true
-	_info.text = "ถอด/ติดตั้งท่าหลบ (ติดตั้ง %d/%d)" % [ps.reads_on(), ps.read_slots()]
+	var rest := ps.at_rest()
+	_info.text = "ท่าหลบ ติดตั้ง %d/%d · %s" % [ps.reads_on(), ps.read_slots(),
+		"ที่จุดพัก ฝาก/ถอนคลังได้" if rest else "ฝาก/ถอนคลังได้ที่จุดพัก"]
 	var first: Button = null
 	for k in ps.reads:
 		var id := str(k)
 		var r: Dictionary = ps.reads[id]
 		var on := bool(r.get("on", false))
-		var btn := _add(UiKit.button("%s %s" % ["ถอด" if on else "ติดตั้ง", _read_label(r)], 123))
-		btn.disabled = int(r.get("p", 0)) < int(r.get("need", 1)) or (not on and ps.reads_on() >= ps.read_slots())
-		btn.pressed.connect(func():
-			ps.toggle_read(id)
-			_render()
-			_pick_read())
-		if first == null and not btn.disabled:
-			first = btn
+		var btns: Array[Button] = []
+		if bool(r.get("stored", false)):
+			var b := _add(UiKit.button("ถอนคลัง %s" % _read_label(r), 123))
+			b.disabled = not rest
+			b.pressed.connect(func(): ps.retrieve_read(id); _render(); _pick_read())
+			btns.append(b)
+		else:
+			var b := _add(UiKit.button("%s %s" % ["ถอด" if on else "ติดตั้ง", _read_label(r)], 123))
+			b.disabled = not on and ps.reads_on() >= ps.read_slots()
+			b.pressed.connect(func(): ps.toggle_read(id); _render(); _pick_read())
+			btns.append(b)
+			if ps.read_full(id) and rest:
+				var s := _add(UiKit.button("ฝากคลัง %s" % str(r.get("name", "")), 123))
+				s.pressed.connect(func(): ps.store_read(id); _render(); _pick_read())
+				btns.append(s)
+		for b in btns:
+			if first == null and not b.disabled:
+				first = b
 	var back := _add(UiKit.button("ย้อนกลับ", 123))
 	back.pressed.connect(_show_actions)
 	if first == null:

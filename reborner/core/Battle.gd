@@ -535,12 +535,16 @@ func _read_signature(src: Actor, tgt: Actor) -> bool:
 		if randf() >= p:
 			return false
 		var on := tgt.reads_on() < tgt.read_slots
-		tgt.reads[src.id] = {"name": src.signature, "p": 0, "need": maxi(1, src.comprehension), "on": on}
+		# fresh = อ่านได้ในศึกนี้ → สะสมแต้มได้ทั้งศึกแม้ช่องเต็มยังไม่ติดตั้ง (หมดเมื่อจบศึก · PlayerState.absorb)
+		tgt.reads[src.id] = {"name": src.signature, "p": 0, "need": maxi(1, src.comprehension), "on": on, "fresh": true}
 		read_glimmers += 1
 		_log("    ★ ประกายหลบ! %s เริ่มอ่านทาง %s ของ %s (สุ่มติด %.1f%%)%s" % [tgt.name, src.signature, src.name,
 			p * 100.0, "" if on else " · ช่องเต็ม ยังไม่ติดตั้ง"])
 	var r: Dictionary = tgt.reads[src.id]
 	var need := int(r["need"])
+	# kwan 7 ต.ค. 2026: ไม่ได้ติดตั้ง = ไม่ได้แต้ม (ต้องติดตั้งแล้วโดนซ้ำ) · ยกเว้นศึกที่เพิ่งอ่านได้
+	if not bool(r.get("on", false)) and not bool(r.get("fresh", false)):
+		return dodged
 	if int(r["p"]) < need:
 		r["p"] = mini(need, int(r["p"]) + (2 if tgt.guarding else 1))
 		_log("    ◇ อ่านทาง %s %d/%d (หลบได้ %d%%)" % [src.signature, r["p"], need,
