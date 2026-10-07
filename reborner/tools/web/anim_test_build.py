@@ -232,10 +232,15 @@ def main(out_path):
 		'weapons': [dict(w, school=f['school']) for f in json.load(open(os.path.join(ROOT, 'docs/art-bible/weapons/weapons_full.json'), encoding='utf-8'))['families'] for w in f['weapons']],
 		'spells': json.load(open(os.path.join(ROOT, 'docs/art-bible/spells/spells_full.json'), encoding='utf-8'))['schools'],
 		'skill_ref': skill_ref(),
+		# ความเข้ากับร่างกาย (data/monster_body.csv · body_affinity.csv) — แท็บสกิลคิดดาเมจ + ป้าย อ่อนแอ/ต้านทาน แบบเดียวกับเกม
+		'body': {r['monster_id']: r['body'] for r in csv.DictReader(open(os.path.join(ROOT, 'data/monster_body.csv'), encoding='utf-8'))},
+		'body_aff': {r['school'] + '|' + r['body']: int(r['sign']) for r in csv.DictReader(open(os.path.join(ROOT, 'data/body_affinity.csv'), encoding='utf-8'))},
 		'k': {
 			'MIT_K': const('core/Formulas.gd', 'MIT_K'),
 			'WEAK_MULT': const('core/Formulas.gd', 'WEAK_MULT'),
 			'RESIST_MULT': const('core/Formulas.gd', 'RESIST_MULT'),
+			'BODY_GOOD': const('core/Formulas.gd', 'BODY_GOOD'),
+			'BODY_BAD': const('core/Formulas.gd', 'BODY_BAD'),
 			'ATTACK_FRAME_SEC': const('world/BattleScreen.gd', 'ATTACK_FRAME_SEC'),
 			'FOE_IDLE_SEC': const('world/BattleScreen.gd', 'FOE_IDLE_SEC'),
 			'MOVE_TIME': const('world/Overworld.gd', 'MOVE_TIME'),

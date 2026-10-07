@@ -5,6 +5,7 @@ extends RefCounted
 var id: String
 var name: String
 var side: String          # "ally" หรือ "foe"
+var weapon_id := ""       # ตัวเอก: อาวุธที่ถือ (PlayerState.weapon_id) — ใช้เลือกภาพในจอศึกเท่านั้น ไม่มีผลค่าเกม
 var tier: int
 var hp: int
 var max_hp: int

@@ -12,6 +12,7 @@ var end_delay := 1.2
 const QUEUE_SLOTS := 8          # GDD 3.1 — UI ต้องแสดงคิวล่วงหน้า 8 ช่อง
 const LOG_LINES := 2   # กฎ UX ข้อ 5 ของ kwan: กล่องข้อความละไม่เกิน 2 บรรทัด
 const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
+const HELD_DIR := "res://assets/sprites/weapons_held"   # Rion ถืออาวุธ 30 ชิ้น (tools/sprites/weapons_held.py)
 
 # พาเลตต์เดียวกับแผนที่องก์ 1
 const C_BG := Color("15130f")
@@ -76,11 +77,11 @@ func setup(battle: Battle, label: String, auto_on: bool = true) -> void:
 
 func _ready() -> void:
 	layer = 10
-	_load_textures()
 	_build()
 	b.capture = true
 	b.begin()
 	hero = b.hero()
+	_load_textures()
 	_hero_hp_seen = hero.hp if hero != null else -1
 	_flush_log()
 	_refresh()
@@ -382,6 +383,21 @@ func _load_textures() -> void:
 	var p_idle := "%s/west.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
+	# ถืออาวุธจริงตามที่ติดตั้ง (kwan 7 ต.ค. 2026 "แก้ด่วน"): weapons_held/<id>_0 ยืนถือ · _1–4 ง้าง→ฟาด→ฟาดต่อ→ตามแรง
+	# ไม่มีภาพของอาวุธนั้น = ใช้ west/west_a เดิม (มีด)
+	if hero != null and hero.weapon_id != "":
+		var held: Array[Texture2D] = []
+		for i in 5:
+			var ph := "%s/%s_%d.png" % [HELD_DIR, hero.weapon_id, i]
+			if ResourceLoader.exists(ph):
+				held.append(load(ph))
+		if held.size() == 5:
+			_tex_idle = held[0]
+			_tex_attack.clear()
+			for i in range(1, 5):
+				_tex_attack.append(held[i])
+	if _hero_tex != null:   # โหลดหลัง _build (ต้องรู้ hero ก่อน) → ตั้งภาพยืนให้ตัวที่สร้างไว้แล้ว
+		_hero_tex.texture = _rest_tex()
 
 func _build() -> void:
 	var root := Control.new()
@@ -679,7 +695,8 @@ func _strike_fx(e: Dictionary, ult: bool, nth: int) -> void:
 	# ป้าย อ่อนแอ/ต้านทาน = ธาตุ + ร่างกายรวมกัน (Battle._affinity · kwan 7 ต.ค. 2026)
 	var aff := int(e.get("aff", 0))
 	var ncol := Color("ffe08a") if aff > 0 else (Color("a8a29a") if aff < 0 else Color.WHITE)
-	_float_number(to + Vector2(0, 11 * ((nth - 1) % 3)), str(e["dmg"]), ncol, "อ่อนแอ!" if aff > 0 else ("ต้านทาน" if aff < 0 else ""))
+	var step := 24 if aff != 0 else 11   # มีป้ายใต้ตัวเลข = เว้นแถวให้ป้ายไม่ทับตัวเลขของฮิตถัดไป
+	_float_number(to + Vector2(0, step * ((nth - 1) % 3)), str(e["dmg"]), ncol, "อ่อนแอ!" if aff > 0 else ("ต้านทาน" if aff < 0 else ""))
 
 ## จุดกลางตัวบนเวที (Vector2.INF = ตัวนี้ไม่มีรูปบนเวที)
 func _actor_point(a) -> Vector2:
@@ -694,7 +711,8 @@ func _actor_point(a) -> Vector2:
 
 ## ไม้ตาย = ท่าขั้นปลายของต้นไม้ (req_prof ≥ ULT_PROF ใน techs.csv) · ใช้เลือกเอฟเฟกต์เท่านั้น ไม่แตะค่าเกม
 const ULT_PROF := 40
-const NUMBER_TOP_Y := 40.0      # ใต้ป้ายชื่อท่า (y 24-40)
+const NUMBER_BOTTOM_Y := 104.0  # ขอบล่างเวที — ตัวเลขที่หลบกันห้ามเลื่อนลงไปทับแถบบันทึกศึก
+const NUMBER_TOP_Y := 46.0      # ใต้ป้ายชื่อท่า (y 24 · ไม้ตาย 14pt + สระบน/ล่างไทย ลงถึง ~y 45) — ตัวเลขลอยขึ้นแล้วก็ไม่ข้ามเส้นนี้
 var _dim: ColorRect
 
 func _is_ultimate(e: Dictionary) -> bool:
@@ -1336,20 +1354,47 @@ func _hit_flash(a) -> void:
 	tw.tween_callback(func(): n.position = base)
 
 ## tag = ป้ายเล็กใต้ตัวเลข (อ่อนแอ!/ต้านทาน) ลอยไปพร้อมตัวเลข — ไม่ต่อท้ายตัวเลข ไม่งั้นยาวไปทับป้ายชื่อท่า
+var _recent_numbers: Array = []   # [Rect2, เวลาที่ขึ้น] ของตัวเลขที่ยังลอยอยู่ — ตัวใหม่ที่จะทับ เลื่อนลงไปแถวถัดไป
+
 func _float_number(at: Vector2, text: String, col: Color, tag: String = "") -> void:
 	var l := _label(text, 13, col)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 3)
 	l.position = at + Vector2(-10, -30)
 	l.position.y = maxf(l.position.y, NUMBER_TOP_Y)   # ตัวบนแถวลอย (ค้างคาว) → ตัวเลขไม่หลุดขึ้นไปทับแถบคิว/ป้ายท่า
+	# กันทับ: เป้ายืนติดกัน (สไลม์ 2 ตัว) · พิษ + ดาเมจที่เป้าเดียวกัน → หาที่ว่างที่ไม่ชนตัวเลขที่ยังมองเห็นอยู่ (1.1 วิ)
+	var now := Time.get_ticks_msec() / 1000.0
+	_recent_numbers = _recent_numbers.filter(func(r): return now - float(r[1]) < 1.1)   # ลอย 0.5 + ค้าง + จางจบที่ 1.1 วิ
+	# ขนาดจริงจากฟอนต์ (ไทยกว้างกว่าที่เดาจากจำนวนตัวอักษร) — ต้องอยู่ในฉากก่อน ไม่งั้นยังไม่มีฟอนต์ วัดได้ 0
+	_fx_root().add_child(l)
+	var sz := l.get_combined_minimum_size()
+	var t: Label = null
 	if tag != "":
-		var t := _label(tag, 7, col)
+		t = _label(tag, 9, col)   # 9pt = อ่านได้บนมือถือเมื่อจอ 384×216 ถูกย่อ (7pt เล็กเกิน)
 		t.add_theme_color_override("font_outline_color", Color.BLACK)
 		t.add_theme_constant_override("outline_size", 2)
 		t.position = Vector2(0, 15)
 		l.add_child(t)
-	_fx_root().add_child(l)
+		sz.x = maxf(sz.x, t.get_combined_minimum_size().x)
+	# สูงจากขนาดตัวอักษร ไม่ใช่ minimum_size (นั่นรวมช่องบรรทัดสระบน/ล่างไทย สูงเกินจริงเกือบเท่าตัว → ทุกตำแหน่งสำรองล้นขอบเวที)
+	var w := sz.x + 2.0
+	var h := 16.0 + (12.0 if t != null else 0.0)
+	# ที่ว่างแรกตามลำดับ: ที่เดิม → ใต้ → ขวา → ซ้าย → ขวาล่าง · ต้องอยู่ในเวที (x 98–286 · ล่างไม่เกิน NUMBER_BOTTOM_Y) ไม่งั้นข้าม
+	var base := l.position
+	for off in [Vector2.ZERO, Vector2(0, 24), Vector2(w + 4, 0), Vector2(-w - 4, 0), Vector2(0, -24), Vector2(w + 4, 24), Vector2(-w - 4, 24), Vector2(w + 4, -24), Vector2(-w - 4, -24)]:
+		var me := Rect2(base + off, Vector2(w, h))
+		if me.position.x < 98.0 or me.end.x > 286.0 or me.end.y > NUMBER_BOTTOM_Y or me.position.y < NUMBER_TOP_Y:
+			continue
+		var hit := false
+		for r in _recent_numbers:
+			if (r[0] as Rect2).intersects(me):
+				hit = true
+				break
+		if not hit:
+			l.position = me.position
+			break
+	_recent_numbers.append([Rect2(l.position - Vector2(0, 16), Vector2(w, h + 16)), now])   # รวมระยะที่ลอยขึ้น 16
 	var tw := create_tween().set_parallel()
-	tw.tween_property(l, "position:y", l.position.y - 16.0, 0.5).set_ease(Tween.EASE_OUT)
+	tw.tween_property(l, "position:y", maxf(l.position.y - 16.0, NUMBER_TOP_Y), 0.5).set_ease(Tween.EASE_OUT)
 	tw.tween_property(l, "modulate:a", 0.0, 0.3).set_delay(0.8)
 	tw.chain().tween_callback(l.queue_free)

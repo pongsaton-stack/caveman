@@ -27,8 +27,12 @@ func _process(_d: float) -> bool:
 
 func _done(r: Dictionary) -> void:
 	print("seen ", seen.keys(), " won=", r["won"])
-	for n in ["west_a0.png", "west_a2.png", "west_a3.png", "west_h0.png"]:
+	# ถืออาวุธที่ติดตั้ง (kwan 7 ต.ค. 2026): เริ่มเกม = มีดทำครัว → ภาพ weapons_held/<id>_0–4 แทน west/west_a
+	var wid: String = screen.hero.weapon_id
+	ok(wid != "", "ตัวเอกรู้อาวุธที่ถือ (%s)" % wid)
+	for n in ["%s_0.png" % wid, "%s_1.png" % wid, "%s_3.png" % wid, "west_h0.png"]:
 		ok(seen.has(n), "เห็น " + n)
+	ok(not seen.has("west_a0.png"), "ไม่ใช้ท่าฟันมีดเดิมเมื่อมีภาพถืออาวุธ")
 	if hero_down_ever:
 		ok(seen.has("west_k1.png"), "ตัวเอกล้ม → ท่านอน")
 	print("FAILS ", fails)

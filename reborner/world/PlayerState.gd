@@ -198,6 +198,7 @@ func make_hero() -> Actor:
 	a.name = "Rion"
 	a.side = "ally"
 	a.is_hero = true
+	a.weapon_id = weapon_id
 	a.tier = prof
 	a.max_hp = max_hp()
 	a.hp = clampi(hp, 1, a.max_hp)

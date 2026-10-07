@@ -938,6 +938,13 @@ func _hide_panel() -> void:
 		_next_page()
 		return
 	panel.visible = false
-	busy = false
+	busy = _modal_open()   # จออื่นเปิดทับอยู่ (เช่นจอจบเดโม) = ยังเดินไม่ได้ — เดิมกล่องข้อความที่ค้างมาก่อนปลดล็อกทั้งที่จอนั้นยังเปิด
 	_update_hud()
 	message_done.emit()
+
+## มีจอเต็มเปิดทับแผนที่อยู่ไหม (ถ้ามี กล่องข้อความที่ปิดทีหลังห้ามปลดล็อกการเดิน)
+func _modal_open() -> bool:
+	for c in get_children():
+		if (c is MenuScreen or c is ShopScreen or c is BattleScreen or c is DemoEndScreen or c is RecruitScreen) and not c.is_queued_for_deletion():
+			return true
+	return false
