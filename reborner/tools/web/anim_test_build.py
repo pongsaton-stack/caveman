@@ -98,6 +98,12 @@ def sprites():
 		for f in sorted(os.listdir(sd)):
 			if f.endswith('.png'):
 				out['wst/' + f[:-4]] = png(os.path.join(sd, f))
+	# อาวุธ render จาก Blender (tools/sprites/weapons_3d.py) — 48px หมุน 16 มุม
+	bd = os.path.join(SPR, 'weapons_3d_draft')
+	if os.path.isdir(bd):
+		for f in sorted(os.listdir(bd)):
+			if f.endswith('.png'):
+				out['w3d/' + f[:-4]] = png(os.path.join(bd, f))
 	# ท่า Rion ตามการจับ (rion_grips.py) — ใช้กับอนิเมชันสกิลจากชีต
 	gd = os.path.join(SPR, 'rion_lastlight_draft/grips')
 	if os.path.isdir(gd):
@@ -218,6 +224,7 @@ def main(out_path):
 		'vfx_sheet': json.load(open(os.path.join(SPR, 'vfx_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_sheet_draft/index.json')) else None,
 		'vfx_fx': json.load(open(os.path.join(SPR, 'vfx_fx_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'vfx_fx_draft/index.json')) else None,
 		'rion_rig': json.load(open(os.path.join(SPR, 'rion_rig_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'rion_rig_draft/index.json')) else None,
+		'weapon_3d': json.load(open(os.path.join(SPR, 'weapons_3d_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_3d_draft/index.json')) else None,
 		'weapon_stack': json.load(open(os.path.join(SPR, 'weapons_stack_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'weapons_stack_draft/index.json')) else None,
 		'weapon_sheet': json.load(open(os.path.join(SPR, 'weapons_sheet_draft/index.json'), encoding='utf-8'))['items'] if os.path.exists(os.path.join(SPR, 'weapons_sheet_draft/index.json')) else [],
 		'compendium': compendium(),

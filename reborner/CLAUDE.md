@@ -535,6 +535,8 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - Claude Code ต่อผ่าน `.mcp.json` ที่ราก repo (server `blender` = `uvx mcp-for-blender==2.1.9` · ปิดสถิติ + ปิดเช็กอัปเดต) · เครื่องมือ 9 ตัว: get_scene_info · execute_blender_code · look · search_assets/import_asset/generate_3d (ต่อเน็ต ใช้เมื่อสั่งเท่านั้น) ฯลฯ
 - **ต้องรู้**: เครื่องมือ MCP ขึ้นตอนเริ่ม session ใหม่ (Claude Code ถามอนุญาต server จาก .mcp.json ครั้งแรก) · เครื่องคลาวด์ใหม่ทุก session → **ต้องรัน start script ก่อน** (ใส่ hook อัตโนมัติใน .claude/settings.json ถูกระบบความปลอดภัยปฏิเสธ — kwan ใส่เองได้)
 - ตรวจแล้ว 7 ต.ค.: ส่งคำสั่งทางพอร์ต (ข้อมูลฉาก + รันโค้ดสร้างโมเดล + render PNG) ผ่าน · ต่อผ่าน stdio ของ mcp-for-blender: initialize · tools/list 9 ตัว · get_scene_info ผ่าน · kwan เห็นได้แค่ภาพที่ render ไม่เห็นหน้าต่าง Blender
+- **render อาวุธ → หน้าเทส (kwan 7 ต.ค. "render อาวุธ ลงเทส")**: `python3 tools/sprites/weapons_3d.py` (Blender ต้องเปิดอยู่) → `tools/blender/bl.py` ส่ง `tools/blender/weapons_scene.py` ให้ Blender สร้างโมเดลจากรูปทรงพื้นฐาน + render Workbench 96px 16 มุม → ย่อ 48px สีร่วม ≤12 สี + เส้นขอบ → `assets/sprites/weapons_3d_draft/` (.gdignore · **ร่าง ยังไม่เข้าเกม**) + ภาพรวม `docs/art-bible/weapons/weapons_3d_preview.png`
+  ตัวอย่าง 6 ชิ้น (สายละ 1: SL-1 CR-2 PC-1 ST-1 DV-1 BD-1) · หมุนรอบแกนด้ามที่เอียง 35° (ของกลมอย่างไม้เบสบอล/ดินสอแทบไม่เปลี่ยน) · หน้าเทสแท็บ "อาวุธ" กลุ่มบนสุด คู่ไอคอน 2D เดิม · หมุนครบรอบ 3.2 วิ (STACK_SEC)
 
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม
