@@ -7,6 +7,9 @@ func _initialize() -> void:
 	var techs := TechDb.new(); techs.load_from("res://data/techs.csv")
 	var ps := PlayerState.new(); ps.prof = 20; ps.weapon_base = 28
 	ps.init_new(techs, Vector2i.ZERO)
+	if OS.has_environment("WEAPON"):   # เช่น WEAPON=CR-2 (ไม้เบสบอล สายทุบ) ดูป้าย อ่อนแอ/ต้านทาน กับร่างกายมอน
+		for r in CsvDb.load_csv("res://data/weapons.csv"):
+			if str(r["weapon_id"]) == OS.get_environment("WEAPON"): ps.equip(r, techs)
 	var b := Battle.new(); b.techs = techs
 	b.actors.append(ps.make_hero())
 	for mid in ["M03", "M06"]:

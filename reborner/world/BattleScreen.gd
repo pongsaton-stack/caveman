@@ -676,7 +676,10 @@ func _strike_fx(e: Dictionary, ult: bool, nth: int) -> void:
 	if ult:
 		_fx_burst(to, col)
 	_hit_flash(e["tgt"])
-	_float_number(to + Vector2(0, 11 * ((nth - 1) % 3)), ("%d!" % e["dmg"]) if e["weak"] else str(e["dmg"]), Color("ffe08a") if e["weak"] else Color.WHITE)
+	# ป้าย อ่อนแอ/ต้านทาน = ธาตุ + ร่างกายรวมกัน (Battle._affinity · kwan 7 ต.ค. 2026)
+	var aff := int(e.get("aff", 0))
+	var ncol := Color("ffe08a") if aff > 0 else (Color("a8a29a") if aff < 0 else Color.WHITE)
+	_float_number(to + Vector2(0, 11 * ((nth - 1) % 3)), str(e["dmg"]), ncol, "อ่อนแอ!" if aff > 0 else ("ต้านทาน" if aff < 0 else ""))
 
 ## จุดกลางตัวบนเวที (Vector2.INF = ตัวนี้ไม่มีรูปบนเวที)
 func _actor_point(a) -> Vector2:
@@ -1332,12 +1335,19 @@ func _hit_flash(a) -> void:
 	tw.parallel().tween_method(func(t: float): n.position = base + Vector2(sin(t * 40.0) * 3.0 * (1.0 - t), 0), 0.0, 1.0, 0.3)
 	tw.tween_callback(func(): n.position = base)
 
-func _float_number(at: Vector2, text: String, col: Color) -> void:
+## tag = ป้ายเล็กใต้ตัวเลข (อ่อนแอ!/ต้านทาน) ลอยไปพร้อมตัวเลข — ไม่ต่อท้ายตัวเลข ไม่งั้นยาวไปทับป้ายชื่อท่า
+func _float_number(at: Vector2, text: String, col: Color, tag: String = "") -> void:
 	var l := _label(text, 13, col)
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 3)
 	l.position = at + Vector2(-10, -30)
 	l.position.y = maxf(l.position.y, NUMBER_TOP_Y)   # ตัวบนแถวลอย (ค้างคาว) → ตัวเลขไม่หลุดขึ้นไปทับแถบคิว/ป้ายท่า
+	if tag != "":
+		var t := _label(tag, 7, col)
+		t.add_theme_color_override("font_outline_color", Color.BLACK)
+		t.add_theme_constant_override("outline_size", 2)
+		t.position = Vector2(0, 15)
+		l.add_child(t)
 	_fx_root().add_child(l)
 	var tw := create_tween().set_parallel()
 	tw.tween_property(l, "position:y", l.position.y - 16.0, 0.5).set_ease(Tween.EASE_OUT)

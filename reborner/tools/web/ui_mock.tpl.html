@@ -146,7 +146,7 @@ screen('battle', 'จอศึก (HUD + คำสั่ง)', 'ผังแบ�
   h += SPR('B1', 40, 60, 1) + SPR('M06', 128, 66, 1);
   h += SPR('rion_w', 222, 74, 1) + SPR('C06', 268, 64) + SPR('C03', 276, 96);
   // ป๊อปอัป
-  h += `<div class="pop" style="left:70px;top:60px;font-size:13px;color:#ffe08a">129!</div>` + CHIP(70, 76, 'เข้าทาง ×1.2', '#4d6b2e');
+  h += `<div class="pop" style="left:70px;top:60px;font-size:13px;color:#ffe08a">129!</div>` + CHIP(70, 76, 'อ่อนแอ!', '#4d6b2e');
   h += `<div class="pop" style="left:232px;top:68px;font-size:9px;color:#8af0c0">หลบ!</div>`;
   h += `<div class="pop" style="left:120px;top:44px;font-size:9px;color:var(--ins)">★ ประกาย! Rion · ${D.learned[D.learned.length - 1]}</div>`;
   // แผงทีม
@@ -168,7 +168,7 @@ screen('battle', 'จอศึก (HUD + คำสั่ง)', 'ผังแบ�
   return h;
 }, ['หลอด <b>ขัด</b> = ดาเมจสะสมถึง 15% ของ HP บอส (ค่า INTERRUPT_PCT ในเกม) ใช้แทน "Break" ของชีต',
    'หลอด <b>Insight</b> มีขีดขาว = ส่วนที่ค้างมาจากศึกก่อน (ระบบ Insight ค้างข้ามศึก)',
-   'ป้าย <b>เข้าทาง ×1.2</b> ใต้ตัวเลข = ความเข้ากับร่างกาย (ทุบ × เกราะ) ที่ยังไม่มีในจอเกมตอนนี้',
+   'ป้าย <b>อ่อนแอ!</b> ใต้ตัวเลข = ธาตุ + ร่างกายรวมกัน (ทุบ × เกราะ) · ต้านทาน = สีเทา · มีในจอเกมแล้ว (7 ต.ค.)',
    'มอนในทีมแสดง <b>LP ●●○</b> และความเชื่อใจ แทนตัวละครคน Lv. ในชีต']);
 
 // 2 ── เมนูหลัก ──
@@ -219,7 +219,7 @@ screen('skills', 'ท่า · เลือกสาย', 'โครง RS3 Skil
    'ไอคอนสาย = อาวุธชิ้นแรกของแต่ละตระกูลจากชุดร่าง 30 ชิ้น']);
 
 // 4 ── ต้นไม้ท่า ──
-screen('tree', 'ท่า · ต้นไม้สายที่ถือ', 'สายทุบ: ราก + 3 กิ่ง × 2 ท่า · ท่าที่รู้แล้วสว่าง · ท่าที่ประกายได้ตอนนี้มีดาว · ท่าที่ความชำนาญยังไม่ถึงบอกเลขที่ต้องการ · แถบล่างบอกร่างกายที่สายนี้เข้าทาง', () => {
+screen('tree', 'ท่า · ต้นไม้สายที่ถือ', 'สายทุบ: ราก + 3 กิ่ง × 2 ท่า · ท่าที่รู้แล้วสว่าง · ท่าที่ประกายได้ตอนนี้มีดาว · ท่าที่ความชำนาญยังไม่ถึงบอกเลขที่ต้องการ · แถบล่างบอกร่างกายที่อ่อนแอ/ต้านทานสายนี้', () => {
   const sc = D.school, ts = techsOf(sc), root = ts.find(t => !t.parent), af = aff(sc);
   let h = `<div class="bgp"></div>`;
   h += `<img src="${icon(sc)}" style="left:14px;top:10px;width:18px;height:18px">` + L(36, 13, `<span class="b" style="font-size:10px">สาย${sc}</span> <span class="mut">ชี้ทาง: ${D.steer || 'อาวุธนี้ไม่ชี้ทาง'}</span>`);
@@ -241,7 +241,7 @@ screen('tree', 'ท่า · ต้นไม้สายที่ถือ', '�
     h += card(a, 138, y) + L(208, y + 4, `กิ่ง${b}`, 'acc', 'font-size:5.5px') + `<div style="position:absolute;left:242px;top:${y + 13}px;width:12px;height:1px;background:var(--winB)"></div>` + card(c, 256, y);
   });
   h += W(10, 166, 364, 30);
-  h += L(16, 171, `<span class="acc">เข้าทาง ×1.2:</span> ${af.g.join(' · ')}`) + L(16, 182, `<span style="color:var(--bad)">ไม่ค่อยเข้า ×0.8:</span> ${af.b.join(' · ')}`);
+  h += L(16, 171, `<span class="acc">อ่อนแอ ×1.2:</span> ${af.g.join(' · ')}`) + L(16, 182, `<span style="color:var(--bad)">ต้านทาน ×0.8:</span> ${af.b.join(' · ')}`);
   h += BTN(316, 200, 58, 'กลับ');
   return h;
 }, ['★ = ท่าที่พ่อแม่เรียนแล้ว + ความชำนาญถึง (เงื่อนไขเดียวกับ TechDb.candidates ในเกม)',
@@ -320,7 +320,7 @@ screen('dialog', 'บทพูด · แจ้งเตือน · คำแน
   h += SPR('rion_s', 168, 70, 1) + SPR('B1', 30, 50, 1);
   h += W(248, 8, 128, 14) + L(254, 11, '🎁 ได้ ตำรา White "คืน LP"', '', 'font-size:7px');
   h += W(248, 26, 128, 14) + L(254, 29, `◇ อ่านทาง ผลุบผลับ 2/3`, '', 'font-size:7px');
-  h += W(8, 10, 150, 30, 'คำแนะนำ') + L(14, 17, 'ทุบเข้าทางมอนเกราะ กระดูก หิน', '', 'font-size:7px') + L(14, 27, 'เปลี่ยนอาวุธได้ที่ เมนู › อาวุธ', 'mut', 'font-size:7px');
+  h += W(8, 10, 150, 30, 'คำแนะนำ') + L(14, 17, 'ทุบ: มอนเกราะ กระดูก หิน อ่อนแอ', '', 'font-size:7px') + L(14, 27, 'เปลี่ยนอาวุธได้ที่ เมนู › อาวุธ', 'mut', 'font-size:7px');
   h += W(8, 158, 368, 52);
   h += `<div style="position:absolute;left:14px;top:164px;width:40px;height:40px;border:1px solid var(--winB);background:#0006;display:grid;place-items:center;color:var(--t2);font-size:16px">?</div>`;
   h += L(60, 162, '???', 'acc b', 'font-size:8px');
@@ -338,7 +338,7 @@ const CONF = [
   ['แท็บ SL PC CR BD ST DV', 'ตรงกับ 6 ตระกูลอาวุธ = 6 สาย ✓', 'ใช้ตามนั้น'],
   ['Break gauge บอส', 'ขัดจังหวะ = ดาเมจสะสม 15% maxHP ระหว่างที่บอสเปิดท่า (GDD 3.8)', 'หลอด "ขัด"'],
   ['Weak ไอคอนธาตุ', 'จุดอ่อนธาตุ + ร่างกาย (ความเข้ากับร่างกาย)', 'ป้ายร่างกาย + ท่าที่เปิด'],
-  ['CRITICAL / ดาเมจ 1205', 'ไม่มีคริติคอล · ดาเมจหลักสิบ–ร้อยต้น', 'ตัวเลขเหลือง ! = จุดอ่อน · ป้ายเข้าทาง'],
+  ['CRITICAL / ดาเมจ 1205', 'ไม่มีคริติคอล · ดาเมจหลักสิบ–ร้อยต้น', 'ตัวเลขเหลือง + ป้าย อ่อนแอ! / เทา + ต้านทาน (ธาตุ + ร่างกายรวมกัน)'],
   ['อุปกรณ์ 6 ช่อง +N · CRIT 15%', 'ยังมีแค่อาวุธ · GDD: อาวุธเปลี่ยนกฎ ไม่ใช่ +N', 'แค่อาวุธ'],
   ['Mini Map · เข็มทิศ · พิกัด X/Y · เควส', 'ยังไม่มีระบบเควส/มินิแมพ', 'ยังไม่วาด (รอรูป/ตัดสิน)'],
   ['Achievement · Language · Resolution 3840', 'ยังไม่มี · จอเกม 384×216', 'ยังไม่วาด'],
@@ -553,8 +553,8 @@ render();
       const s = st[e.tgt], a = R.roster[e.tgt], top = a.side === 'foe' ? 80 : a.hero ? 64 : 40;
       if (e.dodge) pops.push({ s: 'หลบ!', x: s.x, y: s.y - top, col: '#8af0c0', size: 8, t0: tAll + j * 120 });
       else if (e.buff) pops.push({ s: e.buff, x: s.x, y: s.y - top, col: '#8ad0f0', size: 7, t0: tAll });
-      else pops.push({ s: e.weak ? e.dmg + '!' : String(e.dmg), x: s.x + j * 6, y: s.y - top, col: e.weak ? '#ffe08a' : '#fff', size: 9, t0: tAll + j * 120,
-        sub: e.body > 0 ? 'เข้าทาง' : e.body < 0 ? 'ไม่ค่อยเข้า' : '', subc: e.body > 0 ? '#b8f08a' : '#ffb0a8' });
+      else pops.push({ s: String(e.dmg), x: s.x + j * 6, y: s.y - top, col: e.aff > 0 ? '#ffe08a' : e.aff < 0 ? '#a8a29a' : '#fff', size: 9, t0: tAll + j * 120,
+        sub: e.aff > 0 ? 'อ่อนแอ!' : e.aff < 0 ? 'ต้านทาน' : '', subc: e.aff > 0 ? '#ffe08a' : '#a8a29a' });   // ตรงกับ BattleScreen (kwan 7 ต.ค. 2026)
     });
   }
   let last = performance.now();

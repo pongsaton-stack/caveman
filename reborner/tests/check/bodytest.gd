@@ -33,5 +33,13 @@ func _initialize() -> void:
 	b.actors.append(h); b.actors.append(f)
 	b._strike(h, f, td.get_tech("ทุบ"), 1.0)
 	check(is_equal_approx(h.av, 100.0), "ตีเข้าทางร่างกายไม่ดันคิว (AV %.1f)" % h.av)
+	# ป้ายจอศึก อ่อนแอ/ต้านทาน (kwan 7 ต.ค. 2026): ธาตุ + ร่างกายรวมกัน · หักล้างกันได้
+	var W := Formulas.WEAK_MULT; var R := Formulas.RESIST_MULT
+	check(Battle._affinity(1.0, 1) == 1 and Battle._affinity(W, 0) == 1 and Battle._affinity(W, 1) == 1, "ร่างกายเข้าทาง/จุดอ่อนธาตุ = อ่อนแอ")
+	check(Battle._affinity(1.0, -1) == -1 and Battle._affinity(R, 0) == -1 and Battle._affinity(0.0, 0) == -1, "ร่างกายไม่เข้า/ต้านธาตุ/ไม่ระคาย = ต้านทาน")
+	check(Battle._affinity(W, -1) == 0 and Battle._affinity(R, 1) == 0 and Battle._affinity(1.0, 0) == 0, "ดีหนึ่งเสียหนึ่ง/ปกติ = ไม่ขึ้นป้าย")
+	b.capture = true; b.events.clear()
+	b._strike(h, f, td.get_tech("ทุบ"), 1.0)
+	check(int(b.events[-1]["aff"]) == 1, "event ศึกส่ง aff ให้จอศึก (ทุบ×เกราะ = อ่อนแอ)")
 	print("FAILS ", fails)
 	quit()

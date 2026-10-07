@@ -551,6 +551,14 @@ func _read_signature(src: Actor, tgt: Actor) -> bool:
 			int(round(100.0 * float(r["p"]) / float(need)))])
 	return dodged
 
+## ป้ายบนจอศึก (kwan 7 ต.ค. 2026): ธาตุ + ร่างกายรวมเป็นป้ายเดียว · >0 อ่อนแอ · <0 ต้านทาน · 0 ไม่ขึ้น (ดีหนึ่งเสียหนึ่งหักกัน)
+static func _affinity(elem: float, bsign: int) -> int:
+	var n := 0
+	if elem > 1.0: n += 1
+	elif elem < 1.0: n -= 1
+	if bsign != 0 and Formulas.body_mult(bsign) != 1.0: n += signi(bsign)
+	return signi(n)
+
 # ── ประกายสวนกลับ (kwan 6 ต.ค. 2026) ──────────────────────
 ## ตั้งรับแล้วโดนตี → โรลสูตรประกาย (Insight เต็ม = แน่นอน) → ติด = เรียนท่าใหม่แล้วสวนทันที นอกคิว
 ## ไม่เสีย SP · แรง x1.5 เหมือนประกายปกติ · ครั้งเดียวต่อการตั้งรับหนึ่งครั้ง
@@ -604,7 +612,7 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 
 	var tag := ""
 	if elem == Formulas.WEAK_MULT:
-		tag = "  จุดอ่อน! ดันคิว"
+		tag = "  อ่อนแอ! ดันคิว"
 		src.av *= Formulas.PUSH_MULT
 		if src.is_hero:
 			_gain_insight(src, Insight.HIT_WEAKNESS, "ตีจุดอ่อน")
@@ -615,13 +623,13 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 	if tgt.guarding:
 		tag += "  (ตั้งรับ -50%)"
 	if bsign != 0 and Formulas.body_mult(bsign) != 1.0:
-		tag += "  เข้าทาง%s" % tgt.body if bsign > 0 else "  ไม่ค่อยเข้า%s" % tgt.body
+		tag += "  อ่อนแอ (ร่าง%s)" % tgt.body if bsign > 0 else "  ต้านทาน (ร่าง%s)" % tgt.body
 
 	_log("  รอบ %2d  %s → %s [%s] : %d (เหลือ %d/%d)%s"
 		% [rounds, src.name, tgt.name, tech.name, dmg, tgt.hp, tgt.max_hp, tag])
 	if capture:
 		events.append({"src": src, "tgt": tgt, "tech": tech.name, "school": tech.school, "dmg": dmg,
-			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer, "body": bsign})
+			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer, "body": bsign, "aff": _affinity(elem, bsign)})
 
 	# ฝ่ายเราโดนตี = สะสม Insight
 	# ศัตรูเล็งตัวที่ HP น้อยที่สุด มอนร่วมทีมจึงเป็นแท้งก์และตัวเอกแทบไม่โดน

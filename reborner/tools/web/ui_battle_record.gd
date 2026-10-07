@@ -50,7 +50,7 @@ func record(seed_n: int, td: TechDb, by_id: Dictionary) -> Dictionary:
 		var evs := []
 		for e in b.events.slice(e0):
 			var d := {"src": idx[e["src"]], "tgt": idx[e["tgt"]], "tech": e["tech"], "dmg": e["dmg"], "weak": e.get("weak", false),
-				"glimmer": e.get("glimmer", false), "body": e.get("body", 0), "dodge": e.get("dodge", false), "buff": e.get("buff", ""), "dot": e.get("dot", "")}
+				"glimmer": e.get("glimmer", false), "body": e.get("body", 0), "aff": e.get("aff", 0), "dodge": e.get("dodge", false), "buff": e.get("buff", ""), "dot": e.get("dot", "")}
 			if e["tech"] == by_id["B1"]["signature_tech"]: sig_hit = true
 			evs.append(d)
 		turns.append({"cur": idx[cur], "queue": queue, "usable": usable, "events": evs, "after": snap(b), "log": b.log_lines.slice(l0)})
