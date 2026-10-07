@@ -150,7 +150,7 @@ Damage     = Base × Mitigation × ElemMult × PosMult × ComboMult × Variance
 
 ```
 ลดดาเมจที่รับ 50%
-Insight +8 เมื่อถูกโจมตีขณะตั้งรับ
+Insight +8.8 เมื่อถูกโจมตีขณะตั้งรับ (ค่าจริงใน core/Insight.gd · ดู 4.3)
 ความเข้าใจท่าศัตรู ×2
 ท่าถัดไปน้ำหนัก ×0.5
 ActionWeight ของตัวมันเอง 0.5
