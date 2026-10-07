@@ -537,6 +537,12 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - ตรวจแล้ว 7 ต.ค.: ส่งคำสั่งทางพอร์ต (ข้อมูลฉาก + รันโค้ดสร้างโมเดล + render PNG) ผ่าน · ต่อผ่าน stdio ของ mcp-for-blender: initialize · tools/list 9 ตัว · get_scene_info ผ่าน · kwan เห็นได้แค่ภาพที่ render ไม่เห็นหน้าต่าง Blender
 - **render อาวุธ → หน้าเทส (kwan 7 ต.ค. "render อาวุธ ลงเทส")**: `python3 tools/sprites/weapons_3d.py` (Blender ต้องเปิดอยู่) → `tools/blender/bl.py` ส่ง `tools/blender/weapons_scene.py` ให้ Blender สร้างโมเดลจากรูปทรงพื้นฐาน + render Workbench 96px 16 มุม → ย่อ 48px สีร่วม ≤12 สี + เส้นขอบ → `assets/sprites/weapons_3d_draft/` (.gdignore · **ร่าง ยังไม่เข้าเกม**) + ภาพรวม `docs/art-bible/weapons/weapons_3d_preview.png`
   ตัวอย่าง 6 ชิ้น (สายละ 1: SL-1 CR-2 PC-1 ST-1 DV-1 BD-1) · หมุนรอบแกนด้ามที่เอียง 35° (ของกลมอย่างไม้เบสบอล/ดินสอแทบไม่เปลี่ยน) · หน้าเทสแท็บ "อาวุธ" กลุ่มบนสุด คู่ไอคอน 2D เดิม · หมุนครบรอบ 3.2 วิ (STACK_SEC)
+- **ชีต Environment Tileset + prompt pack 14 แพ็ก (kwan 7 ต.ค.)** → เลือก "ตัดชีตลงหน้าเทส" + **"ยึดเกมเดิม 24px บนลงล่าง"** (ชีต/prompt เป็น 3/4 ไอโซ 32px · ขัดกับ Overworld TILE=24)
+  เก็บ: ชีต `docs/art-bible/world/environment_tileset_sheet.png` · prompt `docs/art-bible/world/environment_prompt_pack.md` (มีหมายเหตุสิ่งที่ขัด ต้องแก้ PACK 13 ก่อนส่งเจนต่อ)
+  `tools/sprites/env_sheet_cut.py [หมวด]` → `assets/sprites/env_sheet_draft/` (.gdignore · **ร่าง**) `<id>_0.png` + `_src.png` + index.json · ภาพตรวจ `docs/art-bible/world/env_<หมวด>_cut.png`
+  ลบพื้นกรมท่า (เทจากขอบกรอบ) → ก้อนติดกัน → ย่อ ÷1.6 ทั้งหมวด (ลังในชีต ~32px → 20px เท่าลังในเกม) สีมากสุดในบล็อก → สีร่วม 24 สี
+  ตัวอย่างหมวดแรก Props 42 ชิ้น (PR01–PR42) · หน้าเทสแท็บ "อาคาร · สิ่งก่อสร้าง" ตัวกรอง "ชีต Environment · ของวาง (Props)"
+  ข้อจำกัด: ของที่วาดชิดกันในชีตบางคู่ติดกัน (กระเป๋า+ราวแขวน PR05) · ตู้น้ำเงินบางตู้แตกเป็นแผ่นบาง (PR21) · ยังไม่มีชื่อไทยรายชิ้น · หมวดอื่น 11 หมวดยังไม่ตัด
 
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม

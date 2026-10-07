@@ -2087,7 +2087,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', env: 'env_sheet_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
 		$('rdFile').textContent = c.vx ? `${VXS.sheet} · ${c.pieces ? 'กรอบ ' + c.pieces[S.frame].box.join(',') : 'แถว ' + c.label + ' · แสง ' + fold + '/' + c.vx.atlas + '.png'}`
 			: `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
@@ -2315,9 +2315,13 @@ function buildGalleries() {
 			+ (ITEM_USE[x.cat] ? `<br><span class="muted">${ITEM_USE[x.cat]}</span>` : '') + `<br><span class="muted">ที่มาข้อมูล: ${x.from}</span>` });
 	const st = DATA.structures || { items: [], in_game: [] };
 	const stl = st.items.map(x => Object.assign({ grp: 'ร่างใหม่' }, x)).concat(st.in_game.filter(x => DATA.sprites['tile/' + x.tile]).map(x => ({ id: 'tile-' + x.tile, name: x.name, tile: x.tile, grp: 'มีในเกมแล้ว', use: 'ไทล์ในเกม (assets/tiles_ll/' + x.tile + '.png)' })));
+	// ชิ้นตัดจากชีต Environment Tileset (tools/sprites/env_sheet_cut.py · kwan 7 ต.ค.) — มุม 3/4 ของชีต ใช้เป็นของวางบนแผนที่ 24px เดิม
+	for (const pn of Object.values((DATA.env_sheet || {}).panels || {}))
+		for (const e of pn.items) stl.push({ id: e.id, pre: 'env/', name: e.id, grp: 'ชีต Environment · ' + pn.name,
+			use: `ขนาดในเกม ${e.size[0]}×${e.size[1]} px (ย่อ ÷${pn.scale} ทั้งหมวด · ลังในชีตเท่าลังในเกม 20px) · ร่าง ยังไม่เข้าเกม`, source: 'ชีต Environment Tileset ของ kwan · กรอบ ' + e.box.join(',') });
 	const pic = x => x.tile ? 'tile/' + x.tile : (x.pre || 'stc/') + x.id + '_0';
 	gallery('structs', 'stc', stl, {
-		group: x => x.grp, frames: x => x.tile ? ['tile/' + x.tile] : frameKeys('stc/' + x.id), sec: 0.22,
+		group: x => x.grp, frames: x => x.tile ? ['tile/' + x.tile] : frameKeys((x.pre || 'stc/') + x.id), sec: 0.22,
 		thumb: x => `<img src="${DATA.sprites[pic(x)]}" alt=""><span>${x.name}</span><small>${x.grp}</small>`,
 		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.grp}</span><br>${x.use}${x.source ? '<br><span class="muted">ที่มา: ' + x.source + '</span>' : ''}` });
 	const vh = (DATA.vehicles || { items: [] }).items.map(x => Object.assign({ pre: 'veh/' }, x));

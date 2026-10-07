@@ -133,7 +133,7 @@ def sprites():
 		for f in sorted(os.listdir(rd)):
 			if f.endswith('.png'): out['rig/' + f[:-4]] = png(os.path.join(rd, f))
 	# ไอเท็ม / สิ่งก่อสร้าง / ยานพาหนะ / NPC ร่าง (tools/sprites/items_icons.py · world_props.py · npc_sprites.py)
-	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc')):
+	for folder, pre in (('items_draft', 'itm'), ('structures_draft', 'stc'), ('vehicles_draft', 'veh'), ('npcs_draft', 'npc'), ('env_sheet_draft', 'env')):
 		d = os.path.join(SPR, folder)
 		if os.path.isdir(d):
 			for f in sorted(os.listdir(d)):
@@ -214,6 +214,7 @@ def main(out_path):
 		'monsters': monsters(mon_ids),
 		'bosses': bosses(),
 		'items': json.load(open(os.path.join(SPR, 'items_draft/index.json'), encoding='utf-8'))['items'],
+		'env_sheet': json.load(open(os.path.join(SPR, 'env_sheet_draft/index.json'), encoding='utf-8')) if os.path.exists(os.path.join(SPR, 'env_sheet_draft/index.json')) else None,
 		'structures': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/structures.json'), encoding='utf-8')),
 		'vehicles': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/vehicles.json'), encoding='utf-8')),
 		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
