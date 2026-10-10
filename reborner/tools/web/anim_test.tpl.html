@@ -698,11 +698,13 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	const tg = IMG[L.target.key];
 	if (tg) {
 		const kb = since < 7 ? -[0, 5, 8, 7, 5, 3, 1][since] : 0, tx = T.x - (tg.width >> 1) + kb, ty = L.target.foot - tg.height - (since < 4 ? [0, 3, 2, 1][since] : 0);
+		if (!(L.targetDraw && L.targetDraw(tg, tx, ty, since))) {   // targetDraw คืน true = วาดเป้าเองแล้ว (เช่น ท่าตาย)
 		ctx.drawImage(tg, tx, ty);
 		if (L.silhouette && since < 9) {   // แนว RS3: มอนกลายเป็นเงาสีแสงของท่า
 			const o = VFX_OC2; o.width = tg.width; o.height = tg.height; const x = o.getContext('2d'); x.drawImage(tg, 0, 0); x.globalCompositeOperation = 'source-atop'; x.fillStyle = since % 2 ? '#ffffff' : col[0]; x.fillRect(0, 0, o.width, o.height);
 			ctx.save(); ctx.globalAlpha = since < 6 ? 0.9 : 0.9 * (1 - (since - 5) / 4); ctx.drawImage(o, tx, ty); ctx.restore();
 		} else if (since < 3) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = [1, 0.6, 0.3][since]; ctx.drawImage(tg, tx, ty); ctx.restore(); }
+		}
 	}
 	// ออร่ารอบ Rion ตอนชาร์จ + ประกายลอยขึ้น
 	const rx = L.rion[0] + 32, ry = L.rion[1] + 40;
@@ -778,6 +780,41 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	if (S.grid) drawGrid();
 }
 
+// ── มอนตายตามสายที่โดน (kwan 10 ต.ค. "ถ้ามอนตาย ให้สลายไปตามสายการโจมตี เช่น สายฟัน ตัวขาดแล้วสลาย") ──
+// วาดทีละพิกเซลจากภาพมอน: d = เฟรมนับจากจังหวะตาย · คืน false เมื่อเลยท่าตายแล้ว (ไม่ต้องวาดเป้าอีก)
+const DEATH_PX = new Map();
+function deathPixels(im) {
+	if (DEATH_PX.has(im)) return DEATH_PX.get(im);
+	const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+	const d = x.getImageData(0, 0, c.width, c.height).data, out = [];
+	for (let y = 0; y < c.height; y++) for (let X = 0; X < c.width; X++) { const i = (y * c.width + X) * 4; if (d[i + 3] < 40) continue;
+		const h = Math.sin(X * 12.9898 + y * 78.233) * 43758.5453; out.push({ x: X, y, c: `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`, h: h - Math.floor(h) }); }
+	DEATH_PX.set(im, out); return out;
+}
+const DEATH_FX = {
+	// สายฟัน: ขาดเป็นสองท่อนตามแนวฟันลงเฉียง (บนขวา → ล่างซ้าย) · เส้นแสงตรงรอยขาด · ท่อนบนไถลลงตามคมดาบ ท่อนล่างทรุด · แล้วสลายเป็นผงลอยขึ้น
+	SL: (im, x0, y0, d, col) => {
+		const px = deathPixels(im), w = im.width, h = im.height, cx = w / 2, cy = h * 0.52, dir = [-0.82, 0.57], nrm = [0.57, 0.82];
+		const slide = d < 2 ? 0 : Math.min(13, (d - 2) * 1.8), gap = d < 2 ? 0 : Math.min(3, (d - 1) * 0.8), sink = d < 3 ? 0 : Math.min(3, (d - 3) * 0.5), q = Math.max(0, Math.min(1.2, (d - 8) / 10));
+		if (q >= 1.2) return;
+		ctx.save();
+		for (const p of px) {
+			const sd = (p.x - cx) * nrm[0] + (p.y - cy) * nrm[1], up = sd < 0;   // ฝั่งบนของรอยฟัน
+			if (d >= 2 && Math.abs(sd) < 0.7) continue;   // รอยขาดเปิดเป็นร่อง
+			let X = x0 + p.x + (up ? dir[0] * slide - nrm[0] * gap : 1 + nrm[0] * gap * 0.4), Y = y0 + p.y + (up ? dir[1] * slide - nrm[1] * gap : sink + nrm[1] * gap * 0.4);
+			if (p.h < q) { const k = (q - p.h) * 26; X += Math.sin(p.h * 40 + d * 0.6) * 2; Y -= k; ctx.globalAlpha = Math.max(0, 1 - (q - p.h) * 2.2); ctx.fillStyle = p.h > 0.5 ? col : '#e8dcff'; }   // ผงลอยขึ้น
+			else { ctx.globalAlpha = 1; ctx.fillStyle = d < 2 ? '#ffffff' : p.c; }
+			ctx.fillRect(Math.round(X), Math.round(Y), 1, 1);
+		}
+		ctx.restore();
+		if (d < 7) { const a = 1 - d / 7, L = 34, mx = x0 + cx, my = y0 + cy;   // เส้นแสงรอยขาด
+			ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.shadowBlur = 4; ctx.shadowColor = col; line([[mx - dir[0] * L, my - dir[1] * L], [mx + dir[0] * L, my + dir[1] * L]], '#ffffff', d < 2 ? 3 : 2, a); line([[mx - dir[0] * L, my - dir[1] * L], [mx + dir[0] * L, my + dir[1] * L]], col, 1, a); ctx.restore(); }
+	},
+	// สายอื่นยังไม่ได้ออกแบบท่าตาย → จางเป็นผงลอยขึ้นเฉยๆ
+	_: (im, x0, y0, d, col) => { const px = deathPixels(im), q = Math.max(0, Math.min(1.2, (d - 2) / 12)); if (q >= 1.2) return; ctx.save();
+		for (const p of px) { let Y = y0 + p.y; if (p.h < q) { Y -= (q - p.h) * 22; ctx.globalAlpha = Math.max(0, 1 - (q - p.h) * 2.2); ctx.fillStyle = col; } else { ctx.globalAlpha = 1; ctx.fillStyle = p.c; } ctx.fillRect(x0 + p.x, Math.round(Y), 1, 1); }
+		ctx.restore(); },
+};
 const rollHits = () => [ROLL.HIT, ROLL.ATK + VFX.HIT + 6 + VFX.STOP, ROLL.ATK + VFX.HIT + 12 + VFX.STOP];   // เฟรมกระทบ 3 ระลอก (= epic hits ใน vfxScene) → 32 · 40 · 46
 function rollView(c) {   // กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
 	const F = S.frame, f = F - ROLL.ATK, it = c.skill, rw = RIG_ON && rigWeapon(it), home = SKS.rion_at, land = [VFX.TARGET.x + 22 + ROLL.SKID, home[1]], stop = [land[0] - ROLL.SKID, land[1]];   // แตะพื้นแล้วไถลไปหยุดชิดขวาของเป้า
@@ -833,7 +870,9 @@ function rollView(c) {   // กระโดดม้วน: Rion เคลื่
 			ctx.save(); ctx.globalAlpha = 0.55 * (1 - d / 16); ctx.fillStyle = '#7d6a55'; ctx.fillRect(Math.round(stop[0] + 30), foot - 1, Math.round(sx - stop[0] - 30 + Math.min(d, 4) * 2), 1); ctx.restore();   // รอยลาก
 			for (let i = 0; i < 6; i++) { const q = d - i * 0.7; if (q < 0) continue; dust(sx + 6 + i * 3 + q * 1.2, foot - 2 - q * 0.8 - (i % 2) * 2, 2.5 + q * 0.7, 0.75 * (1 - q / 12)); }
 		} };
-	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: VFX.TARGET, bg: drawBg, cell: true, under, party: auraBack, front: auraFront,
+	const kill = rollHits()[2], targetDraw = (im, tx, ty) => { const d = F - kill; if (d < 0) return false;   // ฟันครั้งสุดท้ายฆ่า → ท่าตายตามสายของท่า
+		(DEATH_FX[it.family] || DEATH_FX._)(im, VFX.TARGET.x - (im.width >> 1), VFX.TARGET.foot - im.height, d, '#b48cff'); return true; };
+	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: VFX.TARGET, bg: drawBg, cell: false, under, party: auraBack, front: auraFront, targetDraw,   // ไม่มีกรอบช่องต้นฉบับซ้ายบน (kwan 10 ต.ค.)
 		over: () => { if (F === ROLL.POWER || F === ROLL.POWER + 1) { ctx.fillStyle = `rgba(255,224,110,${F === ROLL.POWER ? 0.4 : 0.15})`; ctx.fillRect(0, 0, cv.width, cv.height); }   // วาบทองตอนระเบิดพลัง
 			if (F >= 2 && F < ROLL.UP + 4) rs3Bubble((it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
 			const s0 = ROLL.HIT - 2; if (F >= s0 && F < s0 + 16) rs3Bubble(ROLL.SHOUT, stop[0] + 40, stop[1] + 6, F - s0, F < s0 + 11 ? 1 : 1 - (F - s0 - 10) / 6); } });
