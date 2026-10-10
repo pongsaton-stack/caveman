@@ -275,6 +275,28 @@ pose('rion_b_item', 'rion', 'ในศึก', 'ใช้ไอเท็ม', 0.
 pose('rion_b_victory', 'rion', 'ในศึก', 'ชนะ (ชูหมัด)', 1.12, lambda t: {'squash': kf(t, [(0, 0), (0.12, 2), (0.22, 0), (0.88, 0), (0.95, 2), (1, 0)]),
 	'dy': kf(t, [(0.18, 0), (0.32, -3), (0.45, 0)]), 'shadow': 8, 'arm': kf(t, [(0, (24, 44, 23, 47)), (0.2, (22, 33, 19, 27)), (0.9, (22, 33, 19, 27)), (1, (24, 44, 23, 47))]),
 	'glyphs': sparkles(t, [(12, 16), (24, 6), (14, 12)], 0.3, 0.9)})
+def chacha(t):
+	"""ท่าชนะเต้นสามช่า (kwan 10 ต.ค. "ท่าชนะของตัวเอก ให้เต้นสามช่าตลกๆ") · 8 จังหวะต่อรอบ = "ก้าว ถอย ช่า-ช่า-ช่า" 2 ชุด
+	   ชุดแรกหันซ้าย (ก้าวหน้าชี้นิ้ว-ถอยก้นโด่ง แล้วส่ายสะโพกสามจังหวะ) → หมุนตัวรอบ → ชุดสองหันหน้า (มือแจ๊สขึ้นลงสลับ ขาย่ำ) → จบชูหมัด"""
+	b = t * 8; notes = [('note', 44 + ri(2 * sin(t, 4)), TOP - 6 - ri(2 * abs(sin(t, 8))), 255)] if (int(b * 2) % 4) < 3 else []
+	beat3 = lambda u: abs(sin(u * 1.5))   # เด้ง 3 ครั้งในช่วง u 0..1 (ช่า-ช่า-ช่า)
+	if b < 4:
+		if b < 2:   # ก้าวหน้า (ชี้นิ้วไปข้างหน้า) → ถอยหลัง (มือลง ก้นโด่ง)
+			fw = b < 1; u = b % 1
+			return {'dx': kf(u, [(0, 0), (0.4, -3 if fw else 2), (1, -3 if fw else 2)]), 'lean': -3 if fw else 3, 'squash': 1 if u < 0.3 else 0,
+				'arm': (21, 36, 13, 37) if fw else (24, 44, 25, 50), 'barm': (28, 45, 31, 48), 'glyphs': notes}
+		u = (b - 2) / 2   # ช่า-ช่า-ช่า: ก้าวสั้นสามที ส่ายสะโพกซ้าย-ขวา-ซ้าย หัวโยกตาม มือสั่นดิ๊ก ๆ
+		k = min(2, int(u * 3)); return {'dx': [-1, 1, -1][k], 'lean': [-3, 3, -3][k], 'squash': 2 * beat3(u), 'hx': [1, -1, 1][k],
+			'arm': (22, 38, 17 + (1 if int(u * 12) % 2 else -1), 33), 'barm': (28, 45, 31, 48), 'glyphs': notes}
+	if b < 5: return dict(spin_dirs((b - 4) % 1, ['west', 'south', 'east', 'north']), dy=-3 * math.sin(math.pi * (b - 4)), shadow=8, glyphs=notes)   # หมุนตัวกลางอากาศ
+	if b < 7.2:   # หันหน้า: ก้าวแยกขา-ชิด · มือแจ๊สขึ้นลงสลับ · ส่ายสะโพก
+		u = b - 5; k = int(u * 3) % 3 if u >= 1 else 0
+		return {'dir': 'south', 'arm_swing': sin(u, 2), 'arm_lift': 3.0, 'hx': -1.5 * sin(u, 2 if u < 1 else 3), 'feet': 2 if (u < 1 and u % 0.5 < 0.25) or (u >= 1 and k != 1) else 0,
+			'lean': 3.5 * sin(u, 2 if u < 1 else 3), 'squash': 2 * beat3(u - 1) if u >= 1 else 1 * abs(sin(u, 2)), 'dy': -2 if u >= 1 and k == 1 else 0, 'shadow': 8, 'glyphs': notes}
+	u = (b - 7.2) / 0.8   # จบ: ย่อแล้วกระโดดชูหมัด ประกายรอบตัว
+	return {'squash': kf(u, [(0, 2), (0.2, 0)]), 'dy': kf(u, [(0, 0), (0.25, -4), (0.5, 0)]), 'shadow': 8, 'arm': kf(u, [(0, (24, 44, 23, 47)), (0.2, (22, 33, 19, 27))]),
+		'glyphs': sparkles(u, [(12, 16), (24, 6), (40, 12)], 0.15, 1.0)}
+pose('rion_b_chacha', 'rion', 'ในศึก', 'ชนะ (เต้นสามช่าตลก ๆ)', 3.2, chacha)
 pose('rion_b_lowhp', 'rion', 'ในศึก', 'HP ต่ำ (หอบ)', 0.44, lambda t: dict(breath(t), lean=-2, squash=2, glyphs=[('sweat', 36, TOP + 6 + ri(1.5 * (t % 1)), 255)]))
 pose('rion_b_revive', 'rion', 'ในศึก', 'ฟื้นจากล้ม', 1.26, lambda t: {'rot': kf(t, [(0, 90), (0.1, 90), (0.45, 0)]), 'squash': kf(t, [(0.45, 5), (0.7, 0)]), 'sq_at': 56,
 	'lean': kf(t, [(0.45, -3), (0.7, 0)]), 'glyphs': sparkles(t, [(14, 8), (44, 14)], 0.7, 1.0)}, hold=True)
