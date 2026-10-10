@@ -1304,38 +1304,76 @@ function fxSlash(at, col, d) {
 		line(tr(arc(26), at, s * 0.62), shade(col, -0.4), 9 * 0.62, a); line(tr(arc(26), at, s * 0.62), col, 6 * 0.62, a); line(tr(arc(25), at, s * 0.62), '#fff', 2 * 0.62, a); });
 }
 // "ฟันดวงดาว" (docs/art-bible/vfx/star_slash.nightforge.json · night-forge-vfx-lab) — ตอนประกาย ★ สายคม (kwan เลือก 10 ต.ค.)
-// วาดตามค่าในไฟล์: span = มุมกวาด · stretch = ยืดแนวนอน · thick = ความหนา · glow = เรือง · pal = ไล่สีหางเข้ม→หัวสว่าง · parts sparkle + partColor
-// flashColor = จอวาบตอนกระทบ · tempo = ความเร็ว (0.8 = ช้ากว่าปกติ) · seed = ตำแหน่งประกายคงที่ · รูปทรงเสี้ยวใกล้เคียง ไม่ใช่ภาพจากโปรแกรม
+// ฟันดวงดาว = preset ของ kwan จาก night-forge-vfx-lab (`docs/art-bible/vfx/star_slash.nightforge.json`)
+// วาดตามกติกาที่อ่านจากเว็บแล็บ (10 ต.ค. 2026) แต่เขียนใหม่เป็น Canvas2D เอง ไม่ได้คัดลอกโค้ด/เชเดอร์ของเว็บ:
+// รูปทรง = เกลียวเสี้ยวเริ่มมุม 70° กวาด span° รัศมีโตขึ้นตามทาง หนาสุดกลางทาง (thick) ยืดแนวนอน (stretch)
+// เวลา (×tempo): โผล่จากหัว 0–0.16 · กินจากหาง 0.26–0.76 · จาง 0.68–0.9 · ลาย pattern 1 = ฟ้ากลางคืน+ดาว · ขอบนอก rimW = pal[4]
+// แสงกระทบ = ดาว 4 แฉก flashColor · อนุภาค sparkle = ดาว 4 แฉกตามขอบนอก (pal[3] · partColor ทุก 4 ดวง) + รอบจุดกระทบ
+// ไม่ได้ใช้: tf (y 1.3 · มุมกล้อง 3D) · bloom ของแล็บ (ใช้ shadowBlur แทน) · puff* (preset ปิดควันอยู่แล้ว)
+const SS_U = 15;   // พิกเซลต่อ 1 หน่วยในแล็บ (เสี้ยวกว้าง ~45px · มอนในหน้าเทส ~32–48px)
+const ssHash = (x, y) => { const h = Math.sin(x * 157.31 + y * 271.97) * 24634.6345; return h - Math.floor(h); };
+function ssNoise(x, y) { const ix = Math.floor(x), iy = Math.floor(y), fx_ = x - ix, fy = y - iy, sx = fx_ * fx_ * (3 - 2 * fx_), sy = fy * fy * (3 - 2 * fy);
+	const a = ssHash(ix, iy), b = ssHash(ix + 1, iy), c = ssHash(ix, iy + 1), e = ssHash(ix + 1, iy + 1); return a + (b - a) * sx + (c - a) * sy + (a - b - c + e) * sx * sy; }
+const ssFbm = (x, y) => 0.5 * ssNoise(x, y) + 0.25 * ssNoise(x * 2.03 + 5.2, y * 2.03 + 1.3) + 0.125 * ssNoise(x * 4.1 + 9.7, y * 4.1 + 3.1) + 0.0625 * ssNoise(x * 8.3, y * 8.3);
+const ssRgb = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const ssMix = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
+const ssCss = (c, m = 1) => `rgb(${Math.min(255, c[0] * m) | 0},${Math.min(255, c[1] * m) | 0},${Math.min(255, c[2] * m) | 0})`;
+const ssClamp = x => Math.max(0, Math.min(1, x)), ssSmooth = (e0, e1, x) => { const k = ssClamp((x - e0) / (e1 - e0)); return k * k * (3 - 2 * k); };
+function ssStar4(x, y, r, col, a) { if (r <= 0.2 || a <= 0) return; const w = Math.max(0.5, r * 0.22);
+	ctx.save(); ctx.globalAlpha = Math.min(1, a); ctx.fillStyle = col; ctx.beginPath();
+	ctx.moveTo(x, y - r); ctx.lineTo(x + w, y - w); ctx.lineTo(x + r, y); ctx.lineTo(x + w, y + w); ctx.lineTo(x, y + r); ctx.lineTo(x - w, y + w); ctx.lineTo(x - r, y); ctx.lineTo(x - w, y - w); ctx.closePath(); ctx.fill(); ctx.restore(); }
 function fxStarSlash(at, d) {
-	const P = DATA.star_slash, pal = P.pal, dur = FX_SEC / (P.tempo || 1) * 1.6;
-	const span = (P.span || 180) * Math.PI / 180, rx = 22 * Math.sqrt(P.stretch || 1), ry = 22 / Math.sqrt(P.stretch || 1) * 1.15, th = 6 * (P.thick || 1);
-	const a0 = -span / 2 - Math.PI / 2 * 0.15;   // เริ่มบนหลังเป้า กวาดลงหน้า (หัน d)
-	const pt = a => [at.x - Math.cos(a) * rx * d, at.y + Math.sin(a) * ry];
-	let sd = (P.seed || 1) * 9301 + 49297; const rnd = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
-	const sp = Array.from({ length: Math.round(14 * (P.partAmount || 1)) }, () => ({ u: rnd(), ang: rnd() * Math.PI * 2, v: 8 + rnd() * 14, s: 1 + rnd() * 1.6, c: rnd() < 0.6 ? P.partColor : pal[4] }));
-	// จอวาบ flashColor ครั้งเดียวต่อการฟัน (ตีหลายเป้าพร้อมกันไม่ซ้อนวาบ)
-	const now = performance.now();
-	if (!(S.starFlashAt > now - 150)) { S.starFlashAt = now; fx(dur * 0.12, (p) => { ctx.save(); ctx.globalAlpha = 0.2 * (1 - p); ctx.fillStyle = P.flashColor; ctx.fillRect(0, 0, W(), H()); ctx.restore(); }); }
-	fx(dur, (p) => {
-		const sweep = Math.min(1, p / 0.45), fade = p < 0.5 ? 1 : 1 - (p - 0.5) / 0.5;
-		const head = a0 + span * sweep, tail = Math.max(a0, head - span * (0.55 + 0.45 * (1 - fade)));
-		const N = 20, seg = (u0, u1) => [pt(tail + (head - tail) * u0), pt(tail + (head - tail) * u1)];
-		const width = u => th * (0.3 + 0.7 * Math.sin(Math.PI * Math.min(1, u * (1 + (P.wisp || 0)))));
-		// ชั้น 1 ขอบเข้ม pal[0] (ให้เห็นบนพื้นสว่าง) · ชั้น 2 ไล่สี pal[1]→pal[3] หาง→หัว · ชั้น 3 แกน pal[4] เรืองแสง (glow)
-		for (let i = 0; i < N; i++) line(seg(i / N, (i + 1) / N), pal[0], width((i + 1) / N) + 2.2, fade * 0.9);
-		for (let i = 0; i < N; i++) { const u = (i + 1) / N; line(seg(i / N, u), pal[1 + Math.min(2, Math.floor(u * 2.999))], width(u), fade); }
-		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.shadowBlur = 3 * (P.glow || 1); ctx.shadowColor = pal[3];
-		for (let i = Math.floor(N * 0.45); i < N; i++) { const u = (i + 1) / N; line(seg(i / N, u), pal[4], width(u) * 0.38, fade); }
-		ctx.restore();
-		for (const s of sp) {   // ประกายดาว 4 แฉก กระจายออกจากแนวเสี้ยวหลังหัวผ่าน
-			if (s.u > sweep) continue;
-			const q = Math.max(0, p - s.u * 0.45), [bx, by] = pt(a0 + span * s.u), r = s.v * q, x = bx + Math.cos(s.ang) * r, y = by + Math.sin(s.ang) * r, z = s.s * (1 - q);
-			if (z <= 0.1) continue;
-			ctx.save(); ctx.globalAlpha = Math.min(1, fade * 1.2); ctx.fillStyle = s.c; ctx.shadowBlur = 2 * (P.glow || 1); ctx.shadowColor = s.c;
-			ctx.beginPath(); ctx.moveTo(x, y - 2.4 * z); ctx.lineTo(x + 0.6 * z, y); ctx.lineTo(x, y + 2.4 * z); ctx.lineTo(x - 0.6 * z, y); ctx.closePath(); ctx.fill();
-			ctx.beginPath(); ctx.moveTo(x - 2.4 * z, y); ctx.lineTo(x, y + 0.6 * z); ctx.lineTo(x + 2.4 * z, y); ctx.lineTo(x, y - 0.6 * z); ctx.closePath(); ctx.fill();
+	const P = DATA.star_slash, tempo = P.tempo || 1, life = 0.9 / tempo, C = P.pal.map(ssRgb), glow = P.glow || 1;
+	const a0 = 70 * Math.PI / 180, span = (P.span || 180) * Math.PI / 180, st = P.stretch || 1, thick = P.thick || 1, rimW = P.rimW || 0.1, wisp = P.wisp || 0;
+	const edge = (u, v) => { const ang = a0 + span * u, r = 1.25 * (0.82 + 0.42 * u) - thick * Math.pow(Math.sin(Math.PI * Math.pow(u, 0.75)), 0.8) * (1 - v);
+		return [Math.cos(ang) * r * st + 0.45, Math.sin(ang) * r - 0.05]; };
+	const scr = ([x, y]) => [at.x + (d < 0 ? 1 : -1) * (x - 0.45) * SS_U, at.y - y * SS_U];   // ตีไปทางซ: ตามแล็บ · ตีไปทางขวา: กลับซ้ายขวา
+	let sd = 100 + Math.round(P.seed || 1); const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647, rr = (a, b) => a + (b - a) * rnd();
+	const hit = edge(0.42, 0.55); hit[0] -= 0.15;
+	const parts = [], amt = n => Math.round(n * (P.partAmount ?? 1)), pc = ssRgb(P.partColor || P.pal[3]);
+	if (P.parts === 'sparkle') {
+		for (let i = 0; i < amt(16); i++) { const u = rr(0.08, 0.98), [x, y] = edge(u, rr(0.95, 1.35)); parts.push({ x, y, vx: rr(-0.2, 0.2), vy: rr(-0.1, 0.3), delay: u * 0.16 + rr(0, 0.1), life: rr(0.3, 0.65), size: rr(0.1, 0.24), col: i % 4 ? C[3] : pc, shrink: 0.4 }); }
+		for (let i = 0; i < amt(7); i++) parts.push({ x: hit[0] + rr(-0.6, 0.4), y: hit[1] + rr(-0.6, 0.6), vx: rr(-0.8, 0.2), vy: rr(-0.3, 0.4), delay: rr(0, 0.1), life: rr(0.3, 0.5), size: rr(0.08, 0.18), col: C[3], shrink: 0.5 });
+	}
+	// ลายฟ้ากลางคืนคงที่ต่อ 1 ครั้ง (ดาวในเนื้อเสี้ยว) · คำนวณครั้งเดียว ขยับแค่ระยิบ
+	const NU = 150, NV = 22, cells = [];
+	for (let i = 0; i <= NU; i++) for (let j = 0; j <= NV; j++) { const u = i / NU, v = j / NV, gx = u * 28, gy = v * 4, id = [Math.floor(gx), Math.floor(gy)], r = ssHash(id[0], id[1]);
+		let star = 0; if (r > 0.45) { const ox = (ssHash(id[0] + 3.1, id[1]) - 0.5) * 0.5, oy = (ssHash(id[0], id[1] + 7.7) - 0.5) * 0.5, qx = gx - id[0] - 0.5 - ox, qy = (gy - id[1] - 0.5 - oy) * 0.7, s = 0.08 + 0.16 * ssHash(id[0] + 1.3, id[1]), L = Math.hypot(qx, qy);
+			star = ssClamp(Math.max(0, 1 - Math.abs(qx * qy) / (s * s * 0.05)) * Math.max(0, 1 - L / s) * 1.6 + ssSmooth(s * 0.25, 0, L)); }
+		cells.push({ u, v, star, r, dust: ssHash(Math.floor(u * 170), Math.floor(v * 18)) > 0.986 }); }
+	fx(life, (p, t) => {
+		const tt = t * tempo, reveal = (1 - Math.pow(1 - ssClamp(tt / 0.16), 3)) * 1.02, erode = ssClamp((tt - 0.26) / 0.5) ** 2, fade = 1 - ssClamp((tt - 0.68) / 0.22);
+		if (tt <= 0.9) {
+			ctx.save(); ctx.globalAlpha = fade;
+			for (const c of cells) {
+				if (c.u > reveal) continue;
+				if (c.u < erode * 1.2 - 0.1 + (ssFbm(c.u * 7 + tt * 0.7, c.v * 4 + tt * 0.7) - 0.5) * 0.35) continue;
+				const streak = ssFbm(c.u * 2.5 - tt * 2.2, c.v * 12), inner = c.v + (streak - 0.5) * wisp; if (inner < 0.2) continue;
+				const k = ssClamp((inner - 0.2) / 0.8);
+				let col = ssMix(C[0], C[1], ssSmooth(0, 0.9, k)); col = ssMix(col, C[2], ssSmooth(0.55, 0.8, streak) * 0.6);
+				let m = 1;
+				if (c.star > 0) { const tw = 0.75 + 0.25 * Math.sin(tt * 14 + c.r * 40); col = ssMix(col, C[3].map(x => x * glow), ssClamp(c.star * tw)); }
+				if (c.dust) col = ssMix(col, C[3], 0.8);
+				if (c.v > 1 - rimW) { col = C[4]; m = glow; } else if (c.v > 1 - rimW * 2.2) { col = ssMix(col, C[3], 0.6); m = 1 + (glow - 1) * 0.6; }
+				const [x, y] = scr(edge(c.u, c.v)); ctx.fillStyle = ssCss(col, m); ctx.fillRect(Math.round(x), Math.round(y), 2, 2);
+			}
+			// ขอบนอกเรือง (แทน bloom): เส้น pal[4] ตามขอบที่ยังเหลือ
+			const u0 = Math.max(0, erode * 1.2 - 0.1), u1 = Math.min(1, reveal);
+			if (u1 > u0) { const pts = []; for (let i = 0; i <= 40; i++) pts.push(scr(edge(u0 + (u1 - u0) * i / 40, 1)));
+				ctx.globalCompositeOperation = 'lighter'; ctx.shadowBlur = 2 * glow; ctx.shadowColor = P.pal[4]; line(pts, ssCss(C[4], 0.6), 1, fade * 0.7); }
 			ctx.restore();
 		}
+		// แสงกระทบ: ดาว 4 แฉกสี flashColor โตใน 0.22 จางหลัง 0.35 (ของช่วง 0.45 แรก)
+		const uT = tt / 0.45;
+		if (uT < 1) { const grow = ssSmooth(0, 0.22, uT), fa = 1 - ssSmooth(0.35, 1, uT), k = 0.35 + 0.9 * grow, [hx, hy] = scr(hit), fl = ssRgb(P.flashColor || P.pal[4]);
+			ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.shadowBlur = 3 * glow; ctx.shadowColor = P.flashColor;
+			ssStar4(hx, hy, 1.3 * k / 1.15 * SS_U, ssCss(fl, glow), fa); ctx.beginPath(); ctx.globalAlpha = fa; ctx.fillStyle = ssCss([255, 255, 255], 1); ctx.arc(hx, hy, 0.28 * k * 1.3 * SS_U * 0.5, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+		// อนุภาคดาว
+		ctx.save(); ctx.globalCompositeOperation = 'lighter';
+		for (const e of parts) { const n = tt - e.delay, r = n / e.life; if (r < 0 || r > 1) continue;
+			const a = 1 - 0.35 * r, x = e.x + e.vx * n * a, y = e.y + e.vy * n * a; let sz = e.size * (1 - e.shrink * r) * Math.min(1, r * 7 + 0.2); sz *= 0.6 + 0.4 * Math.sin(n * 40 + e.x * 13);
+			const [sx, sy] = scr([x, y]); ssStar4(sx, sy, sz * SS_U, ssCss(e.col, 2.2), 1 - ssClamp((r - 0.55) / 0.45) ** 2); }
+		ctx.restore();
 	});
 }
 function fxPierce(at, col, d) {
