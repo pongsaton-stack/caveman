@@ -1303,6 +1303,41 @@ function fxSlash(at, col, d) {
 	fx(FX_SEC, p => { const s = 0.7 + 0.9 * p, a = 1 - p * p;
 		line(tr(arc(26), at, s * 0.62), shade(col, -0.4), 9 * 0.62, a); line(tr(arc(26), at, s * 0.62), col, 6 * 0.62, a); line(tr(arc(25), at, s * 0.62), '#fff', 2 * 0.62, a); });
 }
+// "ฟันดวงดาว" (docs/art-bible/vfx/star_slash.nightforge.json · night-forge-vfx-lab) — ตอนประกาย ★ สายคม (kwan เลือก 10 ต.ค.)
+// วาดตามค่าในไฟล์: span = มุมกวาด · stretch = ยืดแนวนอน · thick = ความหนา · glow = เรือง · pal = ไล่สีหางเข้ม→หัวสว่าง · parts sparkle + partColor
+// flashColor = จอวาบตอนกระทบ · tempo = ความเร็ว (0.8 = ช้ากว่าปกติ) · seed = ตำแหน่งประกายคงที่ · รูปทรงเสี้ยวใกล้เคียง ไม่ใช่ภาพจากโปรแกรม
+function fxStarSlash(at, d) {
+	const P = DATA.star_slash, pal = P.pal, dur = FX_SEC / (P.tempo || 1) * 1.6;
+	const span = (P.span || 180) * Math.PI / 180, rx = 22 * Math.sqrt(P.stretch || 1), ry = 22 / Math.sqrt(P.stretch || 1) * 1.15, th = 6 * (P.thick || 1);
+	const a0 = -span / 2 - Math.PI / 2 * 0.15;   // เริ่มบนหลังเป้า กวาดลงหน้า (หัน d)
+	const pt = a => [at.x - Math.cos(a) * rx * d, at.y + Math.sin(a) * ry];
+	let sd = (P.seed || 1) * 9301 + 49297; const rnd = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
+	const sp = Array.from({ length: Math.round(14 * (P.partAmount || 1)) }, () => ({ u: rnd(), ang: rnd() * Math.PI * 2, v: 8 + rnd() * 14, s: 1 + rnd() * 1.6, c: rnd() < 0.6 ? P.partColor : pal[4] }));
+	// จอวาบ flashColor ครั้งเดียวต่อการฟัน (ตีหลายเป้าพร้อมกันไม่ซ้อนวาบ)
+	const now = performance.now();
+	if (!(S.starFlashAt > now - 150)) { S.starFlashAt = now; fx(dur * 0.12, (p) => { ctx.save(); ctx.globalAlpha = 0.2 * (1 - p); ctx.fillStyle = P.flashColor; ctx.fillRect(0, 0, W(), H()); ctx.restore(); }); }
+	fx(dur, (p) => {
+		const sweep = Math.min(1, p / 0.45), fade = p < 0.5 ? 1 : 1 - (p - 0.5) / 0.5;
+		const head = a0 + span * sweep, tail = Math.max(a0, head - span * (0.55 + 0.45 * (1 - fade)));
+		const N = 20, seg = (u0, u1) => [pt(tail + (head - tail) * u0), pt(tail + (head - tail) * u1)];
+		const width = u => th * (0.3 + 0.7 * Math.sin(Math.PI * Math.min(1, u * (1 + (P.wisp || 0)))));
+		// ชั้น 1 ขอบเข้ม pal[0] (ให้เห็นบนพื้นสว่าง) · ชั้น 2 ไล่สี pal[1]→pal[3] หาง→หัว · ชั้น 3 แกน pal[4] เรืองแสง (glow)
+		for (let i = 0; i < N; i++) line(seg(i / N, (i + 1) / N), pal[0], width((i + 1) / N) + 2.2, fade * 0.9);
+		for (let i = 0; i < N; i++) { const u = (i + 1) / N; line(seg(i / N, u), pal[1 + Math.min(2, Math.floor(u * 2.999))], width(u), fade); }
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.shadowBlur = 3 * (P.glow || 1); ctx.shadowColor = pal[3];
+		for (let i = Math.floor(N * 0.45); i < N; i++) { const u = (i + 1) / N; line(seg(i / N, u), pal[4], width(u) * 0.38, fade); }
+		ctx.restore();
+		for (const s of sp) {   // ประกายดาว 4 แฉก กระจายออกจากแนวเสี้ยวหลังหัวผ่าน
+			if (s.u > sweep) continue;
+			const q = Math.max(0, p - s.u * 0.45), [bx, by] = pt(a0 + span * s.u), r = s.v * q, x = bx + Math.cos(s.ang) * r, y = by + Math.sin(s.ang) * r, z = s.s * (1 - q);
+			if (z <= 0.1) continue;
+			ctx.save(); ctx.globalAlpha = Math.min(1, fade * 1.2); ctx.fillStyle = s.c; ctx.shadowBlur = 2 * (P.glow || 1); ctx.shadowColor = s.c;
+			ctx.beginPath(); ctx.moveTo(x, y - 2.4 * z); ctx.lineTo(x + 0.6 * z, y); ctx.lineTo(x, y + 2.4 * z); ctx.lineTo(x - 0.6 * z, y); ctx.closePath(); ctx.fill();
+			ctx.beginPath(); ctx.moveTo(x - 2.4 * z, y); ctx.lineTo(x, y + 0.6 * z); ctx.lineTo(x + 2.4 * z, y); ctx.lineTo(x, y - 0.6 * z); ctx.closePath(); ctx.fill();
+			ctx.restore();
+		}
+	});
+}
 function fxPierce(at, col, d) {
 	fx(FX_SEC, p => { const x = at.x - 10 * d + 20 * d * Math.min(1, p / 0.6), a = 1 - p * p;
 		line([[x - 26 * d, at.y], [x + 16 * d, at.y]], col, 3.2, a); line([[x - 23 * d, at.y], [x + 15 * d, at.y]], '#fff', 1, a);
@@ -1955,7 +1990,7 @@ function sagaPlay(t) {
 	later(T, () => { runAnim('west', 0.24); heroTo(front, 0.24, p => p); });
 	attackAnim(T + 0.24);
 	later(T + 0.38, () => { for (let h = 0; h < Math.max(1, +t.hits || 1); h++) for (const g of tg) later(h * 0.12, () => {
-		switch (t.school) { case 'คม': fxSlash(g, col, -1); break; case 'แทง': fxPierce(g, col, -1); break; case 'ทุบ': fxCrush(g, col); break; case 'ยิง': fxShoot(heroPt(), g, col); break; default: fxClaw(g, col, -1); }
+		switch (t.school) { case 'คม': S.glim ? fxStarSlash(g, -1) : fxSlash(g, col, -1); break; case 'แทง': fxPierce(g, col, -1); break; case 'ทุบ': fxCrush(g, col); break; case 'ยิง': fxShoot(heroPt(), g, col); break; default: fxClaw(g, col, -1); }
 		hitFlash('f' + g.i); bounceNum(g, numTxt, numCol); }); });
 	later(T + 0.7, () => { runAnim('east', 0.24); heroTo({ x: HERO.x, y: HERO.y }, 0.24, p => p); });
 	later(T + 0.95, () => { S.heroFrame = rigRest(); });
@@ -2028,7 +2063,7 @@ function playTech(t) {
 	const ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
 	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
 	const from = heroPt();
-	banner((ult ? '◆ ไม้ตาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : shade(col, 0.3), ult);
+	banner((ult ? '◆ ไม้ตาย! ' : S.glim ? '★ ประกาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : S.glim ? '#f2c94c' : shade(col, 0.3), ult);
 	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.rgb = null; S.cam = { x: 120, y: 60, k: 1 }; S.foeOff = {}; S.dimTotal = 0.85;
 	const cine = ult && S.cine && CINE[t.school];
 	let impact = 0;
@@ -2043,7 +2078,7 @@ function playTech(t) {
 	const hitsFx = () => {
 		for (let h = 0; h < Math.max(1, +t.hits || 1); h++) for (const f of tg) {
 			const at = f.pt;
-			if (!cine) switch (t.school) { case 'คม': fxSlash(at, col, -1); break; case 'แทง': fxPierce(at, col, -1); break; case 'ทุบ': fxCrush(at, col); break; case 'ยิง': fxShoot(from, at, col); break; default: fxClaw(at, col, -1); }
+			if (!cine) switch (t.school) { case 'คม': S.glim ? fxStarSlash(at, -1) : fxSlash(at, col, -1); break; case 'แทง': fxPierce(at, col, -1); break; case 'ทุบ': fxCrush(at, col); break; case 'ยิง': fxShoot(from, at, col); break; default: fxClaw(at, col, -1); }
 			if (ult) burst(at, col);
 			hitFlash('f' + f.i);
 			floatNum(at, String(r.mid), AFF_COL(r), nth++, AFF_TAG(r));
@@ -2077,7 +2112,7 @@ function tick(now) {
 			if (S.seq) { S.seq.acc += dt; while (S.seq && S.seq.acc >= S.seq.sec) { S.seq.acc -= S.seq.sec; S.seq.i++;
 				if (S.seq.i >= S.seq.frames.length) { S.heroFrame = S.seq.rest; S.seq = null; } else S.heroFrame = S.seq.frames[S.seq.i]; } }
 			for (const e of [...S.fx]) { e.t += dt; if (e.step && e.t >= 0) e.step(Math.min(1, e.t / Math.max(e.dur, 1e-6))); if (e.then && e.t >= e.dur) { const fn = e.then; e.then = null; fn(); } }
-			S.fx = S.fx.filter(e => e.t < e.dur);
+			S.fx = S.fx.filter(e => e.t < e.dur || e.then);   // later(0) ที่สั่งจากใน then: ยังไม่ทันยิง then ห้ามทิ้ง
 			for (const [k, v] of S.flash) { const nv = v - dt / 0.3; nv <= 0 ? S.flash.delete(k) : S.flash.set(k, nv); }
 			if (S.shake > 0) S.shake = Math.max(0, S.shake - dt);
 			if (S.dimT !== undefined) { S.dimT += dt; const t = S.dimT, hold = (S.dimTotal || 0.85) - 0.03; S.dim = t < 0.12 ? 0.55 * t / 0.12 : t < hold ? 0.55 : t < hold + 0.35 ? 0.55 * (1 - (t - hold) / 0.35) : 0; if (t >= hold + 0.35) S.dimT = undefined; }
