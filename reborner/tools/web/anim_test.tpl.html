@@ -1163,9 +1163,16 @@ for (const w of (DATA.weapons || [])) {
 	if (!DATA.sprites['held/' + w.id + '_0']) continue;
 	CLIPS['held_' + w.id] = { id: 'held_' + w.id, label: `${w.id} · ${w.name}`, frames: [0, 0, 0, 1, 2, 3, 4, 0].map(i => `held/${w.id}_${i}`), sec: K.ATTACK_FRAME_SEC * 1.6, loop: true };
 }
+const SPELL_LAB = { 'BK-1': 'fire_rune', 'BK-5': 'fire_rune' };   // คาถาไฟสายดำ (spells_full.json element ไฟ) · SM-1 อัญเชิญไฟไม่ได้ใส่
 for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่าร่ายเวทย์ (tools/sprites/spells_anim.py) — แสดงในแท็บเวทย์มนต์เท่านั้น
 	if (!DATA.sprites['spl/' + sp.id + '_0']) continue;
 	CLIPS['spell_' + sp.id] = { id: 'spell_' + sp.id, label: `${sp.id} · ${sp.name}`, frames: [0, 1, 2, 3, 4, 5, 6, 7, 7].map(i => `spl/${sp.id}_${i}`), sec: K.ATTACK_FRAME_SEC * 1.6, loop: true };
+	const lab = SPELL_LAB[sp.id], comp = lab && (DATA.lab || []).find(x => x.file === lab);
+	if (comp) {   // ค้างท่ายืนจนรูนเพลิงจบ · เริ่มรูนที่เฟรมปล่อยแรก (3)
+		const c = CLIPS['spell_' + sp.id], len = Math.max(...comp.comp.layers.map(L => (L.start || 0) + (L.params && L.params.life || 1.4) / (L.speed || 1)));
+		c.lab = lab; c.scope = sp.scope; c.labAt = 3 * c.sec; c.label += ' · รูนเพลิง';
+		while (c.frames.length * c.sec < c.labAt + len + 0.3) c.frames.push(`spl/${sp.id}_0`);
+	}
 }
 
 // ── สถานะผู้ชม ──
@@ -1217,6 +1224,7 @@ function clipView() {
 	if (c.vx) return vxView(c);
 	if (c.panels) return panelView(c);
 	if (c.skill) return sheetSkillView(c);
+	if (c.lab) return labSpellView(c);
 	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
 	drawBg();
 	if (S.onion && c.frames.length > 1) {
@@ -1483,24 +1491,44 @@ const LAB_PARTS = {
 const LAB = () => DATA.lab || [];
 // เล่น preset ทั้งชุดที่เป้า at (จุดกลางตัวมอน = ความสูง 1.3 หน่วยจากพื้นแบบกล้องแล็บ) · d = ทิศตี (-1 = ตีไปทางซ้ายแบบเดียวกับแล็บ)
 // สเกลตามความกว้างเป้า (w): มอน 48px = 20 px/หน่วย · บอส 96px = 40 — ในแล็บวงพื้นกว้างกว่าตัวละครมาก ถ้าสเกลเท่ากันทุกตัว วงจะหลบใต้มอนตัวใหญ่หมด
-function labPlay(comp, at, d = -1, w = 0) {
-	const U = w ? Math.max(15, w / 2.4) : LAB_U, G = { x: at.x, y: at.y + 1.3 * LAB_COS * U }, mx = d < 0 ? 1 : -1;
+function labInst(comp, at, d = -1, w = 0) {   // ชั้นที่พร้อมวาด: { start, dur, sp, under, draw(tในชั้น) }
+	const U = w ? Math.max(15, w / 2.4) : LAB_U, G = { x: at.x, y: at.y + 1.3 * LAB_COS * U }, mx = d < 0 ? 1 : -1, out = [];
 	for (const L of comp.layers) {
 		const part = LAB_PARTS[L.part]; if (!part || L.on === false) continue;
 		const tf = Object.assign({ x: 0, y: 0, z: 0, s: 1, mirror: false }, part.tf || {}, L.tf || {}), s = tf.s || 1, m = mx * (tf.mirror ? -1 : 1);   // หมุน rx/ry/rz ยังไม่รองรับ (ทุก preset ตอนนี้เป็น 0)
 		const V = { u: U * s, mx: m, pj: (x, y, z) => [G.x + m * (tf.x + x * s) * U, G.y - (tf.y + y * s) * LAB_COS * U + (tf.z + z * s) * LAB_SIN * U] };
-		const sp = L.speed || 1, draw = part.make(L.params || {}, V);
-		S.fx.push({ t: -(L.start || 0), dur: part.dur(L.params || {}) / sp, under: !!part.under, draw: (p, t) => { if (t >= 0) draw(t * sp); } });
+		const sp = L.speed || 1; out.push({ start: L.start || 0, dur: part.dur(L.params || {}) / sp, sp, under: !!part.under, draw: part.make(L.params || {}, V) });
 	}
+	return out;
+}
+function labPlay(comp, at, d = -1, w = 0, delay = 0) {
+	for (const l of labInst(comp, at, d, w)) S.fx.push({ t: -(l.start + delay), dur: l.dur, under: l.under, draw: (p, t) => { if (t >= 0) l.draw(t * l.sp); } });
+}
+const labComp = file => (LAB().find(x => x.file === file) || {}).comp;
+const labLen = comp => Math.max(0, ...comp.layers.map(L => (L.start || 0) + (LAB_PARTS[L.part] ? LAB_PARTS[L.part].dur(L.params || {}) / (L.speed || 1) : 0)));
+// คาถาไฟ (kwan เลือก 10 ต.ค.: รูนเพลิง → คาถาไฟในแท็บเวทย์มนต์) — เวที 192×96: มอน M01 ซ้าย · Rion ร่ายขวา · รูนเพลิงเริ่มที่เฟรมปล่อย
+function labSpellView(c) {
+	cv.width = 192; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
+	const comp = labComp(c.lab), mon = IMG['mon/M01'], n = c.scope === 'all' ? 2 : 1;
+	const foes = Array.from({ length: n }, (_, i) => { const x = n === 1 ? 52 : 30 + i * 46; return { x, y: 78, w: mon ? mon.width : 48, h: mon ? mon.height : 40 }; });
+	if (!c.inst && comp) c.inst = foes.map(f => labInst(comp, { x: f.x, y: f.y - f.h * 0.45 }, -1, f.w));
+	const T = S.frame * c.sec + (S.playing ? S.acc : 0) - c.labAt;
+	const layer = under => { for (const ls of c.inst || []) for (const l of ls) { if (l.under !== under) continue; const t = T - l.start; if (t >= 0 && t < l.dur) l.draw(t * l.sp); } };
+	layer(true);
+	if (mon) for (const f of foes) spr('mon/M01', f.x - mon.width / 2, f.y - mon.height);
+	const key = c.frames[S.frame], im = IMG[key]; if (im) spr(key, 96 + (96 - im.width) / 2, Math.max(0, 78 - im.height));   // พื้นเวที y 78 เหลือที่ให้วงรูนใต้เท้า
+	layer(false);
+	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText('แล็บ · ' + (comp ? comp.name : c.lab), 4, 9);
+	if (S.grid) drawGrid();
 }
 // ฟันดวงดาว = ตอนประกาย ★ สายคม (kwan เลือก 10 ต.ค.)
 function fxStarSlash(at, d) { const c = LAB().find(x => x.file === 'star_slash'); if (c) labPlay(c.comp, at, d, at.f ? at.f.w : (IMG['mon/' + S.foe] || {}).width || 0); }
+const ULT_LAB = { 'คม': 'spirit_slash' };   // ไม้ตายสาย → preset แล็บ (kwan เลือก 10 ต.ค.: ฟันวิญญาณ = ไม้ตายสายคม)
 function labDemo(c) {   // ปุ่มแล็บในแท็บสกิล: เล่นที่มอนทุกตัวบนเวที ไม่มีดาเมจ (ยังไม่ผูกกับท่าไหน)
 	S.fx = []; S.flash.clear(); S.foeTint = null; S.tech = null;
 	banner('แล็บ · ' + c.comp.name, '#c9a6ff', false);
 	const foes = foeLayout(); for (const f of foes) labPlay(c.comp, f.pt, -1, f.w);
-	const tEnd = Math.max(...c.comp.layers.map(L => (L.start || 0) + (LAB_PARTS[L.part] ? LAB_PARTS[L.part].dur(L.params || {}) / (L.speed || 1) : 0)));
-	later(Math.min(0.6, tEnd * 0.3), () => { for (const f of foes) hitFlash('f' + f.i); });
+	later(Math.min(0.6, labLen(c.comp) * 0.3), () => { for (const f of foes) hitFlash('f' + f.i); });
 }
 function fxPierce(at, col, d) {
 	fx(FX_SEC, p => { const x = at.x - 10 * d + 20 * d * Math.min(1, p / 0.6), a = 1 - p * p;
@@ -2175,7 +2203,9 @@ const SAGA = {
 			for (let k = 0; k < 6; k++) { ctx.fillStyle = '#ffe050'; ctx.fillRect(head.x - 10 + ((k * 7 + Math.floor(t * 30)) % 20), head.y - 8 + ((k * 11) % 16), 2, 2); }
 			ctx.restore(); }));
 		later(0.85, () => { flash('#fff6d0', 0.8, 0.15); foeTint('#ff2a1a', 0.85, 0.9);
-			fx(0.55, p => { ctx.save(); ctx.globalAlpha = (p < 0.6 ? 0.8 : 0.8 * (1 - (p - 0.6) / 0.4)); ctx.fillStyle = '#c81e1e'; ctx.translate(c.x, c.y); ctx.rotate(-0.55);
+			const ulab = labComp(ULT_LAB['คม']);   // ฟันวิญญาณแทนวงรีแดงเดิม (kwan 10 ต.ค.)
+			if (ulab) for (const g of tg) labPlay(ulab, g, -1, g.f ? g.f.w : 0);
+			else fx(0.55, p => { ctx.save(); ctx.globalAlpha = (p < 0.6 ? 0.8 : 0.8 * (1 - (p - 0.6) / 0.4)); ctx.fillStyle = '#c81e1e'; ctx.translate(c.x, c.y); ctx.rotate(-0.55);
 				ctx.beginPath(); ctx.ellipse(0, 0, 70 * easeOut(Math.min(1, p / 0.3)), 9, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#ff9a6a'; ctx.beginPath(); ctx.ellipse(0, 0, 60 * easeOut(Math.min(1, p / 0.3)), 2.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); });
 			for (const g of tg) { hitFlash('f' + g.i); bounceNum(g, num, numCol); } shake(3, 0.3); });
 		later(1.45, () => { S.hero = { x: HERO.x, y: -70 }; heroTo({ x: HERO.x, y: HERO.y }, 0.2, easeIn); });
@@ -2242,7 +2272,9 @@ function playTech(t) {
 	const hitsFx = () => {
 		for (let h = 0; h < Math.max(1, +t.hits || 1); h++) for (const f of tg) {
 			const at = f.pt;
-			if (!cine) switch (t.school) { case 'คม': S.glim ? fxStarSlash(at, -1) : fxSlash(at, col, -1); break; case 'แทง': fxPierce(at, col, -1); break; case 'ทุบ': fxCrush(at, col); break; case 'ยิง': fxShoot(from, at, col); break; default: fxClaw(at, col, -1); }
+			const ulab = ult && ULT_LAB[t.school] && labComp(ULT_LAB[t.school]);
+			if (ulab) { if (h === 0) labPlay(ulab, at, -1, f.w); }   // ไม้ตายที่มี preset แล็บ: เล่นครั้งเดียวต่อเป้า (ซินีมาก็ซ้อนตอนกระทบ)
+			else if (!cine) switch (t.school) { case 'คม': S.glim ? fxStarSlash(at, -1) : fxSlash(at, col, -1); break; case 'แทง': fxPierce(at, col, -1); break; case 'ทุบ': fxCrush(at, col); break; case 'ยิง': fxShoot(from, at, col); break; default: fxClaw(at, col, -1); }
 			if (ult) burst(at, col);
 			hitFlash('f' + f.i);
 			floatNum(at, String(r.mid), AFF_COL(r), nth++, AFF_TAG(r));
