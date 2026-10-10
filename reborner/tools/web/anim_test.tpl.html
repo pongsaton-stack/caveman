@@ -179,6 +179,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
 			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></p>
+			<p class="seg" id="labSheet" role="group" aria-label="ซ้อนแล็บ VFX"></p>
 			<div class="clips" id="skGroups"></div>
 		</section>
 
@@ -622,6 +623,15 @@ function vxsLayer(it, t, Hx, Hy, T, foot, hits, col) {   // เวลา t = เ
 	else if (fam === 'DV') flip('DV_hit', HIT, 3, 6, T.x, foot + 2, { foot: true, glow: 0.12 });
 	for (const h of hits) { const d = t - h - 1; if (d >= 0 && d < 5) vxsDraw('spark', 0, c0, T.x, T.y, { a: 1 - d / 5 }); }   // ประกายตอนโดนทุกครั้ง
 }
+// ซ้อน preset แล็บบนท่าจากชีต (kwan 10 ต.ค. "เอามาปรับใช้ในแท็บสกิลจากชีต") — เลือกชุดเดียวใช้กับทุกท่า ไม่ผูกท่าเอง
+// เวลา: ชุดฟันเริ่ม 2 เฟรมก่อนกระทบ (ดาวกระทบแล็บขึ้น ~0.1 วิ) · รูนเพลิงเริ่มเฟรม 2 ให้แรงปะทะของมัน (0.55 วิ) ตรงจังหวะกระทบของท่า
+function labSheetLayer(c, L, under) {
+	if (!S.labSheet) return; const comp = labComp(S.labSheet); if (!comp) return;
+	const tg = IMG[L.target.key], key = S.labSheet + '|' + L.size.join('x'); c.labI = c.labI || {};
+	const inst = c.labI[key] || (c.labI[key] = labInst(comp, { x: L.target.x, y: L.target.foot - 22 }, -1, tg ? tg.width : 48));
+	const T = (L.f - (S.labSheet === 'fire_rune' ? VFX.HIT - 12 : VFX.HIT - 2)) * VFX.SEC;
+	for (const l of inst) { if (l.under !== under) continue; const t = T - l.start; if (t >= 0 && t < l.dur) l.draw(t * l.sp); }
+}
 function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (มุมซ้ายบนของ Rion) · pose · target · bg() · f (เฟรมของ VFX) · ตัวเลือกแนว RS3
 	const it = c.skill, f = L.f, t = vTime(f), fam = it.family, [W0, H0] = L.size, fx = IMG['skf/' + it.code], col = it.colors || ['#ffffff'];
 	const Hx = L.hand[0], Hy = L.hand[1], T = { x: L.target.x, y: L.target.foot - 22 }, HIT = VFX.HIT, REL = VFX.REL, rel = (t - REL) / (HIT - REL);
@@ -640,6 +650,7 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	const dm = L.dim ?? 0.5, dim = t < 3 ? 0 : t < REL ? dm * 0.2 * (t - 2) : t < HIT + 12 ? dm : t < HIT + 16 ? dm * (1 - (t - HIT - 12) / 4) : 0;
 	if (dim) { ctx.fillStyle = L.dimCol ? L.dimCol(dim) : `rgba(6,8,20,${dim})`; ctx.fillRect(-40, -40, W0 + 80, H0 + 80);
 		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = dim * 0.35; ctx.fillStyle = col[col.length - 1]; ctx.fillRect(-40, -40, W0 + 80, H0 * 0.62 + 40); ctx.restore(); }
+	labSheetLayer(c, L, true);   // วงพื้นแล็บ: หลังชั้นมืด (ไม่จาง) ใต้มอน
 	const cell = IMG['skc/' + it.code];
 	if (L.cell && cell) { const k = 40 / cell.height; ctx.globalAlpha = 0.9; ctx.drawImage(cell, 2, 2, Math.round(cell.width * k), 40); ctx.globalAlpha = 1; }
 	// รัศมีแสงหมุนหลังเป้า (หลังกระทบ)
@@ -712,7 +723,7 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	// ถ่านไฟลอยค้างหลังกระทบ
 	if (t > HIT && t < HIT + 18) { const r = vRng(vHash(it.code) + 21); for (let i = 0; i < 16; i++) { const ph = (t - HIT) / 18, sx0 = T.x - 40 + r() * 80, sp = 0.6 + r();
 		vfxDot(sx0 + Math.sin((t + i) * 0.5) * 3, T.y + 20 - ph * 40 * sp, 1, col[i % col.length], (1 - ph) * (0.5 + 0.5 * Math.sin(t * 1.3 + i))); } }
-	vxsLayer(it, t, Hx, Hy, T, L.target.foot, hits, col);
+	vxsLayer(it, t, Hx, Hy, T, L.target.foot, hits, col); labSheetLayer(c, L, false);
 	if (L.party) L.party(); rspr(L.pose, L.rion[0], L.rion[1]);
 	ctx.restore();
 	vfxText(VFX.TEXT[fam], T.x + 8, T.y - 30, HIT, f, col[0]);   // นอกกล้อง: ไม่ซูม/ไม่สั่น จึงไม่ล้นขอบ
@@ -1179,7 +1190,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
-	hero: { x: 168, y: 38 }, cine: true, saga: false, style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
+	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, vxs: true, rigW: null, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
 
@@ -2595,6 +2606,9 @@ function boot() {
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
 	for (const b of document.querySelectorAll('.rigBtn')) b.onclick = () => { RIG_ON = !RIG_ON; for (const x of document.querySelectorAll('.rigBtn')) x.setAttribute('aria-pressed', String(RIG_ON)); };
+	{ const box = $('labSheet'), opts = [['', 'แล็บ VFX: ปิด'], ...LAB().map(c => [c.file, c.comp.name])];
+		for (const [v, t] of opts) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = v; b.textContent = t; b.setAttribute('aria-pressed', String(v === S.labSheet));
+			b.onclick = () => { S.labSheet = v; for (const x of box.children) x.setAttribute('aria-pressed', String(x.dataset.v === v)); }; box.append(b); } }
 	for (const b of document.querySelectorAll('.vxsBtn')) b.onclick = () => { S.vxs = !S.vxs; for (const x of document.querySelectorAll('.vxsBtn')) x.setAttribute('aria-pressed', String(S.vxs)); };
 	for (const sc of Object.keys(FXDB.by_school)) {   // ไม้ตายสายละท่า: ท่าแรกใน techs.csv ที่ความชำนาญถึงขั้นไม้ตาย · เล่นแบบซินีมา
 		const t = DATA.techs.find(x => x.school === sc && +x.req_prof >= K.ULT_PROF); if (!t) continue;
