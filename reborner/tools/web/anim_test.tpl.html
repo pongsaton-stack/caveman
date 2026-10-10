@@ -778,6 +778,7 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	if (S.grid) drawGrid();
 }
 
+const rollHits = () => [ROLL.HIT, ROLL.ATK + VFX.HIT + 6 + VFX.STOP, ROLL.ATK + VFX.HIT + 12 + VFX.STOP];   // เฟรมกระทบ 3 ระลอก (= epic hits ใน vfxScene) → 32 · 40 · 46
 function rollView(c) {   // กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
 	const F = S.frame, f = F - ROLL.ATK, it = c.skill, rw = RIG_ON && rigWeapon(it), home = SKS.rion_at, land = [VFX.TARGET.x + 22 + ROLL.SKID, home[1]], stop = [land[0] - ROLL.SKID, land[1]];   // แตะพื้นแล้วไถลไปหยุดชิดขวาของเป้า
 	const arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h], ease = p => p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p);
@@ -790,7 +791,13 @@ function rollView(c) {   // กระโดดม้วน: Rion เคลื่
 		pose = kn && F >= ROLL.LAND - ROLL.WIND ? rigKey(kn, 3 + F - (ROLL.LAND - ROLL.WIND)) : tuck;   // ง้างดาบสองมือกลางอากาศก่อนแตะพื้น
 		for (let k = 1; k <= 3; k++) { const q = F - k * 1.5; if (q >= ROLL.UP) { const g = fly(q); trail.push({ x: g.xy[0], y: g.xy[1], rot: g.r, a: 0.3 - k * 0.08 }); } } }
 	if (F >= ROLL.LAND && F < ROLL.BACK) { const k = Math.min(1, (F - ROLL.LAND) / 4); pos = [lerp(land[0], stop[0], 1 - (1 - k) * (1 - k)), land[1]];   // แตะพื้น = ฟาดทันที แล้วไถลตามแรงส่ง
-		pose = kn ? rigKey(kn, rigVfx(f)) : rw ? rigKey(rw, rigVfx(f)) : heldPose(it, VFX.POSE[f] ?? 0); }
+		// ฟัน 3 ครั้งตรงฟันวิญญาณ 3 ระลอก (kwan 10 ต.ค. "จำนวนการฟันเท่ากับเอฟเฟค"): ลงตอนแตะพื้น → ตวัดขึ้นสวน (ระลอกกลับทิศ) → ง้างใหม่ ฟันลงปิดท้าย
+		//   ริก SL01K: 0–5 ง้าง (5 = ดาบชี้ไปหลังบน) · 6 ฟาดลง · 7–11 ตามแรงค้างลงต่ำ · ตวัดขึ้น = เล่นย้อน 9→3 ให้ดาบไปจบบนตอนกระทบ
+		const [H1, H2, H3] = rollHits(), seq = { [H1]: 6, [H1 + 1]: 7, [H1 + 2]: 8, [H1 + 3]: 9, [H1 + 4]: 9, [H1 + 5]: 10, [H2 - 2]: 9, [H2 - 1]: 6, [H2]: 3, [H2 + 1]: 3, [H2 + 2]: 2,
+			[H3 - 3]: 3, [H3 - 2]: 4, [H3 - 1]: 5, [H3]: 6, [H3 + 1]: 7, [H3 + 2]: 8, [H3 + 3]: 9 };
+		const kf = seq[F] ?? (F > H3 ? 10 : F > H2 ? 2 : 9);
+		if (F === H2 || F === H3) pos = [pos[0] - 2, pos[1]];   // พุ่งไปหน้านิดหนึ่งทุกครั้งที่ฟัน
+		pose = kn ? rigKey(kn, kf) : rw ? rigKey(rw, rigVfx(f)) : heldPose(it, VFX.POSE[f] ?? 0); }
 	else if (F >= ROLL.BACK && F <= ROLL.HOME) { const p = ease((F - ROLL.BACK) / (ROLL.HOME - ROLL.BACK)); pos = arc(p, stop, home, ROLL.BACK_H); rot = p * 2 * Math.PI; pose = tuck; }
 	else if (F > ROLL.HOME) pose = stand;   // ตีลังกาหลังกลับที่
 	if (F >= ROLL.POWER + 2 && F < ROLL.UP) pos = [pos[0] + (F % 2 ? 1 : -1), pos[1]];   // ตัวสั่นตอนเบ่ง
@@ -985,6 +992,7 @@ function rollSound(F) {
 	if (F === ROLL.POWER) AU_SFX.charge('SL');   // เสียงชาร์จเดิมของท่า ตรงจังหวะเบ่งพลัง
 	if (F === ROLL.LAND - ROLL.WIND) AU_SFX.release.SL();   // เสียงปล่อยเดิม (ลมฟัน + โลหะเฉือน) ตอนเงื้อดาบกลางอากาศ
 	if (F === ROLL.LAND + 1) AU_ROLL.skid();
+	const [, H2, H3] = rollHits(); if (F === H2 - 1 || F === H3 - 1) AU_SFX.release.SL();   // เสียงเหวี่ยงเดิมก่อนฟันครั้ง 2–3
 	if (F === ROLL.BACK) AU_ROLL.flip();
 }
 const AU_SFX = {
