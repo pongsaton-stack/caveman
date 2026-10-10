@@ -354,9 +354,10 @@ const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชา�
 	SHAKE: { SL: 3, PC: 3, CR: 7, BD: 4, ST: 3, DV: 6 }, GRAV: { CR: 0.45 }, TARGET: { x: 58, foot: 90, key: 'mon/M01' },
 	TEXT: { SL: 'ฉัวะ!!', PC: 'ฉึก!!', CR: 'ตูมมม!!', BD: 'ตุบ ตุบ ตุบ!!', ST: 'ปัง!!', DV: 'ครืนนน!!' } };   // ตัวหนังสือเสียงชุดเดียวกับไม้ตาย (ultimates.json sfx_text)
 // กระโดดม้วนหน้า (kwan 10 ต.ค.: "SL01-vfx เปลี่ยนจากยืนฟัน เป็นกระโดดม้วนหน้าหลายๆ รอบเป็นเส้นโค้ง แล้วฟันใส่มอนตอนถึงตัว")
-// 70 เฟรม: ย่อรวมพลัง 0–13 · ม้วน 3 รอบตามเส้นโค้ง 14–37 · ลงฟัน = กระทบ เฟรม 38 · ค้างดูฟันวิญญาณ · ตีลังกากลับ 58–69
-const ROLL = { N: 70, UP: 14, LAND: 38, BACK: 58, TURNS: 3, H: 42, BACK_H: 30 };
-ROLL.ATK = ROLL.LAND - 14;   // = LAND − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
+// 70 เฟรม: ย่อรวมพลัง 0–13 · ม้วน 3 รอบตามเส้นโค้ง 14–31 · ลงชันเข่า จับดาบสองมือ ง้างพาดบ่า 32–37 (kwan 10 ต.ค.) · ฟันเต็มแรง = กระทบ เฟรม 38 + บอลลูน "ตายซะ!!"
+// · ค้างคุกเข่าดูฟันวิญญาณ · ตีลังกากลับ 58–69 · ท่าชันเข่า = ริก SL01K (rion_rig.py --variants · ตัวฐานภาพทรุดเข่า west_k0)
+const ROLL = { N: 70, UP: 14, LAND: 32, HIT: 38, BACK: 58, TURNS: 3, H: 42, BACK_H: 30, SHOUT: 'ตายซะ!!' };
+ROLL.ATK = ROLL.HIT - 14;   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
 const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
 const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
 const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
@@ -426,7 +427,7 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // แนว RS3 — ท
 		const G = 'SL01 × ฟันวิญญาณ · อลังการ (70 เฟรมเท่ากัน)', vk = VFX_POSE_KEYS(it);
 		addClip(G, 'epic_rs3_SL01', 'SL01 · RS3 + ฟันวิญญาณ', Array.from({ length: RS3.N }, (_, f) => rs3Rion(it, f).key), VFX.SEC, { tab: 'sksheet', skill: it, rs3: true, epic: true });
 		addClip(G, 'epic_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ', Array.from({ length: RS3.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - RS3.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true });
-		addClip(G, 'roll_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน', Array.from({ length: ROLL.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - ROLL.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, atk: ROLL.ATK });
+		addClip(G, 'roll_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน ชันเข่าฟัน', Array.from({ length: ROLL.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - ROLL.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, atk: ROLL.ATK });
 	}
 }
 for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
@@ -782,11 +783,13 @@ function rollView(c) {   // กระโดดม้วน: Rion เคลื่
 	if (F < ROLL.UP) pose = F < 5 ? stand : tuck;   // ย่อตัวเตรียมกระโดด
 	else if (F < ROLL.LAND) { const cur = fly(F); pos = cur.xy; rot = cur.r; pose = tuck;
 		for (let k = 1; k <= 3; k++) { const q = F - k * 1.5; if (q >= ROLL.UP) { const g = fly(q); trail.push({ x: g.xy[0], y: g.xy[1], rot: g.r, a: 0.3 - k * 0.08 }); } } }
-	else if (F < ROLL.BACK) { pos = land; pose = rw ? rigKey(rw, rigVfx(f)) : heldPose(it, VFX.POSE[f] ?? 0); }   // ลงฟัน: ริกฟาดตรงกระทบ
+	else if (F < ROLL.BACK) { pos = land; const kn = rw && IMG['rig/' + rw + 'K_0'] ? rw + 'K' : rw;   // ลงชันเข่า: ง้าง 0–5 ก่อนกระทบ แล้วริกฟาดเฟรม 6 ตรงกระทบ
+		pose = kn ? rigKey(kn, F < ROLL.HIT ? Math.round((F - ROLL.LAND) * 5 / (ROLL.HIT - 1 - ROLL.LAND)) : rigVfx(f)) : heldPose(it, VFX.POSE[f] ?? 0); }
 	else { const p = ease((F - ROLL.BACK) / (ROLL.N - 1 - ROLL.BACK)); pos = arc(p, land, home, ROLL.BACK_H); rot = p * 2 * Math.PI; pose = tuck; }   // ตีลังกาหลังกลับที่
 	const hand = [SKS.hand[0] - home[0] + pos[0], SKS.hand[1] - home[1] + pos[1]];
 	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: VFX.TARGET, bg: drawBg, cell: true,
-		over: F >= 2 && F < ROLL.UP + 4 ? () => rs3Bubble((it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5) : null });
+		over: () => { if (F >= 2 && F < ROLL.UP + 4) rs3Bubble((it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
+			const s0 = ROLL.HIT - 2; if (F >= s0 && F < s0 + 16) rs3Bubble(ROLL.SHOUT, land[0] + 40, land[1] + 6, F - s0, F < s0 + 11 ? 1 : 1 - (F - s0 - 10) / 6); } });
 }
 function vfxView(c) {   // แบบเวทีทดสอบ: Rion ขวา เป้า M01 ซ้าย ช่องต้นฉบับมุมซ้ายบน · epic = เลื่อนท่าไปเริ่มเฟรม 28 (ก่อนหน้านั้นยืนรวมพลัง)
 	if (c.roll) return rollView(c);

@@ -43,6 +43,10 @@ KEYS = {
 		(0.5, -4, 0, (20, 41), (14, 41), 180), (0.66, -4, 0, (20, 41), (15, 41), 180), (1.0, 0, 0, (24, 44), (22, 41), 180)],
 	'point': [(0.0, 0, 0, (24, 45), (23, 47), 0), (0.25, 0, 0, (24, 41), (23, 37), 0), (0.45, -2, 0, (20, 41), (15, 40), 0),
 		(0.7, -2, 0, (20, 41), (15, 40), 0), (1.0, 0, 0, (24, 45), (23, 47), 0)],
+	# ชันเข่าฟันสองมือ (kwan 10 ต.ค. "ถึงตัวมอน จับดาบสองมือ ชันเข่าข้างนึง ฟันเต็มแรง") — ใช้หลังกระโดดม้วนลงหน้าเป้า · จบท่าค้างคุกเข่า
+	#   ตัวฐาน = ภาพทรุดเข่า west_k0 (KNEEL_BASE) · ง้างพาดบ่า ดาบอยู่หน้าตัว (ชูเหนือหัวไม่ได้ หัวโตบังหมด) → ฟาดลงหน้า → ค้างคุกเข่า
+	'kneel2': [(0.0, 0, 0, (26, 44), (25, 41), 115), (0.35, 1, 0, (28, 42), (28, 38), 50), (0.5, -2, 0, (21, 47), (17, 48), 205),
+		(0.62, -2, 0, (21, 48), (17, 50), 235), (1.0, -1, 0, (21, 48), (18, 49), 225)],
 }
 # สรีระต่อคีย์ (kwan 6 ต.ค. "ร่างกายแข็ง ไม่เป็นธรรมชาติ ปรับสรีระให้เข้ากับทุกแอกชั่น") — เวลาเดียวกับ KEYS ทีละตัว
 #   lean เอนช่วงบน (+ = ไปหลัง/ขวา − = โถมไปหน้า) · sq ย่อเข่า (แถว) · st ก้าวขา (+1 = ขาหน้าก้าวไปหน้าเต็ม −1 = ถอยขาหน้า) ·
@@ -56,13 +60,16 @@ BODY = {
 	'aim': [Z, B(sq=1, st=0.6), B(lean=1, sq=1, st=0.8, hx=-1), B(lean=3, sq=1, st=0.8, hd=1, pk=1), B(lean=1, sq=1, st=0.8, hx=-1), Z],
 	'punch': [B(sq=1, st=0.5), B(sq=1, st=0.5), B(lean=2, sq=2, st=-0.3, ch=1, pk=-1), B(lean=-3, sq=1, st=1, hx=-1, pk=1), B(lean=-2, sq=1, st=1, hd=1), B(sq=1, st=0.5)],
 	'point': [Z, B(lean=1, st=0.4, ch=-1), B(lean=-2, sq=1, st=0.9, hx=-1, pk=1), B(lean=-2, sq=1, st=0.9), Z],
+	'kneel2': [B(st=0), B(st=0, lean=2, pk=-1), B(st=0, lean=-3, hd=1, hx=-1, pk=1), B(st=0, lean=-3, hd=1, pk=1), B(st=0, lean=-2, hd=1)],
 }
 # มือหลังจับด้ามด้วยในท่าสองมือ (ชดเชยจากมือหน้า) · ประทับปืน มือหลังประคองใต้ลำ
-BACK = {'swing2': (5, 0), 'aim': (5, 1)}
+BACK = {'swing2': (5, 0), 'aim': (5, 1), 'kneel2': 'hilt'}   # hilt = มือหลังจับด้ามถัดลงไปตามแนวด้าม (ดาบตั้ง/เฉียง)
+KNEEL_BASE = {'kneel2': ('west_k0.png', (-1, 4))}   # ตัวฐานต่อท่า + ไหล่เลื่อน (dx, dy) เทียบภาพยืน · ท่านี้อาวุธอยู่หน้าตัวเสมอ
 BEHIND_ANG = (15, 110)   # อาวุธชี้ขึ้น/ไปหลัง (มุมจอในช่วงนี้) = อยู่หลังตัว (พาดบ่า · ง้าง) · รอบแรกใช้ช่วงเวลา แล้วอาวุธหายหลังหัว
 FAM = {'SL': 'slash', 'PC': 'thrust', 'CR': 'swing2', 'ST': 'aim', 'BD': 'punch', 'DV': 'point'}
 W_FAM = {'W301': 'SL', 'W302': 'CR', 'W303': 'SL', 'W304': 'CR', 'W305': 'SL', 'W306': 'ST', 'W307': 'CR', 'W308': 'CR', 'W309': 'CR', 'W310': 'ST'}
 LEN_K = {'SL': 0.72, 'PC': 0.95, 'CR': 0.8, 'ST': 0.6}   # ความยาวในมือ / ความยาวรูปในไอคอน 32px
+VARIANTS = [('SL01', 'kneel2', 'K')]   # ท่าพิเศษ: <code><suffix>_<i>.png ไม่อยู่ใน index (rigCodes ไม่เห็น) · หน้าเทสเรียกชื่อตรง
 SAMPLES = ['SL01', 'SL30', 'PC01', 'PC30', 'CR01', 'CR30', 'ST01', 'ST30', 'BD01', 'BD30', 'DV07', 'DV29', 'W301', 'W309']
 
 def ease(p): return p * p * (3 - 2 * p)
@@ -152,8 +159,10 @@ def smear(im, hand, a0, a1, L):
 			x, y = tip(hand, a0 + d * t, L * r); x, y = int(round(x)), int(round(y))
 			if 0 <= x < 64 and 0 <= y < 64 and not p[x, y][3]: p[x, y] = SMEAR_COL
 
-def render(code, icon):
-	fam = W_FAM.get(code, code[:2]); group = FAM[fam]; base = G.remove_front_arm(Image.open(G.SRC).convert('RGBA'))
+def render(code, icon, group=None):
+	fam = W_FAM.get(code, code[:2]); group = group or FAM[fam]
+	kb = KNEEL_BASE.get(group); base = G.remove_front_arm(Image.open(os.path.join(os.path.dirname(G.SRC), kb[0]) if kb else G.SRC).convert('RGBA'))
+	sd = kb[1] if kb else (0, 0); SHF, SHB = (G.SH_F[0] + sd[0], G.SH_F[1] + sd[1]), (G.SH_B[0] + sd[0], G.SH_B[1] + sd[1])
 	frames = []; prev = None
 	grip, idir, ilen = axis(icon) if fam not in ('BD', 'DV') else ((0, 0), 0, 0)
 	L = max(12.0, ilen * LEN_K.get(fam, 0.8))
@@ -166,7 +175,7 @@ def render(code, icon):
 		body = G.shift(body_pose(raw, bd), dxi)
 		if dyi: body = body.transform(body.size, Image.AFFINE, (1, 0, 0, 0, 1, -dyi), Image.NEAREST)
 		mv = lambda q: (lambda r: (ri(r[0]) + dxi, ri(r[1]) + dyi))(body_pt(q, bd))
-		sh, el, hd = mv(G.SH_F), mv(elbow), mv(hand)
+		sh, el, hd = mv(SHF), mv(elbow), mv(hand)
 		if fam not in ('DV',): hd = tuple(ri(v) for v in P64.reach(sh, hd))   # มือไม่เกินความยาวแขน (อาวุธติดตามมือ)
 		el = P64.ik(sh, hd) if fam not in ('BD', 'DV') else el; el = (ri(el[0]), ri(el[1]))   # ศอกหาเองจากไหล่-มือ (แขนยาวคงที่ ไม่ยืดหด)
 		out = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
@@ -180,11 +189,11 @@ def render(code, icon):
 			out.alpha_composite(body); P64.draw_arm_soft(out, sh, el, hd); glove(out, icon, hd, 0.42 <= t <= 0.7)
 		else:
 			spr, (cx, cy) = weapon_sprite(icon, grip, idir, L, ang); at = (int(round(hd[0] - cx)), int(round(hd[1] - cy)))
-			behind = BEHIND_ANG[0] < ang % 360 < BEHIND_ANG[1] or math.cos(math.radians(ang)) > 0.05   # ชี้ไปหลัง (ขวา) ทุกมุม = หลังตัว (ค้อนช้อนผ่านล่างไปหลังเคยลอยทับกลางตัว)
+			behind = not kb and (BEHIND_ANG[0] < ang % 360 < BEHIND_ANG[1] or math.cos(math.radians(ang)) > 0.05)   # ชี้ไปหลัง (ขวา) ทุกมุม = หลังตัว (ค้อนช้อนผ่านล่างไปหลังเคยลอยทับกลางตัว)
 			if behind: out.alpha_composite(spr, at)
 			out.alpha_composite(body)
 			if group in BACK:
-				bx, by = BACK[group]; sb = mv(G.SH_B); hb = tuple(ri(v) for v in P64.reach(sb, (hd[0] + bx, hd[1] + by))); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True, w_upper=3)
+				bx, by = BACK[group] if BACK[group] != 'hilt' else (-4 * math.cos(math.radians(ang)), 4 * math.sin(math.radians(ang))); sb = mv(SHB); hb = tuple(ri(v) for v in P64.reach(sb, (hd[0] + bx, hd[1] + by))); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True, w_upper=3)
 			if not behind: out.alpha_composite(spr, at)
 			P64.draw_arm_soft(out, sh, el, hd)
 			if prev is not None and abs((ang - prev + 540) % 360 - 180) > SMEAR_DEG: smear(out, hd, prev, ang, L)
@@ -194,6 +203,15 @@ def render(code, icon):
 
 def main():
 	idx = {x['code']: x for x in json.load(open(os.path.join(SHEET, 'index.json'), encoding='utf-8'))['items']}
+	if '--variants' in sys.argv:
+		for code, group, suf in VARIANTS:
+			fr = render(code, Image.open(os.path.join(SHEET, code + '.png')).convert('RGBA'), group)
+			for i, im in enumerate(fr): im.save(os.path.join(OUT, f'{code}{suf}_{i}.png'))
+			pv = Image.new('RGBA', (64 * N, 64), (58, 62, 70, 255))
+			for i, im in enumerate(fr): pv.alpha_composite(im, (64 * i, 0))
+			pv.resize((pv.width * 3, pv.height * 3), Image.NEAREST).save(os.path.join(ROOT, f'docs/art-bible/weapons/rion_rig_{code}{suf}.png'))
+			print(code + suf, group, N, 'เฟรม')
+		return
 	codes = list(idx) if '--all' in sys.argv else [c for c in SAMPLES if c in idx]
 	os.makedirs(OUT, exist_ok=True); open(os.path.join(OUT, '.gdignore'), 'a').close()
 	items = []; rows = []
