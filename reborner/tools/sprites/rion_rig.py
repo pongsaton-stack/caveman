@@ -45,8 +45,11 @@ KEYS = {
 		(0.7, -2, 0, (20, 41), (15, 40), 0), (1.0, 0, 0, (24, 45), (23, 47), 0)],
 	# ชันเข่าฟันสองมือ (kwan 10 ต.ค. "ถึงตัวมอน จับดาบสองมือ ชันเข่าข้างนึง ฟันเต็มแรง") — ใช้หลังกระโดดม้วนลงหน้าเป้า · จบท่าค้างคุกเข่า
 	#   ตัวฐาน = ภาพทรุดเข่า west_k0 (KNEEL_BASE) · ง้างพาดบ่า ดาบอยู่หน้าตัว (ชูเหนือหัวไม่ได้ หัวโตบังหมด) → ฟาดลงหน้า → ค้างคุกเข่า
-	'kneel2': [(0.0, 0, 0, (26, 44), (25, 41), 115), (0.35, 1, 0, (28, 42), (28, 38), 50), (0.5, -2, 0, (21, 47), (17, 48), 205),
+	'kneel2': [(0.0, 0, 0, (26, 44), (26, 41), 60), (0.35, 1, 0, (29, 43), (30, 40), 25),   # ง้างไปหลังเหนือเป้ ใบดาบไม่พาดหน้า
+		 (0.5, -2, 0, (21, 47), (17, 48), 205),
 		(0.62, -2, 0, (21, 48), (17, 50), 235), (1.0, -1, 0, (21, 48), (18, 49), 225)],
+	# ขดตัวม้วนกลางอากาศ (kwan 10 ต.ค. "ปรับท่าม้วนให้เป็นท่าขดตัว") — ตัวฐานทรุดเข่า บีบลำตัว ก้มหัว มือกอดด้ามดาบแนบเข่า ใบชี้ไปหลังเลียบตัว
+	'tuck': [(0.0, 0, 0, (22, 49), (21, 51), 345), (1.0, 0, 0, (22, 49), (21, 51), 345)],
 }
 # สรีระต่อคีย์ (kwan 6 ต.ค. "ร่างกายแข็ง ไม่เป็นธรรมชาติ ปรับสรีระให้เข้ากับทุกแอกชั่น") — เวลาเดียวกับ KEYS ทีละตัว
 #   lean เอนช่วงบน (+ = ไปหลัง/ขวา − = โถมไปหน้า) · sq ย่อเข่า (แถว) · st ก้าวขา (+1 = ขาหน้าก้าวไปหน้าเต็ม −1 = ถอยขาหน้า) ·
@@ -60,16 +63,17 @@ BODY = {
 	'aim': [Z, B(sq=1, st=0.6), B(lean=1, sq=1, st=0.8, hx=-1), B(lean=3, sq=1, st=0.8, hd=1, pk=1), B(lean=1, sq=1, st=0.8, hx=-1), Z],
 	'punch': [B(sq=1, st=0.5), B(sq=1, st=0.5), B(lean=2, sq=2, st=-0.3, ch=1, pk=-1), B(lean=-3, sq=1, st=1, hx=-1, pk=1), B(lean=-2, sq=1, st=1, hd=1), B(sq=1, st=0.5)],
 	'point': [Z, B(lean=1, st=0.4, ch=-1), B(lean=-2, sq=1, st=0.9, hx=-1, pk=1), B(lean=-2, sq=1, st=0.9), Z],
+	'tuck': [B(st=0, sq=7, lean=-6, ch=1, hd=2, hx=-2), B(st=0, sq=7, lean=-6, ch=1, hd=2, hx=-2)],
 	'kneel2': [B(st=0), B(st=0, lean=2, pk=-1), B(st=0, lean=-3, hd=1, hx=-1, pk=1), B(st=0, lean=-3, hd=1, pk=1), B(st=0, lean=-2, hd=1)],
 }
 # มือหลังจับด้ามด้วยในท่าสองมือ (ชดเชยจากมือหน้า) · ประทับปืน มือหลังประคองใต้ลำ
 BACK = {'swing2': (5, 0), 'aim': (5, 1), 'kneel2': 'hilt'}   # hilt = มือหลังจับด้ามถัดลงไปตามแนวด้าม (ดาบตั้ง/เฉียง)
-KNEEL_BASE = {'kneel2': ('west_k0.png', (-1, 4))}   # ตัวฐานต่อท่า + ไหล่เลื่อน (dx, dy) เทียบภาพยืน · ท่านี้อาวุธอยู่หน้าตัวเสมอ
+KNEEL_BASE = {'kneel2': ('west_k0.png', (-1, 4)), 'tuck': ('west_k0.png', (-1, 4))}   # ตัวฐานต่อท่า + ไหล่เลื่อน (dx, dy) เทียบภาพยืน · ท่านี้อาวุธอยู่หน้าตัวเสมอ
 BEHIND_ANG = (15, 110)   # อาวุธชี้ขึ้น/ไปหลัง (มุมจอในช่วงนี้) = อยู่หลังตัว (พาดบ่า · ง้าง) · รอบแรกใช้ช่วงเวลา แล้วอาวุธหายหลังหัว
 FAM = {'SL': 'slash', 'PC': 'thrust', 'CR': 'swing2', 'ST': 'aim', 'BD': 'punch', 'DV': 'point'}
 W_FAM = {'W301': 'SL', 'W302': 'CR', 'W303': 'SL', 'W304': 'CR', 'W305': 'SL', 'W306': 'ST', 'W307': 'CR', 'W308': 'CR', 'W309': 'CR', 'W310': 'ST'}
 LEN_K = {'SL': 0.72, 'PC': 0.95, 'CR': 0.8, 'ST': 0.6}   # ความยาวในมือ / ความยาวรูปในไอคอน 32px
-VARIANTS = [('SL01', 'kneel2', 'K')]   # ท่าพิเศษ: <code><suffix>_<i>.png ไม่อยู่ใน index (rigCodes ไม่เห็น) · หน้าเทสเรียกชื่อตรง
+VARIANTS = [('SL01', 'kneel2', 'K'), ('SL01', 'tuck', 'T')]   # ท่าพิเศษ: <code><suffix>_<i>.png ไม่อยู่ใน index (rigCodes ไม่เห็น) · หน้าเทสเรียกชื่อตรง
 SAMPLES = ['SL01', 'SL30', 'PC01', 'PC30', 'CR01', 'CR30', 'ST01', 'ST30', 'BD01', 'BD30', 'DV07', 'DV29', 'W301', 'W309']
 
 def ease(p): return p * p * (3 - 2 * p)
@@ -193,8 +197,14 @@ def render(code, icon, group=None):
 			if behind: out.alpha_composite(spr, at)
 			out.alpha_composite(body)
 			if group in BACK:
-				bx, by = BACK[group] if BACK[group] != 'hilt' else (-4 * math.cos(math.radians(ang)), 4 * math.sin(math.radians(ang))); sb = mv(SHB); hb = tuple(ri(v) for v in P64.reach(sb, (hd[0] + bx, hd[1] + by))); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True, w_upper=3)
+				bx, by = BACK[group] if BACK[group] != 'hilt' else (-5 * math.cos(math.radians(ang)), 5 * math.sin(math.radians(ang))); sb = mv(SHB); hb = tuple(ri(v) for v in P64.reach(sb, (hd[0] + bx, hd[1] + by))); eb = P64.ik(sb, hb); G.draw_arm(out, sb, (ri(eb[0]), ri(eb[1])), hb, back=True, w_upper=3)
 			if not behind: out.alpha_composite(spr, at)
+			if BACK.get(group) == 'hilt':   # กำปั้นมือหลังทับด้าม (ที่ 64px มือหลังโดนใบดาบบังหมด มองไม่ออกว่าจับสองมือ)
+				px = out.load()
+				for dx2 in (0, 1):
+					for dy2 in (0, 1):
+						q = (hb[0] + dx2 - 1, hb[1] + dy2 - 1)
+						if 0 <= q[0] < 64 and 0 <= q[1] < 64: px[q] = (G.SKIN_D if dy2 else G.SKIN) + (255,)
 			P64.draw_arm_soft(out, sh, el, hd)
 			if prev is not None and abs((ang - prev + 540) % 360 - 180) > SMEAR_DEG: smear(out, hd, prev, ang, L)
 			prev = ang

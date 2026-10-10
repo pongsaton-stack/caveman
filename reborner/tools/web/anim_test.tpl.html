@@ -356,7 +356,7 @@ const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชา�
 // กระโดดม้วนหน้า (kwan 10 ต.ค.: "SL01-vfx เปลี่ยนจากยืนฟัน เป็นกระโดดม้วนหน้าหลายๆ รอบเป็นเส้นโค้ง แล้วฟันใส่มอนตอนถึงตัว")
 // 70 เฟรม: ย่อรวมพลัง 0–13 · ม้วน 3 รอบตามเส้นโค้ง 14–31 (3 เฟรมท้ายง้างดาบกลางอากาศ) · แตะพื้นชันเข่า = ฟันเต็มแรงทันที เฟรม 32 ไม่ชะงัก (kwan 10 ต.ค. "ใช้โมเมนตัมที่กระโดดมา")
 // + ไถลต่อ SKID px ตามแรงส่ง · บอลลูน "ตายซะ!!" · ค้างคุกเข่าดูฟันวิญญาณ · ตีลังกากลับ 58–69 · ท่าชันเข่า = ริก SL01K (rion_rig.py --variants · ตัวฐานภาพทรุดเข่า west_k0)
-const ROLL = { N: 70, UP: 14, LAND: 32, HIT: 32, BACK: 58, TURNS: 3, H: 42, BACK_H: 30, SKID: 7, WIND: 3, SHOUT: 'ตายซะ!!' };
+const ROLL = { N: 70, UP: 14, LAND: 32, HIT: 32, BACK: 50, HOME: 61, TURNS: 3, H: 42, BACK_H: 30, SKID: 7, WIND: 3, SHOUT: 'ตายซะ!!' };   // คุกเข่าค้าง 32–49 (เดิมถึง 57) · ตีลังกากลับ 50–61 · ยืนที่เดิม 62–69
 ROLL.ATK = ROLL.HIT - 14;   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
 const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
 const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
@@ -656,13 +656,14 @@ function epicPlan(c, L, comp, at, tw) {
 		{ part: 'ground', params: { style: '1', pal, radius: 1.3, glow: 2.2, wobble: 0.75, centerGlow: 0.6, halo: true, life, seed: 3 } },
 		{ part: 'runes', params: { pal, radius: 1.3, glow: 2.4, spin: 1.2, life, seed: 9 } },
 		{ part: 'rise', params: { count: 18, radius: 1.1, height: 2.8, life, pal, glow: 2.2, seed: 4 } } ] };
+	const soft = { layers: comp.layers.filter(l => l.part === 'slash').map(l => ({ ...l, params: { ...l.params, _flashK: 0.45 } })) };   // ระลอก 2–3: เฉพาะรอยฟัน ดาววาบเล็กลง ไม่มีแสงวาบ+ควัน/สายฟ้าซ้ำ
 	const bolts = { layers: comp.layers.filter(l => l.part === 'skybolts').map(l => ({ ...l, start: 0, params: { ...l.params, count: 6, radius: 1.6 } })) };
 	return [
 		[c0, () => labInst(charge, { x: r.x + 32, y: r.y + 62 - 1.3 * LAB_COS * 20 }, -1, 48)],
 		[VFX.REL - 5, () => labInst(bolts, at, -1, tw)],
 		[H - 2, () => labInst(comp, at, -1, tw)],
-		[H + 6 + ST - 2, () => labInst(comp, at, 1, tw * 1.35)],
-		[H + 12 + ST - 2, () => labInst(comp, at, -1, tw * 1.9)],
+		[H + 6 + ST - 2, () => labInst(soft, at, 1, tw * 1.35)],
+		[H + 12 + ST - 2, () => labInst(soft, at, -1, tw * 1.9)],
 	];
 }
 function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (มุมซ้ายบนของ Rion) · pose · target · bg() · f (เฟรมของ VFX) · ตัวเลือกแนว RS3
@@ -767,9 +768,10 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	if (c.epic) { vfxText('ฉัวะ!!', T.x - 12, T.y - 40, HIT + 6 + VFX.STOP, f, '#c9a6ff'); vfxText('ฟันวิญญาณ!!!', T.x + 2, T.y - 34, HIT + 12 + VFX.STOP, f, '#ffffff'); }
 	// หลังวาดฉาก: ภาพแยกสี RGB ตอนกระทบ + จอวาบ
 	if (fsince < 3) { VFX_OC.width = W0; VFX_OC.height = H0; VFX_OC.getContext('2d').drawImage(cv, 0, 0);
-		ctx.save(); ctx.globalAlpha = fsince ? 0.16 : 0.28;   // เงาซ้อนเหลื่อมซ้าย-ขวา (บวกแสงทั้งจอบนพื้นสว่างจะขาวโพลน)
+		const fk = c.epic && fsince0 >= 3 ? 0.4 : 1;   // epic: ระลอก 2–3 วาบ/ภาพซ้อนแค่ 40% (เดิมจอขาวโพลน)
+		ctx.save(); ctx.globalAlpha = (fsince ? 0.16 : 0.28) * fk;   // เงาซ้อนเหลื่อมซ้าย-ขวา (บวกแสงทั้งจอบนพื้นสว่างจะขาวโพลน)
 		ctx.drawImage(VFX_OC, -3 + fsince, 0); ctx.drawImage(VFX_OC, 3 - fsince, 0); ctx.restore(); }
-	if (fsince < 3) { ctx.fillStyle = `rgba(255,255,255,${[0.22, 0.1, 0.04][fsince]})`; ctx.fillRect(0, 0, W0, H0); }
+	if (fsince < 3) { ctx.fillStyle = `rgba(255,255,255,${[0.22, 0.1, 0.04][fsince] * (c.epic && fsince0 >= 3 ? 0.4 : 1)})`; ctx.fillRect(0, 0, W0, H0); }
 	if (L.over) L.over();
 	if (S.grid) drawGrid();
 }
@@ -777,19 +779,28 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 function rollView(c) {   // กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
 	const F = S.frame, f = F - ROLL.ATK, it = c.skill, rw = RIG_ON && rigWeapon(it), home = SKS.rion_at, land = [VFX.TARGET.x + 22 + ROLL.SKID, home[1]], stop = [land[0] - ROLL.SKID, land[1]];   // แตะพื้นแล้วไถลไปหยุดชิดขวาของเป้า
 	const arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h], ease = p => p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p);
-	const tuck = rw ? rigKey(rw, 4) : heldPose(it, 1), stand = rw ? rigKey(rw, 0) : heldPose(it, 0);
+	const tuck = rw && IMG['rig/' + rw + 'T_0'] ? rigKey(rw + 'T', 0) : rw ? rigKey(rw, 4) : heldPose(it, 1), stand = rw ? rigKey(rw, 0) : heldPose(it, 0);   // ม้วน = ท่าขดตัว SL01T
 	const fly = q => { const p = ease(Math.max(0, Math.min(1, (q - ROLL.UP) / (ROLL.LAND - ROLL.UP)))); return { xy: arc(p, home, land, ROLL.H), r: -p * ROLL.TURNS * 2 * Math.PI }; };
 	let pos = home, rot = 0, pose = stand; const trail = [];
 	const kn = rw && IMG['rig/' + rw + 'K_0'] ? rw + 'K' : null;
-	if (F < ROLL.UP) pose = F < 5 ? stand : tuck;   // ย่อตัวเตรียมกระโดด
+	if (F < ROLL.UP) pose = F < 5 ? stand : kn ? rigKey(kn, 0) : tuck;   // ย่อตัวเตรียมกระโดด (ท่าทรุดเข่า ไม่ใช่ขดตัว)
 	if (F >= ROLL.UP && F < ROLL.LAND) { const cur = fly(F); pos = cur.xy; rot = cur.r;
 		pose = kn && F >= ROLL.LAND - ROLL.WIND ? rigKey(kn, 3 + F - (ROLL.LAND - ROLL.WIND)) : tuck;   // ง้างดาบสองมือกลางอากาศก่อนแตะพื้น
 		for (let k = 1; k <= 3; k++) { const q = F - k * 1.5; if (q >= ROLL.UP) { const g = fly(q); trail.push({ x: g.xy[0], y: g.xy[1], rot: g.r, a: 0.3 - k * 0.08 }); } } }
 	if (F >= ROLL.LAND && F < ROLL.BACK) { const k = Math.min(1, (F - ROLL.LAND) / 4); pos = [lerp(land[0], stop[0], 1 - (1 - k) * (1 - k)), land[1]];   // แตะพื้น = ฟาดทันที แล้วไถลตามแรงส่ง
 		pose = kn ? rigKey(kn, rigVfx(f)) : rw ? rigKey(rw, rigVfx(f)) : heldPose(it, VFX.POSE[f] ?? 0); }
-	else if (F >= ROLL.BACK) { const p = ease((F - ROLL.BACK) / (ROLL.N - 1 - ROLL.BACK)); pos = arc(p, stop, home, ROLL.BACK_H); rot = p * 2 * Math.PI; pose = tuck; }   // ตีลังกาหลังกลับที่
+	else if (F >= ROLL.BACK && F <= ROLL.HOME) { const p = ease((F - ROLL.BACK) / (ROLL.HOME - ROLL.BACK)); pos = arc(p, stop, home, ROLL.BACK_H); rot = p * 2 * Math.PI; pose = tuck; }
+	else if (F > ROLL.HOME) pose = stand;   // ตีลังกาหลังกลับที่
 	const hand = [SKS.hand[0] - home[0] + pos[0], SKS.hand[1] - home[1] + pos[1]];
-	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: VFX.TARGET, bg: drawBg, cell: true,
+	const foot = home[1] + 62, dust = (x, y, r, a) => { if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#cbb79a'; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.55, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#e6d8c0'; ctx.beginPath(); ctx.ellipse(x - r * 0.25, y - r * 0.2, r * 0.55, r * 0.3, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); };
+	const under = () => {   // ฝุ่นตอนกระโดด/แตะพื้น/ไถล + รอยลากเข่าบนพื้น (ใต้ตัวละคร)
+		const kick = F - ROLL.UP; if (kick >= 0 && kick < 8) for (let i = 0; i < 4; i++) dust(home[0] + 30 + (i - 1.5) * 7 + kick * (i - 1.5), foot - kick * 0.6, 3 + kick * 0.6, 0.7 * (1 - kick / 8));
+		const d = F - ROLL.LAND; if (d >= 0 && d < 16) {
+			const sx = pos[0] + 34;   // ใต้เข่า
+			ctx.save(); ctx.globalAlpha = 0.55 * (1 - d / 16); ctx.fillStyle = '#7d6a55'; ctx.fillRect(Math.round(stop[0] + 30), foot - 1, Math.round(sx - stop[0] - 30 + Math.min(d, 4) * 2), 1); ctx.restore();   // รอยลาก
+			for (let i = 0; i < 6; i++) { const q = d - i * 0.7; if (q < 0) continue; dust(sx + 6 + i * 3 + q * 1.2, foot - 2 - q * 0.8 - (i % 2) * 2, 2.5 + q * 0.7, 0.75 * (1 - q / 12)); }
+		} };
+	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: VFX.TARGET, bg: drawBg, cell: true, under,
 		over: () => { if (F >= 2 && F < ROLL.UP + 4) rs3Bubble((it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
 			const s0 = ROLL.HIT - 2; if (F >= s0 && F < s0 + 16) rs3Bubble(ROLL.SHOUT, stop[0] + 40, stop[1] + 6, F - s0, F < s0 + 11 ? 1 : 1 - (F - s0 - 10) / 6); } });
 }
@@ -932,6 +943,42 @@ function auTone(dur, wave, f0, f1, peak, delay = 0, attack = 0.004, o = {}) { co
 	let node = os; if (o.lp) { const fl = ac.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = o.lp; fl.Q.value = o.q || 1; os.connect(fl); node = fl; }
 	auEnv(g, t0, attack, peak, dur); node.connect(g); auDest(g, o); os.start(t0); os.stop(t0 + dur + 0.05); }
 // เสียงสกิล — หนักและดุ: ซับเบส + หัวกระแทกแตกพร่า (drive) + ห้องก้อง · ไม่มีเสียงกริ๊ง/ระฆังใส
+// เสียงท่ากระโดดม้วน (kwan 10 ต.ค. "ปรับมาทั้ง 6 อย่าง") — สังเคราะห์ทั้งหมด ไม่มีไฟล์เสียง
+// เสียงตะโกน "ตายซะ" = เสียงสังเคราะห์ formant เลียนจังหวะ 2 พยางค์ (ต-าย · ซ-ะ) ไม่ใช่เสียงพูดจริง (ต้องอัดเสียงคนจริงถ้าจะให้ชัด)
+function auYell(syl, delay = 0) {
+	const { ac } = AU, t0 = ac.currentTime + delay;
+	for (const [st, len, f0, f1, vow, noise] of syl) {   // พยางค์: เริ่ม · ยาว · pitch ต้น→ท้าย · formant [F1,F2,F2ท้าย] · เสียงลม (s/t)
+		if (noise) auNoise(noise[1], noise[0] === 's' ? 'highpass' : 'bandpass', noise[0] === 's' ? 4200 : 1800, noise[0] === 's' ? 6500 : 900, noise[0] === 's' ? 0.35 : 0.8, noise[0] === 's' ? 1 : 2, delay + st, { verb: false });
+		const os = ac.createOscillator(), g = ac.createGain(), sh = ac.createWaveShaper(), cur = new Float32Array(256);
+		for (let i = 0; i < 256; i++) { const x = i / 128 - 1; cur[i] = Math.tanh(x * 2.2); } sh.curve = cur;
+		os.type = 'sawtooth'; const a = t0 + st + (noise ? noise[1] * 0.6 : 0);
+		os.frequency.setValueAtTime(f0, a); os.frequency.linearRampToValueAtTime(f1, a + len);
+		const vib = ac.createOscillator(), vg = ac.createGain(); vib.frequency.value = 7; vg.gain.value = 6; vib.connect(vg); vg.connect(os.frequency);
+		g.gain.setValueAtTime(0.0001, a); g.gain.exponentialRampToValueAtTime(0.5, a + 0.02); g.gain.setValueAtTime(0.5, a + len * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, a + len);
+		os.connect(sh); sh.connect(g);
+		for (const [k, q, amp] of [[0, 6, 1], [1, 9, 0.6], [2, 12, 0.25]]) { const bp = ac.createBiquadFilter(), bg = ac.createGain(); bp.type = 'bandpass'; bp.Q.value = q; bg.gain.value = amp;
+			const fA = k === 0 ? vow[0] : k === 1 ? vow[1] : 2800, fB = k === 1 ? (vow[2] || vow[1]) : fA; bp.frequency.setValueAtTime(fA, a); bp.frequency.linearRampToValueAtTime(fB, a + len);
+			g.connect(bp); bp.connect(bg); auDest(bg, {}); }
+		os.start(a); vib.start(a); os.stop(a + len + 0.05); vib.stop(a + len + 0.05);
+	}
+}
+const AU_ROLL = {
+	jump: () => { auNoise(0.25, 'lowpass', 900, 200, 0.7, 1); auTone(0.18, 'sine', 140, 60, 0.6, 0, 0.003, { drive: true }); auNoise(0.3, 'bandpass', 400, 1800, 0.6, 1.5, 0.05); },   // ถีบพื้น + ลม
+	spin: () => auNoise(0.22, 'bandpass', 600, 2400, 0.55, 2.2),   // ลมหมุนต่อรอบ
+	wind: () => { auNoise(0.16, 'highpass', 2600, 7000, 0.45, 6); auTone(0.14, 'sawtooth', 1800, 900, 0.1, 0, 0.004, { lp: 4500 }); },   // ใบดาบเงื้อ
+	shout: () => auYell([[0, 0.26, 330, 290, [750, 1150, 1900], ['t', 0.03]], [0.3, 0.2, 360, 260, [700, 1200], ['s', 0.09]]]),   // "ต-าย ซ-ะ" (สังเคราะห์)
+	skid: () => { auNoise(0.32, 'bandpass', 1500, 500, 0.75, 1.2); auNoise(0.3, 'lowpass', 600, 150, 0.5, 1, 0.02); },   // เข่าไถลพื้น
+	flip: () => { auNoise(0.25, 'bandpass', 500, 2000, 0.5, 2); auTone(0.1, 'sine', 120, 70, 0.4, 0.28, 0.003); },   // ตีลังกากลับ + แตะพื้น
+};
+function rollSound(F) {
+	if (!S.sound || !AU) return;
+	if (F === ROLL.UP) AU_ROLL.jump();
+	for (let k = 0; k < ROLL.TURNS; k++) if (F === ROLL.UP + 2 + Math.round(k * (ROLL.LAND - ROLL.UP - 4) / ROLL.TURNS)) AU_ROLL.spin();
+	if (F === ROLL.LAND - ROLL.WIND) AU_ROLL.wind();
+	if (F === ROLL.HIT - 2) AU_ROLL.shout();
+	if (F === ROLL.LAND + 1) AU_ROLL.skid();
+	if (F === ROLL.BACK) AU_ROLL.flip();
+}
 const AU_SFX = {
 	charge: fam => { auNoise(0.62, 'bandpass', 180, fam === 'DV' ? 4200 : 2600, 0.5, 3, 0, { attack: 0.5 });   // เสียงพลังพุ่งขึ้น
 		auTone(0.62, 'sawtooth', 48, 96, 0.22, 0, 0.45, { lp: 420, q: 4 }); if (fam === 'DV') auTone(0.62, 'sawtooth', 70, 140, 0.12, 0, 0.4, { fm: 31, fmDepth: 60, lp: 1200 }); },
@@ -962,8 +1009,9 @@ const AU_SFX = {
 };
 function vfxSound(c, f) {   // เรียกเมื่อเฟรมเดินเอง (ไม่เล่นตอนกดทีละเฟรม)
 	if (!S.sound || !AU) return; const fam = c.skill.family;
-	if (f === VFX.CHG) AU_SFX.charge(fam);
-	if (f === VFX.REL) AU_SFX.release[fam]();
+	if (f === VFX.CHG && !c.roll) AU_SFX.charge(fam);
+	if (c.epic && (f === VFX.HIT + 6 + VFX.STOP || f === VFX.HIT + 12 + VFX.STOP)) { AU_SFX.hit(fam, f > VFX.HIT + 10); bgmDuck(); }   // ฟันวิญญาณระลอก 2–3
+	if (f === VFX.REL && !c.roll) AU_SFX.release[fam]();
 	if (fam === 'BD' && (f === VFX.HIT - 4 || f === VFX.HIT - 2)) AU_SFX.punch();
 	if (f === VFX.HIT) { AU_SFX.hit(fam, fam === 'CR' || fam === 'DV'); bgmDuck(); }
 	if (f === VFX.HIT + VFX.STOP + 2) AU_SFX.tail(fam);
@@ -1467,7 +1515,7 @@ const LAB_PARTS = {
 					ctx.globalCompositeOperation = 'lighter'; ctx.shadowBlur = 2 * glow; ctx.shadowColor = P.pal[4]; line(pts, ssCss(C[4], 0.6), 1, fade * 0.7); }
 				ctx.restore();
 			}
-			const [hx, hy] = scr(hit); labFlash(hx, hy, 1.3 * V.u, tt / 0.45, glow, P.flashColor, P.puffColor, +P.puffMode || 0, (P.seed || 1) * 1.3);
+			const [hx, hy] = scr(hit); if ((P._flashK ?? 1) > 0) labFlash(hx, hy, 1.3 * V.u * (P._flashK ?? 1), tt / 0.45, glow, P.flashColor, P.puffColor, +P.puffMode || 0, (P.seed || 1) * 1.3);
 			ctx.save(); ctx.globalCompositeOperation = 'lighter';
 			for (const e of parts) { const n = tt - e.delay, r = n / e.life; if (r < 0 || r > 1) continue;
 				const a = 1 - 0.35 * r, x = e.x + e.vx * n * a, y = e.y + e.vy * n * a, op = 1 - ssClamp((r - 0.55) / 0.45) ** 2;
@@ -2372,7 +2420,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) { vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); if (c.roll) rollSound(S.frame); } }
 		}
 		clipView();
 	} else {
