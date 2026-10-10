@@ -235,8 +235,8 @@ def main(out_path):
 		# ความเข้ากับร่างกาย (data/monster_body.csv · body_affinity.csv) — แท็บสกิลคิดดาเมจ + ป้าย อ่อนแอ/ต้านทาน แบบเดียวกับเกม
 		'body': {r['monster_id']: r['body'] for r in csv.DictReader(open(os.path.join(ROOT, 'data/monster_body.csv'), encoding='utf-8'))},
 		'body_aff': {r['school'] + '|' + r['body']: int(r['sign']) for r in csv.DictReader(open(os.path.join(ROOT, 'data/body_affinity.csv'), encoding='utf-8'))},
-		# ค่าตั้ง VFX จาก night-forge-vfx-lab (kwan ส่ง 10 ต.ค.) — "ฟันดวงดาว" ใช้ตอนประกาย ★ สายคม · หน้าเทสวาดเองจากค่า (ไม่มีตัวโปรแกรม)
-		'star_slash': json.load(open(os.path.join(ROOT, 'docs/art-bible/vfx/star_slash.nightforge.json'), encoding='utf-8'))['comp']['layers'][0]['params'],
+		# preset จาก night-forge-vfx-lab (kwan ส่ง 10 ต.ค. · Drive LAB) — ทุกไฟล์ *.nightforge.json · ฟันดวงดาว = ประกาย ★ สายคม
+		'lab': [{'file': os.path.basename(f)[:-len('.nightforge.json')], 'comp': json.load(open(f, encoding='utf-8'))['comp']} for f in sorted(glob.glob(os.path.join(ROOT, 'docs/art-bible/vfx/*.nightforge.json')))],
 		'k': {
 			'MIT_K': const('core/Formulas.gd', 'MIT_K'),
 			'WEAK_MULT': const('core/Formulas.gd', 'WEAK_MULT'),
