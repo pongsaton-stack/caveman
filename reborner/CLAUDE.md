@@ -612,6 +612,7 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   docs `1atuceU4o6LrYQ8n_kKrVf0VsGKJQBy36` · scenes `1s1sLb00yvq3WhwVY5yQwXrrTEAqOBOYj` · assets/sprites_hero `18ftQRAhD4I9U8DClNAvSavJ03KR1KYdr`
   data/fx `1MHKYuHJ_JRGQeuanxTeESbpmTR4nt486` · docs/art-bible `1C-T1zcszJB18NJRwgXJdz6N3byTCcARZ` · tools_web `1sGZFn8o4U6X-XdE6tC-pg0ZbeES59KDy`
   tools_sprites `1X8EBPp12gvEMbzAhxgARKmizgYY7OjUa` · assets/fonts `1AvaYQIBfWDq3105wCgijaB8fToWleRhW`
+  LAB `1FiFbhD6d1QcNeLBfp51vFicz6krc2WIz` (10 ต.ค. 2026 · kwan วางไฟล์/ภาพ/คลิปจาก night-forge-vfx-lab ให้ Claude ดึงไปเทียบ)
 - เครื่องมือ Drive แก้เนื้อหาไฟล์เดิมไม่ได้ → "ทับ" = สร้างไฟล์ใหม่ชื่อเดิมในโฟลเดอร์เดิม แล้ว trash ไฟล์เก่า
 - ต้องตั้ง `disableConversionToGoogleType: true` เสมอ (ไม่งั้นกลายเป็น Google Docs) · เทียบ `fileSize` กับ `wc -c` ทุกไฟล์
 - ไม่อัปโหลด `.uid` / `.import` ของ PNG / `.godot/` (Godot สร้างใหม่เอง)
