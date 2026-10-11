@@ -181,6 +181,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></p>
 			<p class="seg" id="labSheet" role="group" aria-label="ซ้อนแล็บ VFX"></p>
 			<p class="seg" id="rollFoe" role="group" aria-label="มอนที่โดน (ท่ากระโดดม้วน)"></p>
+			<p class="seg"><label class="muted" for="stealPick">ของที่หมาขโมย (อาวุธ):</label> <select id="stealPick"></select></p>
 			<div class="clips" id="skGroups"></div>
 		</section>
 
@@ -957,7 +958,10 @@ function drawAngry(pos, F, standing) {   // โกรธ: เส้นเลื�
 const BROW = [[21, 23], [22, 23], [22, 22], [23, 22], [24, 22], [25, 21], [26, 21], [26, 20], [23, 21], [24, 21], [25, 20]];   // ตา = คอลัมน์ x24 แถว 23–26 ของริก SL01_0 · คิ้วหนา ปลายด้านจมูก (ซ้าย) กดลงชิดตา
 // หมาขโมยของ (kwan 11 ต.ค. "ถ้าหน้าที่หลักที่หมาเข้าแจมคือ เข้ามาขโมยของ" → เลือก "ทำคลิปตัวอย่างก่อน" + "ของดรอปของมอนตัวนั้น")
 // ของ = คอลัมน์ drop ใน monsters.csv → ไอคอน items_draft D-<มอน> · โชว์กรณีขโมยสำเร็จเสมอ (ไม่มีตัวเลขโอกาส · ยังไม่มีระบบนี้ในเกม/GDD)
-const stealItem = id => { const it = (DATA.items || []).find(x => x.id === 'D-' + id); return it ? { key: 'itm/' + it.id, name: it.name } : null; };
+// kwan 11 ต.ค. "ขโมยได้เฉพาะอาวุธและอุปกรณ์" → ของ = อาวุธจาก weapons_full.json (ไอคอน wpn/<id>) · ยังไม่มีอุปกรณ์อื่นในข้อมูลเกม (GDD 6 มีแค่อาวุธ + ตัวปรับกฎในช่องอุปกรณ์ 5 ช่อง)
+// มอนตัวไหนพกอะไร = ยังไม่มีในข้อมูล → STEAL_DRAFT เป็นร่างของหน้าเทสเท่านั้น (ไม่ใช่ข้อมูลเกม) · เลือกเองได้จากช่อง "ของที่หมาขโมย"
+const STEAL_DRAFT = { M01: 'DV-1', M03: 'CR-1', M06: 'ST-1', M15: 'SL-1', B1: 'CR-2' };
+const stealItem = id => { const wid = S.stealPick || STEAL_DRAFT[id] || 'SL-1', w = (DATA.weapons || []).find(x => x.id === wid); return w && IMG['wpn/' + wid] ? { key: 'wpn/' + wid, name: w.name } : null; };
 function drawLoot(item, x, y, a = 1) { if (!item || !IMG[item.key]) return; ctx.save(); ctx.globalAlpha = a; ctx.imageSmoothingEnabled = false; ctx.drawImage(IMG[item.key], Math.round(x) - 2, Math.round(y) - 4, 20, 20); ctx.restore(); }
 function lootLabel(text, x, y, a) {   // ป้ายเล็ก "+ ชื่อของ" ขาวขอบดำ ไม่ล้นจอ
 	ctx.save(); ctx.globalAlpha = a; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
@@ -1506,7 +1510,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
-	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', rollFoe: 'M01', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
+	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', rollFoe: 'M01', stealPick: '', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, vxs: true, rigW: null, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
 
@@ -2922,6 +2926,9 @@ function boot() {
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
 	for (const b of document.querySelectorAll('.rigBtn')) b.onclick = () => { RIG_ON = !RIG_ON; for (const x of document.querySelectorAll('.rigBtn')) x.setAttribute('aria-pressed', String(RIG_ON)); };
+	{ const sel = $('stealPick'), o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'ตามมอน (ร่าง)'; sel.append(o0);   // kwan 11 ต.ค. ขโมยได้เฉพาะอาวุธ/อุปกรณ์
+		for (const w of DATA.weapons || []) { const o = document.createElement('option'); o.value = w.id; o.textContent = `${w.id} ${w.name}`; sel.append(o); }
+		sel.onchange = () => { S.stealPick = sel.value; }; }
 	{ const box = $('rollFoe'), lab = document.createElement('span'); lab.className = 'muted'; lab.textContent = 'มอนที่โดน (SL01 กระโดดม้วน):'; box.append(lab);   // kwan 10 ต.ค. เลือกเป้าเองได้
 		for (const id of Object.keys(ROLL_FOES).filter(id => IMG['mon/' + id])) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = id;
 			const ic = document.createElement('canvas'), im = IMG['mon/' + id], k = 24 / Math.max(im.width, im.height); ic.width = 24; ic.height = 24; ic.style.cssText = 'width:24px;height:24px;image-rendering:pixelated;vertical-align:middle;margin-right:4px';
