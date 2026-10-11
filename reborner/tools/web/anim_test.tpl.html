@@ -358,7 +358,7 @@ const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชา�
 // 70 เฟรม: ย่อรวมพลัง 0–13 · ม้วน 3 รอบตามเส้นโค้ง 14–31 (3 เฟรมท้ายง้างดาบกลางอากาศ) · แตะพื้นชันเข่า = ฟันเต็มแรงทันที เฟรม 32 ไม่ชะงัก (kwan 10 ต.ค. "ใช้โมเมนตัมที่กระโดดมา")
 // + ไถลต่อ SKID px ตามแรงส่ง · บอลลูน "ตายซะ!!" · ค้างคุกเข่าดูฟันวิญญาณ · ตีลังกากลับ 58–69 · ท่าชันเข่า = ริก SL01K (rion_rig.py --variants · ตัวฐานภาพทรุดเข่า west_k0)
 const ROLL = { N: 70, UP: 14, LAND: 32, HIT: 32, BACK: 50, HOME: 61, POWER: 3, TURNS: 3, H: 42, BACK_H: 30, SKID: 7, WIND: 3, SHOUT: 'ตายซะ!!' };   // คุกเข่าค้าง 32–49 (เดิมถึง 57) · ตีลังกากลับ 50–61 · ยืนที่เดิม 62–69
-ROLL.ATK = ROLL.HIT - 14; ROLL.ANGRY = 9; ROLL.DOG_IN = 4;   // โจมตีต่อเนื่อง: ยืนโกรธ 0–8 แล้วย่อกระโดด · หมาวิ่งเข้าเฟรม 4–11   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
+ROLL.ATK = ROLL.HIT - 14; ROLL.ANGRY = 9; ROLL.DOG_IN = 23; ROLL.DOG_RUN = 8;   // โจมตีต่อเนื่อง: ยืนโกรธ 0–8 แล้วย่อกระโดด · หมาวิ่งเข้า 23–30 ถึงมอนตอนโอร่าแรก (31)   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
 // โจมตีต่อเนื่อง: เฟรมรวม T → [เฟรมในชุด, ช่วง] · ชุดแรกมอนรอด (live) → ชุดซ้ำ (combo) → เต้นสามช่า (dance · ยาว 1 รอบท่า poses64)
 const ROLL_DANCE = () => Math.round(((P64.rion_b_chacha || {}).cycle || 3.2) / VFX.SEC);
 const rollPhase = T => T < ROLL.BACK ? [T, 'live'] : T < 2 * ROLL.BACK ? [T - ROLL.BACK, 'combo'] : [T - 2 * ROLL.BACK, 'dance'];   // ชุดละ 50 เฟรม (ตัดช่วงตีลังกากลับ)
@@ -955,26 +955,37 @@ function drawAngry(pos, F, standing) {   // โกรธ: เส้นเลื�
 	ctx.restore();
 }
 const BROW = [[21, 23], [22, 23], [22, 22], [23, 22], [24, 22], [25, 21], [26, 21], [26, 20], [23, 21], [24, 21], [25, 20]];   // ตา = คอลัมน์ x24 แถว 23–26 ของริก SL01_0 · คิ้วหนา ปลายด้านจมูก (ซ้าย) กดลงชิดตา
-function drawDogCombo(F, stop, foe) {   // หมาคู่หู (kwan 11 ต.ค. "ไม่ต้องกระโดดไปมา ตะลุมบอนอยู่ที่มอนตามจังหวะการโจมตี"):
-	// วิ่งเข้าจากขวาตรงไปที่มอน (เฟรม 4–13) → ตะลุมบอนกับมอนในเมฆฝุ่นตลอด · ตรงจังหวะฟันทุกครั้ง = พุ่งงับแรง + ประกาย · มอนตายแล้วกระโดดกลับมาข้าง Rion
+function drawDogCombo(F, stop, foe) {   // หมาคู่หู (kwan 11 ต.ค. "ค่อยเข้ามาตะลุมบอนตอนขึ้นโอร่าแรก · เอฟเฟคตะลุมบอนให้แรนดอมแอกชั่นไปทั่วๆ ตัวมอน"):
+	// วิ่งเข้าจากขวาระหว่าง Rion ม้วนกลางอากาศ → ถึงมอนพร้อมบอลลูนโอร่าแรก → ตะลุมบอน: ทุก 3 เฟรมสุ่มจุดใหม่รอบตัวมอน (ซ้าย/ขวา/บนหัว/ข้างล่าง) + ท่าสุ่ม (งับ · ข่วน · ดึง · โถมทับ · กระโจน)
+	// ตรงจังหวะฟันทุกครั้ง = งับกลางตัวแรง + ประกาย · มอนตายแล้วกระโดดกลับข้าง Rion · สุ่มแบบมี seed ตามเลขเฟรม (กดทีละเฟรมได้ภาพเดิม)
 	if (F < ROLL.DOG_IN) return;
-	const ground = SKS.rion_at[1] + 62, spot = [stop[0] + 44, ground - 34], at = [foe.x - 10, ground - 34], K3 = rollHits()[2], end = K3 + 1, arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h];
-	const run = ROLL.DOG_IN + 10;
-	if (F < run) { const p = (F - ROLL.DOG_IN) / 10; spr(`dog/west_w${F % 4}`, lerp(SKS.stage[0] + 4, at[0], p), at[1] - Math.abs(Math.sin(p * Math.PI * 4)) * 2); return; }   // วิ่งเข้า
-	if (F >= end) { const p = Math.min(1, (F - end) / 2), xy = arc(p, at, spot, 12); spr(p < 1 ? 'dog/west_w1' : 'dog/west', xy[0], xy[1], { flip: p < 1 }); return; }   // กระโดดกลับข้าง Rion ให้ถึงก่อนเต้น (ช่วงจบที่เฟรม 49)
-	const hit = rollHits().find(H => F >= H && F < H + 2), j = F % 6;
-	const dx = hit ? -4 : [0, 2, -1, 1, -2, 1][j], dy = hit ? -3 : -[0, 2, 1, 3, 0, 1][F % 5];
-	const cx = foe.x + 6, cy = ground - 16;
-	const cloud = (a) => { ctx.save(); ctx.globalAlpha = a; for (let i = 0; i < 7; i++) { const an = i / 7 * Math.PI * 2 + F * 0.7, r = 10 + 3 * Math.sin(F * 1.3 + i * 2);   // เมฆฝุ่นตะลุมบอน
-		ctx.fillStyle = i % 2 ? '#efe4d0' : '#d4c3a6'; ctx.beginPath(); ctx.arc(cx + Math.cos(an) * r * 1.4, cy + Math.sin(an) * r * 0.8, 4 + (i + F) % 3, 0, Math.PI * 2); ctx.fill(); } ctx.restore(); };
-	cloud(0.6);
-	spr(`dog/west_w${(F >> 1) % 4}`, at[0] + dx, at[1] + dy, { flip: !hit && (F % 8) >= 6 });   // พลิกตัวไปมาแบบกัดกันชุลมุน
-	cloud(0.4);
-	ctx.save(); ctx.fillStyle = '#fff6c0';   // ดาว/ประกายกระเด็นแบบการ์ตูน
-	for (let k = 0; k < 2; k++) { const t = (F * 2 + k * 5) % 10, x = cx + (k ? 12 : -14) + (k ? t : -t) * 0.8, y = cy - 12 - t; ctx.globalAlpha = 1 - t / 10; for (const [ox, oy] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]]) ctx.fillRect(Math.round(x + ox), Math.round(y + oy), 1, 1); }
+	const ground = SKS.rion_at[1] + 62, spot = [stop[0] + 44, ground - 34], im = IMG[foe.key] || { width: 48, height: 48 }, K3 = rollHits()[2], end = K3 + 1;
+	const top = foe.foot - im.height * 0.78, x0 = foe.x - (im.width >> 1) - 12, x1 = foe.x + (im.width >> 1) - 22, mid = [foe.x - 17, Math.min(ground - 34, foe.foot - im.height * 0.5 - 17)];
+	const arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h], arrive = ROLL.DOG_IN + ROLL.DOG_RUN;
+	if (F < arrive) { const p = (F - ROLL.DOG_IN) / ROLL.DOG_RUN; spr(`dog/west_w${F % 4}`, lerp(SKS.stage[0] + 4, mid[0] + 10, p), ground - 34 - Math.abs(Math.sin(p * Math.PI * 3)) * 2); return; }   // วิ่งเข้า
+	if (F >= end) { const p = Math.min(1, (F - end) / 2), xy = arc(p, mid, spot, 12); spr(p < 1 ? 'dog/west_w1' : 'dog/west', xy[0], xy[1], { flip: p < 1 }); return; }   // กระโดดกลับข้าง Rion ให้ถึงก่อนเต้น
+	const hit = rollHits().find(H => F >= H && F < H + 2), seg = Math.floor((F - arrive) / 3), r = vRng(9173 + seg * 7919), sf = (F - arrive) % 3;
+	const ACTS = ['bite', 'claw', 'tug', 'pounce', 'leap'], act = hit ? 'bite' : ACTS[Math.floor(r() * ACTS.length)];
+	let x = lerp(x0, x1, r()), y = lerp(top - 14, ground - 34, r()), flip = r() < 0.4;
+	if (act === 'pounce') y = top - 18;   // โถมทับบนหัว
+	if (act === 'tug') { flip = true; x += sf; }   // หันก้นงับดึงถอยหลัง
+	if (act === 'leap') y -= [6, 9, 4][sf];   // กระโจนใส่
+	if (hit) { x = mid[0] - 2; y = mid[1]; flip = false; }
+	y = Math.min(y, ground - 34) + (act === 'claw' ? (sf & 1) : 0); x += (sf === 0 ? (flip ? -2 : 2) : 0);   // เฟรมแรกของแต่ละท่า = พุ่งเข้า
+	const mouth = [x + (flip ? 30 : 3), y + 17], cx = foe.x, cy = foe.foot - im.height * 0.4;
+	ctx.save(); ctx.globalAlpha = 0.45; for (let i = 0; i < 6; i++) { const an = i / 6 * Math.PI * 2 + F * 0.9, rr = 8 + 3 * Math.sin(F * 1.7 + i);   // ฝุ่นฟุ้งรอบจุดที่หมาอยู่
+		ctx.fillStyle = i % 2 ? '#efe4d0' : '#d4c3a6'; ctx.beginPath(); ctx.arc(x + 17 + Math.cos(an) * rr * 1.4, y + 22 + Math.sin(an) * rr * 0.7, 3 + (i + F) % 3, 0, Math.PI * 2); ctx.fill(); } ctx.restore();
+	spr(`dog/west_w${(F + seg) % 4}`, x, y, { flip });
+	ctx.save();
+	if (act === 'claw' && sf < 2) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1; for (let k = 0; k < 3; k++) { const sx = mouth[0] + (flip ? 2 : -6) + k * 3, sy = mouth[1] - 6;   // รอยข่วน 3 เส้น
+		ctx.beginPath(); ctx.moveTo(sx + 0.5, sy + 0.5); ctx.lineTo(sx + 4.5, sy + 7.5); ctx.stroke(); } }
+	if ((act === 'bite' || act === 'tug') && sf === 0 || hit && F === hit) { ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#fff6c0'; const big = hit && F === hit;   // งับ!
+		const pts = big ? [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1], [-3, -3], [3, -3], [-3, 3], [3, 3], [-2, 0], [2, 0], [0, -2], [0, 2]] : [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]];
+		for (const [ox, oy] of pts) ctx.fillRect(Math.round(mouth[0] + ox), Math.round(mouth[1] + oy), 1, 1); }
+	ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#fff6c0';   // ดาวกระเด็นแบบการ์ตูนรอบมอน
+	for (let k = 0; k < 3; k++) { const t = (F * 2 + k * 7) % 12, an = k * 2.1 + seg, px = cx + Math.cos(an) * (10 + t * 1.2), py = cy - 6 + Math.sin(an) * 6 - t; ctx.globalAlpha = 1 - t / 12;
+		for (const [ox, oy] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1]]) ctx.fillRect(Math.round(px + ox), Math.round(py + oy), 1, 1); }
 	ctx.restore();
-	if (hit && F === hit) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#fff6c0'; const bx = Math.round(at[0] + 2), by = Math.round(at[1] + 14);   // งับ!
-		for (const [ox, oy] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1], [-3, -3], [3, -3], [-3, 3], [3, 3], [-2, 0], [2, 0], [0, -2], [0, 2]]) ctx.fillRect(bx + ox, by + oy, 1, 1); ctx.restore(); }
 }
 function rollComboView(c) {
 	const [F, m] = rollPhase(S.frame); if (m !== 'dance') return rollView(c, F, m);
@@ -1162,7 +1173,7 @@ function rollSound(F, mode = '') {
 	if (!S.sound || !AU) return;
 	if (F === ROLL.UP) AU_ROLL.jump();
 	for (let k = 0; k < ROLL.TURNS; k++) if (F === ROLL.UP + 2 + Math.round(k * (ROLL.LAND - ROLL.UP - 4) / ROLL.TURNS)) AU_ROLL.spin();
-	if (mode === 'combo') { if (F === 0) AU_ROLL.grr(); if (F === ROLL.POWER) AU_ROLL.fire(); if (F === ROLL.DOG_IN + 2) AU_ROLL.bark(); for (const H of rollHits()) if (F === H) AU_ROLL.bark(); if (F >= ROLL.DOG_IN + 10 && F < rollHits()[2] + 3 && F % 4 === 0) AU_ROLL.scuffle(); }
+	if (mode === 'combo') { if (F === 0) AU_ROLL.grr(); if (F === ROLL.POWER) AU_ROLL.fire(); if (F === ROLL.DOG_IN + 3) AU_ROLL.bark(); for (const H of rollHits()) if (F === H) AU_ROLL.bark(); const a = ROLL.DOG_IN + ROLL.DOG_RUN; if (F >= a && F < rollHits()[2] + 2 && (F - a) % 3 === 0) AU_ROLL.scuffle(); }
 	else if (F === ROLL.POWER) AU_SFX.charge('SL');   // เสียงชาร์จเดิมของท่า ตรงจังหวะเบ่งพลัง
 	if (F === ROLL.LAND - ROLL.WIND) AU_SFX.release.SL();   // เสียงปล่อยเดิม (ลมฟัน + โลหะเฉือน) ตอนเงื้อดาบกลางอากาศ
 	if (F === ROLL.LAND + 1) AU_ROLL.skid();
