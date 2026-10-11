@@ -358,10 +358,10 @@ const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชา�
 // 70 เฟรม: ย่อรวมพลัง 0–13 · ม้วน 3 รอบตามเส้นโค้ง 14–31 (3 เฟรมท้ายง้างดาบกลางอากาศ) · แตะพื้นชันเข่า = ฟันเต็มแรงทันที เฟรม 32 ไม่ชะงัก (kwan 10 ต.ค. "ใช้โมเมนตัมที่กระโดดมา")
 // + ไถลต่อ SKID px ตามแรงส่ง · บอลลูน "ตายซะ!!" · ค้างคุกเข่าดูฟันวิญญาณ · ตีลังกากลับ 58–69 · ท่าชันเข่า = ริก SL01K (rion_rig.py --variants · ตัวฐานภาพทรุดเข่า west_k0)
 const ROLL = { N: 70, UP: 14, LAND: 32, HIT: 32, BACK: 50, HOME: 61, POWER: 3, TURNS: 3, H: 42, BACK_H: 30, SKID: 7, WIND: 3, SHOUT: 'ตายซะ!!' };   // คุกเข่าค้าง 32–49 (เดิมถึง 57) · ตีลังกากลับ 50–61 · ยืนที่เดิม 62–69
-ROLL.ATK = ROLL.HIT - 14;   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
-// ติดคริ: เฟรมรวม T → [เฟรมในชุด, ช่วง] · ชุดแรกมอนรอด (live) → ชุดซ้ำ (crit) → เต้นสามช่า (dance · ยาว 1 รอบท่า poses64)
+ROLL.ATK = ROLL.HIT - 14; ROLL.ANGRY = 9; ROLL.DOG_IN = 4;   // โจมตีต่อเนื่อง: ยืนโกรธ 0–8 แล้วย่อกระโดด · หมาวิ่งเข้าเฟรม 4–11   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
+// โจมตีต่อเนื่อง: เฟรมรวม T → [เฟรมในชุด, ช่วง] · ชุดแรกมอนรอด (live) → ชุดซ้ำ (combo) → เต้นสามช่า (dance · ยาว 1 รอบท่า poses64)
 const ROLL_DANCE = () => Math.round(((P64.rion_b_chacha || {}).cycle || 3.2) / VFX.SEC);
-const rollPhase = T => T < ROLL.N ? [T, 'live'] : T < 2 * ROLL.N ? [T - ROLL.N, 'crit'] : [T - 2 * ROLL.N, 'dance'];
+const rollPhase = T => T < ROLL.BACK ? [T, 'live'] : T < 2 * ROLL.BACK ? [T - ROLL.BACK, 'combo'] : [T - 2 * ROLL.BACK, 'dance'];   // ชุดละ 50 เฟรม (ตัดช่วงตีลังกากลับ)
 const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
 const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
 const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
@@ -432,9 +432,9 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // แนว RS3 — ท
 		addClip(G, 'epic_rs3_SL01', 'SL01 · RS3 + ฟันวิญญาณ', Array.from({ length: RS3.N }, (_, f) => rs3Rion(it, f).key), VFX.SEC, { tab: 'sksheet', skill: it, rs3: true, epic: true });
 		addClip(G, 'epic_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ', Array.from({ length: RS3.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - RS3.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true });
 		addClip(G, 'roll_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน ชันเข่าฟัน', Array.from({ length: ROLL.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - ROLL.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, atk: ROLL.ATK });
-		const ND = ROLL_DANCE();   // ติดคริ: ชุดแรกมอนรอด → ชุดซ้ำ → เต้นสามช่า
-		addClip(G, 'roll_crit_SL01', 'SL01 · กระโดดม้วน · มอนรอด → ติดคริ ซ้ำอีกชุด → เต้นสามช่า', Array.from({ length: 2 * ROLL.N + ND }, (_, T) => T < 2 * ROLL.N ? vk[Math.max(0, Math.min(vk.length - 1, T % ROLL.N - ROLL.ATK))] : p64Key('rion_b_chacha', (T - 2 * ROLL.N) / ND) || vk[0]),
-			VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, crit: true, atk: ROLL.ATK });
+		const ND = ROLL_DANCE(), B = ROLL.BACK;   // โจมตีต่อเนื่อง: ชุดแรกมอนรอด → ชุดซ้ำ + หมาแจม → เต้นสามช่า
+		addClip(G, 'roll_combo_SL01', 'SL01 · กระโดดม้วน · มอนรอด → โจมตีต่อเนื่อง + หมาแจม → เต้นสามช่า', Array.from({ length: 2 * B + ND }, (_, T) => T < 2 * B ? vk[Math.max(0, Math.min(vk.length - 1, T % B - ROLL.ATK))] : p64Key('rion_b_chacha', (T - 2 * B) / ND) || vk[0]),
+			VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, combo: true, atk: ROLL.ATK });
 	}
 }
 for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
@@ -865,15 +865,15 @@ const DEATH_FX = {
 		ctx.restore(); },
 };
 const rollHits = () => [ROLL.HIT, ROLL.ATK + VFX.HIT + 6 + VFX.STOP, ROLL.ATK + VFX.HIT + 12 + VFX.STOP];   // เฟรมกระทบ 3 ระลอก (= epic hits ใน vfxScene) → 32 · 40 · 46
-function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟันครั้งสุดท้ายฆ่า) · 'live' = มอนรอด (คริชุดแรก) · 'crit' = ชุดซ้ำหลังติดคริ ออร่าค้างจนมอนตาย · กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
+function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟันครั้งสุดท้ายฆ่า) · 'live' = มอนรอด (ชุดแรกของโจมตีต่อเนื่อง) · 'combo' = โจมตีต่อเนื่อง: โกรธ → ไฟลุก → ม้วนจากที่คุกเข่าอยู่ ฟันซ้ำ + หมาแจม · กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
 	const F = Fin ?? S.frame, f = F - ROLL.ATK, it = c.skill, rw = RIG_ON && rigWeapon(it), home = SKS.rion_at, foe = rollFoe(), fw = (IMG[foe.key] || { width: 48 }).width;
-	const land = [foe.x + (fw >> 1) - 2 + ROLL.SKID, home[1]], stop = [land[0] - ROLL.SKID, land[1]];   // แตะพื้นแล้วไถลไปหยุดชิดขวาของเป้า (ระยะตามความกว้างภาพมอน)
+	const { land, stop } = rollStop(), combo = mode === 'combo', start = combo ? stop : home;   // combo: ไม่กระโดดกลับ ม้วนซ้ำจากจุดที่คุกเข่าอยู่
 	const arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h], ease = p => p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p);
 	const tuck = rw && IMG['rig/' + rw + 'T_0'] ? rigKey(rw + 'T', 0) : rw ? rigKey(rw, 4) : heldPose(it, 1), stand = rw ? rigKey(rw, 0) : heldPose(it, 0);   // ม้วน = ท่าขดตัว SL01T
-	const fly = q => { const p = ease(Math.max(0, Math.min(1, (q - ROLL.UP) / (ROLL.LAND - ROLL.UP)))); return { xy: arc(p, home, land, ROLL.H), r: -p * ROLL.TURNS * 2 * Math.PI }; };
-	let pos = home, rot = 0, pose = stand; const trail = [];
+	const fly = q => { const p = ease(Math.max(0, Math.min(1, (q - ROLL.UP) / (ROLL.LAND - ROLL.UP)))); return { xy: arc(p, start, land, ROLL.H), r: -p * ROLL.TURNS * 2 * Math.PI }; };
+	let pos = start, rot = 0, pose = stand; const trail = [];
 	const kn = rw && IMG['rig/' + rw + 'K_0'] ? rw + 'K' : null;
-	if (F < ROLL.UP) pose = F < 5 ? stand : kn ? rigKey(kn, 0) : tuck;   // ย่อตัวเตรียมกระโดด (ท่าทรุดเข่า ไม่ใช่ขดตัว)
+	if (F < ROLL.UP) pose = F < (combo ? ROLL.ANGRY : 5) ? stand : kn ? rigKey(kn, 0) : tuck;   // ย่อตัวเตรียมกระโดด (ท่าทรุดเข่า ไม่ใช่ขดตัว) · combo: ยืนโกรธก่อน
 	if (F >= ROLL.UP && F < ROLL.LAND) { const cur = fly(F); pos = cur.xy; rot = cur.r;
 		pose = kn && F >= ROLL.LAND - ROLL.WIND ? rigKey(kn, 3 + F - (ROLL.LAND - ROLL.WIND)) : tuck;   // ง้างดาบสองมือกลางอากาศก่อนแตะพื้น
 		for (let k = 1; k <= 3; k++) { const q = F - k * 1.5; if (q >= ROLL.UP) { const g = fly(q); trail.push({ x: g.xy[0], y: g.xy[1], rot: g.r, a: 0.3 - k * 0.08 }); } } }
@@ -891,31 +891,34 @@ function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟัน�
 	const hand = [SKS.hand[0] - home[0] + pos[0], SKS.hand[1] - home[1] + pos[1]];
 	// เบ่งพลัง ออร่าทองลุกเป็นเปลว (kwan 10 ต.ค. "ตอนชาร์จ เบ่งพลังแบบซุปเปอร์ไซย่าร่าง 1") — แนวแรงบันดาลใจ วาดเองทั้งหมด
 	//   ระเบิดพลัง F POWER (วาบทอง) → ออร่าโตเกิน 1.2 แล้วนิ่ง 1 → ลอยตามตัวตอนกระโดดแล้วจางใน 5 เฟรม · ตัวเรืองทองกะพริบ · ประกายพุ่งขึ้น · หินลอยรอบเท้า
-	const P0 = ROLL.POWER, K3 = rollHits()[2], pw = F < P0 ? 0 : F < P0 + 3 ? 0.4 + 0.8 * (F - P0) / 3 : mode === 'crit' ? (F < K3 + 4 ? 1 : F < K3 + 10 ? 1 - (F - K3 - 4) / 6 : 0)   // คริ: ออร่าค้างทั้งท่า หมดเมื่อมอนตาย
+	const P0 = ROLL.POWER, K3 = rollHits()[2], pw = F < P0 ? 0 : F < P0 + 3 ? 0.4 + 0.8 * (F - P0) / 3 : combo ? (F < K3 + 4 ? 1 : F < K3 + 10 ? 1 - (F - K3 - 4) / 6 : 0)   // โจมตีต่อเนื่อง: ไฟลุกค้างทั้งท่า ดับเมื่อมอนตาย
 		: F < ROLL.UP ? 1 : F < ROLL.UP + 5 ? 1 - (F - ROLL.UP) / 5 : 0;
 	const cx = pos[0] + 32, cy = pos[1] + 42, feetY = home[1] + 62;
+	// สีออร่า: ทอง (เบ่งพลัง) · ไฟลุก (โจมตีต่อเนื่อง kwan 11 ต.ค. "เปลี่ยนเอฟเฟคซุปเปอร์ไซย่า เป็นไฟลุก") — เปลวสูงกว่า สั่นไวกว่า มีถ่านไฟลอย
+	const AP = combo ? { g: ['255,170,60', '255,70,20', '200,30,0'], fl: ['#ff3a10', '#ff9a1e'], fr: '#ffd27a', tint: '#ff5a1e', spark: '#ffb347', len: 1.4, flash: '255,110,40' }
+		: { g: ['255,236,140', '255,190,40', '255,170,0'], fl: ['#ffb21e', '#fff09a'], fr: '#fff6c8', tint: '#ffd84a', spark: '#fff3a0', len: 1, flash: '255,224,110' };
 	const flame = (k, col, a) => { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.fillStyle = col;
 		for (let i = 0; i < 16; i++) { const an = Math.PI * (0.05 + 0.9 * i / 15), side = Math.cos(an), bx = cx + side * 15 * k, by = cy + 16 - Math.sin(an) * 30 * k,
-			len = (11 + 7 * Math.sin(F * 1.9 + i * 2.3) + 4 * Math.sin(F * 3.1 + i)) * pw * k, w = 4.5 * k, tx = bx + side * len * 0.35, ty = by - len;
+			len = (11 + 7 * Math.sin(F * 1.9 + i * 2.3) + 4 * Math.sin(F * 3.1 + i) + (combo ? 5 * Math.sin(F * 4.7 + i * 1.3) : 0)) * pw * k * AP.len, w = 4.5 * k, tx = bx + side * len * 0.35, ty = by - len;
 			ctx.beginPath(); ctx.moveTo(bx - w, by + 2); ctx.quadraticCurveTo(bx - w * 0.6 + side * 3, by - len * 0.5, tx, ty); ctx.quadraticCurveTo(bx + w * 0.6 + side * 3, by - len * 0.5, bx + w, by + 2); ctx.closePath(); ctx.fill(); }
 		ctx.restore(); };
 	const auraBack = pw > 0 ? () => {
 		ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createRadialGradient(cx, cy, 2, cx, cy, 38);
-		g.addColorStop(0, `rgba(255,236,140,${0.55 * pw})`); g.addColorStop(0.6, `rgba(255,190,40,${0.25 * pw})`); g.addColorStop(1, 'rgba(255,170,0,0)'); ctx.fillStyle = g; ctx.fillRect(cx - 40, cy - 48, 80, 90); ctx.restore();
-		flame(1.15, '#ffb21e', 0.5); flame(0.8, '#fff09a', 0.6);
-		if (F < ROLL.UP + 2) for (let i = 0; i < 6; i++) { const lift = Math.min(1, Math.max(0, (F - P0 - 1) / 7)), x = home[0] + 32 + [-16, -9, -3, 5, 11, 17][i];   // หินลอย
+		g.addColorStop(0, `rgba(${AP.g[0]},${0.55 * pw})`); g.addColorStop(0.6, `rgba(${AP.g[1]},${0.25 * pw})`); g.addColorStop(1, `rgba(${AP.g[2]},0)`); ctx.fillStyle = g; ctx.fillRect(cx - 40, cy - 48, 80, 90); ctx.restore();
+		flame(1.15, AP.fl[0], 0.5); flame(0.8, AP.fl[1], 0.6);
+		if (!combo && F < ROLL.UP + 2) for (let i = 0; i < 6; i++) { const lift = Math.min(1, Math.max(0, (F - P0 - 1) / 7)), x = home[0] + 32 + [-16, -9, -3, 5, 11, 17][i];   // หินลอย
 			ctx.fillStyle = i % 2 ? '#7a6a58' : '#9a8670'; ctx.fillRect(Math.round(x), Math.round(feetY - 1 - lift * (5 + (i * 7) % 11) + Math.sin(F * 0.9 + i) * lift), 2, 2); }
 	} : null;
 	const auraFront = pw > 0 ? () => {
-		const ti = tinted(pose, '#ffd84a'); if (ti && !rot) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (0.22 + 0.12 * (F % 2)) * pw; ctx.drawImage(ti, Math.round(pos[0]), Math.round(pos[1] - (pose.startsWith('p64/') ? P64_TOP : 0))); ctx.restore(); }
-		flame(0.55, '#fff6c8', 0.35);
-		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#fff3a0';
+		const ti = tinted(pose, AP.tint); if (ti && !rot) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (0.22 + 0.12 * (F % 2)) * pw; ctx.drawImage(ti, Math.round(pos[0]), Math.round(pos[1] - (pose.startsWith('p64/') ? P64_TOP : 0))); ctx.restore(); }
+		flame(0.55, AP.fr, 0.35);
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = AP.spark;
 		for (let i = 0; i < 12; i++) { const r = (i * 37 % 11) / 11, x = cx - 16 + r * 32, y = cy + 18 - ((F * 3.5 + i * 9) % 46); ctx.globalAlpha = pw * (0.5 + 0.5 * ((F + i) % 2)); ctx.fillRect(Math.round(x), Math.round(y), 1, 2 + (i % 2)); }   // ประกายพุ่งขึ้น
 		ctx.restore();
 	} : null;
 	const foot = home[1] + 62, dust = (x, y, r, a) => { if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = '#cbb79a'; ctx.beginPath(); ctx.ellipse(x, y, r, r * 0.55, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = '#e6d8c0'; ctx.beginPath(); ctx.ellipse(x - r * 0.25, y - r * 0.2, r * 0.55, r * 0.3, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); };
 	const under = () => {   // ฝุ่นตอนกระโดด/แตะพื้น/ไถล + รอยลากเข่าบนพื้น (ใต้ตัวละคร)
-		const kick = F - ROLL.UP; if (kick >= 0 && kick < 8) for (let i = 0; i < 4; i++) dust(home[0] + 30 + (i - 1.5) * 7 + kick * (i - 1.5), foot - kick * 0.6, 3 + kick * 0.6, 0.7 * (1 - kick / 8));
+		const kick = F - ROLL.UP; if (kick >= 0 && kick < 8) for (let i = 0; i < 4; i++) dust(start[0] + 30 + (i - 1.5) * 7 + kick * (i - 1.5), foot - kick * 0.6, 3 + kick * 0.6, 0.7 * (1 - kick / 8));
 		const d = F - ROLL.LAND; if (d >= 0 && d < 16) {
 			const sx = pos[0] + 34;   // ใต้เข่า
 			ctx.save(); ctx.globalAlpha = 0.55 * (1 - d / 16); ctx.fillStyle = '#7d6a55'; ctx.fillRect(Math.round(stop[0] + 30), foot - 1, Math.round(sx - stop[0] - 30 + Math.min(d, 4) * 2), 1); ctx.restore();   // รอยลาก
@@ -924,24 +927,52 @@ function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟัน�
 	const kill = mode === 'live' ? Infinity : rollHits()[2], targetDraw = (im, tx, ty) => { const d = F - kill; if (d < 0) return false;   // ฟันครั้งสุดท้ายฆ่า → ท่าตายตามสายของท่า
 		(DEATH_FX[it.family] || DEATH_FX._)(im, foe.x - (im.width >> 1), foe.foot - im.height, d, '#b48cff', monDeath(foe.id)); return true; };
 	const targetAfter = (im, tx, ty) => { for (const H of rollHits()) { const d = F - H; if (d >= 0 && (H !== kill || d < 2)) drawTears(im, foe.id, tx, ty, d); } };   // ร้องไห้ทุกครั้งที่โดน (ครั้งสุดท้ายแค่ก่อนตัวขาด)
-	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: foe, bg: drawBg, cell: false, under, party: auraBack, front: auraFront, targetDraw, targetAfter,   // ไม่มีกรอบช่องต้นฉบับซ้ายบน (kwan 10 ต.ค.)
-		over: () => { if (F === ROLL.POWER || F === ROLL.POWER + 1) { ctx.fillStyle = `rgba(255,224,110,${F === ROLL.POWER ? 0.4 : 0.15})`; ctx.fillRect(0, 0, cv.width, cv.height); }   // วาบทองตอนระเบิดพลัง
-			if (F >= 2 && F < ROLL.UP + 4) rs3Bubble(mode === 'crit' ? 'คริติคอล!!' : (it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
+	const front = () => { if (auraFront) auraFront(); if (combo) { if (F < ROLL.UP + 2) drawAngry(pos, F, pose === stand); drawDogCombo(F, stop, foe); } };
+	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: foe, bg: drawBg, cell: false, under, party: auraBack, front, targetDraw, targetAfter,   // ไม่มีกรอบช่องต้นฉบับซ้ายบน (kwan 10 ต.ค.)
+		over: () => { if (F === ROLL.POWER || F === ROLL.POWER + 1) { ctx.fillStyle = `rgba(${AP.flash},${F === ROLL.POWER ? 0.4 : 0.15})`; ctx.fillRect(0, 0, cv.width, cv.height); }   // วาบตอนระเบิดพลัง/ไฟลุก
+			if (!combo && F >= 2 && F < ROLL.UP + 4) rs3Bubble((it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
 			const hs = rollHits(), s0 = ROLL.HIT - 2;
-			if (mode === 'crit') { const i = hs.reduce((a, h, k) => F >= h - 1 ? k : a, -1);   // โอร่า! ตามจำนวนครั้งที่ฟัน (1 → 2 → 3)
+			if (combo) { const i = hs.reduce((a, h, k) => F >= h - 1 ? k : a, -1);   // โอร่า! ตามจำนวนครั้งที่ฟัน (1 → 2 → 3)
 				if (i >= 0 && F < hs[2] + 12) rs3Bubble(Array(i + 1).fill('โอร่า').join(' ') + '!!', stop[0] + 40, stop[1] + 6 - i * 2, F - hs[i] + 1, F < hs[2] + 7 ? 1 : 1 - (F - hs[2] - 6) / 6); }
 			else if (F >= s0 && F < s0 + 16) rs3Bubble(ROLL.SHOUT, stop[0] + 40, stop[1] + 6, F - s0, F < s0 + 11 ? 1 : 1 - (F - s0 - 10) / 6); } });
 }
-// ติดคริ (kwan 11 ต.ค. "ถ้ามอนไม่ตายภายในสกิลเดียว ตัวเอกมีโอกาสติดคริ … อัดท่าเดิมซ้ำอีกชุด · มอนตาย ออร่าหมด แล้วเต้นสามช่า")
-// ชุดแรก 0–69 มอนรอด (ร้องไห้ 3 ครั้ง) → ชุดซ้ำ 70–139 เบ่งพลังใหม่ บอลลูน "คริติคอล!!" + "โอร่า" ตามจำนวนครั้งที่ฟัน ฟันครั้งสุดท้ายตาย → 140– เต้นสามช่า (poses64 rion_b_chacha) 1 รอบ
-// โอกาสติดคริไม่มีในเกม/GDD (ไม่มีค่า CRIT) → คลิปนี้โชว์กรณีติดเสมอ ไม่มีตัวเลขโอกาส
-function rollCritView(c) {
+// โจมตีต่อเนื่อง (kwan 11 ต.ค. "เปลี่ยนจากคริติคอล เป็นโจมตีต่อเนื่อง … โกรธ ขมวดคิ้ว … ไฟลุก … ไม่ต้องกระโดดกลับ อัดสกิลเดิมซ้ำ … โอร่า … หมากระโดดเข้ามาแจม")
+// ชุดแรก 0–49 มอนรอด (ร้องไห้ 3 ครั้ง · ค้างคุกเข่า ไม่ตีลังกากลับ) → ชุดซ้ำ 50–99: ยืนโกรธ (เส้นเลือด 💢 ขมวดคิ้ว ควันหัว) ไฟลุก → ม้วนจากที่คุกเข่า ฟันซ้ำ 3 ครั้ง + โอร่า + หมากระโดดงับทุกครั้ง → มอนตาย ไฟดับ
+// → 100– เต้นสามช่าที่จุดคุกเข่า หมาหมุนดีใจข้างๆ · อัตราการเกิดยังไม่กำหนด (kwan จะสรุป) → คลิปโชว์กรณีเกิดเสมอ
+const rollStop = () => { const foe = rollFoe(), fw = (IMG[foe.key] || { width: 48 }).width, land = [foe.x + (fw >> 1) - 2 + ROLL.SKID, SKS.rion_at[1]]; return { land, stop: [land[0] - ROLL.SKID, land[1]] }; };
+function drawAngry(pos, F, standing) {   // โกรธ: เส้นเลือด 💢 แดงเด้งที่มุมหัว · ขมวดคิ้ว (ตอนยืน) · ควันพุ่งจากหัว
+	const x0 = Math.round(pos[0]), y0 = Math.round(pos[1]), pop = F < 2 ? 1 : F % 6 < 3 ? 0 : 1;
+	const V = ['.XX...XX.', 'XXX...XXX', 'XX.....XX', '.........', '.........', '.........', 'XX.....XX', 'XXX...XXX', '.XX...XX.'], vx = x0 + 37 - pop, vy = y0 + 1 - pop;
+	ctx.save();
+	for (let j = 0; j < 9; j++) for (let i = 0; i < 9; i++) if (V[j][i] === 'X') { ctx.fillStyle = '#3a0a0a'; ctx.fillRect(vx + i - 1, vy + j, 3, 1); ctx.fillRect(vx + i, vy + j - 1, 1, 3); }
+	for (let j = 0; j < 9; j++) for (let i = 0; i < 9; i++) if (V[j][i] === 'X') { ctx.fillStyle = '#ff2a2a'; ctx.fillRect(vx + i, vy + j, 1, 1); }
+	if (standing) { ctx.fillStyle = '#2a1410'; for (const [bx, by] of BROW) ctx.fillRect(x0 + bx, y0 + by, 1, 1); }   // คิ้วขมวดลงหาจมูก (หันซ้าย)
+	for (let k = 0; k < 2; k++) { const t = (F + k * 3) % 6, a = 1 - t / 6; ctx.globalAlpha = 0.8 * a; ctx.fillStyle = '#f2f2f2';   // ควันพ่นจากหัวสองข้าง
+		ctx.fillRect(x0 + 22 + (k ? 10 : -4) + (k ? t : -t), y0 + 6 - t * 1.5, 2 + (t >> 1), 2); }
+	ctx.restore();
+}
+const BROW = [[22, 23], [22, 22], [23, 22], [24, 22], [25, 21], [26, 21], [26, 20]];   // ตา = คอลัมน์ x24 แถว 23–26 ของริก SL01_0 · คิ้วหนา ปลายด้านจมูก (ซ้าย) กดลงชิดตา
+function drawDogCombo(F, stop, foe) {   // หมาคู่หู: วิ่งเข้าฉากตอนไฟลุก → ยืนรอหลัง Rion → กระโดดงับมอนตรงจังหวะฟันทุกครั้ง แล้วเด้งกลับ
+	if (F < ROLL.DOG_IN) return;
+	const ground = SKS.rion_at[1] + 62, spot = [stop[0] + 44, ground - 34], bite = [foe.x - 10, ground - 34 - 10], arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h];
+	let xy = spot, key = 'dog/west', fx = 0;
+	if (F < ROLL.DOG_IN + 8) { const p = (F - ROLL.DOG_IN) / 8; xy = [lerp(SKS.stage[0] + 4, spot[0], p), spot[1] - Math.abs(Math.sin(p * Math.PI * 3)) * 3]; key = `dog/west_w${F % 4}`; }   // วิ่งเข้า
+	for (const H of rollHits()) {
+		if (F >= H - 3 && F <= H) { xy = arc((F - H + 3) / 3, spot, bite, 16); key = 'dog/west_w1'; if (F === H) fx = 1; }   // กระโดดงับ
+		else if (F > H && F <= H + 2) { xy = arc((F - H) / 2, bite, spot, 8); key = 'dog/west_w3'; } }   // เด้งกลับ
+	if (!IMG[key]) key = 'dog/west';
+	spr(key, xy[0], xy[1]);
+	if (fx) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = '#fff6c0'; const bx = Math.round(bite[0] + 6), by = Math.round(bite[1] + 16);   // ประกายงับ
+		for (const [dx, dy] of [[0, 0], [-1, 0], [1, 0], [0, -1], [0, 1], [-3, -3], [3, -3], [-3, 3], [3, 3], [-2, 0], [2, 0]]) ctx.fillRect(bx + dx, by + dy, 1, 1); ctx.restore(); }
+}
+function rollComboView(c) {
 	const [F, m] = rollPhase(S.frame); if (m !== 'dance') return rollView(c, F, m);
-	const pose = p64Key('rion_b_chacha', F / ROLL_DANCE()) || rigKey(rigWeapon(c.skill), 0);
-	vfxScene(c, { f: ROLL.N - 1 - ROLL.ATK, size: SKS.stage, hand: SKS.hand, rion: SKS.rion_at, pose, target: rollFoe(), bg: drawBg, cell: false, targetDraw: () => true });   // มอนตายไปแล้ว ไม่วาด
+	const { stop } = rollStop(), pose = p64Key('rion_b_chacha', F / ROLL_DANCE()) || rigKey(rigWeapon(c.skill), 0), dog = p64Key('dog_spin', F * VFX.SEC / 0.36), ground = SKS.rion_at[1] + 62;
+	vfxScene(c, { f: ROLL.N - 1 - ROLL.ATK, size: SKS.stage, hand: SKS.hand, rion: stop, pose, target: rollFoe(), bg: drawBg, cell: false, targetDraw: () => true,   // มอนตายไปแล้ว ไม่วาด
+		front: () => { if (dog) spr(dog, stop[0] + 44 - 7, ground - 48); } });   // หมาหมุนดีใจข้าง Rion (poses64 dog_spin · ผืน 48 เท้าชิดล่าง)
 }
 function vfxView(c) {   // แบบเวทีทดสอบ: Rion ขวา เป้า M01 ซ้าย ช่องต้นฉบับมุมซ้ายบน · epic = เลื่อนท่าไปเริ่มเฟรม 28 (ก่อนหน้านั้นยืนรวมพลัง)
-	if (c.roll) return c.crit ? rollCritView(c) : rollView(c);
+	if (c.roll) return c.combo ? rollComboView(c) : rollView(c);
 	const f = c.epic ? S.frame - RS3.ATK : S.frame, rw = RIG_ON && rigWeapon(c.skill);
 	const pose = f < 0 ? (rw ? rigKey(rw, S.frame < 6 ? 0 : 4) : heldPose(c.skill, S.frame < 6 ? 0 : 1)) : rw ? rigKey(rw, rigVfx(f)) : heldPose(c.skill, VFX.POSE[f] ?? 0);
 	const F = S.frame, b0 = RS3.SHOUT + EY.BUBBLE, it = c.skill;   // epic: คัตอิน + บอลลูนชื่อท่า ช่วงเดียวกับแนว RS3 (ตะโกนก่อนลงมือ)
@@ -1100,13 +1131,17 @@ const AU_ROLL = {
 	spin: () => auNoise(0.22, 'bandpass', 600, 2400, 0.55, 2.2),   // ลมหมุนต่อรอบ
 	wind: () => { auNoise(0.16, 'highpass', 2600, 7000, 0.45, 6); auTone(0.14, 'sawtooth', 1800, 900, 0.1, 0, 0.004, { lp: 4500 }); },   // ใบดาบเงื้อ
 	skid: () => { auNoise(0.32, 'bandpass', 1500, 500, 0.75, 1.2); auNoise(0.3, 'lowpass', 600, 150, 0.5, 1, 0.02); },   // เข่าไถลพื้น
+	bark: () => { for (const d of [0, 0.09]) auTone(0.07, 'square', 520, 300, 0.22, d, 0.003, { lp: 2200 }); },   // หมาเห่า โฮ่งๆ
+	fire: () => { auNoise(0.6, 'lowpass', 300, 1800, 0.7, 1, 0, { attack: 0.08 }); auNoise(0.5, 'bandpass', 900, 2600, 0.35, 2, 0.1); },   // ไฟลุกพรึ่บ
+	grr: () => auTone(0.35, 'sawtooth', 110, 90, 0.25, 0, 0.02, { lp: 600 }),   // ฮึ่ม (โกรธ)
 	flip: () => { auNoise(0.25, 'bandpass', 500, 2000, 0.5, 2); auTone(0.1, 'sine', 120, 70, 0.4, 0.28, 0.003); },   // ตีลังกากลับ + แตะพื้น
 };
 function rollSound(F, mode = '') {
 	if (!S.sound || !AU) return;
 	if (F === ROLL.UP) AU_ROLL.jump();
 	for (let k = 0; k < ROLL.TURNS; k++) if (F === ROLL.UP + 2 + Math.round(k * (ROLL.LAND - ROLL.UP - 4) / ROLL.TURNS)) AU_ROLL.spin();
-	if (F === ROLL.POWER) AU_SFX.charge('SL');   // เสียงชาร์จเดิมของท่า ตรงจังหวะเบ่งพลัง
+	if (mode === 'combo') { if (F === 0) AU_ROLL.grr(); if (F === ROLL.POWER) AU_ROLL.fire(); if (F === ROLL.DOG_IN + 2) AU_ROLL.bark(); for (const H of rollHits()) if (F === H - 3) AU_ROLL.bark(); }
+	else if (F === ROLL.POWER) AU_SFX.charge('SL');   // เสียงชาร์จเดิมของท่า ตรงจังหวะเบ่งพลัง
 	if (F === ROLL.LAND - ROLL.WIND) AU_SFX.release.SL();   // เสียงปล่อยเดิม (ลมฟัน + โลหะเฉือน) ตอนเงื้อดาบกลางอากาศ
 	if (F === ROLL.LAND + 1) AU_ROLL.skid();
 	const [, H2, H3] = rollHits(); if (F === H2 - 1 || F === H3 - 1) AU_SFX.release.SL();   // เสียงเหวี่ยงเดิมก่อนฟันครั้ง 2–3
@@ -2554,7 +2589,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.crit ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		clipView();
 	} else {
