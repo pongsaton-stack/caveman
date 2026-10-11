@@ -359,6 +359,9 @@ const VFX = { N: 36, SEC: 0.045, CHG: 1, REL: 8, HIT: 14, STOP: 2,   // ชา�
 // + ไถลต่อ SKID px ตามแรงส่ง · บอลลูน "ตายซะ!!" · ค้างคุกเข่าดูฟันวิญญาณ · ตีลังกากลับ 58–69 · ท่าชันเข่า = ริก SL01K (rion_rig.py --variants · ตัวฐานภาพทรุดเข่า west_k0)
 const ROLL = { N: 70, UP: 14, LAND: 32, HIT: 32, BACK: 50, HOME: 61, POWER: 3, TURNS: 3, H: 42, BACK_H: 30, SKID: 7, WIND: 3, SHOUT: 'ตายซะ!!' };   // คุกเข่าค้าง 32–49 (เดิมถึง 57) · ตีลังกากลับ 50–61 · ยืนที่เดิม 62–69
 ROLL.ATK = ROLL.HIT - 14;   // = HIT − VFX.HIT (VFX ประกาศทีหลัง ใส่เลขตรงนี้: HIT 14)
+// ติดคริ: เฟรมรวม T → [เฟรมในชุด, ช่วง] · ชุดแรกมอนรอด (live) → ชุดซ้ำ (crit) → เต้นสามช่า (dance · ยาว 1 รอบท่า poses64)
+const ROLL_DANCE = () => Math.round(((P64.rion_b_chacha || {}).cycle || 3.2) / VFX.SEC);
+const rollPhase = T => T < ROLL.N ? [T, 'live'] : T < 2 * ROLL.N ? [T - ROLL.N, 'crit'] : [T - 2 * ROLL.N, 'dance'];
 const vHash = str => { let h = 2166136261; for (const ch of str) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
 const vRng = seed => { let s = (seed >>> 0) || 1; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; };
 const lerp = (a, b, t) => a + (b - a) * Math.max(0, Math.min(1, t));
@@ -429,6 +432,9 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // แนว RS3 — ท
 		addClip(G, 'epic_rs3_SL01', 'SL01 · RS3 + ฟันวิญญาณ', Array.from({ length: RS3.N }, (_, f) => rs3Rion(it, f).key), VFX.SEC, { tab: 'sksheet', skill: it, rs3: true, epic: true });
 		addClip(G, 'epic_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ', Array.from({ length: RS3.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - RS3.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true });
 		addClip(G, 'roll_vfx_SL01', 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน ชันเข่าฟัน', Array.from({ length: ROLL.N }, (_, f) => vk[Math.max(0, Math.min(vk.length - 1, f - ROLL.ATK))]), VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, atk: ROLL.ATK });
+		const ND = ROLL_DANCE();   // ติดคริ: ชุดแรกมอนรอด → ชุดซ้ำ → เต้นสามช่า
+		addClip(G, 'roll_crit_SL01', 'SL01 · กระโดดม้วน · มอนรอด → ติดคริ ซ้ำอีกชุด → เต้นสามช่า', Array.from({ length: 2 * ROLL.N + ND }, (_, T) => T < 2 * ROLL.N ? vk[Math.max(0, Math.min(vk.length - 1, T % ROLL.N - ROLL.ATK))] : p64Key('rion_b_chacha', (T - 2 * ROLL.N) / ND) || vk[0]),
+			VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, crit: true, atk: ROLL.ATK });
 	}
 }
 for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
@@ -859,8 +865,8 @@ const DEATH_FX = {
 		ctx.restore(); },
 };
 const rollHits = () => [ROLL.HIT, ROLL.ATK + VFX.HIT + 6 + VFX.STOP, ROLL.ATK + VFX.HIT + 12 + VFX.STOP];   // เฟรมกระทบ 3 ระลอก (= epic hits ใน vfxScene) → 32 · 40 · 46
-function rollView(c) {   // กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
-	const F = S.frame, f = F - ROLL.ATK, it = c.skill, rw = RIG_ON && rigWeapon(it), home = SKS.rion_at, foe = rollFoe(), fw = (IMG[foe.key] || { width: 48 }).width;
+function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟันครั้งสุดท้ายฆ่า) · 'live' = มอนรอด (คริชุดแรก) · 'crit' = ชุดซ้ำหลังติดคริ ออร่าค้างจนมอนตาย · กระโดดม้วน: Rion เคลื่อนตามเส้นโค้งจากที่ยืนถึงหน้าเป้า หมุนรอบตัว ROLL.TURNS รอบ (ม้วนหน้า = ทวนเข็มเมื่อหันซ้าย) + ภาพติดตา
+	const F = Fin ?? S.frame, f = F - ROLL.ATK, it = c.skill, rw = RIG_ON && rigWeapon(it), home = SKS.rion_at, foe = rollFoe(), fw = (IMG[foe.key] || { width: 48 }).width;
 	const land = [foe.x + (fw >> 1) - 2 + ROLL.SKID, home[1]], stop = [land[0] - ROLL.SKID, land[1]];   // แตะพื้นแล้วไถลไปหยุดชิดขวาของเป้า (ระยะตามความกว้างภาพมอน)
 	const arc = (p, a, b, h) => [lerp(a[0], b[0], p), lerp(a[1], b[1], p) - Math.sin(Math.PI * p) * h], ease = p => p < 0.5 ? 2 * p * p : 1 - 2 * (1 - p) * (1 - p);
 	const tuck = rw && IMG['rig/' + rw + 'T_0'] ? rigKey(rw + 'T', 0) : rw ? rigKey(rw, 4) : heldPose(it, 1), stand = rw ? rigKey(rw, 0) : heldPose(it, 0);   // ม้วน = ท่าขดตัว SL01T
@@ -885,7 +891,8 @@ function rollView(c) {   // กระโดดม้วน: Rion เคลื่
 	const hand = [SKS.hand[0] - home[0] + pos[0], SKS.hand[1] - home[1] + pos[1]];
 	// เบ่งพลัง ออร่าทองลุกเป็นเปลว (kwan 10 ต.ค. "ตอนชาร์จ เบ่งพลังแบบซุปเปอร์ไซย่าร่าง 1") — แนวแรงบันดาลใจ วาดเองทั้งหมด
 	//   ระเบิดพลัง F POWER (วาบทอง) → ออร่าโตเกิน 1.2 แล้วนิ่ง 1 → ลอยตามตัวตอนกระโดดแล้วจางใน 5 เฟรม · ตัวเรืองทองกะพริบ · ประกายพุ่งขึ้น · หินลอยรอบเท้า
-	const P0 = ROLL.POWER, pw = F < P0 ? 0 : F < P0 + 3 ? 0.4 + 0.8 * (F - P0) / 3 : F < ROLL.UP ? 1 : F < ROLL.UP + 5 ? 1 - (F - ROLL.UP) / 5 : 0;
+	const P0 = ROLL.POWER, K3 = rollHits()[2], pw = F < P0 ? 0 : F < P0 + 3 ? 0.4 + 0.8 * (F - P0) / 3 : mode === 'crit' ? (F < K3 + 4 ? 1 : F < K3 + 10 ? 1 - (F - K3 - 4) / 6 : 0)   // คริ: ออร่าค้างทั้งท่า หมดเมื่อมอนตาย
+		: F < ROLL.UP ? 1 : F < ROLL.UP + 5 ? 1 - (F - ROLL.UP) / 5 : 0;
 	const cx = pos[0] + 32, cy = pos[1] + 42, feetY = home[1] + 62;
 	const flame = (k, col, a) => { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = a; ctx.fillStyle = col;
 		for (let i = 0; i < 16; i++) { const an = Math.PI * (0.05 + 0.9 * i / 15), side = Math.cos(an), bx = cx + side * 15 * k, by = cy + 16 - Math.sin(an) * 30 * k,
@@ -914,16 +921,27 @@ function rollView(c) {   // กระโดดม้วน: Rion เคลื่
 			ctx.save(); ctx.globalAlpha = 0.55 * (1 - d / 16); ctx.fillStyle = '#7d6a55'; ctx.fillRect(Math.round(stop[0] + 30), foot - 1, Math.round(sx - stop[0] - 30 + Math.min(d, 4) * 2), 1); ctx.restore();   // รอยลาก
 			for (let i = 0; i < 6; i++) { const q = d - i * 0.7; if (q < 0) continue; dust(sx + 6 + i * 3 + q * 1.2, foot - 2 - q * 0.8 - (i % 2) * 2, 2.5 + q * 0.7, 0.75 * (1 - q / 12)); }
 		} };
-	const kill = rollHits()[2], targetDraw = (im, tx, ty) => { const d = F - kill; if (d < 0) return false;   // ฟันครั้งสุดท้ายฆ่า → ท่าตายตามสายของท่า
+	const kill = mode === 'live' ? Infinity : rollHits()[2], targetDraw = (im, tx, ty) => { const d = F - kill; if (d < 0) return false;   // ฟันครั้งสุดท้ายฆ่า → ท่าตายตามสายของท่า
 		(DEATH_FX[it.family] || DEATH_FX._)(im, foe.x - (im.width >> 1), foe.foot - im.height, d, '#b48cff', monDeath(foe.id)); return true; };
 	const targetAfter = (im, tx, ty) => { for (const H of rollHits()) { const d = F - H; if (d >= 0 && (H !== kill || d < 2)) drawTears(im, foe.id, tx, ty, d); } };   // ร้องไห้ทุกครั้งที่โดน (ครั้งสุดท้ายแค่ก่อนตัวขาด)
 	vfxScene(c, { f, size: SKS.stage, hand, rion: pos, pose, rot, trail, target: foe, bg: drawBg, cell: false, under, party: auraBack, front: auraFront, targetDraw, targetAfter,   // ไม่มีกรอบช่องต้นฉบับซ้ายบน (kwan 10 ต.ค.)
 		over: () => { if (F === ROLL.POWER || F === ROLL.POWER + 1) { ctx.fillStyle = `rgba(255,224,110,${F === ROLL.POWER ? 0.4 : 0.15})`; ctx.fillRect(0, 0, cv.width, cv.height); }   // วาบทองตอนระเบิดพลัง
-			if (F >= 2 && F < ROLL.UP + 4) rs3Bubble((it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
-			const s0 = ROLL.HIT - 2; if (F >= s0 && F < s0 + 16) rs3Bubble(ROLL.SHOUT, stop[0] + 40, stop[1] + 6, F - s0, F < s0 + 11 ? 1 : 1 - (F - s0 - 10) / 6); } });
+			if (F >= 2 && F < ROLL.UP + 4) rs3Bubble(mode === 'crit' ? 'คริติคอล!!' : (it.name_th || it.code) + '!!', home[0] + 32, home[1] + 4, F - 2, F < ROLL.UP ? 1 : 1 - (F - ROLL.UP + 1) / 5);
+			const hs = rollHits(), s0 = ROLL.HIT - 2;
+			if (mode === 'crit') { const i = hs.reduce((a, h, k) => F >= h - 1 ? k : a, -1);   // โอร่า! ตามจำนวนครั้งที่ฟัน (1 → 2 → 3)
+				if (i >= 0 && F < hs[2] + 12) rs3Bubble(Array(i + 1).fill('โอร่า').join(' ') + '!!', stop[0] + 40, stop[1] + 6 - i * 2, F - hs[i] + 1, F < hs[2] + 7 ? 1 : 1 - (F - hs[2] - 6) / 6); }
+			else if (F >= s0 && F < s0 + 16) rs3Bubble(ROLL.SHOUT, stop[0] + 40, stop[1] + 6, F - s0, F < s0 + 11 ? 1 : 1 - (F - s0 - 10) / 6); } });
+}
+// ติดคริ (kwan 11 ต.ค. "ถ้ามอนไม่ตายภายในสกิลเดียว ตัวเอกมีโอกาสติดคริ … อัดท่าเดิมซ้ำอีกชุด · มอนตาย ออร่าหมด แล้วเต้นสามช่า")
+// ชุดแรก 0–69 มอนรอด (ร้องไห้ 3 ครั้ง) → ชุดซ้ำ 70–139 เบ่งพลังใหม่ บอลลูน "คริติคอล!!" + "โอร่า" ตามจำนวนครั้งที่ฟัน ฟันครั้งสุดท้ายตาย → 140– เต้นสามช่า (poses64 rion_b_chacha) 1 รอบ
+// โอกาสติดคริไม่มีในเกม/GDD (ไม่มีค่า CRIT) → คลิปนี้โชว์กรณีติดเสมอ ไม่มีตัวเลขโอกาส
+function rollCritView(c) {
+	const [F, m] = rollPhase(S.frame); if (m !== 'dance') return rollView(c, F, m);
+	const pose = p64Key('rion_b_chacha', F / ROLL_DANCE()) || rigKey(rigWeapon(c.skill), 0);
+	vfxScene(c, { f: ROLL.N - 1 - ROLL.ATK, size: SKS.stage, hand: SKS.hand, rion: SKS.rion_at, pose, target: rollFoe(), bg: drawBg, cell: false, targetDraw: () => true });   // มอนตายไปแล้ว ไม่วาด
 }
 function vfxView(c) {   // แบบเวทีทดสอบ: Rion ขวา เป้า M01 ซ้าย ช่องต้นฉบับมุมซ้ายบน · epic = เลื่อนท่าไปเริ่มเฟรม 28 (ก่อนหน้านั้นยืนรวมพลัง)
-	if (c.roll) return rollView(c);
+	if (c.roll) return c.crit ? rollCritView(c) : rollView(c);
 	const f = c.epic ? S.frame - RS3.ATK : S.frame, rw = RIG_ON && rigWeapon(c.skill);
 	const pose = f < 0 ? (rw ? rigKey(rw, S.frame < 6 ? 0 : 4) : heldPose(c.skill, S.frame < 6 ? 0 : 1)) : rw ? rigKey(rw, rigVfx(f)) : heldPose(c.skill, VFX.POSE[f] ?? 0);
 	const F = S.frame, b0 = RS3.SHOUT + EY.BUBBLE, it = c.skill;   // epic: คัตอิน + บอลลูนชื่อท่า ช่วงเดียวกับแนว RS3 (ตะโกนก่อนลงมือ)
@@ -1084,7 +1102,7 @@ const AU_ROLL = {
 	skid: () => { auNoise(0.32, 'bandpass', 1500, 500, 0.75, 1.2); auNoise(0.3, 'lowpass', 600, 150, 0.5, 1, 0.02); },   // เข่าไถลพื้น
 	flip: () => { auNoise(0.25, 'bandpass', 500, 2000, 0.5, 2); auTone(0.1, 'sine', 120, 70, 0.4, 0.28, 0.003); },   // ตีลังกากลับ + แตะพื้น
 };
-function rollSound(F) {
+function rollSound(F, mode = '') {
 	if (!S.sound || !AU) return;
 	if (F === ROLL.UP) AU_ROLL.jump();
 	for (let k = 0; k < ROLL.TURNS; k++) if (F === ROLL.UP + 2 + Math.round(k * (ROLL.LAND - ROLL.UP - 4) / ROLL.TURNS)) AU_ROLL.spin();
@@ -1093,7 +1111,7 @@ function rollSound(F) {
 	if (F === ROLL.LAND + 1) AU_ROLL.skid();
 	const [, H2, H3] = rollHits(); if (F === H2 - 1 || F === H3 - 1) AU_SFX.release.SL();   // เสียงเหวี่ยงเดิมก่อนฟันครั้ง 2–3
 	if (F === ROLL.BACK) AU_ROLL.flip();
-	rollHits().forEach((H, i, a) => { if (F === H + 1) { const id = rollFoe().id; auMon(monVoice(id), i === a.length - 1, 48 / (IMG['mon/' + id] || { width: 48 }).width); } });   // มอนร้องทุกครั้งที่โดน
+	rollHits().forEach((H, i, a) => { if (F === H + 1) { const id = rollFoe().id; auMon(monVoice(id), mode !== 'live' && i === a.length - 1, 48 / (IMG['mon/' + id] || { width: 48 }).width); } });   // มอนร้องทุกครั้งที่โดน
 }
 const AU_SFX = {
 	charge: fam => { auNoise(0.62, 'bandpass', 180, fam === 'DV' ? 4200 : 2600, 0.5, 3, 0, { attack: 0.5 });   // เสียงพลังพุ่งขึ้น
@@ -2536,7 +2554,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) { vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); if (c.roll) rollSound(S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.crit ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		clipView();
 	} else {
