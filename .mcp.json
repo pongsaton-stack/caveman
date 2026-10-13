@@ -12,3 +12,24 @@
     }
   }
 }
+{
+  "mcpServers": {
+    "blender": {
+      "command": "uvx",
+      "args": ["mcp-for-blender==2.1.9"],
+      "env": {
+        "BLENDER_HOST": "127.0.0.1",
+        "BLENDER_PORT": "9876",
+        "DISABLE_TELEMETRY": "1",
+        "BLENDERMCP_NO_UPDATE_CHECK": "1"
+      }
+    },
+    "night-forge-vfx": {
+      "type": "http",
+      "url": "https://vfx-lab.blogbox.me/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ${NIGHTFORGE_API_KEY}"
+      }
+    }
+  }
+}
