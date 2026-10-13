@@ -438,7 +438,23 @@ for (const code of ((SKS || {}).vfx_samples || [])) {   // แนว RS3 — ท
 			VFX.SEC, { tab: 'sksheet', skill: it, vfx: true, epic: true, roll: true, combo: true, atk: ROLL.ATK });
 	}
 }
-for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
+// ── ห่าลูกไฟ (kwan 13 ต.ค. ส่งคลิปเกมอื่น "ผมอยากได้ท่าสกิลแบบนี้ในเกมเรา") — ลักษณะจากคลิป วาดเองทั้งหมด ไม่ใช้ภาพจากคลิป ──
+// ยิงลูกไฟทีละลูก 5 ลูก ทุกลูกที่โดนเติมแต้มสะสมเหนือหัวมอน → ครบ 5 = พายุเพลิงหมุนขึ้นรอบตัว Rion → ห่าลูกไฟโค้งพุ่งรัว → มอนเซแล้วล้มหงาย → ของดรอปกลิ้งมาหา Rion
+// ร่างของหน้าเทส: ยังไม่ผูกกับท่า/คาถาไหน · ไม่มีตัวเลขดาเมจ · จำนวนลูก/แต้มสะสม 5 = ค่าภาพตามคลิป ไม่ใช่กฎเกม
+const FB = { N: 160, SHOT0: 4, SHOT_GAP: 6, SHOTS: 5, FLY: 8, BURST: 38, BAR0: 58, BAR1: 110, BAR_GAP: 2, FALL: 120, LOOT: 129, REST: 142 };
+FB.shotHit = k => FB.SHOT0 + k * FB.SHOT_GAP + FB.FLY;   // ลูกที่ k โดน → แต้มสะสม k+1 (12 18 24 30 36)
+const FB_SKILL = { code: 'FIREBAR', family: 'BK', name_th: 'ห่าลูกไฟ', colors: ['#ffd24a', '#ff8a1e', '#e8401a', '#fff4c0'] };
+function fbPose(F) {   // ท่ายืนร่าย cast_fwd: 0 ยืน · 1–2 รวมพลัง · 3–4 ผลักฝ่ามือ
+	const k = n => 'rion/grips/cast_fwd_' + n;
+	if (F < FB.SHOT0) return k(F < 2 ? 0 : 1);
+	if (F < FB.BURST) { const d = (F - FB.SHOT0) % FB.SHOT_GAP; return k(d < 2 ? 4 : d < 4 ? 3 : 2); }
+	if (F < FB.BAR0) return k(F < FB.BURST + 4 ? 2 : 1);   // พายุเพลิง: รวมพลังกลางวง
+	if (F < FB.BAR1 + 4) return k((F - FB.BAR0) % 4 < 2 ? 4 : 3);   // ห่าลูกไฟ: ผลักรัว
+	return k(F < FB.REST ? 3 : 0);
+}
+if (IMG_OK('rion/grips/cast_fwd_0')) addClip('ตัวอย่างจากคลิป · ห่าลูกไฟ (ร่าง ยังไม่ผูกท่า)', 'fire_barrage', 'ห่าลูกไฟ · ยิงสะสม 5 → พายุเพลิง → ห่าลูกไฟ → มอนล้ม + ของดรอป',
+	Array.from({ length: FB.N }, (_, F) => fbPose(F)), VFX.SEC, { tab: 'sksheet', skill: FB_SKILL, vfx: true, fire: true });
+for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ', 'ตัวอย่างจากคลิป']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
 // ── ชีต VFX Protagonist (kwan 6 ต.ค. "ตัดมาใส่ในเทสแยกแทป เชคดูถ้าไม่เนียน จัดการให้สวยงาม") ──
 // แผงท่า: แถวละ 1 คลิป · เฟรมในชีต = ภาพหลัก แต่ละภาพแตกเป็น SUB เฟรมย่อยไว้เฟด · ค่าทั้งหมดเป็นค่าดูในหน้าเทส ไม่ใช่ค่าเกม
 const VXS = DATA.vfx_sheet, VX = { SUB: 3, KEY_SEC: 0.12, K: 1.6, PW: 150, PH: 120, STILL_SEC: 1.2,
@@ -1000,7 +1016,105 @@ function rollComboView(c) {
 		front: () => { if (dog) spr(dog, stop[0] + 44 - 7, ground - 48); const item = stealItem(rollFoe().id), bob = Math.sin(F * 0.5) * 2;   // หมาหมุนดีใจข้าง Rion (poses64 dog_spin · ผืน 48 เท้าชิดล่าง)
 			drawLoot(item, stop[0] + 53, ground - 64 + bob); if (item && F < 40) lootLabel('+ ' + item.name, stop[0] + 61, ground - 66 + bob, F < 32 ? 1 : 1 - (F - 32) / 8); } });   // ของที่ขโมยมาลอยเหนือหัวหมา + ป้ายชื่อ
 }
+// ห่าลูกไฟ — วาดทั้งฉากเอง (ไม่ผ่าน vfxScene) · ทุกอย่างคิดจากเลขเฟรม → กดทีละเฟรมได้ภาพเดิม
+const FB_COL = ['#fff4c0', '#ffd24a', '#ff8a1e', '#e8401a', '#8a1a10'];
+const fbBalls = () => {   // ลูกไฟทั้งหมด: [เฟรมยิง, เฟรมโดน, ความสูงโค้ง, เยื้องจุดโดน x, y]
+	if (FB._balls) return FB._balls; const r = vRng(4242), out = [];
+	for (let k = 0; k < FB.SHOTS; k++) out.push({ t0: FB.SHOT0 + k * FB.SHOT_GAP, t1: FB.shotHit(k), h: 16, dx: 0, dy: 0, big: true });
+	for (let t = FB.BAR0; t <= FB.BAR1; t += FB.BAR_GAP) for (let j = 0; j < 2; j++) { const fly = 7 + Math.floor(r() * 4); out.push({ t0: t, t1: t + fly, h: r() < 0.25 ? -6 - r() * 8 : 14 + r() * 30, dx: (r() * 2 - 1) * 9, dy: (r() * 2 - 1) * 9, side: r() * 24 - 12 }); }
+	return (FB._balls = out);
+};
+function fbBall(x, y, s, a) {   // ลูกไฟ: เรืองส้ม → แกนเหลือง → จุดขาว
+	vfxDot(x, y, 4.5 * s, FB_COL[3], 0.45 * a); vfxDot(x, y, 3 * s, FB_COL[2], 0.8 * a); vfxDot(x, y, 1.8 * s, FB_COL[1], a); vfxDot(x - 0.5, y - 0.5, 0.9 * s, FB_COL[0], a);
+}
+function fireView(c) {
+	const F = S.frame, [W0, H0] = SKS.stage, rx = SKS.rion_at[0], ry = SKS.rion_at[1], ground = ry + 62, foe = rollFoe(), tg = IMG[foe.key];
+	const tw = tg ? tg.width : 48, th = tg ? tg.height : 48, T = { x: foe.x, y: foe.foot - tgMid(foe) }, hx = rx + 12, hy = ry + 40, balls = fbBalls();
+	const hitsNow = balls.filter(b => b.t1 <= F && F - b.t1 < 3), lastHit = Math.max(-99, ...balls.filter(b => b.t1 <= F).map(b => b.t1)), since = F - lastHit;
+	const fall = F >= FB.FALL ? Math.min(1, (F - FB.FALL) / 8) : 0, burst = F >= FB.BURST && F < FB.BAR1 + 10;
+	cv.width = W0; cv.height = H0; ctx.imageSmoothingEnabled = false; ctx.save();
+	const shk = F >= FB.FALL + 7 && F < FB.FALL + 12 ? 3 : F >= FB.BAR0 && F < FB.FALL && since < 2 ? 1 : F >= FB.BURST && F < FB.BURST + 4 ? 2 : 0, rs = vRng(F * 97 + 5);
+	ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk));
+	drawBg();
+	// ฟ้ามืดอุ่นตอนพายุเพลิง/ห่าลูกไฟ
+	const dim = F < FB.BURST ? 0 : F < FB.BURST + 6 ? (F - FB.BURST) / 6 : F < FB.FALL + 8 ? 1 : Math.max(0, 1 - (F - FB.FALL - 8) / 10);
+	if (dim) { ctx.fillStyle = `rgba(28,8,4,${0.45 * dim})`; ctx.fillRect(-8, -8, W0 + 16, H0 + 16);
+		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.16 * dim; ctx.fillStyle = FB_COL[3]; ctx.fillRect(-8, -8, W0 + 16, H0 * 0.6); ctx.restore(); }
+	// พายุเพลิงรอบ Rion: เกลียวเปลวไฟหมุนขึ้น (ครึ่งหลังวาดก่อนตัว ครึ่งหน้าวาดทับตัว) · ระหว่างห่าลูกไฟเหลือวงเล็ก
+	const cx = rx + 33, storm = F < FB.BURST ? 0 : F < FB.BURST + 5 ? (F - FB.BURST + 1) / 5 : F < FB.BAR0 ? 1 : F < FB.BAR1 + 6 ? 0.4 : F < FB.BAR1 + 14 ? 0.4 * (1 - (F - FB.BAR1 - 6) / 8) : 0;
+	const tornado = front => { if (!storm) return; const n = 72, Hh = 80 * Math.min(1, storm * 1.6);   // ลิ้นไฟ: ตัวเปลวทึบ (แดง→ส้ม) + แกนเรือง (เหลือง→ขาว) ยืดตามแนวพุ่งขึ้น
+		for (let i = 0; i < n; i++) { const ph = (F * 0.06 + i / n) % 1, ang = i * 2.39 + F * 0.5, z = Math.sin(ang); if ((z > 0) !== front) continue;
+			const rad = (6 + ph * 20) * Math.min(1, storm + 0.3), x = cx + Math.cos(ang) * rad, y = ground - 2 - ph * Hh, sz = (5.5 - ph * 4) * (0.6 + 0.4 * storm), a = (1 - ph * 0.85) * storm;
+			ctx.save(); ctx.globalAlpha = a * (front ? 0.9 : 0.75); ctx.fillStyle = FB_COL[ph < 0.3 ? 2 : ph < 0.65 ? 3 : 4];
+			ctx.beginPath(); ctx.ellipse(x, y, sz * 0.6, sz * 1.5, Math.cos(ang) * 0.35, 0, 7); ctx.fill(); ctx.restore();
+			vfxDot(x, y + sz * 0.3, sz * 0.45, FB_COL[ph < 0.4 ? 0 : 1], a * 0.8); } };
+	if (storm) { vfxRing(cx, ground, 12 + 10 * storm, (12 + 10 * storm) * 0.28, FB_COL[2], 0.8 * storm, 2); vfxDot(cx, ground - 26, 26 * storm, FB_COL[3], 0.16 * storm); }
+	tornado(false);
+	if (F >= FB.BURST && F < FB.BURST + 8) { const q = (F - FB.BURST) / 8; vfxRing(cx, ground - 20, 6 + q * 60, (6 + q * 60) * 0.55, FB_COL[1], 1 - q, 3); }   // คลื่นไฟระเบิดออกตอนครบสะสม
+	// มอน: เซตอนโดนรัว → ล้มหงายไปทางซ้าย (หมุนรอบเท้า) → นอนนิ่ง มืดลง
+	if (tg) { const kb = since < 3 && F < FB.FALL ? -[2, 1, 0][since] : 0, wob = F >= FB.BAR1 - 14 && F < FB.FALL ? Math.round(Math.sin(F * 1.3) * 2) : 0;
+		// ล้ม: เอนหงายช้า ๆ → ทรุดแบนติดพื้น (ยุบสูง 30% · แผ่ 125%) แล้วเด้งนิดหนึ่ง · ไม่หมุน 90° เพราะเวทีซ้ายแคบ ตัวจะหลุดจอ
+		const ease = fall < 1 ? fall * fall : 1, tilt = F >= FB.BAR1 - 14 ? -0.22 * Math.min(1, (F - FB.BAR1 + 14) / 14) * (1 - ease) : 0;
+		const bounce = F >= FB.FALL + 8 && F < FB.FALL + 12 ? [0.12, 0.06, 0.02, 0][F - FB.FALL - 8] : 0, sy = 1 - 0.7 * ease + bounce, sx = 1 + 0.25 * ease;
+		const px = foe.x + kb + wob, py = foe.foot, o = VFX_OC2; o.width = tw; o.height = th; const ox = o.getContext('2d'); ox.drawImage(tg, 0, 0);
+		if (F < FB.FALL && since < 2) { ox.globalCompositeOperation = 'lighter'; ox.globalAlpha = since ? 0.35 : 0.7; ox.drawImage(tg, 0, 0); }   // วาบตอนโดน
+		if (fall >= 1) { ox.globalCompositeOperation = 'source-atop'; ox.globalAlpha = Math.min(0.45, (F - FB.FALL - 8) * 0.04); ox.fillStyle = '#1a0c08'; ox.fillRect(0, 0, tw, th); }   // นอนนิ่ง มืดลง
+		ctx.save(); ctx.translate(px, py); ctx.rotate(tilt); ctx.scale(sx, sy); ctx.drawImage(o, -(tw >> 1), -th); ctx.restore();
+		if (F >= FB.FALL + 7) vfxBurst('FBdust', FB.FALL + 7, F, px, py - 2, 22, ['#8d735d', '#b39a80', '#6b5444'], { grav: 0.12, speed: 1.8, dir: -Math.PI / 2, spread: 1.5, life: 12, size: 3 });
+		if (F >= FB.BAR0 && F < FB.FALL + 10) { const r = vRng(77); for (let i = 0; i < 10; i++) { const ph = ((F - FB.BAR0) * 0.05 + r()) % 1;   // ไฟติดตัวมอน
+			vfxDot(px - tw * 0.35 + r() * tw * 0.7, py - 4 - ph * th * 0.9, 2 - ph * 1.4, FB_COL[1 + (i % 3)], (1 - ph) * 0.8); } } }
+	// แต้มสะสมเหนือหัวมอน (5 ช่อง) → ครบแล้วกะพริบค้างจนมอนล้ม
+	const lit = balls.slice(0, FB.SHOTS).filter(b => b.t1 <= F).length;
+	if (F >= FB.SHOT0 && F < FB.FALL + 6) { const a = F < FB.FALL ? 1 : 1 - (F - FB.FALL) / 6, y0 = Math.max(28, foe.foot - th - 9), x0 = foe.x - 22;   // ไม่ต่ำกว่า 28 = ไม่โดนแถบป้ายครบสะสมบัง (B1 ตัวสูงเต็มเวที)
+		ctx.save(); ctx.globalAlpha = a; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.lineWidth = 3; ctx.strokeStyle = '#1a1208';
+		ctx.strokeText('สะสม', foe.x, y0 - 2); ctx.fillStyle = '#ffe680'; ctx.fillText('สะสม', foe.x, y0 - 2);
+		for (let k = 0; k < FB.SHOTS; k++) { const on = k < lit, pop = on && F - FB.shotHit(k) < 3, x = x0 + k * 10, full = lit === FB.SHOTS && (F >> 1) % 2;
+			ctx.fillStyle = '#1a1208'; ctx.fillRect(x - 1, y0 - 1, 9, 9); ctx.fillStyle = on ? (full ? '#fff4c0' : pop ? '#ffffff' : FB_COL[1]) : '#4a3a2a'; ctx.fillRect(x, y0, 7, 7);
+			if (on) { ctx.fillStyle = full ? FB_COL[1] : FB_COL[2]; ctx.fillRect(x + 2, y0 + 2, 3, 3); if (pop) { ctx.globalAlpha = a; vfxDot(x + 3.5, y0 + 3.5, 6, FB_COL[1], 0.6); } } }
+		ctx.restore(); }
+	// ลูกไฟ: โค้งจากฝ่ามือ (bezier) ทิ้งหางไฟ · โดนแล้วระเบิดเล็ก
+	for (const b of balls) { const p = (F - b.t0) / (b.t1 - b.t0); const ex = T.x + b.dx, ey = T.y + b.dy;
+		if (p >= 0 && p <= 1) { const mx = (hx + ex) / 2 + (b.side || 0), my = Math.min(hy, ey) - b.h, at = q => { const u = 1 - q; return [u * u * hx + 2 * u * q * mx + q * q * ex, u * u * hy + 2 * u * q * my + q * q * ey]; };
+			for (let k = 5; k >= 1; k--) { const [x, y] = at(Math.max(0, p - k * 0.05)); vfxDot(x, y, (b.big ? 2.6 : 2) * (1 - k / 7), FB_COL[Math.min(4, 1 + (k >> 1))], 0.55 * (1 - k / 6)); }
+			const [x, y] = at(p); fbBall(x, y, b.big ? 1.2 : 1, 1); }
+		if (p >= 0 && p <= 0.15) vfxDot(hx - 2, hy, b.big ? 5 : 3.5, FB_COL[1], 0.8);   // แสงที่ฝ่ามือตอนยิง
+		const d = F - b.t1; if (d >= 0 && d < 6) { vfxDot(ex, ey, (b.big ? 7 : 5) * (1 - d / 7) + 1, d ? FB_COL[2] : FB_COL[0], 1 - d / 6); vfxRing(ex, ey, 3 + d * (b.big ? 4 : 2.5), 3 + d * (b.big ? 4 : 2.5), FB_COL[1], 1 - d / 6, 1); }
+		if (b.big) vfxBurst('FB' + b.t1, b.t1, F, ex, ey, 10, FB_COL, { speed: 2.2, life: 8, grav: 0.1 }); }
+	// Rion + เปลวหน้าตัว
+	const pose = fbPose(F); if (IMG[pose]) { ctx.drawImage(IMG[pose], rx, ry);
+		if (storm) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.18 * storm * (0.7 + 0.3 * Math.sin(F * 1.1)); ctx.drawImage(IMG[pose], rx, ry); ctx.restore(); } }
+	tornado(true);
+	if (storm >= 1 && F < FB.BAR0) vfxBurst('FBup', FB.BURST, F, cx, ground - 6, 28, FB_COL, { speed: 2.6, dir: -Math.PI / 2, spread: 0.7, life: 16, grav: -0.02 });
+	// ของดรอปกลิ้งมาหา Rion (คอลัมน์ drop ใน monsters.csv → ไอคอน items_draft) + ป้ายชื่อ
+	const drop = (DATA.items || []).find(x => x.id === 'D-' + foe.id), dim2 = IMG['itm/D-' + foe.id];
+	if (drop && dim2 && F >= FB.LOOT) { const q = Math.min(1, (F - FB.LOOT) / (FB.REST - FB.LOOT)), e = 1 - Math.pow(1 - q, 2), x0 = foe.x - 6, x1 = rx - 18, x = lerp(x0, x1, e);
+		const hop = F - FB.LOOT < 5 ? Math.sin(Math.PI * (F - FB.LOOT) / 5) * 10 : q < 1 ? Math.abs(Math.sin(q * 9)) * 2 * (1 - q) : 0, y = ground - 8 - hop;
+		ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(q < 1 ? (x - x0) / 8 : 0); ctx.drawImage(dim2, -8, -8, 16, 16); ctx.restore();
+		if (q >= 1) { vfxDot(x, y, 8 + Math.sin(F * 0.6) * 1.5, '#fff4c0', 0.25); lootLabel('+ ' + drop.name, x, y - 11, Math.min(1, (F - FB.REST) / 3)); } }
+	ctx.restore();
+	// ป้ายครบสะสม (นอกจอสั่น)
+	const rb = F - FB.BURST; if (rb >= 0 && rb < 16) { const a = rb < 12 ? 1 : 1 - (rb - 11) / 5, slide = rb < 3 ? (3 - rb) * 30 : 0;
+		ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = 'rgba(120,20,8,0.85)'; ctx.fillRect(0, 1, W0, 15); ctx.fillStyle = FB_COL[1]; ctx.fillRect(0, 1, W0, 1); ctx.fillRect(0, 15, W0, 1);
+		ctx.font = '900 11px system-ui, "Noto Sans Thai", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 3; ctx.strokeStyle = '#2a0804';
+		ctx.strokeText('สะสมครบ! พายุเพลิง!!', W0 / 2 + slide, 9); ctx.fillStyle = '#fff4c0'; ctx.fillText('สะสมครบ! พายุเพลิง!!', W0 / 2 + slide, 9); ctx.restore(); }
+	if (F >= FB.BURST && F < FB.BURST + 2) { ctx.fillStyle = `rgba(255,220,150,${F === FB.BURST ? 0.35 : 0.15})`; ctx.fillRect(0, 0, W0, H0); }
+	vfxText('ตูม!!', T.x, T.y - 26, FB.FALL + 7, F, FB_COL[1]);
+	if (S.grid) drawGrid();
+	return true;
+}
+function fireSound(F) {   // ยิงลูกไฟ = ฟู่สั้น · โดน = ตุบแตก · พายุเพลิง = ไฟลุกพรึ่บ + เสียงพลังขึ้น · ล้ม = ตูมต่ำ · ของดรอป = กลิ้ง
+	if (!S.sound || !AU) return; const balls = fbBalls(), foe = rollFoe();
+	balls.forEach((b, i) => { const big = !!b.big;
+		if (F === b.t0 && (big || i % 2 === 0)) { auNoise(big ? 0.22 : 0.14, 'bandpass', 700, 2200, big ? 0.5 : 0.3, 1.5); auTone(0.12, 'sawtooth', 220, 110, big ? 0.12 : 0.06, 0, 0.004, { lp: 900 }); }
+		if (F === b.t1 && (big || i % 2)) { auNoise(0.16, 'lowpass', 2400, 300, big ? 0.6 : 0.4, 1); auTone(0.12, 'sine', 150, 55, big ? 0.5 : 0.35, 0, 0.002, { drive: true }); } });
+	balls.slice(0, FB.SHOTS).forEach((b, k) => { if (F === b.t1 + 1) auTone(0.08, 'square', 330 + k * 70, 330 + k * 70, 0.1, 0, 0.003, { lp: 1800 }); });   // แต้มสะสมขึ้นทีละขั้น (ทุ้ม ไม่ใช่กริ๊ง)
+	if (F === FB.BURST) { AU_ROLL.fire(); AU_SFX.charge('CR'); auTone(0.5, 'sawtooth', 70, 45, 0.35, 0, 0.01, { lp: 400, drive: true }); }
+	if (F === FB.BAR1 - 10 || F === FB.BAR1 + 2) auMon(monVoice(foe.id), false, 48 / (IMG[foe.key] || { width: 48 }).width);
+	if (F === FB.FALL + 7) { auTone(0.6, 'sine', 90, 35, 0.8, 0, 0.003, { drive: true }); auNoise(0.5, 'lowpass', 900, 120, 0.6, 1); auMon(monVoice(foe.id), true, 48 / (IMG[foe.key] || { width: 48 }).width); }
+	if (F === FB.LOOT || F === FB.LOOT + 5) auTone(0.06, 'square', 500, 420, 0.1, 0, 0.002, { lp: 2000 });
+}
 function vfxView(c) {   // แบบเวทีทดสอบ: Rion ขวา เป้า M01 ซ้าย ช่องต้นฉบับมุมซ้ายบน · epic = เลื่อนท่าไปเริ่มเฟรม 28 (ก่อนหน้านั้นยืนรวมพลัง)
+	if (c.fire) return fireView(c);
 	if (c.roll) return c.combo ? rollComboView(c) : rollView(c);
 	const f = c.epic ? S.frame - RS3.ATK : S.frame, rw = RIG_ON && rigWeapon(c.skill);
 	const pose = f < 0 ? (rw ? rigKey(rw, S.frame < 6 ? 0 : 4) : heldPose(c.skill, S.frame < 6 ? 0 : 1)) : rw ? rigKey(rw, rigVfx(f)) : heldPose(c.skill, VFX.POSE[f] ?? 0);
@@ -2631,7 +2745,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		clipView();
 	} else {
