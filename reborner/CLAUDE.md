@@ -558,7 +558,10 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - **คีย์ห้ามอยู่ใน repo/แชท** — เก็บเป็นตัวแปร `NIGHTFORGE_API_KEY` ในหน้าตั้งค่า environment · `.mcp.json` อ้าง `${NIGHTFORGE_API_KEY}` เท่านั้น
 - **Claude แก้ `.mcp.json` เองไม่ได้** (ระบบความปลอดภัยบล็อก Self-Modification แม้ kwan อนุญาตในแชท) → kwan เพิ่มบล็อก `night-forge-vfx` ผ่านหน้าแก้ไฟล์บน GitHub แล้วเปิด session ใหม่ + กดอนุญาตเซิร์ฟเวอร์
 - ตรวจ 13 ต.ค.: initialize/tools/list/list_themes/list_presets/list_parts ผ่าน (ธีม "ไฟ" · preset Fire meteor/pillar/runes · ชิ้น shoot tornado impact ground rise) · เรียกซ้ำผ่าน curl ถูกบล็อก (Untrusted Code Integration) · ยังไม่ได้ save_effect อะไร
-- งานที่รอ: ประกอบ BK-5 ห่าลูกไฟธีมไฟในแล็บ แล้ว save_effect ให้ kwan
+- ✅ 13 ต.ค. 2026 **BK-5 ห่าลูกไฟ (Fire barrage)** save_effect ผ่านเครื่องมือ MCP (ไม่ใช่ curl) · validate ไม่มีคำเตือน · ลิงก์แล็บ https://vfx-lab.blogbox.me/lab?mine=aunfrik24d
+  ธีม "ไฟ" · style glow · 10 ชั้น ไล่จังหวะตาม Version 79/80 (45 ms/เฟรม): ยิงนำ fireball 5 ลูก ทุก 0.32 วิ (0.18 วิ ≈ เฟรม 4–36) → วงไฟ ground + tornado พายุเพลิงรอบผู้ร่าย (1.7 วิ ≈ เฟรม 38) →
+  ห่า 4 ชั้น shoot fireball 14+13+14+13 = 54 ลูก ทุก 0.18 วิ ต่อชั้น สลับเป้าหน้า reach 3 / เป้าหลัง reach 4.8 (2.6–5.0 วิ ≈ เฟรม 58–110) → impact explosion 2 จุด x3 · x4.8 + flash ควัน (5.4 วิ ≈ "ตูม!!" เฟรม 120)
+  ยังไม่ได้เปิดดูในแล็บด้วยตา (เครื่องมือไม่มีพรีวิว) · ตำแหน่งเป้าเป็นค่าเดา ถ้าแกนยิงไม่ใช่ +x ต้องขยับ tf.x ของ impact · ช่อง "สะสม"/ของดรอปไม่มีในแล็บ (เป็นแค่ภาพในหน้าเทส) · ยังไม่ export ลง repo
 
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม
