@@ -1,13 +1,112 @@
 {
  "app": "night-forge-vfx-lab",
  "version": 2,
- "lab_url": "https://vfx-lab.blogbox.me/lab?mine=b8pvkbhjm8",
- "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=uvjb5bq333",
+ "note": "v2 (13 ต.ค. 2026): จังหวะท่าพนมมือ รวมพลัง 0–0.45 วิ → ผลักปล่อย 0.45 · เวลาโดน = เริ่มยิง + ระยะ/ความเร็ว · ไม่มีอนุภาคก้อนสี่เหลี่ยม · สีตามธีม · ร่าง ยังไม่เข้าเกม",
  "comp": {
-  "name": "BK-5 ห่าลูกไฟ (pixel)",
+  "name": "BK-5 ห่าลูกไฟ (pixel v2)",
   "theme": "ไฟ",
   "style": "pixel",
   "layers": [
+   {
+    "part": "speedlines",
+    "name": "พนมมือ · พลังไหลเข้ามือ",
+    "params": {
+     "count": 14,
+     "radius": 1.6,
+     "length": 0.6,
+     "charge": true,
+     "life": 0.5,
+     "glow": 1.6,
+     "seed": 1
+    },
+    "tf": {
+     "x": 0.25,
+     "y": 1.0,
+     "s": 0.5
+    },
+    "start": 0,
+    "speed": 1
+   },
+   {
+    "part": "shapes",
+    "name": "พนมมือ · แสงวนรอบมือ",
+    "params": {
+     "shape": "star",
+     "motion": "orbit",
+     "ending": "fade",
+     "count": 10,
+     "radius": 0.45,
+     "height": 0.4,
+     "size": 0.07,
+     "spawn": 0.15,
+     "travel": 0.3,
+     "hold": 0,
+     "endT": 0.1,
+     "sway": 0.2,
+     "spin": 3,
+     "glow": 1.6,
+     "seed": 2
+    },
+    "tf": {
+     "x": 0.25,
+     "y": 1.0
+    },
+    "start": 0.05,
+    "speed": 1
+   },
+   {
+    "part": "flash",
+    "name": "ปล่อย · วาบที่มือ",
+    "params": {
+     "puff": "0",
+     "size": 0.7,
+     "glow": 1.8,
+     "seed": 3
+    },
+    "tf": {
+     "x": 0.25,
+     "y": 1.0
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "rings",
+    "name": "ปล่อย · แรงอัดหน้ามือ",
+    "params": {
+     "mode": "shock",
+     "facing": "camera",
+     "count": 1,
+     "radius": 0.6,
+     "stagger": 0,
+     "life": 0.45,
+     "glow": 1.6
+    },
+    "tf": {
+     "x": 0.45,
+     "y": 1.0
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "toonfx",
+    "name": "แรงสะท้อน · ฝุ่นใต้เท้า",
+    "params": {
+     "style": "dust",
+     "count": 6,
+     "radius": 0.5,
+     "size": 0.22,
+     "life": 0.6,
+     "seed": 4
+    },
+    "tf": {
+     "x": -0.15
+    },
+    "start": 0.45,
+    "speed": 1
+   },
    {
     "part": "shoot",
     "name": "ยิงนำ 5 ลูก (ช่องสะสม)",
@@ -24,17 +123,8 @@
      "glow": 1.7,
      "seed": 3
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 0.18,
+    "tf": {},
+    "start": 0.63,
     "speed": 1
    },
    {
@@ -50,17 +140,8 @@
      "life": 1.2,
      "seed": 1
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 1.7,
+    "tf": {},
+    "start": 2.15,
     "speed": 1
    },
    {
@@ -79,17 +160,8 @@
      "glow": 1.36,
      "seed": 2
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 1.7,
+    "tf": {},
+    "start": 2.15,
     "speed": 1
    },
    {
@@ -108,17 +180,8 @@
      "glow": 1.7,
      "seed": 11
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 2.6,
+    "tf": {},
+    "start": 3.05,
     "speed": 1
    },
    {
@@ -137,17 +200,8 @@
      "glow": 1.7,
      "seed": 12
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 2.69,
+    "tf": {},
+    "start": 3.14,
     "speed": 1
    },
    {
@@ -166,17 +220,8 @@
      "glow": 1.7,
      "seed": 13
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 2.65,
+    "tf": {},
+    "start": 3.1,
     "speed": 1
    },
    {
@@ -195,17 +240,8 @@
      "glow": 1.7,
      "seed": 14
     },
-    "tf": {
-     "x": 0,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
-    },
-    "start": 2.74,
+    "tf": {},
+    "start": 3.19,
     "speed": 1
    },
    {
@@ -224,15 +260,9 @@
     },
     "tf": {
      "x": 3,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 0.8,
-     "mirror": false
+     "s": 0.8
     },
-    "start": 5.4,
+    "start": 5.8,
     "speed": 1
    },
    {
@@ -251,15 +281,9 @@
     },
     "tf": {
      "x": 4.8,
-     "y": 0,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 0.8,
-     "mirror": false
+     "s": 0.8
     },
-    "start": 5.45,
+    "start": 5.85,
     "speed": 1
    },
    {
@@ -273,37 +297,44 @@
     },
     "tf": {
      "x": 3.9,
-     "y": 1,
-     "z": 0,
-     "rx": 0,
-     "ry": 0,
-     "rz": 0,
-     "s": 1,
-     "mirror": false
+     "y": 1
     },
-    "start": 5.45,
+    "start": 5.85,
     "speed": 1
    },
    {
-    "part": "particles",
-    "name": "เศษไฟพิกเซลหลังระเบิด",
+    "part": "toonfx",
+    "name": "ระเบิดดันควันออก",
     "params": {
-     "style": "block",
-     "shape": "burst",
-     "count": 36,
-     "radius": 1.6,
-     "speed": 1.8,
-     "size": 0.9,
-     "plife": 0.6,
-     "spread": 0.2,
-     "glow": 1.6,
-     "seed": 8
+     "style": "burst",
+     "count": 14,
+     "radius": 1.8,
+     "size": 0.5,
+     "life": 1.0,
+     "seed": 20
     },
     "tf": {
-     "x": 3.9,
-     "y": 0.6
+     "x": 3.9
     },
-    "start": 5.45,
+    "start": 5.8,
+    "speed": 1
+   },
+   {
+    "part": "rise",
+    "name": "ถ่านลอยตามความร้อน",
+    "params": {
+     "style": "embers",
+     "count": 18,
+     "radius": 1.6,
+     "height": 2.4,
+     "life": 1.6,
+     "glow": 1.6,
+     "seed": 21
+    },
+    "tf": {
+     "x": 3.9
+    },
+    "start": 5.95,
     "speed": 1
    }
   ]

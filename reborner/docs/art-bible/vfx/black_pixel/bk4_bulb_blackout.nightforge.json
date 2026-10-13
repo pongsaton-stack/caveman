@@ -1,52 +1,151 @@
 {
  "app": "night-forge-vfx-lab",
  "version": 2,
- "lab_url": "https://vfx-lab.blogbox.me/lab?mine=nxckc3j5pf",
- "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=tdvbggzwpp",
+ "note": "v2 (13 ต.ค. 2026): จังหวะท่าพนมมือ รวมพลัง 0–0.45 วิ → ผลักปล่อย 0.45 · เวลาโดน = เริ่มยิง + ระยะ/ความเร็ว · ไม่มีอนุภาคก้อนสี่เหลี่ยม · สีตามธีม · ร่าง ยังไม่เข้าเกม",
  "comp": {
-  "name": "BK-4 หลอดไฟดับ (pixel)",
+  "name": "BK-4 หลอดไฟดับ (pixel v2)",
   "theme": "ความมืด",
   "style": "pixel",
   "layers": [
    {
-    "part": "energyorb",
-    "name": "หลอดไฟกะพริบแล้วแตก",
+    "part": "speedlines",
+    "name": "พนมมือ · พลังไหลเข้ามือ",
     "params": {
-     "pattern": "cells",
-     "radius": 0.5,
-     "speed": 2,
-     "life": 0.7,
-     "ending": "pop",
-     "glow": 1.8
-    },
-    "tf": {
-     "x": 3.9,
-     "y": 2.6,
-     "s": 0.5
-    },
-    "start": 0.0,
-    "speed": 1
-   },
-   {
-    "part": "particles",
-    "name": "เศษหลอดแก้วพิกเซล",
-    "params": {
-     "style": "block",
-     "shape": "burst",
      "count": 14,
-     "radius": 0.6,
-     "speed": 1.6,
-     "size": 0.6,
-     "plife": 0.4,
-     "spread": 0.1,
+     "radius": 1.6,
+     "length": 0.6,
+     "charge": true,
+     "life": 0.5,
      "glow": 1.6,
      "seed": 1
     },
     "tf": {
-     "x": 3.9,
-     "y": 2.6
+     "x": 0.25,
+     "y": 1.0,
+     "s": 0.5
     },
-    "start": 0.7,
+    "start": 0,
+    "speed": 1
+   },
+   {
+    "part": "shapes",
+    "name": "พนมมือ · แสงวนรอบมือ",
+    "params": {
+     "shape": "dot",
+     "motion": "orbit",
+     "ending": "fade",
+     "count": 10,
+     "radius": 0.45,
+     "height": 0.4,
+     "size": 0.07,
+     "spawn": 0.15,
+     "travel": 0.3,
+     "hold": 0,
+     "endT": 0.1,
+     "sway": 0.2,
+     "spin": 3,
+     "glow": 1.6,
+     "seed": 2
+    },
+    "tf": {
+     "x": 0.25,
+     "y": 1.0
+    },
+    "start": 0.05,
+    "speed": 1
+   },
+   {
+    "part": "flash",
+    "name": "ปล่อย · วาบที่มือ",
+    "params": {
+     "puff": "0",
+     "size": 0.7,
+     "glow": 1.8,
+     "seed": 3
+    },
+    "tf": {
+     "x": 0.25,
+     "y": 1.0
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "rings",
+    "name": "ปล่อย · แรงอัดหน้ามือ",
+    "params": {
+     "mode": "shock",
+     "facing": "camera",
+     "count": 1,
+     "radius": 0.6,
+     "stagger": 0,
+     "life": 0.45,
+     "glow": 1.6
+    },
+    "tf": {
+     "x": 0.45,
+     "y": 1.0
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "toonfx",
+    "name": "แรงสะท้อน · ฝุ่นใต้เท้า",
+    "params": {
+     "style": "dust",
+     "count": 6,
+     "radius": 0.5,
+     "size": 0.22,
+     "life": 0.6,
+     "seed": 4
+    },
+    "tf": {
+     "x": -0.15
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "energyorb",
+    "name": "หลอดไฟกะพริบ แล้วยุบดับตอนผลักมือ",
+    "params": {
+     "pattern": "cells",
+     "radius": 0.5,
+     "speed": 2.5,
+     "life": 0.5,
+     "ending": "shrink",
+     "glow": 1.7
+    },
+    "tf": {
+     "x": 3.9,
+     "y": 2.4,
+     "s": 0.45
+    },
+    "start": 0,
+    "speed": 1
+   },
+   {
+    "part": "particles",
+    "name": "เศษแก้วหลอดกระเด็น",
+    "params": {
+     "style": "sparkle",
+     "shape": "burst",
+     "count": 10,
+     "radius": 0.5,
+     "speed": 1.4,
+     "size": 0.6,
+     "plife": 0.35,
+     "spread": 0.05,
+     "glow": 1.5,
+     "seed": 5
+    },
+    "tf": {
+     "x": 3.9,
+     "y": 2.4
+    },
+    "start": 0.5,
     "speed": 1
    },
    {
@@ -57,96 +156,93 @@
      "hits": 1,
      "interval": 0.2,
      "reach": 6,
-     "height": 1,
-     "size": 1.4,
+     "height": 1.0,
+     "size": 1.3,
      "speed": 20,
      "spread": 0,
-     "glow": 2,
-     "seed": 2
+     "glow": 1.9,
+     "seed": 6
     },
     "tf": {},
-    "start": 0.75,
+    "start": 0.47,
     "speed": 1
    },
    {
     "part": "riftstrip",
-    "name": "รอยแยกมืดตามคอลัมน์",
+    "name": "รอยแยกไล่ตามแนวพุ่ง",
     "params": {
      "length": 3.6,
-     "width": 0.9,
-     "count": 18,
-     "lift": 0.8,
-     "delay": 0,
-     "pass": 0.3,
+     "width": 0.8,
+     "count": 16,
+     "lift": 0.7,
+     "delay": 0.15,
+     "pass": 0.24,
      "hold": 0.6,
-     "glow": 1.8,
-     "seed": 3
+     "glow": 1.7,
+     "seed": 7
     },
     "tf": {
      "x": 3.9
     },
-    "start": 0.75,
+    "start": 0.47,
     "speed": 1
    },
    {
     "part": "impact",
-    "name": "มืดกระแทกเป้าหน้า",
+    "name": "เป้าหน้าโดน",
     "params": {
      "style": "sparks",
      "count": 10,
      "flash": true,
      "shock": false,
      "onGround": true,
-     "radius": 1.2,
+     "radius": 1.1,
      "glow": 1.8,
-     "seed": 4
+     "seed": 8
     },
     "tf": {
      "x": 3,
      "s": 0.8
     },
-    "start": 0.9,
+    "start": 0.62,
     "speed": 1
    },
    {
     "part": "impact",
-    "name": "มืดกระแทกเป้าหลัง",
+    "name": "เป้าหลังโดน (ช้ากว่าตามระยะ)",
     "params": {
      "style": "sparks",
      "count": 10,
      "flash": true,
      "shock": false,
      "onGround": true,
-     "radius": 1.2,
+     "radius": 1.1,
      "glow": 1.8,
-     "seed": 5
+     "seed": 9
     },
     "tf": {
      "x": 4.8,
      "s": 0.8
     },
-    "start": 1.0,
+    "start": 0.71,
     "speed": 1
    },
    {
-    "part": "particles",
-    "name": "เงาผีลอยขึ้น",
+    "part": "rise",
+    "name": "เงาลอยขึ้นหลังมืด",
     "params": {
-     "style": "ghost",
-     "shape": "rise",
-     "count": 10,
-     "radius": 1.4,
-     "speed": 0.8,
-     "size": 1,
-     "plife": 0.9,
-     "spread": 0.6,
+     "style": "ghosts",
+     "count": 8,
+     "radius": 1.3,
+     "height": 2,
+     "life": 1.6,
      "glow": 1.6,
-     "seed": 6
+     "seed": 10
     },
     "tf": {
      "x": 3.9
     },
-    "start": 1.0,
+    "start": 0.91,
     "speed": 1
    }
   ]

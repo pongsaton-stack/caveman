@@ -1,114 +1,193 @@
 {
  "app": "night-forge-vfx-lab",
  "version": 2,
- "lab_url": "https://vfx-lab.blogbox.me/lab?mine=g5zh6meedv",
- "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=cswxqvib3n",
+ "note": "v2 (13 ต.ค. 2026): จังหวะท่าพนมมือ รวมพลัง 0–0.45 วิ → ผลักปล่อย 0.45 · เวลาโดน = เริ่มยิง + ระยะ/ความเร็ว · ไม่มีอนุภาคก้อนสี่เหลี่ยม · สีตามธีม · ร่าง ยังไม่เข้าเกม",
  "comp": {
-  "name": "BK-6 เข็มน้ำแข็งเจาะเกราะ (pixel)",
+  "name": "BK-6 เข็มน้ำแข็งเจาะเกราะ (pixel v2)",
   "theme": "น้ำแข็ง",
   "style": "pixel",
   "layers": [
    {
-    "part": "particles",
-    "name": "รวมไอเย็นเหนือเป้า",
+    "part": "speedlines",
+    "name": "พนมมือ · พลังไหลเข้ามือ",
     "params": {
-     "style": "dot",
-     "shape": "burst",
      "count": 14,
-     "radius": 0.5,
-     "speed": 0.4,
-     "size": 0.7,
-     "plife": 0.4,
-     "spread": 0.3,
+     "radius": 1.6,
+     "length": 0.6,
+     "charge": true,
+     "life": 0.5,
      "glow": 1.6,
      "seed": 1
     },
     "tf": {
-     "x": 3,
-     "y": 3.2
+     "x": 0.25,
+     "y": 1.0,
+     "s": 0.5
     },
-    "start": 0.0,
+    "start": 0,
     "speed": 1
    },
    {
-    "part": "shatter",
-    "name": "เกราะเป้า (ผลึก) โดนเจาะแตก",
+    "part": "shapes",
+    "name": "พนมมือ · แสงวนรอบมือ",
     "params": {
-     "shape": "crystal",
-     "from": "top",
-     "intro": "form",
-     "height": 1.6,
-     "width": 0.9,
-     "count": 14,
-     "force": 1.2,
-     "hit": 0.55,
-     "life": 1.2,
+     "shape": "snow",
+     "motion": "orbit",
+     "ending": "fade",
+     "count": 10,
+     "radius": 0.45,
+     "height": 0.4,
+     "size": 0.07,
+     "spawn": 0.15,
+     "travel": 0.3,
+     "hold": 0,
+     "endT": 0.1,
+     "sway": 0.2,
+     "spin": 3,
      "glow": 1.6,
      "seed": 2
     },
     "tf": {
-     "x": 3
+     "x": 0.25,
+     "y": 1.0
     },
-    "start": 0.0,
+    "start": 0.05,
     "speed": 1
    },
    {
-    "part": "needle",
-    "name": "เข็มน้ำแข็งตกเจาะ",
+    "part": "flash",
+    "name": "ปล่อย · วาบที่มือ",
     "params": {
-     "length": 2.6,
-     "height": 5,
-     "width": 0.14,
-     "fall": 0.3,
-     "pillar": true,
-     "glow": 2.2
-    },
-    "tf": {
-     "x": 3
-    },
-    "start": 0.25,
-    "speed": 1
-   },
-   {
-    "part": "impact",
-    "name": "เจาะทะลุ",
-    "params": {
-     "style": "shards",
-     "count": 14,
-     "flash": true,
-     "shock": true,
-     "onGround": true,
-     "radius": 1.3,
+     "puff": "0",
+     "size": 0.7,
      "glow": 1.8,
      "seed": 3
     },
     "tf": {
+     "x": 0.25,
+     "y": 1.0
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "rings",
+    "name": "ปล่อย · แรงอัดหน้ามือ",
+    "params": {
+     "mode": "shock",
+     "facing": "camera",
+     "count": 1,
+     "radius": 0.6,
+     "stagger": 0,
+     "life": 0.45,
+     "glow": 1.6
+    },
+    "tf": {
+     "x": 0.45,
+     "y": 1.0
+    },
+    "start": 0.45,
+    "speed": 1
+   },
+   {
+    "part": "shoot",
+    "name": "เข็มน้ำแข็ง (เล็ก เร็วมาก)",
+    "params": {
+     "variant": "bullet",
+     "hits": 1,
+     "interval": 0.2,
+     "reach": 3,
+     "height": 1.1,
+     "size": 0.45,
+     "speed": 40,
+     "spread": 0,
+     "glow": 2,
+     "seed": 5
+    },
+    "tf": {},
+    "start": 0.47,
+    "speed": 1
+   },
+   {
+    "part": "shatter",
+    "name": "เกราะผลึกแตกตามแรงเข็ม (+x)",
+    "params": {
+     "shape": "crystal",
+     "from": "side",
+     "intro": "stand",
+     "height": 1.5,
+     "width": 0.85,
+     "count": 16,
+     "force": 1.6,
+     "hit": 0.545,
+     "life": 1.2,
+     "glow": 1.6,
+     "seed": 6
+    },
+    "tf": {
      "x": 3
     },
-    "start": 0.55,
+    "start": 0,
+    "speed": 1
+   },
+   {
+    "part": "impact",
+    "name": "จุดเจาะ",
+    "params": {
+     "style": "sparks",
+     "count": 10,
+     "flash": true,
+     "shock": true,
+     "onGround": true,
+     "radius": 1.0,
+     "glow": 1.8,
+     "seed": 7
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.545,
     "speed": 1
    },
    {
     "part": "icespike",
-    "name": "หนามน้ำแข็งรอบจุดเจาะ",
+    "name": "หนามน้ำแข็งงอกตามแนวทะลุ",
     "params": {
-     "count": 6,
-     "height": 1.4,
-     "radius": 0.6,
-     "lean": 25,
-     "sparkles": 16,
+     "count": 5,
+     "height": 1.3,
+     "radius": 0.4,
+     "lean": 35,
+     "sparkles": 10,
      "grow": 0.15,
      "hold": 0.6,
      "ending": "shatter",
-     "endT": 0.4,
-     "glow": 1.8,
-     "seed": 4
+     "endT": 0.35,
+     "glow": 1.7,
+     "seed": 8
     },
     "tf": {
-     "x": 3,
-     "s": 0.6
+     "x": 3.5,
+     "s": 0.55
     },
-    "start": 0.6,
+    "start": 0.585,
+    "speed": 1
+   },
+   {
+    "part": "toonfx",
+    "name": "ไอเย็นจมลงพื้น",
+    "params": {
+     "style": "dust",
+     "count": 6,
+     "radius": 0.9,
+     "size": 0.35,
+     "life": 1.2,
+     "seed": 9
+    },
+    "tf": {
+     "x": 3.2
+    },
+    "start": 0.645,
     "speed": 1
    }
   ]
