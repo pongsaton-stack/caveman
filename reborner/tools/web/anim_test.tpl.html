@@ -452,7 +452,7 @@ function fbPose(F) {   // ท่ายืนร่าย cast_fwd: 0 ยืน �
 	if (F < FB.BAR1 + 4) return k((F - FB.BAR0) % 4 < 2 ? 4 : 3);   // ห่าลูกไฟ: ผลักรัว
 	return k(F < FB.REST ? 3 : 0);
 }
-if (IMG_OK('rion/grips/cast_fwd_0')) addClip('ตัวอย่างจากคลิป · ห่าลูกไฟ (ร่าง ยังไม่ผูกท่า)', 'fire_barrage', 'ห่าลูกไฟ · ยิงสะสม 5 → พายุเพลิง → ห่าลูกไฟ → มอนล้ม + ของดรอป',
+if (IMG_OK('rion/grips/cast_fwd_0')) addClip('ตัวอย่างจากคลิป · ห่าลูกไฟ = BK-5 ถังแก๊สระเบิด (ร่าง)', 'fire_barrage', 'ห่าลูกไฟ · ยิงสะสม 5 → พายุเพลิง → ห่าลูกไฟ → มอนล้ม + ของดรอป',
 	Array.from({ length: FB.N }, (_, F) => fbPose(F)), VFX.SEC, { tab: 'sksheet', skill: FB_SKILL, vfx: true, fire: true });
 for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ', 'ตัวอย่างจากคลิป']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
 // ── ชีต VFX Protagonist (kwan 6 ต.ค. "ตัดมาใส่ในเทสแยกแทป เชคดูถ้าไม่เนียน จัดการให้สวยงาม") ──
@@ -1018,19 +1018,21 @@ function rollComboView(c) {
 }
 // ห่าลูกไฟ — วาดทั้งฉากเอง (ไม่ผ่าน vfxScene) · ทุกอย่างคิดจากเลขเฟรม → กดทีละเฟรมได้ภาพเดิม
 const FB_COL = ['#fff4c0', '#ffd24a', '#ff8a1e', '#e8401a', '#8a1a10'];
-const fbBalls = () => {   // ลูกไฟทั้งหมด: [เฟรมยิง, เฟรมโดน, ความสูงโค้ง, เยื้องจุดโดน x, y]
-	if (FB._balls) return FB._balls; const r = vRng(4242), out = [];
-	for (let k = 0; k < FB.SHOTS; k++) out.push({ t0: FB.SHOT0 + k * FB.SHOT_GAP, t1: FB.shotHit(k), h: 16, dx: 0, dy: 0, big: true });
-	for (let t = FB.BAR0; t <= FB.BAR1; t += FB.BAR_GAP) for (let j = 0; j < 2; j++) { const fly = 7 + Math.floor(r() * 4); out.push({ t0: t, t1: t + fly, h: r() < 0.25 ? -6 - r() * 8 : 14 + r() * 30, dx: (r() * 2 - 1) * 9, dy: (r() * 2 - 1) * 9, side: r() * 24 - 12 }); }
-	return (FB._balls = out);
+const fbBalls = (n = 1) => {   // ลูกไฟทั้งหมด: เฟรมยิง t0 · เฟรมโดน t1 · ความสูงโค้ง h · เยื้องจุดโดน dx dy · ti = เป้าตัวที่ (หลายเป้า = สลับกัน)
+	FB._balls = FB._balls || {}; if (FB._balls[n]) return FB._balls[n]; const r = vRng(4242), out = [];
+	for (let k = 0; k < FB.SHOTS; k++) out.push({ t0: FB.SHOT0 + k * FB.SHOT_GAP, t1: FB.shotHit(k), h: 16, dx: 0, dy: 0, big: true, ti: k % n });
+	for (let t = FB.BAR0; t <= FB.BAR1; t += FB.BAR_GAP) for (let j = 0; j < 2; j++) { const fly = 7 + Math.floor(r() * 4); out.push({ t0: t, t1: t + fly, h: r() < 0.25 ? -6 - r() * 8 : 14 + r() * 30, dx: (r() * 2 - 1) * 9, dy: (r() * 2 - 1) * 9, side: r() * 24 - 12, ti: (t / FB.BAR_GAP + j) % n }); }
+	return (FB._balls[n] = out);
 };
+// เป้า: แท็บสกิลจากชีต = มอนที่เลือกตัวเดียว · แท็บเวทย์มนต์ BK-5 (ขอบเขต all) = ศัตรู 2 ตัว (สไลม์แถวหน้า · หนอนหินแถวหลังยืนสูงกว่า)
+const fbFoes = c => c.fireAll ? [{ id: 'M01', x: 40, foot: 92 }, { id: IMG['mon/M03'] ? 'M03' : 'M01', x: 104, foot: 84 }].map(f => ({ ...f, key: 'mon/' + f.id })) : [rollFoe()];
 function fbBall(x, y, s, a) {   // ลูกไฟ: เรืองส้ม → แกนเหลือง → จุดขาว
 	vfxDot(x, y, 4.5 * s, FB_COL[3], 0.45 * a); vfxDot(x, y, 3 * s, FB_COL[2], 0.8 * a); vfxDot(x, y, 1.8 * s, FB_COL[1], a); vfxDot(x - 0.5, y - 0.5, 0.9 * s, FB_COL[0], a);
 }
 function fireView(c) {
-	const F = S.frame, [W0, H0] = SKS.stage, rx = SKS.rion_at[0], ry = SKS.rion_at[1], ground = ry + 62, foe = rollFoe(), tg = IMG[foe.key];
-	const tw = tg ? tg.width : 48, th = tg ? tg.height : 48, T = { x: foe.x, y: foe.foot - tgMid(foe) }, hx = rx + 12, hy = ry + 40, balls = fbBalls();
-	const hitsNow = balls.filter(b => b.t1 <= F && F - b.t1 < 3), lastHit = Math.max(-99, ...balls.filter(b => b.t1 <= F).map(b => b.t1)), since = F - lastHit;
+	const F = S.frame, [W0, H0] = SKS.stage, rx = SKS.rion_at[0], ry = SKS.rion_at[1], ground = ry + 62, foes = fbFoes(c), balls = fbBalls(foes.length), hx = rx + 12, hy = ry + 40;
+	for (const fo of foes) { fo.T = { x: fo.x, y: fo.foot - tgMid(fo) }; fo.since = F - Math.max(-99, ...balls.filter(b => b.ti === foes.indexOf(fo) && b.t1 <= F).map(b => b.t1)); }
+	const since = Math.min(...foes.map(fo => fo.since)), foe = foes[0];
 	const fall = F >= FB.FALL ? Math.min(1, (F - FB.FALL) / 8) : 0, burst = F >= FB.BURST && F < FB.BAR1 + 10;
 	cv.width = W0; cv.height = H0; ctx.imageSmoothingEnabled = false; ctx.save();
 	const shk = F >= FB.FALL + 7 && F < FB.FALL + 12 ? 3 : F >= FB.BAR0 && F < FB.FALL && since < 2 ? 1 : F >= FB.BURST && F < FB.BURST + 4 ? 2 : 0, rs = vRng(F * 97 + 5);
@@ -1052,7 +1054,8 @@ function fireView(c) {
 	tornado(false);
 	if (F >= FB.BURST && F < FB.BURST + 8) { const q = (F - FB.BURST) / 8; vfxRing(cx, ground - 20, 6 + q * 60, (6 + q * 60) * 0.55, FB_COL[1], 1 - q, 3); }   // คลื่นไฟระเบิดออกตอนครบสะสม
 	// มอน: เซตอนโดนรัว → ล้มหงายไปทางซ้าย (หมุนรอบเท้า) → นอนนิ่ง มืดลง
-	if (tg) { const kb = since < 3 && F < FB.FALL ? -[2, 1, 0][since] : 0, wob = F >= FB.BAR1 - 14 && F < FB.FALL ? Math.round(Math.sin(F * 1.3) * 2) : 0;
+	for (const fo of foes) { const tg = IMG[fo.key]; if (!tg) continue; const tw = tg.width, th = tg.height, since = fo.since, foe = fo;
+		{ const kb = since < 3 && F < FB.FALL ? -[2, 1, 0][since] : 0, wob = F >= FB.BAR1 - 14 && F < FB.FALL ? Math.round(Math.sin(F * 1.3) * 2) : 0;
 		// ล้ม: เอนหงายช้า ๆ → ทรุดแบนติดพื้น (ยุบสูง 30% · แผ่ 125%) แล้วเด้งนิดหนึ่ง · ไม่หมุน 90° เพราะเวทีซ้ายแคบ ตัวจะหลุดจอ
 		const ease = fall < 1 ? fall * fall : 1, tilt = F >= FB.BAR1 - 14 ? -0.22 * Math.min(1, (F - FB.BAR1 + 14) / 14) * (1 - ease) : 0;
 		const bounce = F >= FB.FALL + 8 && F < FB.FALL + 12 ? [0.12, 0.06, 0.02, 0][F - FB.FALL - 8] : 0, sy = 1 - 0.7 * ease + bounce, sx = 1 + 0.25 * ease;
@@ -1062,18 +1065,19 @@ function fireView(c) {
 		ctx.save(); ctx.translate(px, py); ctx.rotate(tilt); ctx.scale(sx, sy); ctx.drawImage(o, -(tw >> 1), -th); ctx.restore();
 		if (F >= FB.FALL + 7) vfxBurst('FBdust', FB.FALL + 7, F, px, py - 2, 22, ['#8d735d', '#b39a80', '#6b5444'], { grav: 0.12, speed: 1.8, dir: -Math.PI / 2, spread: 1.5, life: 12, size: 3 });
 		if (F >= FB.BAR0 && F < FB.FALL + 10) { const r = vRng(77); for (let i = 0; i < 10; i++) { const ph = ((F - FB.BAR0) * 0.05 + r()) % 1;   // ไฟติดตัวมอน
-			vfxDot(px - tw * 0.35 + r() * tw * 0.7, py - 4 - ph * th * 0.9, 2 - ph * 1.4, FB_COL[1 + (i % 3)], (1 - ph) * 0.8); } } }
+			vfxDot(px - tw * 0.35 + r() * tw * 0.7, py - 4 - ph * th * 0.9, 2 - ph * 1.4, FB_COL[1 + (i % 3)], (1 - ph) * 0.8); } } } }
 	// แต้มสะสมเหนือหัวมอน (5 ช่อง) → ครบแล้วกะพริบค้างจนมอนล้ม
 	const lit = balls.slice(0, FB.SHOTS).filter(b => b.t1 <= F).length;
-	if (F >= FB.SHOT0 && F < FB.FALL + 6) { const a = F < FB.FALL ? 1 : 1 - (F - FB.FALL) / 6, y0 = Math.max(28, foe.foot - th - 9), x0 = foe.x - 22;   // ไม่ต่ำกว่า 28 = ไม่โดนแถบป้ายครบสะสมบัง (B1 ตัวสูงเต็มเวที)
+	const gx = Math.round(foes.reduce((a, fo) => a + fo.x, 0) / foes.length), topY = Math.min(...foes.map(fo => fo.foot - (IMG[fo.key] || { height: 48 }).height));
+	if (F >= FB.SHOT0 && F < FB.FALL + 6) { const a = F < FB.FALL ? 1 : 1 - (F - FB.FALL) / 6, y0 = Math.max(28, topY - 9), x0 = gx - 22;   // ไม่ต่ำกว่า 28 = ไม่โดนแถบป้ายครบสะสมบัง (B1 ตัวสูงเต็มเวที)
 		ctx.save(); ctx.globalAlpha = a; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.lineWidth = 3; ctx.strokeStyle = '#1a1208';
-		ctx.strokeText('สะสม', foe.x, y0 - 2); ctx.fillStyle = '#ffe680'; ctx.fillText('สะสม', foe.x, y0 - 2);
+		ctx.strokeText('สะสม', gx, y0 - 2); ctx.fillStyle = '#ffe680'; ctx.fillText('สะสม', gx, y0 - 2);
 		for (let k = 0; k < FB.SHOTS; k++) { const on = k < lit, pop = on && F - FB.shotHit(k) < 3, x = x0 + k * 10, full = lit === FB.SHOTS && (F >> 1) % 2;
 			ctx.fillStyle = '#1a1208'; ctx.fillRect(x - 1, y0 - 1, 9, 9); ctx.fillStyle = on ? (full ? '#fff4c0' : pop ? '#ffffff' : FB_COL[1]) : '#4a3a2a'; ctx.fillRect(x, y0, 7, 7);
 			if (on) { ctx.fillStyle = full ? FB_COL[1] : FB_COL[2]; ctx.fillRect(x + 2, y0 + 2, 3, 3); if (pop) { ctx.globalAlpha = a; vfxDot(x + 3.5, y0 + 3.5, 6, FB_COL[1], 0.6); } } }
 		ctx.restore(); }
 	// ลูกไฟ: โค้งจากฝ่ามือ (bezier) ทิ้งหางไฟ · โดนแล้วระเบิดเล็ก
-	for (const b of balls) { const p = (F - b.t0) / (b.t1 - b.t0); const ex = T.x + b.dx, ey = T.y + b.dy;
+	for (const b of balls) { const p = (F - b.t0) / (b.t1 - b.t0), T = foes[b.ti].T, ex = T.x + b.dx, ey = T.y + b.dy;
 		if (p >= 0 && p <= 1) { const mx = (hx + ex) / 2 + (b.side || 0), my = Math.min(hy, ey) - b.h, at = q => { const u = 1 - q; return [u * u * hx + 2 * u * q * mx + q * q * ex, u * u * hy + 2 * u * q * my + q * q * ey]; };
 			for (let k = 5; k >= 1; k--) { const [x, y] = at(Math.max(0, p - k * 0.05)); vfxDot(x, y, (b.big ? 2.6 : 2) * (1 - k / 7), FB_COL[Math.min(4, 1 + (k >> 1))], 0.55 * (1 - k / 6)); }
 			const [x, y] = at(p); fbBall(x, y, b.big ? 1.2 : 1, 1); }
@@ -1086,11 +1090,11 @@ function fireView(c) {
 	tornado(true);
 	if (storm >= 1 && F < FB.BAR0) vfxBurst('FBup', FB.BURST, F, cx, ground - 6, 28, FB_COL, { speed: 2.6, dir: -Math.PI / 2, spread: 0.7, life: 16, grav: -0.02 });
 	// ของดรอปกลิ้งมาหา Rion (คอลัมน์ drop ใน monsters.csv → ไอคอน items_draft) + ป้ายชื่อ
-	const drop = (DATA.items || []).find(x => x.id === 'D-' + foe.id), dim2 = IMG['itm/D-' + foe.id];
-	if (drop && dim2 && F >= FB.LOOT) { const q = Math.min(1, (F - FB.LOOT) / (FB.REST - FB.LOOT)), e = 1 - Math.pow(1 - q, 2), x0 = foe.x - 6, x1 = rx - 18, x = lerp(x0, x1, e);
+	foes.forEach((foe, li) => { const drop = (DATA.items || []).find(x => x.id === 'D-' + foe.id), dim2 = IMG['itm/D-' + foe.id];
+	if (drop && dim2 && F >= FB.LOOT) { const q = Math.min(1, (F - FB.LOOT) / (FB.REST - FB.LOOT)), e = 1 - Math.pow(1 - q, 2), x0 = foe.x - 6, x1 = rx - 18 - li * 26, x = lerp(x0, x1, e);
 		const hop = F - FB.LOOT < 5 ? Math.sin(Math.PI * (F - FB.LOOT) / 5) * 10 : q < 1 ? Math.abs(Math.sin(q * 9)) * 2 * (1 - q) : 0, y = ground - 8 - hop;
 		ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(q < 1 ? (x - x0) / 8 : 0); ctx.drawImage(dim2, -8, -8, 16, 16); ctx.restore();
-		if (q >= 1) { vfxDot(x, y, 8 + Math.sin(F * 0.6) * 1.5, '#fff4c0', 0.25); lootLabel('+ ' + drop.name, x, y - 11, Math.min(1, (F - FB.REST) / 3)); } }
+		if (q >= 1) { vfxDot(x, y, 8 + Math.sin(F * 0.6) * 1.5, '#fff4c0', 0.25); lootLabel('+ ' + drop.name, x, y - 11 - li * 12, Math.min(1, (F - FB.REST) / 3)); } } });
 	ctx.restore();
 	// ป้ายครบสะสม (นอกจอสั่น)
 	const rb = F - FB.BURST; if (rb >= 0 && rb < 16) { const a = rb < 12 ? 1 : 1 - (rb - 11) / 5, slide = rb < 3 ? (3 - rb) * 30 : 0;
@@ -1098,12 +1102,12 @@ function fireView(c) {
 		ctx.font = '900 11px system-ui, "Noto Sans Thai", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineWidth = 3; ctx.strokeStyle = '#2a0804';
 		ctx.strokeText('สะสมครบ! พายุเพลิง!!', W0 / 2 + slide, 9); ctx.fillStyle = '#fff4c0'; ctx.fillText('สะสมครบ! พายุเพลิง!!', W0 / 2 + slide, 9); ctx.restore(); }
 	if (F >= FB.BURST && F < FB.BURST + 2) { ctx.fillStyle = `rgba(255,220,150,${F === FB.BURST ? 0.35 : 0.15})`; ctx.fillRect(0, 0, W0, H0); }
-	vfxText('ตูม!!', T.x, T.y - 26, FB.FALL + 7, F, FB_COL[1]);
+	vfxText('ตูม!!', gx, foe.T.y - 26, FB.FALL + 7, F, FB_COL[1]);
 	if (S.grid) drawGrid();
 	return true;
 }
-function fireSound(F) {   // ยิงลูกไฟ = ฟู่สั้น · โดน = ตุบแตก · พายุเพลิง = ไฟลุกพรึ่บ + เสียงพลังขึ้น · ล้ม = ตูมต่ำ · ของดรอป = กลิ้ง
-	if (!S.sound || !AU) return; const balls = fbBalls(), foe = rollFoe();
+function fireSound(F, c) {   // ยิงลูกไฟ = ฟู่สั้น · โดน = ตุบแตก · พายุเพลิง = ไฟลุกพรึ่บ + เสียงพลังขึ้น · ล้ม = ตูมต่ำ · ของดรอป = กลิ้ง
+	if (!S.sound || !AU) return; const foes = c ? fbFoes(c) : [rollFoe()], balls = fbBalls(foes.length), foe = foes[0];
 	balls.forEach((b, i) => { const big = !!b.big;
 		if (F === b.t0 && (big || i % 2 === 0)) { auNoise(big ? 0.22 : 0.14, 'bandpass', 700, 2200, big ? 0.5 : 0.3, 1.5); auTone(0.12, 'sawtooth', 220, 110, big ? 0.12 : 0.06, 0, 0.004, { lp: 900 }); }
 		if (F === b.t1 && (big || i % 2)) { auNoise(0.16, 'lowpass', 2400, 300, big ? 0.6 : 0.4, 1); auTone(0.12, 'sine', 150, 55, big ? 0.5 : 0.35, 0, 0.002, { drive: true }); } });
@@ -1608,10 +1612,12 @@ for (const w of (DATA.weapons || [])) {
 	if (!DATA.sprites['held/' + w.id + '_0']) continue;
 	CLIPS['held_' + w.id] = { id: 'held_' + w.id, label: `${w.id} · ${w.name}`, frames: [0, 0, 0, 1, 2, 3, 4, 0].map(i => `held/${w.id}_${i}`), sec: K.ATTACK_FRAME_SEC * 1.6, loop: true };
 }
-const SPELL_LAB = { 'BK-1': 'fire_rune', 'BK-5': 'fire_rune' };   // คาถาไฟสายดำ (spells_full.json element ไฟ) · SM-1 อัญเชิญไฟไม่ได้ใส่
+const SPELL_LAB = { 'BK-1': 'fire_rune' };   // คาถาไฟสายดำ (spells_full.json element ไฟ) · SM-1 อัญเชิญไฟไม่ได้ใส่ · BK-5 = ห่าลูกไฟ (kwan เลือก 13 ต.ค.)
 for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่าร่ายเวทย์ (tools/sprites/spells_anim.py) — แสดงในแท็บเวทย์มนต์เท่านั้น
 	if (!DATA.sprites['spl/' + sp.id + '_0']) continue;
 	CLIPS['spell_' + sp.id] = { id: 'spell_' + sp.id, label: `${sp.id} · ${sp.name}`, frames: [0, 1, 2, 3, 4, 5, 6, 7, 7].map(i => `spl/${sp.id}_${i}`), sec: K.ATTACK_FRAME_SEC * 1.6, loop: true };
+	if (sp.id === 'BK-5' && IMG_OK('rion/grips/cast_fwd_0')) {   // ถังแก๊สระเบิด = ห่าลูกไฟใส่ศัตรูทุกตัว (ภาพเดียวกับคลิปในแท็บสกิลจากชีต)
+		Object.assign(CLIPS['spell_' + sp.id], { label: `${sp.id} · ${sp.name} · ห่าลูกไฟ`, frames: Array.from({ length: FB.N }, (_, F) => fbPose(F)), sec: VFX.SEC, fire: true, fireAll: true }); continue; }
 	const lab = SPELL_LAB[sp.id], comp = lab && (DATA.lab || []).find(x => x.file === lab);
 	if (comp) {   // ค้างท่ายืนจนรูนเพลิงจบ · เริ่มรูนที่เฟรมปล่อยแรก (3)
 		const c = CLIPS['spell_' + sp.id], len = Math.max(...comp.comp.layers.map(L => (L.start || 0) + (L.params && L.params.life || 1.4) / (L.speed || 1)));
@@ -1665,6 +1671,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.fire) return fireView(c);
 	if (c.vxg) return vxgView(c);
 	if (c.vx) return vxView(c);
 	if (c.panels) return panelView(c);
@@ -2745,7 +2752,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		clipView();
 	} else {
