@@ -1,0 +1,116 @@
+{
+ "app": "night-forge-vfx-lab",
+ "version": 2,
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=g5zh6meedv",
+ "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "comp": {
+  "name": "BK-6 เข็มน้ำแข็งเจาะเกราะ (pixel)",
+  "theme": "น้ำแข็ง",
+  "style": "pixel",
+  "layers": [
+   {
+    "part": "particles",
+    "name": "รวมไอเย็นเหนือเป้า",
+    "params": {
+     "style": "dot",
+     "shape": "burst",
+     "count": 14,
+     "radius": 0.5,
+     "speed": 0.4,
+     "size": 0.7,
+     "plife": 0.4,
+     "spread": 0.3,
+     "glow": 1.6,
+     "seed": 1
+    },
+    "tf": {
+     "x": 3,
+     "y": 3.2
+    },
+    "start": 0.0,
+    "speed": 1
+   },
+   {
+    "part": "shatter",
+    "name": "เกราะเป้า (ผลึก) โดนเจาะแตก",
+    "params": {
+     "shape": "crystal",
+     "from": "top",
+     "intro": "form",
+     "height": 1.6,
+     "width": 0.9,
+     "count": 14,
+     "force": 1.2,
+     "hit": 0.55,
+     "life": 1.2,
+     "glow": 1.6,
+     "seed": 2
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.0,
+    "speed": 1
+   },
+   {
+    "part": "needle",
+    "name": "เข็มน้ำแข็งตกเจาะ",
+    "params": {
+     "length": 2.6,
+     "height": 5,
+     "width": 0.14,
+     "fall": 0.3,
+     "pillar": true,
+     "glow": 2.2
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.25,
+    "speed": 1
+   },
+   {
+    "part": "impact",
+    "name": "เจาะทะลุ",
+    "params": {
+     "style": "shards",
+     "count": 14,
+     "flash": true,
+     "shock": true,
+     "onGround": true,
+     "radius": 1.3,
+     "glow": 1.8,
+     "seed": 3
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.55,
+    "speed": 1
+   },
+   {
+    "part": "icespike",
+    "name": "หนามน้ำแข็งรอบจุดเจาะ",
+    "params": {
+     "count": 6,
+     "height": 1.4,
+     "radius": 0.6,
+     "lean": 25,
+     "sparkles": 16,
+     "grow": 0.15,
+     "hold": 0.6,
+     "ending": "shatter",
+     "endT": 0.4,
+     "glow": 1.8,
+     "seed": 4
+    },
+    "tf": {
+     "x": 3,
+     "s": 0.6
+    },
+    "start": 0.6,
+    "speed": 1
+   }
+  ]
+ }
+}

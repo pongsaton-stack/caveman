@@ -568,6 +568,11 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
     คลิป `fire_barrage_lab` (แท็บสกิลจากชีต กลุ่ม "ตัวอย่างจากคลิป") `fbLabView`: เวที 288×120 · 26 px/หน่วย · Rion ที่จุดกำเนิด x252 ยิงไปซ้าย · M03 ที่ reach 3 · M01 ที่ reach 4.8 · มอนวาบตามเวลาโดนที่คิดจากชั้น shoot · ยุบล้มตอน impact · เสียง `fbLabSound` ตามเวลาชั้น
     `LAB_CASTER` = ชุดที่เริ่มจากผู้ใช้ → ไม่ใส่ในแถวปุ่มแล็บที่เล่นบนตัวมอน · ตรวจ: ภาพ 20 จังหวะ (0.1–6.7 วิ) ไม่มี error · 400px ไม่เลื่อนข้าง · เสียงเรียก 132 ครั้ง
     **ใกล้เคียงแล็บ ไม่เท่ากันทุกพิกเซล** (แล็บเป็น 3D + bloom) · ยังไม่ได้เทียบกับภาพในแล็บด้วยตา · ควันหลังระเบิด (flash puff 2 size 3.2) ในหน้าเทสทึบ บังมอนช่วง 6.0–6.5 วิ (แล็บโปร่งกว่า)
+- 13 ต.ค. 2026 **เวทย์ดำแบบพิกเซล 6 คาถา** (kwan "ลองสร้างเวทย์ดำจาก vfx ที่มีในแล็บให้เหมาะกับแต่ละชนิด ปรับให้มีความเป็น pixel art") — save_effect เข้าบัญชีแล็บ · `style: "pixel"` · แสง (glow) ต่ำกว่าเดิม · มีอนุภาคก้อน (block) ทุกชุด
+  BK-1 ไฟแช็กพ่น `ppnva5rckv` · BK-2 ลมตู้แช่ `e8yixuuitc` · BK-3 ไฟฉายแสงจ้า `43jtk7wrv7` · BK-4 หลอดไฟดับ `nxckc3j5pf` · BK-5 ห่าลูกไฟ (pixel) `b8pvkbhjm8` (รุ่นเดิม `aunfrik24d` ไม่แตะ) · BK-6 เข็มน้ำแข็งเจาะเกราะ `g5zh6meedv` (ลิงก์ = `https://vfx-lab.blogbox.me/lab?mine=<รหัส>`)
+  ไฟล์ `docs/art-bible/vfx/black_pixel/*.nightforge.json` (โฟลเดอร์ย่อย → ตัวสร้างหน้า animation test ยังไม่อ่าน เพราะตัวเล่นในหน้าเทสยังไม่รองรับ windring/icespike/riftstrip/needle/shatter/radial/energyorb)
+  ขอบเขตตามข้อมูล: แถว = 3 จุดตามแกน z ที่ x3 · คอลัมน์ = ทะลุ x3→x4.8 · เป้าเดียว = x3 · ผ่าน validate_effect ไม่มีคำเตือน · **ยังไม่มีใครเปิดดูภาพ** (เครื่องมือไม่มีพรีวิว) · ทิศของรอยแยก BK-4 และแท่งน้ำแข็งตามแถวของ BK-2 ยังเดา
+  หน้าลิงก์แล็บ (พินไว้): https://claude.ai/artifact/3snhArM3yfTyq8jFbTqton
 
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม

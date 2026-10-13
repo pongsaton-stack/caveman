@@ -1,0 +1,112 @@
+{
+ "app": "night-forge-vfx-lab",
+ "version": 2,
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=43jtk7wrv7",
+ "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "comp": {
+  "name": "BK-3 ไฟฉายแสงจ้า (pixel)",
+  "theme": "แสง",
+  "style": "pixel",
+  "layers": [
+   {
+    "part": "flash",
+    "name": "กดสวิตช์ไฟฉาย",
+    "params": {
+     "puff": "0",
+     "size": 0.7,
+     "glow": 2,
+     "seed": 1
+    },
+    "tf": {
+     "x": 0.5,
+     "y": 1.1
+    },
+    "start": 0.0,
+    "speed": 1
+   },
+   {
+    "part": "shoot",
+    "name": "ลำแสงไฟฉาย",
+    "params": {
+     "variant": "laser",
+     "hits": 1,
+     "interval": 0.2,
+     "reach": 3,
+     "height": 1.2,
+     "size": 1.6,
+     "speed": 24,
+     "spread": 0,
+     "glow": 2.2,
+     "seed": 2
+    },
+    "tf": {},
+    "start": 0.12,
+    "speed": 1
+   },
+   {
+    "part": "radial",
+    "name": "แสงจ้าแตกเป็นเส้น",
+    "params": {
+     "facing": "camera",
+     "count": 14,
+     "length": 1.8,
+     "lenVar": 0.5,
+     "width": 0.14,
+     "tone": "4",
+     "accEvery": 4,
+     "extend": 0.15,
+     "life": 0.7,
+     "glow": 2,
+     "seed": 3
+    },
+    "tf": {
+     "x": 3,
+     "y": 1.2
+    },
+    "start": 0.3,
+    "speed": 1
+   },
+   {
+    "part": "impact",
+    "name": "แสบตา",
+    "params": {
+     "style": "flash",
+     "count": 8,
+     "flash": true,
+     "shock": true,
+     "onGround": true,
+     "radius": 1.4,
+     "glow": 2,
+     "seed": 4
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.3,
+    "speed": 1
+   },
+   {
+    "part": "particles",
+    "name": "จุดแสงพิกเซลกระจาย",
+    "params": {
+     "style": "block",
+     "shape": "burst",
+     "count": 18,
+     "radius": 0.9,
+     "speed": 1.6,
+     "size": 0.7,
+     "plife": 0.4,
+     "spread": 0.15,
+     "glow": 1.8,
+     "seed": 5
+    },
+    "tf": {
+     "x": 3,
+     "y": 1.2
+    },
+    "start": 0.35,
+    "speed": 1
+   }
+  ]
+ }
+}

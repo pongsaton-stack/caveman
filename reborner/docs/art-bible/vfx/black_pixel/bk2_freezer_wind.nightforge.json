@@ -1,0 +1,150 @@
+{
+ "app": "night-forge-vfx-lab",
+ "version": 2,
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=e8yixuuitc",
+ "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "comp": {
+  "name": "BK-2 ลมตู้แช่ (pixel)",
+  "theme": "น้ำแข็ง",
+  "style": "pixel",
+  "layers": [
+   {
+    "part": "particles",
+    "name": "ไอเย็นพุ่งจากผู้ร่าย",
+    "params": {
+     "style": "dot",
+     "shape": "burst",
+     "count": 20,
+     "radius": 0.8,
+     "speed": 1,
+     "size": 0.9,
+     "plife": 0.5,
+     "spread": 0.3,
+     "glow": 1.6,
+     "seed": 1
+    },
+    "tf": {
+     "x": 0.6,
+     "y": 0.8
+    },
+    "start": 0.0,
+    "speed": 1
+   },
+   {
+    "part": "windring",
+    "name": "ลมหนาวกวาดทั้งแถว",
+    "params": {
+     "count": 6,
+     "radius": 1.8,
+     "height": 1.2,
+     "width": 0.18,
+     "arc": 220,
+     "spin": 3,
+     "life": 1.4,
+     "glow": 1.7,
+     "seed": 2
+    },
+    "tf": {
+     "x": 3,
+     "s": 1.2
+    },
+    "start": 0.25,
+    "speed": 1
+   },
+   {
+    "part": "icespike",
+    "name": "แท่งน้ำแข็งเป้า z-1.4",
+    "params": {
+     "count": 5,
+     "height": 1.8,
+     "radius": 0.5,
+     "lean": 18,
+     "sparkles": 12,
+     "grow": 0.2,
+     "hold": 0.7,
+     "ending": "shatter",
+     "endT": 0.4,
+     "glow": 1.8,
+     "seed": 3
+    },
+    "tf": {
+     "x": 3,
+     "z": -1.4,
+     "s": 0.7
+    },
+    "start": 0.55,
+    "speed": 1
+   },
+   {
+    "part": "icespike",
+    "name": "แท่งน้ำแข็งเป้า z+0",
+    "params": {
+     "count": 5,
+     "height": 1.8,
+     "radius": 0.5,
+     "lean": 18,
+     "sparkles": 12,
+     "grow": 0.2,
+     "hold": 0.7,
+     "ending": "shatter",
+     "endT": 0.4,
+     "glow": 1.8,
+     "seed": 4
+    },
+    "tf": {
+     "x": 3,
+     "z": 0,
+     "s": 0.7
+    },
+    "start": 0.63,
+    "speed": 1
+   },
+   {
+    "part": "icespike",
+    "name": "แท่งน้ำแข็งเป้า z+1.4",
+    "params": {
+     "count": 5,
+     "height": 1.8,
+     "radius": 0.5,
+     "lean": 18,
+     "sparkles": 12,
+     "grow": 0.2,
+     "hold": 0.7,
+     "ending": "shatter",
+     "endT": 0.4,
+     "glow": 1.8,
+     "seed": 5
+    },
+    "tf": {
+     "x": 3,
+     "z": 1.4,
+     "s": 0.7
+    },
+    "start": 0.7100000000000001,
+    "speed": 1
+   },
+   {
+    "part": "particles",
+    "name": "เกล็ดน้ำแข็งพิกเซลตก",
+    "params": {
+     "style": "block",
+     "shape": "fall",
+     "count": 30,
+     "radius": 2,
+     "speed": 1,
+     "size": 0.8,
+     "plife": 0.8,
+     "spread": 0.8,
+     "glow": 1.6,
+     "seed": 7
+    },
+    "tf": {
+     "x": 3,
+     "y": 0
+    },
+    "start": 0.5,
+    "speed": 1
+   }
+  ]
+ }
+}

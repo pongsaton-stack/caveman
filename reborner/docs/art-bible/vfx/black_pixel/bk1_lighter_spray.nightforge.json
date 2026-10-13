@@ -1,0 +1,110 @@
+{
+ "app": "night-forge-vfx-lab",
+ "version": 2,
+ "lab_url": "https://vfx-lab.blogbox.me/lab?mine=ppnva5rckv",
+ "note": "สีตามธีม (pal ว่าง = ใช้ชุดสีของธีมในแล็บ) · ร่าง ยังไม่เข้าเกม",
+ "comp": {
+  "name": "BK-1 ไฟแช็กพ่น (pixel)",
+  "theme": "ไฟ",
+  "style": "pixel",
+  "layers": [
+   {
+    "part": "flash",
+    "name": "ประกายไฟแช็กติด",
+    "params": {
+     "puff": "0",
+     "size": 0.8,
+     "glow": 1.8,
+     "seed": 2
+    },
+    "tf": {
+     "x": 0.5,
+     "y": 1.1
+    },
+    "start": 0.0,
+    "speed": 1
+   },
+   {
+    "part": "shoot",
+    "name": "สายไฟพ่น (ลูกไฟเล็กรัว)",
+    "params": {
+     "variant": "fireball",
+     "hits": 10,
+     "interval": 0.06,
+     "reach": 3,
+     "height": 1.1,
+     "size": 0.55,
+     "speed": 12,
+     "spread": 0.12,
+     "glow": 1.8,
+     "seed": 4
+    },
+    "tf": {},
+    "start": 0.15,
+    "speed": 1
+   },
+   {
+    "part": "impact",
+    "name": "ไฟลวกเป้า",
+    "params": {
+     "style": "explosion",
+     "count": 10,
+     "flash": true,
+     "shock": false,
+     "onGround": true,
+     "radius": 1.2,
+     "glow": 1.8,
+     "seed": 3
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.75,
+    "speed": 1
+   },
+   {
+    "part": "particles",
+    "name": "ติดไฟลุกบนเป้า",
+    "params": {
+     "style": "flame",
+     "shape": "rise",
+     "count": 16,
+     "radius": 0.6,
+     "speed": 1.2,
+     "size": 1,
+     "plife": 0.5,
+     "spread": 0.6,
+     "glow": 1.8,
+     "seed": 5
+    },
+    "tf": {
+     "x": 3
+    },
+    "start": 0.8,
+    "speed": 1
+   },
+   {
+    "part": "particles",
+    "name": "เศษถ่านพิกเซล",
+    "params": {
+     "style": "block",
+     "shape": "burst",
+     "count": 14,
+     "radius": 0.8,
+     "speed": 1.4,
+     "size": 0.8,
+     "plife": 0.45,
+     "spread": 0.2,
+     "glow": 1.6,
+     "seed": 6
+    },
+    "tf": {
+     "x": 3,
+     "y": 1
+    },
+    "start": 0.8,
+    "speed": 1
+   }
+  ]
+ }
+}
