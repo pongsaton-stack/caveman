@@ -553,6 +553,13 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   ตัวอย่างหมวดแรก Props 42 ชิ้น (PR01–PR42) · หน้าเทสแท็บ "อาคาร · สิ่งก่อสร้าง" ตัวกรอง "ชีต Environment · ของวาง (Props)"
   ข้อจำกัด: ของที่วาดชิดกันในชีตบางคู่ติดกัน (กระเป๋า+ราวแขวน PR05) · ตู้น้ำเงินบางตู้แตกเป็นแผ่นบาง (PR21) · ยังไม่มีชื่อไทยรายชิ้น · หมวดอื่น 11 หมวดยังไม่ตัด
 
+## night-forge VFX Lab MCP (kwan 13 ต.ค. 2026 "ตั้งเป็นเซิร์ฟเวอร์ MCP ถาวร")
+- Endpoint `https://vfx-lab.blogbox.me/api/mcp` (Streamable HTTP · header `Authorization: Bearer <คีย์>`) · บัญชีแล็บของ kwan · เครื่องมือ: list_themes · list_parts · get_part · list_presets · get_preset · validate_effect · save_effect (บันทึกเข้าบัญชี ได้ลิงก์เปิดในแล็บ)
+- **คีย์ห้ามอยู่ใน repo/แชท** — เก็บเป็นตัวแปร `NIGHTFORGE_API_KEY` ในหน้าตั้งค่า environment · `.mcp.json` อ้าง `${NIGHTFORGE_API_KEY}` เท่านั้น
+- **Claude แก้ `.mcp.json` เองไม่ได้** (ระบบความปลอดภัยบล็อก Self-Modification แม้ kwan อนุญาตในแชท) → kwan เพิ่มบล็อก `night-forge-vfx` ผ่านหน้าแก้ไฟล์บน GitHub แล้วเปิด session ใหม่ + กดอนุญาตเซิร์ฟเวอร์
+- ตรวจ 13 ต.ค.: initialize/tools/list/list_themes/list_presets/list_parts ผ่าน (ธีม "ไฟ" · preset Fire meteor/pillar/runes · ชิ้น shoot tornado impact ground rise) · เรียกซ้ำผ่าน curl ถูกบล็อก (Untrusted Code Integration) · ยังไม่ได้ save_effect อะไร
+- งานที่รอ: ประกอบ BK-5 ห่าลูกไฟธีมไฟในแล็บ แล้ว save_effect ให้ kwan
+
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม
 - ทุกจอวาดที่ 384×216 จริงแล้วขยาย · สองหน้าตา: ทอง (โทน UiKit ในเกม + โครง RS3) / น้ำเงิน (ตามชีต UI ของ kwan) · ค่าบนจอมาจากเกม (Rion ความชำนาญ 20 ถือไม้เบสบอล vs B1)
