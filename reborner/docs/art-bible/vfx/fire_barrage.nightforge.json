@@ -1,0 +1,367 @@
+{
+  "app": "night-forge-vfx-lab",
+  "version": 2,
+  "comp": {
+    "name": "BK-5 ห่าลูกไฟ (Fire barrage)",
+    "theme": "ไฟ",
+    "style": "glow",
+    "layers": [
+      {
+        "part": "shoot",
+        "name": "ยิงนำ 5 ลูก (ช่องสะสม)",
+        "params": {
+          "hits": 5,
+          "interval": 0.32,
+          "reach": 3,
+          "height": 1.2,
+          "size": 1,
+          "spread": 0.2,
+          "variant": "fireball",
+          "speed": 10,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.2,
+          "seed": 3
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 0.18,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "ground",
+        "name": "วงไฟใต้ผู้ร่าย",
+        "params": {
+          "style": "3",
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "radius": 1.6,
+          "glow": 2.4,
+          "wobble": 0.6,
+          "centerGlow": 0.6,
+          "halo": true,
+          "life": 1.2,
+          "seed": 1
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 1.7,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "tornado",
+        "name": "พายุเพลิงรอบผู้ร่าย",
+        "params": {
+          "height": 3,
+          "radius": 0.9,
+          "spin": 2.2,
+          "bands": 4,
+          "sway": 0.2,
+          "debris": 24,
+          "grow": 0.3,
+          "life": 1,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 1.6,
+          "seed": 2
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 1.7,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "shoot",
+        "name": "ห่า · เป้าหน้า A",
+        "params": {
+          "hits": 14,
+          "interval": 0.18,
+          "reach": 3,
+          "height": 1.1,
+          "size": 0.8,
+          "spread": 0.5,
+          "variant": "fireball",
+          "speed": 14,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.2,
+          "seed": 11
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 2.6,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "shoot",
+        "name": "ห่า · เป้าหลัง A",
+        "params": {
+          "hits": 13,
+          "interval": 0.18,
+          "reach": 4.8,
+          "height": 1.1,
+          "size": 0.8,
+          "spread": 0.5,
+          "variant": "fireball",
+          "speed": 14,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.2,
+          "seed": 12
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 2.69,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "shoot",
+        "name": "ห่า · เป้าหน้า B",
+        "params": {
+          "hits": 14,
+          "interval": 0.18,
+          "reach": 3,
+          "height": 1.4,
+          "size": 0.7,
+          "spread": 0.6,
+          "variant": "fireball",
+          "speed": 16,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.2,
+          "seed": 13
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 2.65,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "shoot",
+        "name": "ห่า · เป้าหลัง B",
+        "params": {
+          "hits": 13,
+          "interval": 0.18,
+          "reach": 4.8,
+          "height": 1.4,
+          "size": 0.7,
+          "spread": 0.6,
+          "variant": "fireball",
+          "speed": 16,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.2,
+          "seed": 14
+        },
+        "tf": {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 2.74,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "impact",
+        "name": "ตูม!! เป้าหน้า",
+        "params": {
+          "style": "explosion",
+          "count": 18,
+          "flash": true,
+          "shock": true,
+          "onGround": true,
+          "radius": 2,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.6,
+          "seed": 4
+        },
+        "tf": {
+          "x": 3,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 0.8,
+          "mirror": false
+        },
+        "start": 5.4,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "impact",
+        "name": "ตูม!! เป้าหลัง",
+        "params": {
+          "style": "explosion",
+          "count": 18,
+          "flash": true,
+          "shock": true,
+          "onGround": true,
+          "radius": 2,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "acc": "#ffd36b",
+          "glow": 2.6,
+          "seed": 5
+        },
+        "tf": {
+          "x": 4.8,
+          "y": 0,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 0.8,
+          "mirror": false
+        },
+        "start": 5.45,
+        "speed": 1,
+        "on": true
+      },
+      {
+        "part": "flash",
+        "name": "ควันหลังระเบิด",
+        "params": {
+          "puff": "2",
+          "size": 3.2,
+          "pal": [
+            "#2a0700",
+            "#a3260a",
+            "#ff6a14",
+            "#ffc04a",
+            "#fff2c4"
+          ],
+          "glow": 2.2,
+          "seed": 6
+        },
+        "tf": {
+          "x": 3.9,
+          "y": 1,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 5.45,
+        "speed": 1,
+        "on": true
+      }
+    ]
+  }
+}
