@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tools/sprites/rion3d.py — Rion 3D (ปั้นใน Blender ตามภาพ kwan 14 ต.ค. 2026) → ร่างภาพคม 8 ทิศ
+"""tools/sprites/rion3d.py — Rion 3D (tools/blender/rion_model.py · ตามภาพ kwan 14 ต.ค. 2026) → ร่างภาพคม 8 ทิศ + สไปรต์ชีต
 
   python3 tools/sprites/rion3d.py            render ใหม่ผ่าน Blender (ต้องเปิด tools/blender/start_blender_mcp.sh ก่อน) แล้วจัดผืน
   python3 tools/sprites/rion3d.py --raw DIR  ข้าม render ใช้ dir_*.png ที่มีอยู่ใน DIR
@@ -7,6 +7,7 @@
 
 ผล: assets/sprites/rion3d_draft/dir_0–7.png (ผืน 512 ตัวสูง 464 เท้าแถว 504 กลาง x256 — เท่า rion_hires_draft)
     0 = หน้า · ทวนเข็ม: 2 = หันขวาของภาพ · 4 = หลัง · 6 = หันซ้ายของภาพ · ทุกทิศใช้สเกลเดียวกัน (วัดจากทิศหน้า)
+    sheet_4dir.png (หน้า ขวา หลัง ซ้าย แถวเดียว) · sheet_8dir.png (4x2 ตามลำดับทิศ) · sheet.json (ขนาดช่อง ลำดับ จุดเท้า)
 """
 import argparse, base64, io, json, os, subprocess, sys, tempfile
 from PIL import Image
@@ -18,8 +19,8 @@ CANVAS, HEIGHT, FOOT, N = 512, 464, 504, 8
 
 
 def render(raw):
-	subprocess.run([sys.executable, os.path.join(ROOT, "tools/blender/bl.py"), os.path.join(ROOT, "tools/blender/rion_scene.py"),
-		"OUT=" + raw, "SIZE=1024", "N=%d" % N, "PREVIEW=0"], check=True)
+	subprocess.run([sys.executable, os.path.join(ROOT, "tools/blender/bl.py"), os.path.join(ROOT, "tools/blender/rion_model.py"),
+		"OUT=" + raw, "BG=alpha", "DIRS=%d" % N], check=True)
 
 
 def normalize(raw):
@@ -28,10 +29,26 @@ def normalize(raw):
 	k = HEIGHT / (b - t); cx = (l + r) / 2   # สเกล+จุดยึดจากทิศหน้า ใช้กับทุกทิศ (ตัวไม่ยืด/หดตอนหัน)
 	out = []
 	for i, im in enumerate(ims):
-		w = round(im.width * k); sm = im.resize((w, w), Image.LANCZOS)
+		sm = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
 		cv = Image.new("RGBA", (CANVAS, CANVAS)); cv.alpha_composite(sm, (round(CANVAS / 2 - cx * k), round(FOOT - b * k)))
 		cv.save(os.path.join(OUT, "dir_%d.png" % i)); out.append(cv)
 	return out
+
+
+def sheets(ims):
+	"""สไปรต์ชีตพื้นโปร่ง ช่องละ 512 · ลำดับและจุดเท้าเขียนใน sheet.json ให้ตัวตัดเฟรมฝั่งเกมอ่าน"""
+	four = [0, 2, 4, 6]
+	s4 = Image.new("RGBA", (CANVAS * 4, CANVAS))
+	for c, i in enumerate(four):
+		s4.alpha_composite(ims[i], (CANVAS * c, 0))
+	s4.save(os.path.join(OUT, "sheet_4dir.png"))
+	s8 = Image.new("RGBA", (CANVAS * 4, CANVAS * 2))
+	for i, im in enumerate(ims):
+		s8.alpha_composite(im, (CANVAS * (i % 4), CANVAS * (i // 4)))
+	s8.save(os.path.join(OUT, "sheet_8dir.png"))
+	json.dump({"cell": CANVAS, "foot_y": FOOT, "center_x": CANVAS // 2, "body_h": HEIGHT,
+		"sheet_4dir": ["front", "right", "back", "left"], "sheet_8dir": ["front", "front_right", "right", "back_right", "back", "back_left", "left", "front_left"],
+		"note": "right = หันไปทางขวาของภาพ · 8 ทิศเรียงซ้าย→ขวา บน→ล่าง"}, open(os.path.join(OUT, "sheet.json"), "w"), ensure_ascii=False, indent=1)
 
 
 def uri(im, q=90):
@@ -50,7 +67,7 @@ if __name__ == "__main__":
 	raw = a.raw or tempfile.mkdtemp(prefix="rion3d_")
 	if not a.raw:
 		render(raw)
-	ims = normalize(raw)
+	ims = normalize(raw); sheets(ims)
 	print("rion3d:", N, "ทิศ →", OUT)
 	if a.page:
 		page(ims, a.page); print("หน้าเทส →", a.page, os.path.getsize(a.page), "bytes")
