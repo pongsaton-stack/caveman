@@ -51,6 +51,12 @@ var _tex_hurt: Array[Texture2D] = []     # west_h0..h1: ผงะ + ประก
 var _tex_ko: Array[Texture2D] = []       # west_k0..k1: ทรุดเข่า → นอนราบ (ค้างไว้จนฟื้น)
 var _hero_hp_seen := -1
 const HERO_X := 222                       # ตัวเอกยืนขวาของเวที ชิดแผงปาร์ตี้
+# ภาพคม (kwan 14 ต.ค. 2026 "เปลี่ยน art ของเกมเป็นแบบนี้เลย ไม่ใช้ pixel แล้ว" · ขั้น 1 Rion + ฉากต่อสู้) — ร่าง ปิดไว้จน kwan อนุมัติ
+# เปิดทดลองด้วย env REBORNER_HIRES=1 · ภาพ 512x512 ต่อเฟรม (ตัวสูง 464 เท้าแถว 504) ย่อลงช่อง 64x64 เดิม → จอ canvas_items วาดคมตามขนาดหน้าต่าง
+const HIRES_DIR := "res://assets/sprites/rion_hires_draft"
+const HIRES_FPS := 25.0                   # รอบเดิน 24 เฟรม 0.96 วิ (เท่าคลิปพระ)
+var _hires_idle: Array[Texture2D] = []
+var _hires_t := 0.0
 const FOE_SPRITE_DIR := "res://assets/sprites/monsters_ll"
 const FOE_AREA := Vector2(100, 178)       # ช่วง x ที่ศัตรูยืน (ระหว่างแผงศัตรูกับมอนฝั่งเรา)
 # มอนฝั่งเรายืนหน้า-ซ้ายของ Rion (หันซ้าย = พลิกรูป) · ช่อง 1 พื้น · ช่อง 2 ลอยสูง (ค้างคาวบินได้ ไม่บังกัน)
@@ -396,8 +402,36 @@ func _load_textures() -> void:
 			_tex_attack.clear()
 			for i in range(1, 5):
 				_tex_attack.append(held[i])
+	_load_hires()
 	if _hero_tex != null:   # โหลดหลัง _build (ต้องรู้ hero ก่อน) → ตั้งภาพยืนให้ตัวที่สร้างไว้แล้ว
 		_hero_tex.texture = _rest_tex()
+
+## ภาพคม: โหลดเฟรมจากโฟลเดอร์ร่าง (.gdignore → ไม่ผ่าน import ต้องอ่านไฟล์ตรง ใช้ได้ตอนรันจากโฟลเดอร์โปรเจกต์เท่านั้น)
+## มีภาพคมแล้วไม่ปนท่าพิกเซล: ท่าฟัน/โดนตี/ล้มพิกเซลถูกปิด (เหลือท่าพุ่งของ FX) จนกว่าจะมีชุดภาพคม
+func _load_hires() -> void:
+	if OS.get_environment("REBORNER_HIRES") != "1":
+		return
+	for i in 24:
+		var f := ProjectSettings.globalize_path("%s/walk_south_%02d.png" % [HIRES_DIR, i])
+		if not FileAccess.file_exists(f):
+			break
+		var img := Image.load_from_file(f)
+		img.generate_mipmaps()   # ย่อ 512 → ~170 จุดบนจอ: ไม่มี mipmap ขอบจะแตก
+		_hires_idle.append(ImageTexture.create_from_image(img))
+	if _hires_idle.is_empty() or _hero_tex == null:
+		return
+	_tex_idle = _hires_idle[0]
+	_tex_attack.clear(); _tex_hurt.clear(); _tex_ko.clear()
+	_hero_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_hero_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_hero_tex.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+
+func _hires_tick(delta: float) -> void:
+	if _hires_idle.is_empty() or _hero_tex == null or _hero_tex.texture not in _hires_idle:
+		return
+	_hires_t += delta
+	_hero_tex.texture = _hires_idle[int(_hires_t * HIRES_FPS) % _hires_idle.size()]
+	_tex_idle = _hero_tex.texture
 
 func _build() -> void:
 	var root := Control.new()
@@ -613,6 +647,7 @@ func _build_ally_sprites(root: Control) -> void:
 		_foe_frames[a] = frames
 
 func _process(delta: float) -> void:
+	_hires_tick(delta)
 	if _foe_rects.is_empty():
 		return
 	_foe_clock += delta

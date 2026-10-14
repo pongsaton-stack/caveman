@@ -32,6 +32,19 @@ Canvas 1145x1374, character about 1130 px tall, feet at the same height as the r
 | 10 | rion_left_pray.png | ร่ายเวทย์ (พนมมือ) | Facing LEFT, palms pressed together in front of the chest (prayer pose), eyes closed, focused. |
 | 11 | rion_left_cast.png | ร่ายเวทย์ (ผลักปล่อย) | Facing LEFT, both palms pushed forward toward the left at chest height, releasing magic, front foot forward. |
 | 12 | rion_left_run.png | วิ่ง | Facing LEFT, running mid-stride, one leg forward one leg back, arms swinging. (ไม่บังคับ) |
+| 13 | battle_bg_act1.png | ฉากหลังจอต่อสู้ (ไม่ต้องแนบภาพ Rion · ไม่ใช้กฎกลาง) | **คำสั่งแยก** ดูหัวข้อ "ภาพ 13" ข้างล่าง |
+
+## ภาพ 13 — ฉากหลังจอต่อสู้ (ขั้น 1 แนวภาพคม · kwan 14 ต.ค. เลือก "ขั้น 1: Rion + ฉากต่อสู้")
+ใช้แทนพื้นสีเรียบ (ฟ้า A7B5A0 + ดิน D4B08A) ในแถบเวทีของจอสู้ · องก์ 1 ตาม GDD = เขียวชอุ่ม ฟ้าใส ทองอุ่น แนวจิบลิ
+```
+Wide side-view background for a 2D JRPG battle scene, same flat cel-shaded anime style as the character art
+(clean dark outlines, flat colors, soft simple shading, NOT pixel art). Peaceful countryside on a sunny afternoon:
+clear light-blue sky with a few soft clouds, distant green hills, a few trees far away, warm golden light.
+The bottom 30% is flat open ground (short grass and a sandy dirt path) seen from the side, completely empty
+where characters will stand. Calm, low detail, muted enough that characters in front stay readable.
+No characters, no animals, no text, no UI. Landscape 1920x1080.
+```
+ผมตัดเป็นแถบเวที (กว้าง:สูง ≈ 4.9:1) เส้นพื้นอยู่ ~73% จากบนของแถบ · ถ้าพื้นในภาพสูง/ต่ำไปผมเลื่อนได้
 
 ## ตรวจก่อนส่ง (ดูด้วยตา)
 - หมวกน้ำเงินทั้งใบ · นาฬิกาข้อมือซ้าย · เป้มีสายสองข้าง · ไม่มีของเกินมา (เข็มขัดเพิ่ม/กระเป๋าใหม่)
