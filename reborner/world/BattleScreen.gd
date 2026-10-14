@@ -54,6 +54,7 @@ const HERO_X := 222                       # ตัวเอกยืนขวา
 # ภาพคม (kwan 14 ต.ค. 2026 "เปลี่ยน art ของเกมเป็นแบบนี้เลย ไม่ใช้ pixel แล้ว" · ขั้น 1 Rion + ฉากต่อสู้) — ร่าง ปิดไว้จน kwan อนุมัติ
 # เปิดทดลองด้วย env REBORNER_HIRES=1 · ภาพ 512x512 ต่อเฟรม (ตัวสูง 464 เท้าแถว 504) ย่อลงช่อง 64x64 เดิม → จอ canvas_items วาดคมตามขนาดหน้าต่าง
 const HIRES_DIR := "res://assets/sprites/rion_hires_draft"
+const HIRES_BG := "res://assets/sprites/battle_bg_hires_draft/act1.png"
 const HIRES_FPS := 25.0                   # รอบเดิน 24 เฟรม 0.96 วิ (เท่าคลิปพระ)
 var _hires_idle: Array[Texture2D] = []
 var _hires_t := 0.0
@@ -412,12 +413,10 @@ func _load_hires() -> void:
 	if OS.get_environment("REBORNER_HIRES") != "1":
 		return
 	for i in 24:
-		var f := ProjectSettings.globalize_path("%s/walk_south_%02d.png" % [HIRES_DIR, i])
-		if not FileAccess.file_exists(f):
+		var t := _hires_tex("%s/walk_south_%02d.png" % [HIRES_DIR, i])
+		if t == null:
 			break
-		var img := Image.load_from_file(f)
-		img.generate_mipmaps()   # ย่อ 512 → ~170 จุดบนจอ: ไม่มี mipmap ขอบจะแตก
-		_hires_idle.append(ImageTexture.create_from_image(img))
+		_hires_idle.append(t)
 	if _hires_idle.is_empty() or _hero_tex == null:
 		return
 	_tex_idle = _hires_idle[0]
@@ -425,6 +424,15 @@ func _load_hires() -> void:
 	_hero_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_hero_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_hero_tex.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+
+## อ่านภาพจากโฟลเดอร์ร่าง (.gdignore ไม่ผ่าน import) + mipmap (ย่อ 512 → ~170 จุดบนจอ: ไม่มี mipmap ขอบจะแตก) · ไม่มีไฟล์ = null
+func _hires_tex(res_path: String) -> Texture2D:
+	var f := ProjectSettings.globalize_path(res_path)
+	if not FileAccess.file_exists(f):
+		return null
+	var img := Image.load_from_file(f)
+	img.generate_mipmaps()
+	return ImageTexture.create_from_image(img)
 
 func _hires_tick(delta: float) -> void:
 	if _hires_idle.is_empty() or _hero_tex == null or _hero_tex.texture not in _hires_idle:
@@ -441,7 +449,17 @@ func _build() -> void:
 	bg.color = C_BG
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(bg)
-	for r in [[Rect2(0, 24, 384, 58), C_STAGE_SKY], [Rect2(0, 82, 384, 21), C_STAGE_GROUND], [Rect2(0, 82, 384, 1), C_STAGE_LINE]]:
+	var stage_bg := _hires_tex(HIRES_BG) if OS.get_environment("REBORNER_HIRES") == "1" else null
+	if stage_bg != null:   # ภาพคม: ฉากหลังวาด 1920x395 ย่อลงแถบเวทีเดิม (tools/sprites/battle_bg_hires.py)
+		var sb := TextureRect.new()
+		sb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # ตั้งก่อนใส่ภาพ/ขนาด ไม่งั้นช่องขยายเท่าภาพ 1920x395
+		sb.stretch_mode = TextureRect.STRETCH_SCALE
+		sb.texture = stage_bg
+		sb.position = Vector2(0, 24)
+		sb.size = Vector2(384, 79)
+		sb.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		root.add_child(sb)
+	for r in ([] if stage_bg != null else [[Rect2(0, 24, 384, 58), C_STAGE_SKY], [Rect2(0, 82, 384, 21), C_STAGE_GROUND], [Rect2(0, 82, 384, 1), C_STAGE_LINE]]):
 		var st := ColorRect.new()
 		st.position = r[0].position
 		st.size = r[0].size
