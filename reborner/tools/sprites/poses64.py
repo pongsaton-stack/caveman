@@ -434,6 +434,10 @@ for pid, label, cyc, fn, old in (('rion_walk_west_v2', 'เดินซ้าย
 import rion_smooth as RS
 pose('rion_walk_south_smooth', 'rion', 'ตัวอย่างระดับ 2', 'เดินหน้า · เนียนแบบคลิปพระ', RS.CYCLE_SEC, lambda t: {'t': t})
 DRAW['rion_walk_south_smooth'] = lambda p: RS.frame(p['t']); COMPARE['rion_walk_south_smooth'] = 'rion_walk_south'
+# จากภาพใหญ่ที่ kwan เจน (tools/sprites/rion_hd.py → hd_walk_south_00–23.png · รันก่อน poses64) · ขยับชุดเดียวกัน คู่เทียบ = แบบภาพ 64 ข้างบน
+_HD = os.path.join(ROOT, 'assets/sprites/rion_smooth_draft/hd_walk_south_%02d.png')
+pose('rion_walk_south_hd', 'rion', 'ตัวอย่างระดับ 2', 'เดินหน้า · เนียน จากภาพใหญ่', RS.CYCLE_SEC, lambda t: {'t': t})
+DRAW['rion_walk_south_hd'] = lambda p: Image.open(_HD % (int(p['t'] * RS.FRAMES) % RS.FRAMES)).convert('RGBA'); COMPARE['rion_walk_south_hd'] = 'rion_walk_south_smooth'
 
 # ── ชั้นความสมจริง (kwan 6 ต.ค. "apply กับท่าขยับทั้งหมด ทำให้สมจริงมากที่สุด") — ใส่ทับทุกท่าอัตโนมัติ จากการเคลื่อนที่ของท่านั้นเอง ──
 # 1) แรงเฉื่อย: หัว / เป้ / หางหมา เป็นสปริงหน่วงต่อลำตัว — ตัวขยับ ส่วนเหล่านี้ค้างที่เดิมก่อน แล้วถูกดึงตาม เลยไปนิด แล้วเด้งกลับ (follow-through)
