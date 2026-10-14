@@ -33,6 +33,19 @@ POSES = {
 	"left_run":    ((1283, 571, 1526, 922), "วิ่ง (#12)"),
 }
 SCALE_REF = "left"     # ท่ายืนตรงหันซ้าย = ตัวสูงเต็ม → ตัวสูง 464 ในผืน 512
+# ท่าที่ทำต่อจากท่าในชีต (ไม่ได้เจน · kwan 14 ต.ค. "วาดส่วนที่ขาดเองไม่ได้เหรอ")
+# right = หันซ้ายพลิกภาพ + ลบนาฬิกา: หันขวาแขนใกล้ = แขนขวา นาฬิกา (ข้อมือซ้าย) ต้องอยู่แขนไกลที่มองไม่เห็น
+#   แขนท่อนล่างช่วงนาฬิกาตั้งตรง กว้างเท่าเดิม → คัดลอกแถว 237 (เส้นขอบ x74–78 · ผิว 79–97 · เส้นขอบ 99–103 วัดจากภาพ) ทับแถว 239–259
+WATCH_ROWS, WATCH_COLS, ARM_ROW = (239, 260), (74, 102), 237
+DERIVED = {"right": ("left", "หันขวา (#4 · พลิกจากหันซ้าย + ลบนาฬิกา)")}
+
+
+def derive_right(a, al):
+	a, al = a.copy(), al.copy()
+	for y in range(*WATCH_ROWS):
+		a[y, WATCH_COLS[0]:WATCH_COLS[1]] = a[ARM_ROW, WATCH_COLS[0]:WATCH_COLS[1]]
+		al[y, WATCH_COLS[0]:WATCH_COLS[1]] = al[ARM_ROW, WATCH_COLS[0]:WATCH_COLS[1]]
+	return a[:, ::-1], al[:, ::-1]
 
 
 def cut(name, box, a_full):
@@ -54,10 +67,15 @@ def main():
 	os.makedirs(SRC_OUT, exist_ok=True)
 	sheet = np.asarray(Image.open(SHEET).convert("RGB")).astype(np.int32)
 	cuts = {n: cut(n, box, sheet) for n, (box, _) in POSES.items()}
+	labels = {n: lab for n, (_, lab) in POSES.items()}
 	_, al_ref, _ = cuts[SCALE_REF]
 	bx0, by0, bx1, by1 = R.body_box(al_ref)
 	k = R.BODY_H / (by1 - by0 + 1)
 	meta = {}
+	for n, (base, lab) in DERIVED.items():   # ทำหลังตัด (พิกัดลบนาฬิกาเป็นพิกัดของภาพที่ครอปตัวแล้ว)
+		a0, al0, _ = cuts[base]; x0, y0, x1, y1 = R.body_box(al0)
+		a1, al1 = derive_right(a0[y0:y1 + 1, x0:x1 + 1], al0[y0:y1 + 1, x0:x1 + 1])
+		cuts[n] = (a1, al1, 0); labels[n] = lab
 	for n, (a, al, fx) in cuts.items():
 		rgba = Image.fromarray(np.dstack([a, al * 255]).astype(np.uint8), "RGBA")
 		x0, y0, x1, y1 = R.body_box(al)
@@ -66,7 +84,7 @@ def main():
 		cv = Image.new("RGBA", (R.CANVAS, R.CANVAS))
 		cv.alpha_composite(sm, (round(R.CANVAS / 2 - sm.width / 2), R.FOOT_ROW - sm.height + 1))
 		cv.save(os.path.join(OUT, n + ".png"))
-		meta[n] = {"label": POSES[n][1], "src_h": int(y1 - y0 + 1), "canvas_w": sm.width, "canvas_h": sm.height, "fx_removed_px": fx,
+		meta[n] = {"label": labels[n], "src_h": int(y1 - y0 + 1), "canvas_w": sm.width, "canvas_h": sm.height, "fx_removed_px": fx,
 			"clipped": bool(sm.width > R.CANVAS or sm.height > R.FOOT_ROW + 1)}
 		print("%-12s ในชีตสูง %3d → ผืน %3dx%3d · ลบแสงเวทย์ %d จุด%s" % (n, y1 - y0 + 1, sm.width, sm.height, fx, " · ล้นผืน!" if meta[n]["clipped"] else ""))
 	print("อัตราย่อ/ขยาย %.3f (จากท่า %s สูง %d → %d)" % (k, SCALE_REF, by1 - by0 + 1, R.BODY_H))
@@ -74,7 +92,7 @@ def main():
 		def uri(p):
 			b = io.BytesIO(); Image.open(p).save(b, "WEBP", quality=92); return "data:image/webp;base64," + base64.b64encode(b.getvalue()).decode()
 		data = {"front": uri(os.path.join(OUT, "stand_south.png")),
-			"poses": [{"id": n, "label": POSES[n][1], "src": uri(os.path.join(OUT, n + ".png"))} for n in POSES],
+			"poses": [{"id": n, "label": labels[n], "src": uri(os.path.join(OUT, n + ".png"))} for n in cuts],
 			"sheet": uri(SHEET), "k": round(k, 3),
 			"bg": uri(os.path.join(ROOT, "assets/sprites/battle_bg_hires_draft/act1.png")), "bg_ground": 0.734}   # เส้นพื้นของฉาก (battle_bg_hires.GROUND)
 		tpl = open(os.path.join(ROOT, "tools/web/rion_poses_test.tpl.html"), encoding="utf-8").read()

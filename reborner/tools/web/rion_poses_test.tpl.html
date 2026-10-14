@@ -85,6 +85,7 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const CLIPS = [
   { id: 'idle_front', name: 'ยืนหายใจ · หันหน้า', dur: 2400, breath: 1, keys: [{ t: 0, pose: 'stand_south' }] },
   { id: 'idle_left', name: 'ยืนหายใจ · หันซ้าย (ท่ายืนในจอสู้)', dur: 2400, breath: 1, sway: 1, keys: [{ t: 0, pose: 'left' }] },
+  { id: 'idle_right', name: 'ยืนหายใจ · หันขวา (พลิกจากหันซ้าย + ลบนาฬิกา · ไม่ได้เจน)', dur: 2400, breath: 1, sway: 1, keys: [{ t: 0, pose: 'right' }] },
   { id: 'idle_back', name: 'ยืนหายใจ · หันหลัง', dur: 2400, breath: 1, keys: [{ t: 0, pose: 'back' }] },
   { id: 'run', name: 'วิ่ง · หันซ้าย (ฉากเลื่อน)', dur: 960, run: 1, keys: [{ t: 0, pose: 'left_run' }] },
   { id: 'attack', name: 'โจมตี: วิ่งเข้า → ง้างกลางทาง → ฟาดทันที → ไถล → กระโดดถอย', dur: 2300, dummy: 1, keys: [
