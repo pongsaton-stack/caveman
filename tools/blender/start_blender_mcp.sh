@@ -17,6 +17,7 @@ if (exec 3<>/dev/tcp/127.0.0.1/$PORT) 2>/dev/null; then echo "Blender MCP เป
 
 command -v blender >/dev/null || { echo "ติดตั้ง Blender…"; (sudo -n true 2>/dev/null && SUDO=sudo || SUDO=""; $SUDO apt-get install -y --no-install-recommends blender >/dev/null) || { echo "ติดตั้ง Blender ไม่ได้"; exit 1; }; }
 blender --background --python-expr "import requests" >/dev/null 2>&1 || { echo "ติดตั้ง python3-requests ให้ Blender…"; (sudo -n true 2>/dev/null && SUDO=sudo || SUDO=""; $SUDO apt-get install -y --no-install-recommends python3-requests >/dev/null) || { echo "ติดตั้ง python3-requests ไม่ได้"; exit 1; }; }
+blender --background --python-expr "import numpy" >/dev/null 2>&1 || { echo "ติดตั้ง python3-numpy ให้ Blender (นำเข้า glb/gltf)…"; (sudo -n true 2>/dev/null && SUDO=sudo || SUDO=""; $SUDO apt-get install -y --no-install-recommends python3-numpy >/dev/null) || { echo "ติดตั้ง python3-numpy ไม่ได้"; exit 1; }; }
 command -v xvfb-run >/dev/null || { echo "ไม่มี xvfb-run"; exit 1; }
 command -v uv >/dev/null || { echo "ไม่มี uv"; exit 1; }
 uv tool list 2>/dev/null | grep -q "mcp-for-blender v$VER" || uv tool install -q "mcp-for-blender==$VER" || { echo "ติดตั้ง mcp-for-blender ไม่ได้"; exit 1; }

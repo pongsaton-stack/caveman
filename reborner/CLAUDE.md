@@ -565,7 +565,7 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - **ภาพอ้างอิงท่า #4 #8 #10 (kwan เลือก "1")**: หุ่น rest pose จาก ActionForge → Blender จัดท่าด้วย DAMPED_TRACK → `python3 tools/sprites/rion_pose_refs.py <glb>` (+ `tools/blender/pose_ref_scene.py`)
   → `docs/art-bible/rion_hires/pose_refs/` (`pose_refs_v1.png` ชีตรวม: หันขวายืน · พนมมือหันซ้าย · คุกเข่าข้างเดียวมือแตะพื้นหันซ้าย) · คำสั่งเจนแนบ 2 ภาพอยู่ใน SHOTLIST หัวข้อ "ภาพ 4 · 8 · 10 รอบ 2"
   ไม่มีคลิปพนมมือในคลัง จึงจัดท่าเอง · คลิป Fixing Kneeling มีแต่ภาพเล็กมุมเฉียง จึงจัดท่าคุกเข่าเองให้มุม/ขนาดเท่ากัน · มือที่แตะพื้นยังลอยเหนือพื้นเล็กน้อย
-  Blender (apt) นำเข้า glb ต้องมี numpy → `apt-get install python3-numpy` (เครื่องใหม่ต้องลงซ้ำ) · **รอ kwan เจนชีตใหม่**
+  Blender (apt) นำเข้า glb ต้องมี numpy → `start_blender_mcp.sh` ลง python3-numpy ให้เองแล้ว (kwan 14 ต.ค. "ลง numpy") · **รอ kwan เจนชีตใหม่**
 
 ## night-forge VFX Lab MCP (kwan 13 ต.ค. 2026 "ตั้งเป็นเซิร์ฟเวอร์ MCP ถาวร")
 - Endpoint `https://vfx-lab.blogbox.me/api/mcp` (Streamable HTTP · header `Authorization: Bearer <คีย์>`) · บัญชีแล็บของ kwan · เครื่องมือ: list_themes · list_parts · get_part · list_presets · get_preset · validate_effect · save_effect (บันทึกเข้าบัญชี ได้ลิงก์เปิดในแล็บ)
