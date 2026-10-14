@@ -555,6 +555,14 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
   ตัวอย่างหมวดแรก Props 42 ชิ้น (PR01–PR42) · หน้าเทสแท็บ "อาคาร · สิ่งก่อสร้าง" ตัวกรอง "ชีต Environment · ของวาง (Props)"
   ข้อจำกัด: ของที่วาดชิดกันในชีตบางคู่ติดกัน (กระเป๋า+ราวแขวน PR05) · ตู้น้ำเงินบางตู้แตกเป็นแผ่นบาง (PR21) · ยังไม่มีชื่อไทยรายชิ้น · หมวดอื่น 11 หมวดยังไม่ตัด
 
+## ActionForge (kwan 14 ต.ค. 2026 "เข้าไปลองใช้งานได้ไหม" → เลือก "3" ให้แก้ใบรับรองเบราว์เซอร์แล้วลองเอง)
+- https://actionforge.app — ทำอนิเมชันตัวละคร **3D** บนเบราว์เซอร์ (แนว Mixamo · Beta · ไม่ต้องล็อกอิน) · คลัง 85 คลิป หุ่น Mannequin · IK · จัดท่า · ของถือ · เดินวิ่ง 8 ทิศ · export GLB/FBX (โครง Default/UE5/UE4/Reallusion/Mixamo)
+- ลิขสิทธิ์ (THIRD-PARTY-NOTICES.txt): ท่า+โครง (Quaternius) และของถือ = **CC0** ใช้ขายได้ไม่ต้องให้เครดิต · โค้ดเว็บ = สงวนสิทธิ์ ห้ามคัดลอก
+- คลิปที่ตรงกับท่า Rion ที่ขาด: Fixing Kneeling (คุกเข่า) · Roll · Sword Attack/Heavy Combo/Regular A–C · Spell Simple Enter/Shoot · Hit Chest/Head/Knockback · Death01 · Dance Loop · Punch Jab/Cross
+- ลองแล้ว: เปิดใน Chromium (playwright + `proxy: {server: HTTPS_PROXY}`) · เลือกคลิป · เลื่อนเวลาจับภาพ · ดาวน์โหลด GLB ได้ (roll/sword_attack 0.76 MB · glTF 2 · 71 กระดูก · 1 อนิเมชัน) · ไม่มี error ของหน้า · ไฟล์ไม่ลง repo
+- **Chromium ในเครื่องคลาวด์**: ที่เก็บใบรับรอง `/root/.pki/nssdb` ว่าง → ERR_CERT_AUTHORITY_INVALID ทุกเว็บ · แก้ = `apt-get install libnss3-tools` แล้ว `certutil -A -t "C,,"` ทุกใบใน `/root/.ccr/ca-bundle.crt` (kwan อนุญาต 14 ต.ค.) · ใบ CA ของ proxy เปลี่ยนตามเครื่อง → เครื่องใหม่ต้องทำซ้ำ
+- ข้อจำกัด: งาน 3D ล้วน (Rion ใช้ 2D เป็นภาพหลัก) → ใช้เป็นภาพอ้างอิงท่าตอนเจน · คลิป Roll ตัวเคลื่อนหลุดกล้อง (ต้องเปิด In Place/Follow)
+
 ## night-forge VFX Lab MCP (kwan 13 ต.ค. 2026 "ตั้งเป็นเซิร์ฟเวอร์ MCP ถาวร")
 - Endpoint `https://vfx-lab.blogbox.me/api/mcp` (Streamable HTTP · header `Authorization: Bearer <คีย์>`) · บัญชีแล็บของ kwan · เครื่องมือ: list_themes · list_parts · get_part · list_presets · get_preset · validate_effect · save_effect (บันทึกเข้าบัญชี ได้ลิงก์เปิดในแล็บ)
 - **คีย์ห้ามอยู่ใน repo/แชท** — เก็บเป็นตัวแปร `NIGHTFORGE_API_KEY` ในหน้าตั้งค่า environment · `.mcp.json` อ้าง `${NIGHTFORGE_API_KEY}` เท่านั้น
