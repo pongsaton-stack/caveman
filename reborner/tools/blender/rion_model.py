@@ -8,7 +8,7 @@
 #   BLEND=<ไฟล์ .blend>   บันทึกไฟล์ Blender ที่แก้ต่อได้ (ไม่ใส่ = ไม่บันทึก)
 #   DIRS=0|4|8            เพิ่มภาพพื้นโปร่งรอบตัว ผืน/กล้องเดียวกับภาพหลัก: 4 → front/right/back/left.png (right = หันไปทางขวาของภาพ)
 #                         8 → dir_<i>.png (0 หน้า · ทวนเข็ม: 2 = หันขวาของภาพ · 4 หลัง · 6 = หันซ้ายของภาพ)
-#   EL=<องศา>             มุมกล้องก้มลง (ค่าเริ่ม 5 = เกือบตรง) · FILL=<สัดส่วน> ตัวสูงกี่ส่วนของภาพ (ค่าเริ่ม 0.86)
+#   EL=<องศา>             มุมกล้องก้มลง (ค่าเริ่ม 5 · ลอง 14 แล้วหมวกบังหน้า) · FILL=<สัดส่วน> ตัวสูงกี่ส่วนของภาพ (ค่าเริ่ม 0.86)
 #
 # พิกัด: ยืนบนพื้น z=0 · หันหน้าไป -Y · ซ้ายของตัวละคร = +X (ชื่อ .L) · ตัวสูง ~1.85 หน่วย
 # สัดส่วนวัดจากภาพต้นแบบ (1 หน่วย ≈ 655 จุดในภาพ 1145x1374): ยอดหมวก→คาง 45% ของความสูง · เข็มขัด 0.64 · ชายกางเกง 0.39 · บูทสูง 0.27
@@ -90,28 +90,28 @@ def both(fn):
 	for s, side in ((1, "L"), (-1, "R")):
 		fn(s, side)
 
-# ── บูทหนังผูกเชือก + ถุงเท้า + ขา ──  (ขาห่างกันเล็กน้อย ปลายเท้าแบะออก 6°)
+# ── บูทหนังผูกเชือก + ถุงเท้า + ขา ──  (ขาห่างกันเล็กน้อย · ปลายเท้าแบะออก 12° หลังรวมชิ้น)
 FX = 0.17
 def leg(s, side):
 	x = FX * s; B = "Boot." + side
-	part(B, "box", (x, -0.045, 0.035), (0.25, 0.37, 0.07), TAN)                          # พื้นรองเท้าสีทราย
+	part(B, "cyl", (x, -0.05, 0.035), (0.28, 0.41, 0.07), TAN)                           # พื้นรองเท้าสีทรายมน
 	part(B, "sph", (x, -0.06, 0.09), (0.25, 0.37, 0.15), BOOT)                           # หัวบูทเตี้ย
-	part(B, "sph", (x, -0.16, 0.075), (0.2, 0.15, 0.11), TAN)                            # หัวรองเท้าสีทราย
-	part(B, "cyl", (x, -0.01, 0.19), (0.21, 0.21, 0.17), BOOT)                           # ข้อบูท (ที่ผูกเชือก)
-	part(B, "cyl", (x, -0.01, 0.272), (0.225, 0.225, 0.03), BOOT)                        # ขอบปากบูทพับ
-	part(B, "box", (x, -0.105, 0.2), (0.07, 0.02, 0.13), BOOT)                           # ลิ้นรองเท้า
-	for z, a in ((0.155, 32), (0.19, -32), (0.225, 32), (0.255, -20)):                   # เชือกผูกไขว้ด้านหน้า
+	part(B, "sph", (x, -0.17, 0.075), (0.23, 0.17, 0.12), TAN)                           # หัวรองเท้าสีทราย
+	part(B, "cyl", (x, -0.01, 0.17), (0.21, 0.21, 0.13), BOOT)                           # ข้อบูท (ที่ผูกเชือก)
+	part(B, "cyl", (x, -0.01, 0.232), (0.225, 0.225, 0.03), BOOT)                        # ขอบปากบูทพับ
+	part(B, "box", (x, -0.105, 0.18), (0.07, 0.02, 0.1), BOOT)                           # ลิ้นรองเท้า
+	for z, a in ((0.145, 32), (0.175, -32), (0.205, 32)):                                # เชือกผูกไขว้ด้านหน้า
 		part(B, "box", (x, -0.118, z), (0.085, 0.014, 0.014), LACE, rot=(0, a, 0))
-	for z in (0.155, 0.19, 0.225):
+	for z in (0.145, 0.175, 0.205):
 		for e in (-1, 1):
 			part(B, "cyl", (x + 0.045 * e, -0.113, z), (0.018, 0.018, 0.01), GOLD, rot=(90, 0, 0), v=12)   # ตาไก่ทอง
 	part(B, "box", (x, -0.205, 0.13), (0.11, 0.03, 0.025), GOLD, rot=(30, 0, 0))         # สายรัดทองหลังเท้า
-	part("Sock." + side, "cyl", (x, 0.0, 0.29), (0.15, 0.15, 0.06), SOCK)
-	part("Leg." + side, "cyl", (x, 0.0, 0.345), (0.11, 0.11, 0.12), SKIN)
-	part("Shorts." + side, "cyl", (x * 0.82, 0.0, 0.47), (0.23, 0.24, 0.17), SHORTS)    # ขากางเกง (แยกซ้าย/ขวา ขยับตามต้นขา)
-	part("Shorts." + side, "cyl", (x * 0.82, 0.0, 0.395), (0.245, 0.255, 0.04), CUFF)   # ปลายขาพับ
+	part("Sock." + side, "cyl", (x, 0.0, 0.265), (0.15, 0.15, 0.07), SOCK)
+	part("Leg." + side, "cyl", (x, 0.0, 0.33), (0.11, 0.11, 0.14), SKIN)
+	part("Shorts." + side, "cone", (x * 0.85, 0.0, 0.47), (0.27, 0.27, 0.17), SHORTS, r1=0.5, r2=0.4, v=32)   # ขากางเกงบานล่าง (แยกซ้าย/ขวา ขยับตามต้นขา)
+	part("Shorts." + side, "cyl", (x * 0.85, 0.0, 0.395), (0.28, 0.28, 0.04), CUFF)     # ปลายขาพับ
 both(leg)
-part("Shorts", "box", (0, 0, 0.575), (0.43, 0.27, 0.13), SHORTS)                       # สะโพก
+part("Shorts", "cyl", (0, 0, 0.575), (0.44, 0.29, 0.13), SHORTS)                       # สะโพก
 part("Belt", "cyl", (0, 0, 0.645), (0.45, 0.29, 0.05), BELT)
 part("Belt", "box", (0, -0.145, 0.645), (0.09, 0.02, 0.05), GOLD)                       # หัวเข็มขัด
 
@@ -124,16 +124,16 @@ part("Tie", "cone", (0, -0.143, 0.745), (0.06, 0.02, 0.05), TIE, rot=(180, 0, 0)
 part("Tie", "box", (0, -0.14, 0.965), (0.07, 0.035, 0.045), TIE)                       # ปม
 part("Head", "cyl", (0, 0, 1.03), (0.11, 0.11, 0.1), SKIN)                             # คอ
 
-# ── แขน: แขนเสื้อสั้น + แขน + กำมือ · กางออกจากตัว 11° ──
-SHOULDER = 0.98; ARM_OUT = 11
+# ── แขน: แขนเสื้อสั้น + แขน + กำมือ · กางออกจากตัว 17° ──
+SHOULDER = 0.98; ARM_OUT = 17
 def arm(s, side):
-	part("Sleeve." + side, "sph", (0.215 * s, 0, 0.93), (0.18, 0.18, 0.16), SHIRT)
-	part("Arm." + side, "cyl", (0.24 * s, 0, 0.76), (0.09, 0.09, 0.26), SKIN)
-	part("Arm." + side, "sph", (0.245 * s, -0.01, 0.6), (0.13, 0.12, 0.13), SKIN)        # กำปั้น
-	part("Arm." + side, "sph", (0.215 * s, -0.06, 0.615), (0.05, 0.04, 0.05), SKIN)      # นิ้วโป้ง
+	part("Sleeve." + side, "sph", (0.215 * s, 0, 0.93), (0.17, 0.17, 0.15), SHIRT)
+	part("Arm." + side, "cyl", (0.24 * s, 0, 0.74), (0.09, 0.09, 0.3), SKIN)
+	part("Arm." + side, "sph", (0.245 * s, -0.01, 0.565), (0.14, 0.13, 0.14), SKIN)      # กำปั้น
+	part("Arm." + side, "sph", (0.213 * s, -0.065, 0.58), (0.05, 0.04, 0.05), SKIN)      # นิ้วโป้ง
 both(arm)
-part("Watch", "cyl", (0.242, 0, 0.665), (0.105, 0.105, 0.04), "#2f62c6")               # นาฬิกาข้อมือซ้าย (ขวาของภาพ)
-part("Watch", "box", (0.245, -0.052, 0.665), (0.045, 0.012, 0.035), "#55a86a")         # หน้าปัด
+part("Watch", "cyl", (0.242, 0, 0.635), (0.105, 0.105, 0.045), "#2f62c6")               # นาฬิกาข้อมือซ้าย (ขวาของภาพ)
+part("Watch", "box", (0.245, -0.053, 0.635), (0.05, 0.012, 0.04), "#55a86a")         # หน้าปัด
 
 # ── เป้หลัง + สายสะพาย 2 เส้น + กระเป๋าข้าง ──
 part("Backpack", "box", (0, 0.21, 0.82), (0.42, 0.2, 0.36), BAG)
@@ -141,8 +141,8 @@ part("Backpack", "box", (0, 0.315, 0.79), (0.3, 0.05, 0.22), BAG2)              
 part("Backpack", "box", (0, 0.32, 0.88), (0.31, 0.06, 0.06), BAG)                     # ฝาช่องหน้า
 part("Backpack", "box", (0, 0.35, 0.86), (0.05, 0.01, 0.05), GOLD)
 for s in (-1, 1):
-	part("Backpack", "box", (0.255 * s, 0.17, 0.8), (0.09, 0.15, 0.2), BAG2)           # กระเป๋าข้าง
-	part("Backpack", "box", (0.302 * s, 0.17, 0.83), (0.01, 0.05, 0.05), GOLD)
+	part("Backpack", "box", (0.3 * s, 0.13, 0.8), (0.13, 0.17, 0.22), BAG2)            # กระเป๋าข้าง (โผล่พ้นแขนเมื่อมองหน้า)
+	part("Backpack", "box", (0.367 * s, 0.13, 0.83), (0.01, 0.06, 0.06), GOLD)
 	part("Straps", "box", (0.12 * s, -0.13, 0.84), (0.055, 0.02, 0.32), BAG)           # สายสะพายหน้าอก
 	part("Straps", "box", (0.12 * s, -0.145, 0.85), (0.075, 0.02, 0.055), GOLD)       # หัวเข็มสาย
 	part("Straps", "box", (0.12 * s, 0.0, 1.0), (0.055, 0.28, 0.03), BAG)             # ข้ามบ่า
@@ -154,43 +154,46 @@ part("Head", "sph", (0, 0, HZ), (0.72, 0.64, 0.66), SKIN)
 for s in (-1, 1):
 	part("Head", "sph", (0.355 * s, 0.02, HZ - 0.1), (0.08, 0.06, 0.11), SKIN)        # หู
 # ผมยุ่ง: เปลือกครึ่งหลัง + หน้าม้าแหลมหลายปอย + จอน + ปอยชี้ออกข้าง + ท้ายทอย
-part("Hair", "sph", (0, 0.01, HZ), (0.77, 0.71, 0.72), HAIR, cut=lambda c: c.y < 0.02 and c.z < 0.12)
-for x, ln, tilt, yo in ((-0.27, 0.13, 32, 0), (-0.18, 0.17, 18, 0.01), (-0.09, 0.15, 8, 0), (-0.03, 0.21, 2, 0.012),
-		(0.05, 0.24, -6, 0), (0.13, 0.17, -14, 0.01), (0.21, 0.15, -24, 0), (0.28, 0.12, -34, 0.01)):
-	part("Hair", "cone", (x, -0.3 - yo, HZ + 0.07 - ln / 2), (0.14, 0.1, ln), HAIR, rot=(188, tilt, 0), v=6)
+part("Hair", "sph", (0, 0.02, HZ - 0.01), (0.86, 0.76, 0.76), HAIR, cut=lambda c: c.y < 0.0 and c.z < 0.12)   # ผมฟูกว้างกว่าหน้า
+# หน้าม้าเป็นช่อแบน (ปอยกลางยาวลงถึงระดับตา)
+for x, ln, tilt, yo, w in ((-0.27, 0.15, 34, 0, 0.16), (-0.17, 0.19, 20, 0.012, 0.18), (-0.06, 0.2, 6, 0, 0.17), (0.03, 0.27, -4, 0.016, 0.2),
+		(0.13, 0.2, -16, 0.006, 0.18), (0.23, 0.17, -28, 0.012, 0.17), (0.3, 0.13, -40, 0, 0.14)):
+	part("Hair", "cone", (x, -0.3 - yo, HZ + 0.08 - ln / 2), (w, 0.12, ln), HAIR, rot=(188, tilt, 0), v=6)
 for s in (-1, 1):
-	part("Hair", "cone", (0.325 * s, -0.03, HZ - 0.07), (0.09, 0.07, 0.22), HAIR, rot=(180, -8 * s, 0), v=6)   # จอน (หน้าหู · ไม่บังตาตอนหันข้าง)
-	for z, ln, a, y in ((HZ + 0.03, 0.2, 72, 0.04), (HZ - 0.06, 0.18, 98, 0.1), (HZ - 0.17, 0.14, 122, 0.06), (HZ - 0.02, 0.15, 85, 0.2)):
-		part("Hair", "cone", (0.36 * s, y, z), (0.11, 0.09, ln), HAIR, rot=(0, a * s, 0), v=6)
-	part("Hair", "cone", (0.13 * s, 0.33, HZ - 0.22), (0.13, 0.08, 0.17), HAIR, rot=(-170, 0, 0), v=6)    # ท้ายทอย
-part("Hair", "cone", (0, 0.34, HZ - 0.24), (0.13, 0.08, 0.19), HAIR, rot=(-172, 0, 0), v=6)
+	part("Hair", "cone", (0.325 * s, -0.03, HZ - 0.08), (0.11, 0.08, 0.26), HAIR, rot=(180, -10 * s, 0), v=6)   # จอนหน้าหู
+	# ปอยข้างฟูชี้ออก-ลง (ต้นแบบ: ผมกว้างเลยหน้าราว 0.14 หน่วยต่อข้าง)
+	for z, ln, a, y, w in ((HZ + 0.04, 0.22, 78, 0.03, 0.15), (HZ - 0.05, 0.24, 100, 0.06, 0.17), (HZ - 0.15, 0.22, 122, 0.04, 0.16),
+			(HZ - 0.24, 0.16, 142, 0.08, 0.13), (HZ - 0.03, 0.18, 90, 0.2, 0.15)):
+		part("Hair", "cone", (0.37 * s, y, z), (w, 0.12, ln), HAIR, rot=(0, a * s, 0), v=6)
+	part("Hair", "cone", (0.14 * s, 0.33, HZ - 0.22), (0.15, 0.09, 0.2), HAIR, rot=(-168, 0, 0), v=6)    # ท้ายทอย
+part("Hair", "cone", (0, 0.35, HZ - 0.25), (0.15, 0.09, 0.22), HAIR, rot=(-172, 0, 0), v=6)
 
 # ลายหน้า: แผ่นบางชิดผิว เอียงตามความโค้ง · ตาโต (ขอบเข้มหนาบน → ขาว → ม่านตาน้ำตาล → รูม่านตา → ประกาย 2 จุด)
 EZ = HZ - 0.15
 for s in (-1, 1):
 	x = 0.13 * s; R = (22, 0, 22 * s)   # เอียงตามผิวหัวมากขึ้น → หันข้างยังเห็นตา
-	part("Face", "sph", (x, -0.275, EZ + 0.014), (0.13, 0.012, 0.175), DARK, rot=R)
-	part("Face", "sph", (x * 1.01, -0.281, EZ), (0.11, 0.012, 0.15), WHITE, rot=R)
-	part("Face", "sph", (x * 0.97, -0.287, EZ - 0.008), (0.088, 0.012, 0.128), EYE, rot=R)
-	part("Face", "sph", (x * 0.97, -0.292, EZ - 0.01), (0.05, 0.012, 0.076), DARK, rot=R)
-	part("Face", "sph", (x * 0.97 + 0.02, -0.298, EZ + 0.026), (0.034, 0.008, 0.04), WHITE, rot=R)
+	part("Face", "sph", (x, -0.275, EZ + 0.016), (0.14, 0.012, 0.19), DARK, rot=R)
+	part("Face", "sph", (x * 1.01, -0.281, EZ), (0.12, 0.012, 0.165), WHITE, rot=R)
+	part("Face", "sph", (x * 0.97, -0.287, EZ - 0.008), (0.1, 0.012, 0.145), EYE, rot=R)
+	part("Face", "sph", (x * 0.97, -0.292, EZ - 0.012), (0.06, 0.012, 0.09), DARK, rot=R)
+	part("Face", "sph", (x * 0.97 + 0.022, -0.298, EZ + 0.03), (0.042, 0.008, 0.05), WHITE, rot=R)
 	part("Face", "sph", (x * 0.97 - 0.02, -0.296, EZ - 0.04), (0.016, 0.008, 0.018), WHITE, rot=R)
-	part("Face", "box", (0.13 * s, -0.325, HZ - 0.035), (0.11, 0.03, 0.026), DARK, rot=(0, 20 * s, 18 * s))   # คิ้วเฉียงมุ่งมั่น
+	part("Face", "box", (0.13 * s, -0.325, HZ - 0.04), (0.12, 0.03, 0.032), DARK, rot=(0, -20 * s, 18 * s))   # คิ้วเฉียงมุ่งมั่น (หัวคิ้วต่ำ)
 	part("Face", "sph", (0.2 * s, -0.178, HZ - 0.215), (0.075, 0.01, 0.04), BLUSH, rot=(35, 0, 40 * s))
 part("Face", "sph", (0, -0.262, HZ - 0.205), (0.012, 0.01, 0.012), DARK)                # จมูกจุด
 part("Face", "torus", (0, -0.243, HZ - 0.232), (0.05, 0.05, 0.05), DARK, rot=(80, 0, 0), minor=0.16, cut=lambda c: c.y > -0.05)   # ยิ้ม
 
 # หมวกแก๊ปน้ำเงินล้วน (ไม่มีแถบครีม/ขาว) ทรงสูง + ปีกหน้าสั้นโค้ง + ปุ่มบน
-part("Cap", "sph", (0, 0.0, HZ + 0.04), (0.8, 0.76, 0.78), CAP, cut=lambda c: c.z < 0.0)
-part("Cap", "sph", (0, -0.17, HZ + 0.05), (0.68, 0.62, 0.05), CAP, rot=(-6, 0, 0), cut=lambda c: c.y > -0.05)
-part("Cap", "sph", (0, 0.0, HZ + 0.43), (0.09, 0.09, 0.06), CAP)
+part("Cap", "sph", (0, 0.0, HZ + 0.1), (0.8, 0.76, 0.7), CAP, cut=lambda c: c.z < 0.0)   # ขอบหมวกสูงขึ้น เห็นผมใต้ปีก
+part("Cap", "sph", (0, -0.19, HZ + 0.12), (0.74, 0.7, 0.06), CAP, rot=(10, 0, 0), cut=lambda c: c.y > -0.05)   # ปีกหมวกยื่นหน้าก้มลง (ปลายปีกที่ราว HZ+0.07 = .51 ของหัวตามต้นแบบ)
+part("Cap", "sph", (0, 0.0, HZ + 0.45), (0.09, 0.09, 0.06), CAP)
 # แว่นกันลมทองเหลือง เลนส์ฟ้าสะท้อน วางบนหมวก + สายรัดรอบหมวก
-GZ = HZ + 0.22
+GZ = HZ + 0.27
 part("Goggles", "cyl", (0, 0.0, GZ), (0.73, 0.69, 0.05), STRAP_G)
 for s in (-1, 1):
 	x = 0.135 * s
-	part("Goggles", "torus", (x, -0.325, GZ), (0.2, 0.2, 0.2), GOLD, rot=(64, 0, 0), minor=0.14)
-	part("Goggles", "cyl", (x, -0.322, GZ), (0.18, 0.18, 0.02), LENS, rot=(64, 0, 0))
+	part("Goggles", "torus", (x, -0.325, GZ), (0.2, 0.2, 0.2), GOLD, rot=(64, 0, 0), minor=0.09)
+	part("Goggles", "cyl", (x, -0.322, GZ), (0.19, 0.19, 0.02), LENS, rot=(64, 0, 0))
 	part("Goggles", "sph", (x + 0.03, -0.345, GZ + 0.02), (0.05, 0.01, 0.03), "#d8ecff", rot=(64, 0, 0))   # แสงสะท้อนเลนส์
 	part("Goggles", "box", (0.25 * s, -0.25, GZ), (0.05, 0.06, 0.07), GOLD, rot=(0, 0, -40 * s))
 part("Goggles", "box", (0, -0.35, GZ), (0.07, 0.03, 0.05), GOLD)
@@ -216,6 +219,10 @@ for side, s in (("L", 1), ("R", -1)):
 	for n in ("Arm." + side, "Sleeve." + side) + (("Watch",) if side == "L" else ()):
 		OBJS[n].data.transform(rot)
 
+for side, s in (("L", 1), ("R", -1)):   # ปลายบูทแบะออก 12° (ต้นแบบยืนเท้าแบะ)
+	piv = Vector((FX * s, 0, 0))
+	OBJS["Boot." + side].data.transform(Matrix.Translation(piv) @ Matrix.Rotation(math.radians(12 * s), 4, "Z") @ Matrix.Translation(-piv))
+
 for name, o in OBJS.items():
 	bpy.context.view_layer.objects.active = o; o.select_set(True)
 	bpy.ops.object.shade_smooth(); o.data.use_auto_smooth = True; o.data.auto_smooth_angle = math.radians(40)
@@ -223,7 +230,7 @@ for name, o in OBJS.items():
 		continue   # ลายหน้าไม่มีเส้นขอบ/ลบมุม (ไม่งั้นปาก/จมูกบวมเป็นก้อนดำ)
 	bev = o.modifiers.new("bevel", "BEVEL"); bev.width = 0.006; bev.segments = 2; bev.limit_method = "ANGLE"; bev.angle_limit = math.radians(35)
 	o.data.materials.append(ink)
-	sol = o.modifiers.new("outline", "SOLIDIFY"); sol.thickness = float(ARGS.get("LINE", 0.012)); sol.offset = 1.0
+	sol = o.modifiers.new("outline", "SOLIDIFY"); sol.thickness = float(ARGS.get("LINE", 0.009)); sol.offset = 1.0
 	sol.use_flip_normals = True; sol.material_offset = len(o.data.materials) - 1; sol.use_rim = False
 
 # ── โครงกระดูก (พร้อมทำท่า): ชิ้นแข็งผูกกับกระดูก ──
@@ -240,7 +247,7 @@ bone("hips", (0, 0, 0.56), (0, 0, 0.66), "root")
 bone("spine", (0, 0, 0.66), (0, 0, 0.98), "hips")
 bone("head", (0, 0, 1.0), (0, 0, 1.6), "spine")
 for side, s in (("L", 1), ("R", -1)):
-	sh = PIVOT[side]; hand = Vector((0.245 * s + math.sin(math.radians(ARM_OUT)) * 0.36 * s, 0, 0.6))
+	sh = PIVOT[side]; hand = Vector((0.245 * s + math.sin(math.radians(ARM_OUT)) * 0.41 * s, 0, 0.57))
 	bone("arm." + side, tuple(sh), tuple(hand), "spine")
 	bone("thigh." + side, (FX * 0.82 * s, 0, 0.56), (FX * s, 0, 0.32), "hips")
 	bone("foot." + side, (FX * s, 0, 0.32), (FX * s, -0.15, 0.06), "thigh." + side)
@@ -258,14 +265,14 @@ bpy.context.view_layer.update()
 # ── ฉาก: กล้องฉากตั้งตรงหน้า · แสงเดียวไม่มีเงาตกกระทบ · ไม่มีพื้น ──
 sun_d = bpy.data.lights.new("key", "SUN"); sun_d.energy = 3.0; sun_d.use_shadow = False
 sun = bpy.data.objects.new("key", sun_d); sc.collection.objects.link(sun)
-sun.rotation_euler = (math.radians(50), math.radians(-20), math.radians(-15))   # หน้า-บน-ซ้ายของภาพ
+sun.rotation_euler = (math.radians(58), math.radians(-10), math.radians(-12))   # เกือบตรงหน้า-บน → เงาแค่ขอบ (ภาพต้นแบบแทบไม่ลงเงา)
 w = bpy.data.worlds.new("REBORNER_World"); sc.world = w; w.use_nodes = True
 next(n for n in w.node_tree.nodes if n.type == "BACKGROUND").inputs["Strength"].default_value = 0.0   # ไม่ให้สีพื้นหลังไปย้อมแสงตัว
 
 pts = [o.matrix_world @ Vector(c) for o in OBJS.values() for c in o.bound_box]
 zmin, zmax = min(p.z for p in pts), max(p.z for p in pts); zc = (zmin + zmax) / 2
 cam_d = bpy.data.cameras.new("FrontCam"); cam_d.type = "ORTHO"; cam_d.sensor_fit = "VERTICAL"
-cam_d.ortho_scale = (zmax - zmin + float(ARGS.get("LINE", 0.012)) * 2) / FILL; cam_d.clip_start = 1; cam_d.clip_end = 30
+cam_d.ortho_scale = (zmax - zmin + float(ARGS.get("LINE", 0.009)) * 2) / FILL; cam_d.clip_start = 1; cam_d.clip_end = 30
 cam = bpy.data.objects.new("FrontCam", cam_d); sc.collection.objects.link(cam); sc.camera = cam
 el = math.radians(EL)
 cam.location = (0, -12 * math.cos(el), zc + 12 * math.sin(el)); cam.rotation_euler = (math.radians(90) - el, 0, 0)
