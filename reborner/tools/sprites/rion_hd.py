@@ -24,8 +24,8 @@ F = H64 * S / H_ABS                    # จุดภาพต้นฉบับ
 NECK_Y, HIP_Y, LEG_SPLIT_X, SHOULDER_Y = 625, 1052, 570, 770
 NECK_OVERLAP = 40                     # ตัดคอที่คาง (ไม่มีปกเสื้อบังแบบภาพเดิม) → ตัวต่อขึ้นไปหลังหัว 40 จุด
 # แขน = รูปหลายเหลี่ยมรอบแขนท่อนล่างใต้แขนเสื้อถึงกำปั้น (วัดจากตาราง) · sh = จุดหมุนที่ไหล่/ปลายแขนเสื้อ
-ARM_L = dict(poly=[(372, 790), (440, 828), (425, 880), (412, 910), (410, 1000), (320, 1000), (322, 930), (345, 870), (358, 815)], sh=(405, 810))
-ARM_R = dict(poly=[(700, 828), (762, 790), (785, 840), (808, 880), (820, 1000), (725, 1000), (722, 930), (705, 880)], sh=(735, 810))
+ARM_L = dict(poly=[(372, 790), (440, 828), (425, 880), (412, 910), (410, 1012), (320, 1012), (322, 930), (345, 870), (358, 815)], sh=(405, 810))
+ARM_R = dict(poly=[(700, 828), (762, 790), (785, 840), (808, 880), (820, 1012), (725, 1012), (722, 930), (705, 880)], sh=(735, 810))
 
 def to64(x, y): return 32 + (x - CX_ABS) * F / S, 63 - (FOOT_ABS - y) * F / S
 def to_work(x, y): a, b = to64(x, y); return a * S, b * S
@@ -65,6 +65,26 @@ def work_image(a, alpha, pal):
 	canvas[cy0:cy0 + hh, cx0:cx0 + ww] = out[sy0:sy0 + hh, sx0:sx0 + ww]
 	return canvas
 
+def work_image_hires(a):
+	"""ผืนทำงานแบบภาพคม (ไม่ล็อกสี ไม่ย่อพิกเซล): ตัดเขียวแบบขอบนุ่ม + ล้างเขียวที่ขอบ → ย่อ LANCZOS"""
+	r, g, b = a[..., 0], a[..., 1], a[..., 2]
+	d = g - np.maximum(r, b)
+	al = np.clip((90 - d) / 50.0, 0, 1)                                     # d ≤ 40 ทึบ · ≥ 90 โปร่ง (พื้น #00B140 d≈113)
+	band = al < 1
+	for _ in range(3):                                                      # ขอบ 3 จุดรอบพื้นโปร่ง (หน้าปัดนาฬิกาสีเขียวอยู่ด้านในเลยไม่โดน)
+		n = band.copy(); n[1:] |= band[:-1]; n[:-1] |= band[1:]; n[:, 1:] |= band[:, :-1]; n[:, :-1] |= band[:, 1:]; band = n
+	a = a.copy(); spill = band & (d > 0); a[..., 1] = np.where(spill, np.maximum(r, b), g)
+	rgba = np.dstack([a, al * 255]).astype(np.uint8)
+	src = Image.fromarray(rgba, 'RGBA')
+	w, h = round(src.width * F), round(src.height * F)
+	small = np.asarray(src.resize((w, h), Image.LANCZOS))
+	ox, oy = to_work(0, 0); canvas = np.zeros((64 * S, 64 * S, 4), np.uint8)
+	x0, y0 = int(round(ox)), int(round(oy))
+	cy0, cx0 = max(0, y0), max(0, x0); sy0, sx0 = cy0 - y0, cx0 - x0
+	hh, ww = min(64 * S - cy0, h - sy0), min(64 * S - cx0, w - sx0)
+	canvas[cy0:cy0 + hh, cx0:cx0 + ww] = small[sy0:sy0 + hh, sx0:sx0 + ww]
+	return canvas
+
 def masks(canvas):
 	"""แยกชิ้นในผืนทำงาน · แขน = ผิว/นาฬิกาในกรอบแขน + ขอบเข้มที่ติดผิว (ขยาย 2 จุด)"""
 	Hh, Ww = canvas.shape[:2]; yy, xx = np.mgrid[0:Hh, 0:Ww]
@@ -77,7 +97,10 @@ def masks(canvas):
 	from PIL import ImageDraw
 	def arm(A):
 		m = Image.new('L', (Ww, Hh)); ImageDraw.Draw(m).polygon([to_work(x, y) for x, y in A['poly']], fill=255)
-		return op & (np.asarray(m) > 0) & ~head & ~legs
+		r = np.asarray(m) > 0
+		for _ in range(3):                                                  # กินขอบนุ่มรอบแขนอีก 3 จุด (ภาพคม: ขอบแขนโปร่งครึ่งเดียวค้างอยู่ในตัว)
+			n = r.copy(); n[1:] |= r[:-1]; n[:-1] |= r[1:]; n[:, 1:] |= r[:, :-1]; n[:, :-1] |= r[:, 1:]; r = n
+		return op & r & ~head & ~legs
 	arm_l, arm_r = arm(ARM_L), arm(ARM_R)
 	torso = op & ~head & ~legs & ~arm_l & ~arm_r
 	torso |= op & (yy >= wy(NECK_Y - NECK_OVERLAP)) & (yy < wy(NECK_Y))   # คางซ้อนหลังหัว: หัวตามช้าแล้วไม่เห็นช่องที่คอ
@@ -89,9 +112,10 @@ def fill_holes(canvas, torso, arm, side):
 	ys, xs = np.nonzero(arm)
 	step = 1 if side == 'l' else -1
 	for y, x in zip(ys, xs):
+		if not torso[y, max(0, x - 64):x].any() and side == 'l' or not torso[y, x + 1:x + 65].any() and side == 'r': continue   # ฝั่งนอกไม่มีตัว/เป้ = แขนห้อยกลางอากาศ (ข้างกำปั้น) → ปล่อยโปร่ง ไม่ลากสีกางเกงมาเป็นเส้น
 		for d in range(1, 48):
 			xx = x + step * d
-			if 0 <= xx < canvas.shape[1] and torso[y, xx]: out[y, x] = canvas[y, xx]; break
+			if 0 <= xx < canvas.shape[1] and torso[y, xx] and canvas[y, xx, 3] == 255: out[y, x] = canvas[y, xx]; break   # เฉพาะสีทึบเต็ม ไม่งั้นขอบนุ่มกลายเป็นเส้นลาก
 	return out
 
 def outline(im, color):
@@ -102,9 +126,9 @@ def outline(im, color):
 	edge &= e; a[edge, :3] = color
 	return Image.fromarray(a)
 
-def build():
+def build(hires=False):
 	a, alpha, n_cream = load_src(); pal = palette()
-	canvas = work_image(a, alpha, pal)
+	canvas = work_image_hires(a) if hires else work_image(a, alpha, pal)
 	M = masks(canvas)
 	layer = lambda m: Image.fromarray(np.where(m[..., None], canvas, 0).astype(np.uint8), 'RGBA')
 	torso = M['torso'] | M['arm_l'] | M['arm_r']
@@ -118,10 +142,22 @@ def build():
 	RS.SH_L = to64(*ARM_L['sh']); RS.SH_R = to64(*ARM_R['sh'])
 	dark = tuple(int(v) for v in pal[np.argmin(pal.sum(1))])
 	frames = []
+	if hires:                                                         # ภาพคม: ผืน 512 เต็ม ไม่ย่อ ไม่เติมขอบ (ภาพต้นฉบับมีเส้นขอบแล้ว)
+		RS.RESAMPLE = Image.BICUBIC
+		return [RS.frame(i / RS.FRAMES, big=True) for i in range(RS.FRAMES)], parts, canvas, n_cream
 	for i in range(RS.FRAMES):
 		f = RS.frame(i / RS.FRAMES); body = f.crop((0, RS.TOP, 64, RS.TOP + 64))
 		g = Image.new('RGBA', f.size); g.alpha_composite(outline(body, dark), (0, RS.TOP)); frames.append(g)
 	return frames, parts, canvas, n_cream
+
+HIRES_OUT = os.path.join(ROOT, 'assets/sprites/rion_hires_draft')
+
+if __name__ == '__main__' and '--hires' in sys.argv:
+	# แนวใหม่ (kwan 14 ต.ค. "เปลี่ยน art ของเกมเป็นแบบนี้เลย ไม่ใช้ pixel แล้ว"): ภาพคม 512x512 ต่อเฟรม · ตัวสูง 464 จุด เท้าที่แถว 504
+	os.makedirs(HIRES_OUT, exist_ok=True); open(os.path.join(HIRES_OUT, '.gdignore'), 'w').close()
+	frames = build(hires=True)[0]
+	for i, f in enumerate(frames): f.save(os.path.join(HIRES_OUT, 'walk_south_%02d.png' % i), optimize=True)
+	print('hires frames', len(frames), '→', HIRES_OUT); sys.exit()
 
 if __name__ == '__main__':
 	os.makedirs(OUT, exist_ok=True)

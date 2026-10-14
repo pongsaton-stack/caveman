@@ -30,6 +30,7 @@ KNEE = 2.0      # ขาที่ยกขึ้นสั้นลง
 ARM_DEG = 9.0   # แกว่งแขน
 LAG = 0.07      # หัว/เป้ตามช้ากว่าตัว (สัดส่วนรอบ)
 
+RESAMPLE = Image.NEAREST    # ภาพใหญ่ไม่ย่อพิกเซล (rion_hd --hires) ตั้งเป็น BICUBIC ให้ขอบเรียบตอนหมุน/เลื่อนเศษ
 _cache = {}
 def part(name):
 	if name not in _cache:
@@ -41,17 +42,17 @@ def bob(t): return -BOB * (0.5 - 0.5 * math.cos(4 * math.pi * t))   # ต่ำ�
 
 def affine(im, dx=0.0, dy=0.0, deg=0.0, pivot=(32, 32), sy=1.0, sy_top=None):
 	"""เลื่อน/หมุนรอบ pivot/ยุบแนวตั้งรอบ sy_top · หน่วยภาพ 64 · ทำที่ภาพใหญ่ (nearest)"""
-	if abs(deg) > 1e-3: im = im.rotate(deg, Image.NEAREST, center=(pivot[0] * S, pivot[1] * S))
+	if abs(deg) > 1e-3: im = im.rotate(deg, RESAMPLE, center=(pivot[0] * S, pivot[1] * S))
 	if sy != 1.0:
 		y0 = sy_top * S; a = 1.0 / sy                      # y_src = y0 + (y - y0) / sy
-		im = im.transform(im.size, Image.AFFINE, (1, 0, 0, 0, a, y0 - y0 * a), Image.NEAREST)
-	if dx or dy: im = im.transform(im.size, Image.AFFINE, (1, 0, -dx * S, 0, 1, -dy * S), Image.NEAREST)
+		im = im.transform(im.size, Image.AFFINE, (1, 0, 0, 0, a, y0 - y0 * a), RESAMPLE)
+	if dx or dy: im = im.transform(im.size, Image.AFFINE, (1, 0, -dx * S, 0, 1, -dy * S), RESAMPLE)
 	return im
 
 def leg(im, top, bot, dx):
 	"""ยืด/หดขาให้ช่วง HIP..FOOT+1 ของภาพเดิมไปอยู่ top..bot (ภาพ 64) + เลื่อนข้าง dx"""
 	a = (FOOT + 1 - HIP) / (bot - top)                     # y_src = HIP + (y - top) * a
-	return im.transform(im.size, Image.AFFINE, (1, 0, -dx * S, 0, a, (HIP - top * a) * S), Image.NEAREST)
+	return im.transform(im.size, Image.AFFINE, (1, 0, -dx * S, 0, a, (HIP - top * a) * S), RESAMPLE)
 
 def shear_rows(im, fn):
 	"""เลื่อนแต่ละแถวตาม fn(y ภาพ 64) → dx (เศษพิกเซลได้)"""
@@ -76,7 +77,7 @@ def downsample(big):
 			out[y, x] = ((k >> 16) & 255, (k >> 8) & 255, k & 255, 255)
 	return Image.fromarray(out)
 
-def frame(t):
+def frame(t, big=False):
 	"""t = 0..1 ของรอบเดิน · เท้าซ้ายของภาพยกสูงสุดที่ t 0.25 · ขวาที่ 0.75"""
 	ph = 2 * math.pi * t
 	b, bl = bob(t), bob(t - LAG)                                   # ตัว · ส่วนที่ตามช้า (หัว/เป้)
@@ -100,6 +101,7 @@ def frame(t):
 		canvas.alpha_composite(affine(part(side), dx=body_shift(sh[1]), dy=b, deg=deg, pivot=sh))
 	# หัว: ตามตัวช้านิด · ส่ายน้อยกว่าอก (หัวนิ่งแบบคลิป)
 	canvas.alpha_composite(affine(part('head'), dx=tw * HEAD_SWAY, dy=bl))
+	if big: return canvas                                          # ผืนใหญ่ 512x512 ไม่ย่อ (ภาพคม)
 	small = downsample(canvas)
 	out = Image.new('RGBA', (64, 64 + TOP)); out.alpha_composite(small, (0, TOP)); return out
 
