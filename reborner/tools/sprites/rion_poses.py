@@ -4,7 +4,7 @@
 kwan สั่ง "เอาที่ใช้ได้มาทำก่อน" → 8 ท่าที่ผ่านการดู: หลัง · หันซ้าย · ง้างมีด · ฟาด · โดนตี · นอนล้ม · ผลักปล่อยเวทย์ · วิ่ง
 ไม่เอา: หันหน้า (ใช้ต้นฉบับแทน) · หันขวา (พลิกจากหันซ้าย นาฬิกาผิดข้าง) · พนมมือ (หันหน้าตรง) · ทรุดเข่า (คลานสี่ขา) → รอเจนใหม่
 
-  python3 tools/sprites/rion_poses.py [--page OUT.html]
+  python3 tools/sprites/rion_poses.py [--page OUT.html]   (หน้าเทส = คลิปท่าขยับจากภาพนิ่ง + แกลเลอรี · เทมเพลต tools/web/rion_poses_test.tpl.html)
 
 ขั้นตอนต่อท่า: กรอบในชีต → ตัดพื้นเขียว (สูตรเดียวกับ rion_ref.key) → ลบแสงเวทย์สีฟ้าอมเขียว (ท่าผลักปล่อย) →
   เก็บเฉพาะก้อนใหญ่สุด (ทิ้งประกายลอย) → ย่อทุกท่าอัตราเดียว (วัดจากท่าหันซ้ายยืนตรง = ตัวสูง 464) → ผืน 512 เท้าแถว 504
@@ -75,7 +75,8 @@ def main():
 			b = io.BytesIO(); Image.open(p).save(b, "WEBP", quality=92); return "data:image/webp;base64," + base64.b64encode(b.getvalue()).decode()
 		data = {"front": uri(os.path.join(OUT, "stand_south.png")),
 			"poses": [{"id": n, "label": POSES[n][1], "src": uri(os.path.join(OUT, n + ".png"))} for n in POSES],
-			"sheet": uri(SHEET), "k": round(k, 3)}
+			"sheet": uri(SHEET), "k": round(k, 3),
+			"bg": uri(os.path.join(ROOT, "assets/sprites/battle_bg_hires_draft/act1.png")), "bg_ground": 0.734}   # เส้นพื้นของฉาก (battle_bg_hires.GROUND)
 		tpl = open(os.path.join(ROOT, "tools/web/rion_poses_test.tpl.html"), encoding="utf-8").read()
 		open(args.page, "w", encoding="utf-8").write(tpl.replace("__DATA__", json.dumps(data)))
 		print("หน้าเทส →", args.page, os.path.getsize(args.page), "bytes")

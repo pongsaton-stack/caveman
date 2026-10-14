@@ -2,7 +2,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&family=Kanit:wght@600&display=swap">
 <style>
-/* Layout: header, background switch, grid of pose cards (front original first), source sheet at the end */
+/* Layout: header, animated battle stage + clip/speed controls, then the still gallery and the source sheet */
 :root {
   --bg: #f4f1ec; --surface: #fffdf9; --fg: #241d18; --muted: #6f6359; --line: #e2d8cd;
   --accent: #2f5fb8; --accent-fg: #ffffff; --ok: #2e7d4f; --warn: #a2611a;
@@ -13,18 +13,22 @@
 :root[data-theme="dark"] { --bg: #15120f; --surface: #1f1a16; --fg: #f1e9e1; --muted: #a9998c; --line: #352c25; --accent: #7aa3f0; --accent-fg: #10151f; --ok: #6cc596; --warn: #e0a35c; color-scheme: dark }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.6; padding: 0 16px; }
-main { max-width: 1100px; margin: 0 auto; padding-block: 28px 48px; display: grid; gap: 18px; }
+main { max-width: 1100px; margin: 0 auto; padding-block: 28px 48px; display: grid; gap: 16px; }
 h1 { font-family: var(--display); font-size: 1.5rem; margin: 0; text-wrap: balance; }
-h2 { font-family: var(--display); font-size: 1.1rem; margin: 6px 0 0; }
+h2 { font-family: var(--display); font-size: 1.1rem; margin: 10px 0 0; }
 .sub { color: var(--muted); margin: 2px 0 0; }
-.seg { display: flex; flex-wrap: wrap; gap: 6px; }
-.seg button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.seg .lbl { color: var(--muted); font-size: .85rem; margin-right: 4px; }
+.seg button { font: inherit; font-weight: 600; padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font-variant-numeric: tabular-nums; }
 .seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 12px; }
+.stagebox { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+#cv { display: block; width: 100%; height: auto; }
+.info { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 12px; }
 figure { margin: 0; border-radius: 10px; border: 1px solid var(--line); overflow: hidden; background: var(--surface); display: grid; }
-.stage { aspect-ratio: 1; background: var(--stage, #a7b5a0); display: grid; place-items: center; }
-.stage img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.still { aspect-ratio: 1; background: var(--stage, #a7b5a0); }
+.still img { width: 100%; height: 100%; object-fit: contain; display: block; }
 figcaption { padding: 8px 12px; font-weight: 600; font-size: .9rem; display: flex; justify-content: space-between; gap: 8px; }
 figcaption span { font-weight: 400; color: var(--muted); font-size: .8rem; }
 .tag-ok { color: var(--ok); } .tag-src { color: var(--warn); }
@@ -34,42 +38,244 @@ figcaption span { font-weight: 400; color: var(--muted); font-size: .8rem; }
 </style>
 <main>
   <header>
-    <h1>Rion ท่าจากชีตที่ kwan เจน</h1>
-    <p class="sub">8 ท่าที่ใช้ได้ ตัดจากชีต ไม่วาดทับ · ย่อทุกท่าอัตราเดียว (ท่าหันซ้ายยืนตรง = ตัวสูง 464 ในผืน 512 เท่าภาพหน้าตรง) · ร่าง ยังไม่เข้าเกม</p>
+    <h1>Rion ภาพคม ท่าขยับ</h1>
+    <p class="sub">ขยับจากภาพนิ่งที่ตัดจากชีต (ไม่วาดตัวใหม่) · ท่าเปลี่ยนตามจังหวะ + ยืด/ยุบ/เอน/พุ่ง + เอฟเฟกต์วาดเส้นขอบแบบเดียวกับตัวละคร · ร่าง ยังไม่เข้าเกม</p>
   </header>
-  <div class="seg" role="group" aria-label="พื้นหลัง">
+  <div class="seg" role="group" aria-label="คลิป" id="clips"></div>
+  <div class="stagebox"><canvas id="cv" width="960" height="400" aria-label="ฉากต่อสู้พร้อม Rion"></canvas></div>
+  <div class="info"><span id="clipName"></span><span id="clock"></span></div>
+  <div class="seg" role="group" aria-label="ควบคุม">
+    <button id="play" aria-pressed="true">⏯ เล่น/หยุด</button>
+    <button id="step">ทีละเฟรม ▶</button>
+    <span class="lbl">ความเร็ว</span>
+    <button data-speed="0.25" aria-pressed="false">×0.25</button>
+    <button data-speed="0.5" aria-pressed="false">×0.5</button>
+    <button data-speed="1" aria-pressed="true">×1</button>
+  </div>
+  <div class="note">
+    <ul>
+      <li>โจมตีใช้หลักที่ kwan ชอบ: วิ่งเข้า → ง้างระหว่างยังวิ่ง → ฟาดทันทีตอนถึงเป้า (ไม่หยุดตั้งท่า) → ไถลตามแรง → กระโดดถอยกลับ</li>
+      <li>หุ่นฟางเป็นเป้าชั่วคราว (ยังไม่มีมอนภาพคม) · เวลา/ระยะทั้งหมดเป็นค่าภาพในหน้านี้ ไม่ใช่ค่าเกม</li>
+      <li>ข้อจำกัด: เปลี่ยนท่าเป็นการสลับภาพ (มีภาพนิ่งท่าละ 1 ภาพ) · วิ่งมีภาพเดียว จึงเด้งตัวแทนการสลับขา · ถอยกลับใช้กระโดดถอย (ภาพหันขวายังไม่มี)</li>
+    </ul>
+  </div>
+  <h2>ภาพนิ่งที่ใช้</h2>
+  <div class="seg" role="group" aria-label="พื้นหลังภาพนิ่ง">
     <button data-bg="#a7b5a0" aria-pressed="true">พื้นเวที</button>
     <button data-bg="#ffffff" aria-pressed="false">พื้นขาว</button>
     <button data-bg="#1e1e28" aria-pressed="false">พื้นมืด</button>
   </div>
   <div class="grid" id="grid"></div>
-  <div class="note">
-    <ul>
-      <li>ภาพหน้าตรง = ต้นฉบับ (ตัดพื้นอย่างเดียว) · อีก 8 ท่ามาจากชีต ละเอียดราว 1 ใน 3 ของต้นฉบับ จึงขยายขึ้นเล็กน้อย (<span id="k"></span> เท่า)</li>
-      <li>ลบแล้ว: ประกายลอยรอบมีด · วงเวทย์สีฟ้าในท่าผลักปล่อย</li>
-      <li>รอเจนใหม่: หันขวา (เดิมพลิกภาพ นาฬิกาผิดข้าง) · พนมมือ (เดิมหันหน้าตรง) · ทรุดเข่า (เดิมคลานสี่ขา)</li>
-    </ul>
-  </div>
   <h2>ชีตต้นทาง</h2>
   <img class="sheet" id="sheet" alt="ชีตท่า Rion ที่ kwan เจน">
 </main>
 <script>
 const D = __DATA__;
-const grid = document.getElementById('grid');
-function card(src, label, tag, cls) {
-  const f = document.createElement('figure');
-  f.innerHTML = '<div class="stage"><img alt=""></div><figcaption></figcaption>';
-  f.querySelector('img').src = src; f.querySelector('img').alt = label;
-  const cap = f.querySelector('figcaption'); cap.textContent = label;
-  const s = document.createElement('span'); s.textContent = tag; s.className = cls; cap.append(s);
-  grid.append(f);
+// ── ภาพ ──
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+const SRC = { stand_south: D.front }; D.poses.forEach(p => SRC[p.id] = p.src);
+
+// ── เวที: ภาพผืน 512 (เท้าแถว 504 กลาง x256) วาดขนาด SC · พื้นตามเส้นพื้นของฉาก ──
+const W = 960, H = 400, SC = 0.56, FY = Math.round(H * D.bg_ground) + 26, HX = 700, TX = 236;
+const ease = { lin: t => t, in: t => t * t, out: t => 1 - (1 - t) * (1 - t), io: t => t < .5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t) };
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// คลิป: keys = จุดเวลา (ms) ค่าระหว่างจุดไล่ด้วย ease ของจุดถัดไป · pose เปลี่ยนตอนถึงจุด · fx = เอฟเฟกต์ตามเวลา
+// x = ระยะจากจุดยืนเดิม (ลบ = ไปทางซ้าย/หาเป้า) · y = ยกตัว (ลบ = ขึ้น) · r = เอนองศา (บวก = เอนหลังสำหรับท่าหันซ้าย)
+const CLIPS = [
+  { id: 'idle_front', name: 'ยืนหายใจ · หันหน้า', dur: 2400, breath: 1, keys: [{ t: 0, pose: 'stand_south' }] },
+  { id: 'idle_left', name: 'ยืนหายใจ · หันซ้าย (ท่ายืนในจอสู้)', dur: 2400, breath: 1, sway: 1, keys: [{ t: 0, pose: 'left' }] },
+  { id: 'idle_back', name: 'ยืนหายใจ · หันหลัง', dur: 2400, breath: 1, keys: [{ t: 0, pose: 'back' }] },
+  { id: 'run', name: 'วิ่ง · หันซ้าย (ฉากเลื่อน)', dur: 960, run: 1, keys: [{ t: 0, pose: 'left_run' }] },
+  { id: 'attack', name: 'โจมตี: วิ่งเข้า → ง้างกลางทาง → ฟาดทันที → ไถล → กระโดดถอย', dur: 2300, dummy: 1, keys: [
+    { t: 0, pose: 'left', x: 0 }, { t: 260, pose: 'left_run', x: 0 },
+    { t: 500, pose: 'left_windup', x: -262, r: 3, ease: 'in', bounce: 1 },
+    { t: 600, pose: 'left_strike', x: -330, r: -3, sx: 1.04, sy: .96, ease: 'lin', ghost: 1 },
+    { t: 660, x: -336, r: -4, ease: 'out' },
+    { t: 860, x: -362, r: -2, sx: 1, sy: 1, ease: 'out' },
+    { t: 1180, x: -362, r: 0, ease: 'io' },
+    { t: 1200, pose: 'left', x: -362, sy: .95, sx: 1.03 },
+    { t: 1430, x: -181, y: -46, sy: 1.03, sx: .98, ease: 'out', arc: 1 },
+    { t: 1640, x: 0, y: 0, ease: 'in', arc: 1 },
+    { t: 1720, sy: .95, sx: 1.03, ease: 'out' }, { t: 1860, sy: 1, sx: 1, ease: 'io' }],
+    fx: [{ t: 260, k: 'dust', dx: 30 }, { t: 600, k: 'slash' }, { t: 610, k: 'star', at: 'target' }, { t: 600, k: 'shake', p: 9 },
+      { t: 600, k: 'hitstop', d: 60 }, { t: 660, k: 'slide' }, { t: 600, k: 'dummy' }, { t: 1640, k: 'dust', dx: 0 }] },
+  { id: 'hurt', name: 'โดนตี (กระเด็นถอย → ตั้งหลัก)', dur: 1700, keys: [
+    { t: 0, pose: 'left', x: 0 }, { t: 360, pose: 'left_hurt', x: 0, r: 0 },
+    { t: 520, x: 52, r: 4, ease: 'out', shiver: 1 }, { t: 980, x: 52, r: 3, ease: 'io', shiver: 1 },
+    { t: 1000, pose: 'left', x: 52, r: 0 }, { t: 1300, x: 0, ease: 'io' }],
+    fx: [{ t: 360, k: 'flash', d: 180 }, { t: 360, k: 'star', at: 'chest' }, { t: 360, k: 'shake', p: 7 }, { t: 360, k: 'hitstop', d: 50 }, { t: 400, k: 'dust', dx: 40 }] },
+  { id: 'down', name: 'ล้ม (โดนแรง → ล้มคว่ำ → ค้าง)', dur: 3000, keys: [
+    { t: 0, pose: 'left', x: 0 }, { t: 300, pose: 'left_hurt', x: 0 },
+    { t: 520, x: 60, y: -30, r: 10, ease: 'out' },
+    { t: 640, pose: 'left_down', x: 96, y: 0, r: 0, ease: 'in' }, { t: 720, y: -14, ease: 'out' }, { t: 800, y: 0, ease: 'in' },
+    { t: 860, y: -4, ease: 'out' }, { t: 910, y: 0, ease: 'in' }, { t: 2500, x: 96, ease: 'lin', a: 1 }, { t: 2800, a: 0, ease: 'in' }, { t: 2801, pose: 'left', x: 0, a: 0 }, { t: 3000, a: 1 }],
+    fx: [{ t: 300, k: 'flash', d: 200 }, { t: 300, k: 'star', at: 'chest' }, { t: 300, k: 'shake', p: 10 }, { t: 300, k: 'hitstop', d: 70 },
+      { t: 640, k: 'dust', dx: 60, big: 1 }, { t: 640, k: 'shake', p: 5 }] },
+  { id: 'cast', name: 'ร่ายเวทย์ (รวมพลัง → ผลักปล่อย → ลูกพลังเข้าเป้า)', dur: 2600, dummy: 1, keys: [
+    { t: 0, pose: 'left', x: 0 }, { t: 300, pose: 'left', sy: .97, sx: 1.015, ease: 'io' }, { t: 820, sy: .96, sx: 1.02, ease: 'io', shiver: .5 },
+    { t: 840, pose: 'left_cast', x: -14, sy: 1.02, sx: .99, r: -2, ease: 'out' }, { t: 1000, x: -10, sy: 1, sx: 1, r: 0, ease: 'io' },
+    { t: 1800, x: -10 }, { t: 1820, pose: 'left', x: -10 }, { t: 2100, x: 0, ease: 'io' }],
+    fx: [{ t: 300, k: 'charge', d: 540 }, { t: 840, k: 'burst' }, { t: 840, k: 'orb', d: 300 }, { t: 1140, k: 'star', at: 'target', c: 'cyan' },
+      { t: 1140, k: 'shake', p: 6 }, { t: 1140, k: 'dummy' }] },
+];
+
+// ── ค่าตามเวลา ──
+function sample(c, t) {
+  const st = { pose: c.keys[0].pose, x: 0, y: 0, r: 0, sx: 1, sy: 1, a: 1, shiver: 0, ghost: 0 };
+  const props = ['x', 'y', 'r', 'sx', 'sy', 'a'];
+  let prev = { t: 0 }; for (const p of props) prev[p] = st[p];
+  for (const k of c.keys) {
+    if (k.t <= t) { if (k.pose) st.pose = k.pose; for (const p of props) if (k[p] !== undefined) prev[p] = k[p]; prev.t = k.t; st.shiver = k.shiver || 0; st.ghost = k.ghost || 0; continue; }
+    const f = (ease[k.ease] || ease.io)(Math.min(1, (t - prev.t) / Math.max(1, k.t - prev.t)));
+    for (const p of props) st[p] = k[p] !== undefined ? lerp(prev[p], k[p], f) : prev[p];
+    if (k.bounce) st.y += -Math.abs(Math.sin((t / 120) * Math.PI)) * 12;
+    if (k.arc) st.y = Math.min(st.y, 0);
+    return finish(c, st, t);
+  }
+  for (const p of props) st[p] = prev[p];
+  return finish(c, st, t);
 }
-card(D.front, 'หันหน้า (#1)', 'ต้นฉบับ', 'tag-src');
-D.poses.forEach(p => card(p.src, p.label, 'จากชีต', 'tag-ok'));
-document.getElementById('sheet').src = D.sheet;
-document.getElementById('k').textContent = D.k;
-document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
-  document.documentElement.style.setProperty('--stage', b.dataset.bg);
-  document.querySelectorAll('.seg button').forEach(o => o.setAttribute('aria-pressed', o === b));
-}));
+function finish(c, st, t) {
+  if (c.breath) { const b = .5 - .5 * Math.cos(2 * Math.PI * t / c.dur); st.sy *= 1 - .016 * b; st.sx *= 1 + .007 * b; }
+  if (c.sway) st.r += .7 * Math.sin(2 * Math.PI * t / c.dur);
+  if (c.run) { const ph = (t % 240) / 240; st.y = -16 * Math.sin(Math.PI * ph); const land = ph < .1 || ph > .92; st.sy = land ? .95 : 1.02; st.sx = land ? 1.03 : .99; st.r = -3 + 1.5 * Math.sin(2 * Math.PI * ph); }
+  if (st.shiver) st.x += Math.sin(t * .9) * 1.5 * st.shiver;
+  return st;
+}
+
+// ── วาด ──
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let IMG = {}, WHITE = {}, BG;
+function whiteOf(name) {
+  if (WHITE[name]) return WHITE[name];
+  const im = IMG[name], o = document.createElement('canvas'); o.width = im.width; o.height = im.height;
+  const x = o.getContext('2d'); x.drawImage(im, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = '#fff'; x.fillRect(0, 0, o.width, o.height);
+  return WHITE[name] = o;
+}
+function drawPose(st, px, alpha, flash) {
+  const im = IMG[st.pose], s = 512 * SC;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.translate(px, FY + st.y); ctx.rotate(st.r * Math.PI / 180); ctx.scale(st.sx, st.sy);
+  ctx.drawImage(im, -256 * SC, -504 * SC, s, s);
+  if (flash > 0) { ctx.globalAlpha = alpha * flash; ctx.drawImage(whiteOf(st.pose), -256 * SC, -504 * SC, s, s); }
+  ctx.restore();
+}
+const INK = '#2a1a14';
+function outlined(path, fill, lw = 3) { ctx.fillStyle = fill; ctx.fill(path); ctx.lineWidth = lw; ctx.strokeStyle = INK; ctx.stroke(path); }
+function dummy(hit) {   // หุ่นฟาง: เสา + กระสอบ + หัว · โดนแล้วเอนแกว่ง
+  const t = hit, r = t < 0 ? 0 : Math.exp(-t / 260) * Math.sin(t / 55) * 14 * Math.PI / 180;
+  ctx.save(); ctx.translate(TX, FY); ctx.rotate(-r);
+  let p = new Path2D(); p.rect(-6, -150, 12, 150); outlined(p, '#8b5a33');
+  p = new Path2D(); p.rect(-46, -128, 92, 12); outlined(p, '#8b5a33');
+  p = new Path2D(); p.ellipse(0, -96, 34, 50, 0, 0, Math.PI * 2); outlined(p, '#d9b56a');
+  p = new Path2D(); p.ellipse(0, -172, 28, 28, 0, 0, Math.PI * 2); outlined(p, '#e3c896');
+  ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-10, -178); ctx.lineTo(-4, -172); ctx.moveTo(-4, -178); ctx.lineTo(-10, -172);
+  ctx.moveTo(4, -178); ctx.lineTo(10, -172); ctx.moveTo(10, -178); ctx.lineTo(4, -172); ctx.stroke();
+  ctx.restore();
+}
+function star(x, y, k, c) {   // ดาวกระแทก 8 แฉก ขอบเข้ม
+  const s = 20 + 46 * ease.out(Math.min(1, k * 2.2)), a = 1 - Math.max(0, (k - .45) / .55);
+  if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(k * .6);
+  const p = new Path2D(); for (let i = 0; i < 16; i++) { const rr = i % 2 ? s * .42 : s, an = i * Math.PI / 8; i ? p.lineTo(Math.cos(an) * rr, Math.sin(an) * rr) : p.moveTo(rr, 0); } p.closePath();
+  outlined(p, c === 'cyan' ? '#bff6ff' : '#fff6c8', 3);
+  const q = new Path2D(); q.arc(0, 0, s * .28, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(q);
+  ctx.restore();
+}
+function slash(x, y, k) {   // ส่วนโค้งฟันจากเหนือหัวลงหน้า-ล่าง (ทวนเข็มบนจอ) ขอบเข้ม แกนฟ้า
+  const sweep = ease.out(Math.min(1, k * 3)); if (k < 0 || k > 1 || sweep < .08) return;
+  const a = 1 - Math.max(0, (k - .35) / .65), R = 140, a0 = -1.1, a1 = a0 - 2.5 * sweep;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y);
+  const p = new Path2D(); p.arc(0, 0, R, a0, a1, true); p.arc(14, 8, R - 30, a1 + .22, a0 - .22, false); p.closePath();
+  outlined(p, '#ffffff', 3);
+  const q = new Path2D(); q.arc(0, 0, R - 9, a0 - .1, a1 + .05, true); q.arc(9, 5, R - 24, a1 + .2, a0 - .25, false); q.closePath();
+  ctx.fillStyle = '#9fdcff'; ctx.fill(q); ctx.restore();
+}
+function dust(x, k, big) {   // ฝุ่นก้อนกลมขอบเข้ม ขยายแล้วจาง
+  if (k < 0 || k > 1) return; const a = 1 - k, n = big ? 6 : 4;
+  ctx.save(); ctx.globalAlpha = a;
+  for (let i = 0; i < n; i++) { const dx = (i - (n - 1) / 2) * (big ? 30 : 22) * (1 + k), r = (big ? 18 : 12) * (.6 + k) * (1 - Math.abs(i - (n - 1) / 2) * .12);
+    const p = new Path2D(); p.arc(x + dx, FY - r * .7 - k * 10, r * 1.5, 0, Math.PI * 2); outlined(p, '#efe4cc', 2.5); }
+  ctx.restore();
+}
+function shadow(px, st) { const w = 70 * (1 + st.y / 200); ctx.save(); ctx.globalAlpha = .22 * st.a; ctx.fillStyle = '#1b2a14'; ctx.beginPath(); ctx.ellipse(px, FY + 4, Math.max(20, w), 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+
+let clip = CLIPS[0], T = 0, playing = true, speed = 1, bgScroll = 0, hist = [];
+function fxAt(k) { return (clip.fx || []).filter(f => f.k === k); }
+function hitstopShift(t) { let sh = 0; for (const f of fxAt('hitstop')) if (t > f.t) sh += Math.min(f.d, t - f.t); return sh; }
+function render() {
+  const tReal = T % clip.dur, t = tReal - hitstopShift(tReal);
+  const st = sample(clip, t);
+  let sx = 0, sy = 0;
+  for (const f of fxAt('shake')) { const d = tReal - f.t; if (d >= 0 && d < 260) { const m = f.p * (1 - d / 260); sx += Math.sin(d * .7) * m; sy += Math.cos(d * .9) * m * .6; } }
+  ctx.save(); ctx.translate(sx, sy);
+  // ฉาก (เลื่อนตอนวิ่ง)
+  const bw = BG.width * (H / BG.height), off = ((bgScroll % bw) + bw) % bw;
+  for (let i = -1; i < 2; i++) ctx.drawImage(BG, -(bw - W) / 2 + off + i * bw, 0, bw, H);
+  if (clip.dummy) { let hit = -1; for (const f of fxAt('dummy')) if (tReal >= f.t) hit = tReal - f.t; dummy(hit); }
+  const px = HX + st.x;
+  for (const f of fxAt('dust')) dust(HX + sample(clip, f.t).x + f.dx, (tReal - f.t) / 420, f.big);
+  if (clip.run) { const ph = (tReal % 240) / 240; dust(px + 40, ph * 1.2, 0); }
+  shadow(px, st);
+  // ร่างติดตาตอนพุ่ง
+  if (st.ghost || clip.run) for (const [i, g] of hist.entries()) drawPose(g, HX + g.x + (clip.run ? (hist.length - i) * 22 : 0), clip.run ? .05 + .04 * i : .12 + .08 * i, 0);
+  let flash = 0; for (const f of fxAt('flash')) { const d = tReal - f.t; if (d >= 0 && d < f.d) flash = Math.max(flash, (Math.floor(d / 45) % 2 ? .35 : .9) * (1 - d / f.d)); }
+  for (const f of fxAt('charge')) { const d = tReal - f.t; if (d >= 0 && d < f.d) charge(px, st, d / f.d); }
+  drawPose(st, px, st.a, flash);
+  if (clip.run) speedLines(tReal);
+  for (const f of fxAt('slash')) slash(HX + sample(clip, f.t).x - 70, FY - 120, (tReal - f.t) / 300);
+  for (const f of fxAt('burst')) burst(px, (tReal - f.t) / 380);
+  for (const f of fxAt('orb')) { const d = tReal - f.t; if (d >= 0 && d < f.d) orb(px, d / f.d); }
+  for (const f of fxAt('star')) { const d = (tReal - f.t) / 360; if (d >= 0 && d < 1) { const at = f.at === 'chest' ? [px - 40, FY - 150] : [TX + 6, FY - 110]; star(at[0], at[1], d, f.c); } }
+  ctx.restore();
+  hist.push({ ...st }); if (hist.length > 4) hist.shift(); if (!st.ghost && !clip.run) hist.length = 0;
+  document.getElementById('clock').textContent = (tReal / 1000).toFixed(2) + ' / ' + (clip.dur / 1000).toFixed(2) + ' วิ · ' + st.pose;
+}
+function speedLines(t) { ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = 3; for (let i = 0; i < 7; i++) { const y = 70 + ((i * 53 + t * .05) % 260), x = ((i * 137 + t * 1.4) % (W + 200)) - 100; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 90 + (i % 3) * 30, y); ctx.stroke(); } ctx.restore(); }
+function handPt(px, st) { return [px - 140 * SC * (st.pose === 'left_cast' ? 1 : .55), FY - 236 * SC]; }
+function charge(px, st, k) {   // พลังไหลเข้ามือ: วงหดเข้า + จุดแสงวิ่งเข้า
+  const [hx, hy] = handPt(px, st); ctx.save();
+  for (let i = 0; i < 3; i++) { const r = 70 * (1 - ((k * 2 + i / 3) % 1)); ctx.globalAlpha = .7; ctx.lineWidth = 3; ctx.strokeStyle = '#5fd8ff'; ctx.beginPath(); ctx.arc(hx, hy, r, 0, Math.PI * 2); ctx.stroke(); }
+  for (let i = 0; i < 10; i++) { const an = i * 2.4 + k * 3, r = 90 * (1 - ((k * 1.6 + i * .1) % 1)); const p = new Path2D(); p.arc(hx + Math.cos(an) * r, hy + Math.sin(an) * r, 4, 0, Math.PI * 2); ctx.globalAlpha = 1; outlined(p, '#c8f4ff', 2); }
+  const core = new Path2D(); core.arc(hx, hy, 8 + 10 * k, 0, Math.PI * 2); outlined(core, '#e9fbff', 2.5); ctx.restore();
+}
+function burst(px, k) { if (k < 0 || k > 1) return; const [hx, hy] = handPt(px, { pose: 'left_cast' }); ctx.save(); ctx.globalAlpha = 1 - k; ctx.lineWidth = 5; ctx.strokeStyle = '#5fd8ff'; ctx.beginPath(); ctx.ellipse(hx - 10, hy, 20 + 60 * k, 40 + 90 * k, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+function orb(px, k) {   // ลูกพลังพุ่งเข้าเป้า มีหาง
+  const [hx, hy] = handPt(px, { pose: 'left_cast' }), x = lerp(hx, TX + 10, ease.in(k)), y = lerp(hy, FY - 110, k);
+  ctx.save(); for (let i = 5; i > 0; i--) { const p = new Path2D(); p.arc(x + i * 16, y, 16 - i * 2, 0, Math.PI * 2); ctx.globalAlpha = .18 * (6 - i); ctx.fillStyle = '#5fd8ff'; ctx.fill(p); }
+  ctx.globalAlpha = 1; const p = new Path2D(); p.arc(x, y, 18, 0, Math.PI * 2); outlined(p, '#7fe3ff', 3); const q = new Path2D(); q.arc(x - 4, y - 4, 8, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(q); ctx.restore();
+}
+
+// ── วนเวลา ──
+let last = performance.now();
+function tick(now) {
+  const dt = Math.min(50, now - last); last = now;
+  if (playing) { T += dt * speed; if (clip.run) bgScroll += dt * speed * .55; }
+  render(); requestAnimationFrame(tick);
+}
+function pick(c) { clip = c; T = 0; hist = []; document.getElementById('clipName').textContent = c.name;
+  document.querySelectorAll('#clips button').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === c.id)); }
+
+(async () => {
+  const names = Object.keys(SRC);
+  const ims = await Promise.all(names.map(n => load(SRC[n]))); names.forEach((n, i) => IMG[n] = ims[i]);
+  BG = await load(D.bg);
+  const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+  const box = document.getElementById('clips');
+  CLIPS.forEach(c => { const b = document.createElement('button'); b.textContent = c.name.split(' (')[0].split(':')[0]; b.dataset.id = c.id; b.addEventListener('click', () => pick(c)); box.append(b); });
+  pick(CLIPS[4]); requestAnimationFrame(tick);
+  document.getElementById('play').addEventListener('click', e => { playing = !playing; e.currentTarget.setAttribute('aria-pressed', playing); });
+  document.getElementById('step').addEventListener('click', () => { playing = false; document.getElementById('play').setAttribute('aria-pressed', false); T += 1000 / 60; });
+  document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { speed = +b.dataset.speed; document.querySelectorAll('[data-speed]').forEach(o => o.setAttribute('aria-pressed', o === b)); }));
+  // แกลเลอรีภาพนิ่ง
+  const grid = document.getElementById('grid');
+  const card = (src, label, tag, cls) => { const f = document.createElement('figure'); f.innerHTML = '<div class="still"><img alt=""></div><figcaption></figcaption>';
+    f.querySelector('img').src = src; f.querySelector('img').alt = label; const cap = f.querySelector('figcaption'); cap.textContent = label;
+    const s = document.createElement('span'); s.textContent = tag; s.className = cls; cap.append(s); grid.append(f); };
+  card(D.front, 'หันหน้า (#1)', 'ต้นฉบับ', 'tag-src');
+  D.poses.forEach(p => card(p.src, p.label, 'จากชีต', 'tag-ok'));
+  document.getElementById('sheet').src = D.sheet;
+  document.querySelectorAll('[data-bg]').forEach(b => b.addEventListener('click', () => {
+    document.documentElement.style.setProperty('--stage', b.dataset.bg);
+    document.querySelectorAll('[data-bg]').forEach(o => o.setAttribute('aria-pressed', o === b)); }));
+})();
 </script>
