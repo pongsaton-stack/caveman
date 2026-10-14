@@ -1,6 +1,6 @@
 # Rion ภาพใหญ่ — รายการภาพที่ต้องเจน (ขั้น 1 · kwan 14 ต.ค. 2026)
 
-ต้นแบบ = `rion_front_src.png` (หันหน้า · ทำแล้ว Version 85) · **แนบภาพนี้เป็นภาพอ้างอิงทุกครั้ง**
+ต้นแบบ = `rion_front_src.png` (หันหน้า · Version 86 = ภาพที่ kwan เจนใหม่ หมวกน้ำเงินทั้งใบ · ภาพเดิม = `rion_front_src_v1.png` ไม่ใช้อ้างอิงแล้ว) · **แนบภาพนี้เป็นภาพอ้างอิงทุกครั้ง**
 ได้ภาพแล้ววางในโฟลเดอร์นี้ตามชื่อไฟล์ในตาราง (หรือส่งในแชทพร้อมบอกเลขภาพ)
 
 ## กฎกลาง (ใส่ท้ายคำสั่งทุกภาพ)
@@ -20,7 +20,7 @@ Canvas 1145x1374, character about 1130 px tall, feet at the same height as the r
 
 | # | ไฟล์ | ใช้ในเกม | คำสั่งเฉพาะภาพ |
 |---|---|---|---|
-| 1 | rion_front_src.png | เดินหน้า | ✅ มีแล้ว |
+| 1 | rion_front_src.png | เดินหน้า | ✅ มีแล้ว (Version 86) |
 | 2 | rion_back.png | เดินขึ้น | Back view, facing away from the camera, standing straight, arms slightly away from the body. |
 | 3 | rion_left.png | เดินซ้าย · ยืนในจอสู้ | Side view facing LEFT (profile), standing straight, arms relaxed at the sides. |
 | 4 | rion_right.png | เดินขวา | Side view facing RIGHT (profile), standing straight, arms relaxed at the sides. (เจนแยก ห้ามพลิกภาพ — เป้/นาฬิกาอยู่คนละข้าง) |

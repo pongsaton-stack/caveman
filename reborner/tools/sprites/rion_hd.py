@@ -4,6 +4,7 @@
 # ขั้นตอน: ตัดพื้นเขียว → ทาหน้าหมวกสีครีมเป็นน้ำเงิน (kwan เลือก "ผมทาสีน้ำเงินเอง") → ย่อให้ตัวสูง 58×8 จุด → ล็อกสีพาเลตต์ Rion ในเกม (18 สี)
 #   → แยกชิ้น หัว/ตัว/แขนซ้าย/แขนขวา/ขาซ้าย/ขาขวา ด้วยพิกัดที่วัดจากภาพ (ตาราง 50px) → ส่งให้ rion_smooth ขยับ (ชุดเดียวกับ Version 84) → ย่อ 8x8 → เส้นขอบรอบตัว
 # ต้นฉบับ docs/art-bible/rion_hires/rion_front_src.png (ภาพที่ kwan เจน) · ร่าง ยังไม่เข้าเกม
+# Version 86: kwan เจนภาพ 1 ใหม่ หมวกน้ำเงินทั้งใบ แขนกางห่างตัว → ใช้แทน (ภาพเดิม = rion_front_src_v1.png) · วัดพิกัดใหม่ · ทาหมวกยังอยู่แต่แทบไม่เจอครีม
 #
 #   python3 tools/sprites/rion_hd.py      → assets/sprites/rion_smooth_draft/hd_walk_south_<i>.png + hd_parts_check.png
 import os, sys
@@ -17,13 +18,14 @@ SRC = os.path.join(ROOT, 'docs/art-bible/rion_hires/rion_front_src.png')
 REF = os.path.join(ROOT, 'assets/sprites/rion_lastlight_draft/south.png')
 OUT = RS.OUT
 S, H64 = RS.S, 58                      # ตัวสูง 58 จุดเท่า Rion ในเกม (south.png แถว 5–62)
-FOOT_ABS, CX_ABS, H_ABS = 1285, 569, 1131   # วัดจากภาพต้นฉบับ: เท้าล่างสุด · กลางตัว · ความสูงตัว
+FOOT_ABS, CX_ABS, H_ABS = 1316, 570, 1210   # วัดจากภาพต้นฉบับ: เท้าล่างสุด · กลางตัว · ความสูงตัว
 F = H64 * S / H_ABS                    # จุดภาพต้นฉบับ → จุดภาพทำงาน (×8)
 # พิกัดในภาพต้นฉบับ (วัดด้วยตาราง 50px)
-NECK_Y, HIP_Y, LEG_SPLIT_X, SHOULDER_Y = 672, 1062, 575, 770
+NECK_Y, HIP_Y, LEG_SPLIT_X, SHOULDER_Y = 625, 1052, 570, 770
+NECK_OVERLAP = 40                     # ตัดคอที่คาง (ไม่มีปกเสื้อบังแบบภาพเดิม) → ตัวต่อขึ้นไปหลังหัว 40 จุด
 # แขน = รูปหลายเหลี่ยมรอบแขนท่อนล่างใต้แขนเสื้อถึงกำปั้น (วัดจากตาราง) · sh = จุดหมุนที่ไหล่/ปลายแขนเสื้อ
-ARM_L = dict(poly=[(392, 812), (452, 828), (444, 880), (420, 915), (414, 1008), (314, 1008), (314, 930), (348, 880), (376, 840)], sh=(420, 830))
-ARM_R = dict(poly=[(698, 828), (754, 818), (772, 866), (804, 878), (812, 1008), (718, 1008), (714, 930), (698, 880)], sh=(722, 840))
+ARM_L = dict(poly=[(372, 790), (440, 828), (425, 880), (412, 910), (410, 1000), (320, 1000), (322, 930), (345, 870), (358, 815)], sh=(405, 810))
+ARM_R = dict(poly=[(700, 828), (762, 790), (785, 840), (808, 880), (820, 1000), (725, 1000), (722, 930), (705, 880)], sh=(735, 810))
 
 def to64(x, y): return 32 + (x - CX_ABS) * F / S, 63 - (FOOT_ABS - y) * F / S
 def to_work(x, y): a, b = to64(x, y); return a * S, b * S
@@ -78,6 +80,7 @@ def masks(canvas):
 		return op & (np.asarray(m) > 0) & ~head & ~legs
 	arm_l, arm_r = arm(ARM_L), arm(ARM_R)
 	torso = op & ~head & ~legs & ~arm_l & ~arm_r
+	torso |= op & (yy >= wy(NECK_Y - NECK_OVERLAP)) & (yy < wy(NECK_Y))   # คางซ้อนหลังหัว: หัวตามช้าแล้วไม่เห็นช่องที่คอ
 	return dict(head=head, leg_l=leg_l, leg_r=leg_r, arm_l=arm_l, arm_r=arm_r, torso=torso)
 
 def fill_holes(canvas, torso, arm, side):
