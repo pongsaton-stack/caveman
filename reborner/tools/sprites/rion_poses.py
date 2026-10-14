@@ -42,7 +42,9 @@ DERIVED = {"right": ("left", "หันขวา (#4 · พลิกจากห
 # left_pray (kwan เลือก "2" ลองวาดเอง): ยกแขนใกล้ (ผิว+นาฬิกา+เส้นขอบ ใต้ชายแขนเสื้อ แถว 212–292) หมุนรอบข้อศอก PRAY_PIVOT -110° ให้มือตั้งหน้าอก
 #   ที่เดิมของแขนเติมสีตามแถบเสื้อ/ขอบ/เข็มขัด/ขอบ/กางเกง (วัดจากคอลัมน์ข้างแขน) · มือข้างไกล = ชิ้นเดียวกันเลื่อน (-3,-2) สีเข้ม 82% ·
 #   แปะชายแขนเสื้อเดิมทับรอยตัด · หลับตา = ทาผิวทับตา (x41–62 y103–133) + เส้นโค้งลง
-PRAY_BOX, PRAY_PIVOT, PRAY_ANG = (212, 293, 64, 104), (89, 209), -110
+PRAY_BOX, PRAY_PIVOT, PRAY_ANG = (212, 293, 64, 104), (89, 216), -110
+PRAY_HAND_ANG, PRAY_HAND_DY, PRAY_FAR_OFF = -170, 0, (-3, -1)   # มือ: นิ้วชี้ขึ้น เอียงไปหน้า 10° · มือไกลเลื่อนไปหน้า
+PRAY_ELBOW, PRAY_CREASE, PRAY_SKIN = (90, 219), ((79, 214), (85, 208)), (246, 205, 170)
 PRAY_BANDS = [((212, 236), (243, 232, 224)), ((236, 239), (12, 10, 10)), ((239, 247), (96, 62, 52)), ((247, 250), (12, 10, 10)), ((250, 293), (30, 101, 184))]
 
 
@@ -63,17 +65,29 @@ def derive_pray(a, al):
 	core = ndimage.binary_closing(skin | watch, iterations=2) & box
 	arm = core | (ndimage.binary_dilation(core, iterations=3) & box & (r + g + b < 260) & (al > .8))
 	piece = np.zeros_like(rgba); piece[arm] = rgba[arm]
-	out = rgba.copy(); zone = ndimage.binary_dilation(arm, iterations=4) & box
+	out = rgba.copy(); zone = ndimage.binary_dilation(arm, iterations=5) & box
 	for (ya, yb), col in PRAY_BANDS:
 		col = np.array(col)
 		for y in range(ya, yb):
 			for x in np.nonzero(zone[y])[0]:
-				if arm[y, x] or np.abs(rgba[y, x, :3] - col).max() > 45: out[y, x, :3] = col; out[y, x, 3] = 255
+				if arm[y, x] or np.abs(rgba[y, x, :3] - col).max() > 30: out[y, x, :3] = col; out[y, x, 3] = 255
 	img = Image.fromarray(out.astype(np.uint8), "RGBA")
-	pim = Image.fromarray(piece.astype(np.uint8), "RGBA").rotate(PRAY_ANG, center=PRAY_PIVOT, resample=Image.BICUBIC)
-	far = np.array(pim).astype(int); far[..., :3] = far[..., :3] * 82 // 100
-	sh = Image.new("RGBA", img.size); sh.alpha_composite(Image.fromarray(far.astype(np.uint8), "RGBA"), (-3, -2))
-	img.alpha_composite(sh); img.alpha_composite(pim)
+	# แยกท่อนแขน (ใต้ชายแขนเสื้อ → ใต้นาฬิกา) กับมือ (ใต้นาฬิกาลงไป) · ท่อนแขนหมุนรอบข้อศอก · มือหมุนรอบข้อมือให้นิ้วตั้งขึ้น แล้วย้ายไปปลายท่อนแขน
+	wy = WATCH_ROWS[1]; fore = piece.copy(); fore[wy:] = 0; hand = piece.copy(); hand[:wy + 1] = 0
+	hand[(hand[..., 2] > hand[..., 0] + 20)] = 0   # ตัดเศษสายนาฬิกาสีฟ้าออกจากชิ้นมือ
+	px, py = PRAY_PIVOT; th = np.radians(PRAY_ANG); wx0 = WATCH_COLS[0] + (WATCH_COLS[1] - WATCH_COLS[0]) // 2 - 2
+	wx, wyy = px + (wx0 - px) * np.cos(th) + (wy - py) * np.sin(th), py - (wx0 - px) * np.sin(th) + (wy - py) * np.cos(th)
+	fim = Image.fromarray(fore.astype(np.uint8), "RGBA").rotate(PRAY_ANG, center=PRAY_PIVOT, resample=Image.BICUBIC)
+	him = Image.fromarray(hand.astype(np.uint8), "RGBA").rotate(PRAY_HAND_ANG, center=(wx0, wy), resample=Image.BICUBIC)
+	hl = Image.new("RGBA", img.size); hl.alpha_composite(him, (int(round(wx - wx0)), int(round(wyy - wy)) + PRAY_HAND_DY))
+	near = Image.new("RGBA", img.size); near.alpha_composite(hl); near.alpha_composite(fim)   # ท่อนแขน (มีนาฬิกา) ทับโคนมือ
+	far = np.array(hl).astype(int); far[..., :3] = far[..., :3] * 82 // 100
+	sh = Image.new("RGBA", img.size); sh.alpha_composite(Image.fromarray(far.astype(np.uint8), "RGBA"), PRAY_FAR_OFF)
+	# ข้อพับ: ศอกกลมใต้ชายแขนเสื้อ (ปลายศอกชี้ลง-หลัง) วาดก่อนท่อนแขน + เส้นข้อพับด้านในตรงมุมที่ท่อนแขนพับขึ้น
+	d = ImageDraw.Draw(img); ex, ey0 = PRAY_ELBOW
+	d.ellipse((ex - 9, ey0 - 7, ex + 8, ey0 + 8), fill=PRAY_SKIN + (255,), outline=(20, 12, 10, 255), width=2)
+	img.alpha_composite(sh); img.alpha_composite(near)
+	d = ImageDraw.Draw(img); d.line(PRAY_CREASE, fill=(170, 96, 72, 255), width=2)   # เส้นข้อพับด้านใน
 	sm = np.zeros((H, W), bool); sm[170:213, 72:106] = True; sm &= (al > .8) & ~arm   # ชายแขนเสื้อทับรอยตัด
 	sleeve = np.zeros_like(rgba); sleeve[sm] = rgba[sm]; img.alpha_composite(Image.fromarray(sleeve.astype(np.uint8), "RGBA"))
 	o = np.array(img).astype(int); sk = o[128, 66].copy()
