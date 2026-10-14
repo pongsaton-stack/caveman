@@ -203,6 +203,7 @@ let clip = CLIPS[0], T = 0, playing = true, speed = 1, bgScroll = 0, hist = [];
 function fxAt(k) { return (clip.fx || []).filter(f => f.k === k); }
 function hitstopShift(t) { let sh = 0; for (const f of fxAt('hitstop')) if (t > f.t) sh += Math.min(f.d, t - f.t); return sh; }
 function render() {
+  if (clip.custom) { const tr = T % clip.dur; clip.custom(tr); document.getElementById('clock').textContent = (tr / 1000).toFixed(2) + ' / ' + (clip.dur / 1000).toFixed(2) + ' วิ · เฟรม ' + Math.floor(tr / EP.SEC) + ' / ' + EP.N; return; }
   const tReal = T % clip.dur, t = tReal - hitstopShift(tReal);
   const st = sample(clip, t);
   let sx = 0, sy = 0;
@@ -245,6 +246,196 @@ function orb(px, k) {   // ลูกพลังพุ่งเข้าเป�
   ctx.globalAlpha = 1; const p = new Path2D(); p.arc(x, y, 18, 0, Math.PI * 2); outlined(p, '#7fe3ff', 3); const q = new Path2D(); q.arc(x - 4, y - 4, 8, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(q); ctx.restore();
 }
 
+// ── ท่าใหญ่จาก animation test (SL01 · ฟันวิญญาณ) ─────────────────────────────────────────────
+// จังหวะยึดคลิปเดิมในหน้า animation test: 70 เฟรม × 45 ms · epic_vfx_SL01 กระทบ 42/50/56 · roll_vfx_SL01 กระทบ 32/40/46 (rollHits)
+// สีฟันวิญญาณ = pal ใน docs/art-bible/vfx/spirit_slash.nightforge.json · วาดเองเป็นรูปทรงเส้นขอบเข้ม (แนวภาพ kwan) ไม่ใช้แสงฟุ้ง
+const EP = { SEC: 45, N: 70, VFX_HITS: [42, 50, 56], ROLL_HITS: [32, 40, 46], WAVE: [1, 1.35, 1.9] };
+const PUR = ['#12052a', '#3b1688', '#7a3cff', '#c9a6ff', '#ffffff'];
+const hsh = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const TINT = {};
+function tintOf(name, col) {   // เงาสีทั้งตัว (ออร่าทอง/วาบ)
+  const key = name + col; if (TINT[key]) return TINT[key];
+  const im = IMG[name], o = document.createElement('canvas'); o.width = im.width; o.height = im.height;
+  const x = o.getContext('2d'); x.drawImage(im, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = col; x.fillRect(0, 0, o.width, o.height);
+  return TINT[key] = o;
+}
+// วาด Rion หมุนรอบจุดกลางตัว (cy = ความสูงจุดหมุนจากเท้า) · tint = [สี, ความทึบ]
+function drawRion(o) {
+  const im = IMG[o.pose], s = 512 * SC, cy = o.cy || 0;
+  ctx.save(); ctx.globalAlpha = o.a ?? 1; ctx.translate(o.x, FY + (o.y || 0) - cy); ctx.rotate((o.r || 0) * Math.PI / 180); ctx.scale(o.sx || 1, o.sy || 1);
+  ctx.drawImage(im, -256 * SC, -504 * SC + cy, s, s);
+  if (o.tint) { ctx.globalAlpha = (o.a ?? 1) * o.tint[1]; ctx.drawImage(tintOf(o.pose, o.tint[0]), -256 * SC, -504 * SC + cy, s, s); }
+  ctx.restore();
+}
+function bgLayer(dark) {
+  const bw = BG.width * (H / BG.height); ctx.drawImage(BG, -(bw - W) / 2, 0, bw, H);
+  if (dark > 0) { ctx.fillStyle = 'rgba(18,5,42,' + dark + ')'; ctx.fillRect(-W, -H, W * 3, H * 3); }   // กว้างพอตอนกล้องซูม/สั่น
+}
+function crescentPath(R, w, a0, a1, off) { const p = new Path2D(); p.arc(0, 0, R, a0, a1, true); p.arc(off, off * .6, R - w, a1 + .2, a0 - .2, false); p.closePath(); return p; }
+function spiritWave(x, y, k, sc, flip) {   // ฟันวิญญาณ: เสี้ยวม่วง 3 ชั้น + แกนขาว + เปลวตามขอบ · กวาดลงหน้า (flip = ตวัดขึ้น)
+  const sweep = ease.out(clamp01(k * 2.6)); if (k < 0 || k > 1 || sweep < .06) return;
+  const a = 1 - clamp01((k - .5) / .5), R = 118 * sc, a0 = -1.25, a1 = a0 - 2.75 * sweep;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); if (flip) ctx.scale(1, -1);
+  let p = crescentPath(R, 40 * sc, a0, a1, 16 * sc); ctx.fillStyle = PUR[1]; ctx.fill(p); ctx.lineWidth = 4; ctx.strokeStyle = PUR[0]; ctx.stroke(p);
+  p = crescentPath(R - 6 * sc, 28 * sc, a0 - .08, a1 + .06, 11 * sc); ctx.fillStyle = PUR[2]; ctx.fill(p);
+  p = crescentPath(R - 11 * sc, 16 * sc, a0 - .16, a1 + .12, 6 * sc); ctx.fillStyle = PUR[3]; ctx.fill(p);
+  ctx.beginPath(); ctx.arc(0, 0, R - 14 * sc, a0 - .25, a1 + .2, true); ctx.lineWidth = 3 * sc; ctx.strokeStyle = PUR[4]; ctx.stroke();
+  for (let i = 0; i < 7; i++) {   // เปลวม่วงตามขอบนอก
+    const an = a0 - (a0 - a1) * (i + .5) / 7, r0 = R - 2, fl = (10 + 12 * hsh(i * 7 + Math.floor(k * 20))) * sc;
+    const q = new Path2D(), cx = Math.cos(an) * r0, cy = Math.sin(an) * r0, ox = Math.cos(an) * fl, oy = Math.sin(an) * fl;
+    q.moveTo(cx - oy * .35, cy + ox * .35); q.quadraticCurveTo(cx + ox * .9, cy + oy * .9, cx + ox, cy + oy); q.quadraticCurveTo(cx + ox * .9, cy + oy * .9, cx + oy * .35, cy - ox * .35); q.closePath();
+    ctx.fillStyle = PUR[2]; ctx.fill(q); ctx.lineWidth = 2; ctx.strokeStyle = PUR[0]; ctx.stroke(q);
+  }
+  ctx.restore();
+}
+function bolt(x, seed, a) {   // สายฟ้าม่วงจากฟ้าลงเป้า (ขอบเข้ม · แกนขาว)
+  const pts = [[x + (hsh(seed) - .5) * 60, -10]]; for (let i = 1; i <= 8; i++) pts.push([x + (hsh(seed + i * 3.1) - .5) * 46 * (1 - i / 9), (FY - 100) * i / 8]);
+  ctx.save(); ctx.globalAlpha = a; ctx.lineJoin = 'round';
+  for (const [w, c] of [[13, PUR[0]], [8, PUR[2]], [3, PUR[4]]]) { ctx.beginPath(); pts.forEach(([px, py], i) => i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.lineWidth = w; ctx.strokeStyle = c; ctx.stroke(); }
+  ctx.restore();
+}
+function magicCircle(x, k, f) {   // วงเวทย์ม่วงใต้เท้า: วงนอก/ใน + ขีดรูนหมุน
+  if (k <= 0) return; ctx.save(); ctx.translate(x, FY + 2); ctx.scale(1, .26);
+  const R = 120 * k; ctx.fillStyle = 'rgba(122,60,255,.22)'; ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fill();
+  for (const [r, w, c] of [[R, 16, PUR[0]], [R, 9, PUR[2]], [R * .72, 12, PUR[0]], [R * .72, 6, PUR[3]]]) { ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.lineWidth = w; ctx.strokeStyle = c; ctx.stroke(); }
+  for (let i = 0; i < 12; i++) { const an = i * Math.PI / 6 + f * .06; ctx.save(); ctx.rotate(an); ctx.fillStyle = PUR[3]; ctx.strokeStyle = PUR[0]; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.rect(R * .8, -7, R * .12, 14); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  ctx.restore();
+}
+function motes(x, y, f, n, col, spread, rise) {   // อนุภาคลอยขึ้น (ขอบเข้ม)
+  for (let i = 0; i < n; i++) { const ph = (f * .07 + hsh(i)) % 1, px = x + (hsh(i + 9) - .5) * spread, py = y - ph * rise, r = 3 + 3 * hsh(i + 4);
+    ctx.save(); ctx.globalAlpha = 1 - ph; const p = new Path2D(); p.arc(px, py, r, 0, Math.PI * 2); outlined(p, col, 2); ctx.restore(); }
+}
+function auraFlames(x, y, k, f, front) {   // ออร่าทองลุกเป็นเปลว (เบ่งพลัง) · front = ชั้นบางทับหน้าตัว
+  if (k <= 0) return; const n = 14, cx = x, cy = FY + y - 120;
+  ctx.save(); ctx.globalAlpha = front ? .35 : 1;
+  for (let i = 0; i < n; i++) {
+    const an = -Math.PI / 2 + (i / (n - 1) - .5) * 3.4, base = 70 + 30 * Math.abs(Math.cos(an)), hgt = (60 + 50 * hsh(i * 5 + Math.floor(f / 2))) * k;
+    const bx = cx + Math.cos(an) * base * .75, by = cy + Math.sin(an) * base * 1.25 + 40, tx = bx + Math.cos(an) * hgt * .4, ty = by - hgt;
+    const p = new Path2D(); p.moveTo(bx - 16, by); p.quadraticCurveTo(bx - 10, by - hgt * .6, tx, ty); p.quadraticCurveTo(bx + 10, by - hgt * .6, bx + 16, by); p.closePath();
+    outlined(p, i % 2 ? '#ffd34a' : '#ffb21f', 2.5);
+  }
+  ctx.restore();
+}
+function balloon(text, x, y, k) {   // บอลลูนคำพูดขาวขอบเข้ม ตัวแดง เด้งตอนขึ้น
+  if (k < 0 || k > 1) return; const pop = k < .12 ? .6 + .4 * k / .12 : 1, a = k > .85 ? 1 - (k - .85) / .15 : 1;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(pop, pop);
+  ctx.font = '700 30px Kanit, "IBM Plex Sans Thai", sans-serif'; const w = ctx.measureText(text).width + 34;
+  const p = new Path2D(); p.roundRect(-w / 2, -30, w, 52, 20); p.moveTo(-8, 22); p.lineTo(6, 40); p.lineTo(14, 22); outlined(p, '#ffffff', 4);
+  ctx.fillStyle = '#c4161c'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 0, -3); ctx.restore();
+}
+function sfxText(text, x, y, k, size) {   // ตัวหนังสือเสียง ขาวขอบม่วงเข้ม
+  if (k < 0 || k > 1) return; const pop = k < .15 ? 1.6 - .6 * k / .15 : 1, a = k > .7 ? 1 - (k - .7) / .3 : 1;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.rotate(-.12); ctx.scale(pop, pop);
+  ctx.font = '700 ' + size + 'px Kanit, "IBM Plex Sans Thai", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  ctx.lineWidth = size * .22; ctx.strokeStyle = PUR[0]; ctx.strokeText(text, 0, 0); ctx.fillStyle = '#fff'; ctx.fillText(text, 0, 0); ctx.restore();
+}
+function cutIn(k) {   // คัตอินแถบเฉียง: หน้า Rion (ต้นฉบับ) + ชื่อท่า + เส้นความเร็ว
+  if (k < 0 || k > 1) return; const sl = k < .2 ? 1 - k / .2 : k > .8 ? -(k - .8) / .2 : 0;
+  ctx.save(); ctx.translate(sl * W, 0);
+  const band = new Path2D(); band.moveTo(0, 96); band.lineTo(W, 52); band.lineTo(W, 232); band.lineTo(0, 276); band.closePath();
+  ctx.fillStyle = PUR[1]; ctx.fill(band); ctx.lineWidth = 6; ctx.strokeStyle = PUR[0]; ctx.stroke(band);
+  ctx.save(); ctx.clip(band); ctx.strokeStyle = 'rgba(201,166,255,.55)'; ctx.lineWidth = 3;
+  for (let i = 0; i < 14; i++) { const yy = 60 + i * 15, xx = ((i * 97 + k * 2600) % (W + 300)) - 150; ctx.beginPath(); ctx.moveTo(xx, yy); ctx.lineTo(xx + 160, yy - 8); ctx.stroke(); }
+  ctx.drawImage(IMG.stand_south, 150, 40, 240, 200, 570, -30, 336, 280);   // หน้าต้นฉบับขยาย 1.4 เท่า (แถบเห็นแว่นถึงคาง)
+  ctx.restore();
+  ctx.font = '700 64px Kanit, "IBM Plex Sans Thai", sans-serif'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  ctx.lineWidth = 12; ctx.strokeStyle = PUR[0]; ctx.strokeText('ฟันวิญญาณ', 60, 176); ctx.fillStyle = '#fff'; ctx.fillText('ฟันวิญญาณ', 60, 176);
+  ctx.font = '600 20px Kanit, "IBM Plex Sans Thai", sans-serif'; ctx.lineWidth = 6; ctx.strokeText('SL01 · สายคม', 66, 124); ctx.fillStyle = PUR[3]; ctx.fillText('SL01 · สายคม', 66, 124);
+  ctx.restore();
+}
+function puff(x, y, k, sc) {   // ควันม่วงหลังระลอกสุดท้าย
+  if (k < 0 || k > 1) return; ctx.save(); ctx.globalAlpha = 1 - k;
+  for (let i = 0; i < 7; i++) { const an = i * .9, r = (16 + 10 * hsh(i)) * sc * (.6 + k), d = 40 * sc * k; const p = new Path2D(); p.arc(x + Math.cos(an) * d, y + Math.sin(an) * d * .6 - k * 20, r, 0, Math.PI * 2); outlined(p, i % 2 ? PUR[2] : PUR[3], 2.5); }
+  ctx.restore();
+}
+function hitFx(f, hits, wavesAt, flips) {   // คืนค่ากล้อง/วาบตามระลอกที่โดน
+  let shake = 0, zoom = 1, flash = 0;
+  hits.forEach((H, i) => { const d = f - H; if (d >= 0 && d < 7) { shake += 9 * EP.WAVE[i] * (1 - d / 7); if (d < 3) zoom = Math.max(zoom, 1 + .05 * EP.WAVE[i] * (1 - d / 3)); if (d < 2) flash = Math.max(flash, d < 1 ? .55 : .25); } });
+  return { shake, zoom, flash };
+}
+function camBegin(z, fx, fy, sh, f) { ctx.save(); ctx.translate(W / 2 + Math.sin(f * 2.3) * sh, H / 2 + Math.cos(f * 3.1) * sh * .6); ctx.scale(z, z); ctx.translate(-fx, -fy); }
+function dummyAt(f, hits, cut) {   // หุ่นฟาง: แกว่งทุกระลอก · cut = เฟรมที่ฟันขาด (ท่อนบนไถลลงซ้าย แล้วสลายเป็นผงม่วง)
+  let last = -1; for (const H of hits) if (f >= H) last = (f - H) * EP.SEC;
+  if (cut === undefined || f < cut) { dummy(last); return; }
+  const d = f - cut, a = 1 - clamp01((d - 8) / 10), line = (sx) => { ctx.beginPath(); ctx.moveTo(TX - 90, FY - 190 + sx); ctx.lineTo(TX + 90, FY - 70 + sx); };
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(-d * 4, d * 2.4); ctx.beginPath(); ctx.moveTo(TX - 200, FY - 400); ctx.lineTo(TX + 200, FY - 400); ctx.lineTo(TX + 90, FY - 70); ctx.lineTo(TX - 90, FY - 190); ctx.closePath(); ctx.clip(); dummy(-1); ctx.restore();
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, Math.min(d, 4)); ctx.beginPath(); ctx.moveTo(TX - 90, FY - 190); ctx.lineTo(TX + 90, FY - 70); ctx.lineTo(TX + 200, FY + 60); ctx.lineTo(TX - 200, FY + 60); ctx.closePath(); ctx.clip(); dummy(-1); ctx.restore();
+  if (d < 7) { ctx.save(); ctx.globalAlpha = 1 - d / 7; line(0); ctx.lineWidth = 7; ctx.strokeStyle = PUR[3]; ctx.stroke(); line(0); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.restore(); }
+  if (d >= 6) motes(TX, FY - 60, f, 16, PUR[3], 140, 180);
+}
+
+function epicVfx(tr) {   // SL01 · VFX + ฟันวิญญาณ (ยืนรวมพลังที่เดิม → ส่งฟันวิญญาณ 3 ระลอก)
+  const f = tr / EP.SEC, F = Math.floor(f), HT = EP.VFX_HITS, px0 = HX;
+  const dark = F < 8 ? 0 : F < 28 ? .5 * (F - 8) / 20 : F < 58 ? .5 : .5 * (1 - clamp01((F - 58) / 8));
+  const fx = hitFx(f, HT), tgt = [TX, FY - 110];
+  camBegin(fx.zoom, fx.zoom > 1 ? (W / 2 + tgt[0]) / 2 : W / 2, H / 2, fx.shake, f);
+  bgLayer(dark);
+  const ring = F < 2 ? 0 : F < 10 ? (F - 2) / 8 : F < 58 ? 1 : 1 - clamp01((F - 58) / 6);
+  magicCircle(px0, ring, f);
+  dummyAt(F, HT);
+  for (const [i, b] of [30, 32, 34, 36, 38, 40].entries()) if (F >= b && F < b + 2) bolt(TX + [-40, 30, -10, 45, -30, 10][i], b, F === b ? 1 : .55);
+  // Rion: ยืน → ง้างรวมพลัง (สั่นจากเฟรม 28) → ฟาดปล่อย → คืนท่า
+  let pose = 'left', x = px0, sy = 1, sx = 1, tint = null;
+  if (F >= 14 && F < 36) { pose = 'left_windup'; if (F >= 28) x += Math.sin(f * 9) * 1.5; tint = ['#c9a6ff', .12 + .1 * Math.sin(f * 1.7)]; }
+  else if (F >= 36 && F < 58) { pose = 'left_strike'; x -= 10 * ease.out(clamp01((f - 36) / 3)); }
+  else { const b = .5 - .5 * Math.cos(2 * Math.PI * tr / 2400); sy = 1 - .016 * b; sx = 1 + .007 * b; if (F >= 58) x -= 10 * (1 - clamp01((f - 58) / 6)); }
+  shadow(x, { y: 0, a: 1 }); drawRion({ pose, x, sy, sx, tint });
+  if (F >= 10 && F < 36) motes(px0, FY - 20, f, 12, PUR[3], 150, 220);
+  if (F >= 36 && F < 42) { const k = (f - 36) / 6; ctx.save(); ctx.translate(lerp(px0 - 110, tgt[0] + 30, ease.in(k)), tgt[1] - 10); spiritWave(0, 0, .55, .55, false); ctx.restore(); }   // ฟันวิญญาณพุ่งเข้าเป้า
+  HT.forEach((h, i) => spiritWave(tgt[0], tgt[1], (f - h) / 10, EP.WAVE[i], i === 1));
+  HT.forEach(h => { const d = (f - h) * EP.SEC / 360; if (d >= 0 && d < 1) star(tgt[0], tgt[1], d, 'cyan'); });
+  puff(tgt[0], tgt[1], (f - HT[2]) / 12, 1.4);
+  if (F >= 56) motes(tgt[0], FY - 40, f, 14, PUR[3], 160, 200);
+  sfxText('ฉัวะ!!', tgt[0] + 70, 70, (f - HT[0]) / 9, 52); sfxText('ฉัวะ!!', tgt[0] + 110, 110, (f - HT[1]) / 7, 44); sfxText('ฟันวิญญาณ!!!', W / 2 - 40, 78, (f - HT[2]) / 13, 66);
+  ctx.restore();
+  if (fx.flash) { ctx.fillStyle = 'rgba(255,255,255,' + fx.flash + ')'; ctx.fillRect(0, 0, W, H); }
+  cutIn((f - 12) / 16); balloon('ฟันวิญญาณ!!', px0 - 10, FY - 300, (f - 24) / 12);
+}
+
+function epicRoll(tr) {   // SL01 · กระโดดม้วน ชันเข่าฟัน (หลักโมเมนตัม: ง้างกลางอากาศ → แตะพื้น = ฟัน → ไถล) · ฟัน 3 ครั้ง = ฟันวิญญาณ 3 ระลอก
+  const f = tr / EP.SEC, F = Math.floor(f), HT = EP.ROLL_HITS, LAND = -300, SKID = -25, BACK0 = LAND + SKID - 12, CY = 130;
+  const dark = F < 3 ? 0 : F < 14 ? .32 * (F - 3) / 11 : F < 50 ? .32 : .32 * (1 - clamp01((F - 50) / 8));
+  const fx = hitFx(f, HT), tgt = [TX, FY - 110];
+  camBegin(fx.zoom, fx.zoom > 1 ? (W / 2 + tgt[0]) / 2 : W / 2, H / 2, fx.shake + (F >= 3 && F < 14 ? 1.2 : 0), f);
+  bgLayer(dark);
+  dummyAt(F, HT, HT[2]);
+  // ตำแหน่ง/ท่า Rion
+  let o = { pose: 'left', x: HX, y: 0, r: 0, sx: 1, sy: 1, cy: 0 }, ghosts = [];
+  const jumpAt = g => { const t = clamp01((g - 14) / 18); return { x: HX + LAND * t, y: -150 * Math.sin(Math.PI * t), r: g < 29 ? -1080 * ease.io(clamp01((g - 14) / 15)) : 0 }; };
+  if (F < 3) { const b = .5 - .5 * Math.cos(2 * Math.PI * tr / 2400); o.sy = 1 - .016 * b; }
+  else if (F < 14) { o.sy = .88 + .02 * Math.sin(f * 3); o.sx = 1.05; o.x += Math.sin(f * 11) * 1.2; }   // ย่อเบ่งพลัง
+  else if (F < 32) { const j = jumpAt(f); Object.assign(o, j, F < 29 ? { pose: 'left_windup', sx: .84, sy: .84, cy: CY } : { pose: 'left_windup' });
+    if (F < 29) for (let g = 1; g <= 3; g++) { const jg = jumpAt(f - g * .9); ghosts.push({ pose: 'left_windup', ...jg, sx: .84, sy: .84, cy: CY, a: .3 - g * .08, tint: ['#ffd34a', .5] }); } }
+  else if (F < 50) {
+    const skid = SKID * ease.out(clamp01((f - 32) / 4)), lunge = (F >= 40 ? -6 : 0) + (F >= 46 ? -6 : 0);
+    o.x = HX + LAND + skid + lunge; o.pose = (F >= 40 && F < 46) ? 'left_windup' : 'left_strike';
+    const land = f - 32; if (land < 2) { o.sy = .92; o.sx = 1.05; }
+  } else if (F < 62) { const t = clamp01((f - 50) / 11); o.x = HX + BACK0 * (1 - ease.io(t)); o.y = -110 * Math.sin(Math.PI * t); o.r = 360 * ease.io(t); o.cy = CY; o.sx = o.sy = .9; }
+  // ออร่าทอง (เบ่งพลังที่เฟรม 3 · ตามตัวตอนกระโดดแล้วจาง)
+  const aura = F < 3 ? 0 : F < 6 ? .4 + .8 * (f - 3) / 3 : F < 14 ? 1.2 : F < 20 ? 1.2 * (1 - (f - 14) / 6) : 0;
+  shadow(o.x, { y: o.y, a: 1 });
+  auraFlames(o.x, o.y, aura, f, false);
+  ghosts.forEach(g => drawRion(g));
+  const glow = aura > 0 ? ['#ffd34a', .18 + .12 * Math.sin(f * 2.2)] : null;
+  drawRion({ ...o, tint: glow });
+  auraFlames(o.x, o.y, aura * .7, f, true);
+  if (aura > 0) motes(o.x, FY + o.y, f, 12, '#ffe58a', 140, 240);
+  [[14, HX + 20, 0], [32, HX + LAND + 30, 1]].forEach(([d0, dx, big]) => dust(dx, (f - d0) / 9, big));
+  HT.forEach((h, i) => spiritWave(tgt[0], tgt[1], (f - h) / 10, EP.WAVE[i], i === 1));
+  HT.forEach(h => { const d = (f - h) * EP.SEC / 360; if (d >= 0 && d < 1) star(tgt[0] + 10, tgt[1], d, 'cyan'); });
+  sfxText('ฉัวะ!!', tgt[0] + 60, 70, (f - HT[0]) / 9, 50); sfxText('ฉัวะ!!', tgt[0] + 110, 110, (f - HT[1]) / 7, 44); sfxText('ฟันวิญญาณ!!!', W / 2 - 40, 78, (f - HT[2]) / 13, 64);
+  ctx.restore();
+  if (fx.flash) { ctx.fillStyle = 'rgba(255,255,255,' + fx.flash + ')'; ctx.fillRect(0, 0, W, H); }
+  if (F === 3 || F === 4) { ctx.fillStyle = 'rgba(255,211,74,' + (F === 3 ? .55 : .25) + ')'; ctx.fillRect(0, 0, W, H); }   // วาบทองตอนเบ่งพลัง
+  balloon('ฟันวิญญาณ!!', HX - 10, FY - 300, (f - 2) / 12);
+  balloon('ตายซะ!!', HX + LAND + SKID + 10, FY - 290, (f - 36) / 16);
+}
+CLIPS.push(
+  { id: 'epic_vfx', name: 'SL01 · VFX + ฟันวิญญาณ (70 เฟรม · 45 ms)', dur: EP.N * EP.SEC, custom: epicVfx, keys: [{ t: 0, pose: 'left' }] },
+  { id: 'epic_roll', name: 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน ชันเข่าฟัน (70 เฟรม · 45 ms)', dur: EP.N * EP.SEC, custom: epicRoll, keys: [{ t: 0, pose: 'left' }] });
+
 // ── วนเวลา ──
 let last = performance.now();
 function tick(now) {
@@ -262,7 +453,7 @@ function pick(c) { clip = c; T = 0; hist = []; document.getElementById('clipName
   const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
   const box = document.getElementById('clips');
   CLIPS.forEach(c => { const b = document.createElement('button'); b.textContent = c.name.split(' (')[0].split(':')[0]; b.dataset.id = c.id; b.addEventListener('click', () => pick(c)); box.append(b); });
-  pick(CLIPS[4]); requestAnimationFrame(tick);
+  pick(CLIPS.find(c => c.id === 'epic_roll')); requestAnimationFrame(tick);
   document.getElementById('play').addEventListener('click', e => { playing = !playing; e.currentTarget.setAttribute('aria-pressed', playing); });
   document.getElementById('step').addEventListener('click', () => { playing = false; document.getElementById('play').setAttribute('aria-pressed', false); T += 1000 / 60; });
   document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => { speed = +b.dataset.speed; document.querySelectorAll('[data-speed]').forEach(o => o.setAttribute('aria-pressed', o === b)); }));
