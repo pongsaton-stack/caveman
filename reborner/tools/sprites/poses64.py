@@ -430,6 +430,11 @@ for pid, label, cyc, fn, old in (('rion_walk_west_v2', 'เดินซ้าย
 		('rion_idle_west_v2', 'ยืนหายใจซ้าย · ระดับ 2', 1.6, idle_v2, 'rion_idle_west')):
 	pose(pid, 'rion', 'ตัวอย่างระดับ 2', label, cyc, fn); DRAW[pid] = rion_v2; COMPARE[pid] = old
 
+# เดินหน้าแบบเนียน (kwan 14 ต.ค. "ทำมาให้เลย เป็น rion ขยับเหมือนพระ") — ขยับชิ้นส่วนที่ภาพ 8 เท่าแล้วย่อ (tools/sprites/rion_smooth.py) · รอบ 0.96 วิ เท่าคลิปพระ
+import rion_smooth as RS
+pose('rion_walk_south_smooth', 'rion', 'ตัวอย่างระดับ 2', 'เดินหน้า · เนียนแบบคลิปพระ', RS.CYCLE_SEC, lambda t: {'t': t})
+DRAW['rion_walk_south_smooth'] = lambda p: RS.frame(p['t']); COMPARE['rion_walk_south_smooth'] = 'rion_walk_south'
+
 # ── ชั้นความสมจริง (kwan 6 ต.ค. "apply กับท่าขยับทั้งหมด ทำให้สมจริงมากที่สุด") — ใส่ทับทุกท่าอัตโนมัติ จากการเคลื่อนที่ของท่านั้นเอง ──
 # 1) แรงเฉื่อย: หัว / เป้ / หางหมา เป็นสปริงหน่วงต่อลำตัว — ตัวขยับ ส่วนเหล่านี้ค้างที่เดิมก่อน แล้วถูกดึงตาม เลยไปนิด แล้วเด้งกลับ (follow-through)
 #    ตำแหน่งลำตัวคิดจาก dx · dy · ย่อ · อก · เอน ของท่า · ท่าวน = จำลอง 2 รอบเอารอบหลัง · ท่าค้างท้าย = เริ่มนิ่ง · เปลี่ยนทิศ/หมุน/ล้ม = รีเซ็ต
