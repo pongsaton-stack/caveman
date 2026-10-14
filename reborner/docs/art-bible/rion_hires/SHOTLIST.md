@@ -13,8 +13,15 @@ blue wristwatch on his left wrist, white socks, brown lace-up boots. Same chibi 
 Clean bold dark outlines, flat cel-shaded colors, no gradients, no texture, NOT pixel art.
 Full body, feet fully visible, arms and legs clearly separated from the body where the pose allows.
 Solid pure green background (#00B140), no shadow, no text, no props unless stated.
-Canvas 1145x1374, character about 1130 px tall, feet at the same height as the reference.
+Canvas 1145x1374, character about 1210 px tall (cap top to boot soles), feet at the same height as the reference.
 ```
+
+> แก้ 14 ต.ค.: เดิมเขียน "about 1130 px tall" แต่ต้นฉบับวัดจริงได้ตัวสูง 1211 (y106–1316 · ยอดปุ่มหมวกถึงพื้นรองเท้า) · เท้าล่างสุดแถว 1316 · กลางตัว x571 → แก้เป็น 1210 ให้ตรงต้นฉบับ
+
+## ตรวจภาพที่เจนก่อนใช้ (เครื่องตรวจ)
+`python3 tools/sprites/rion_ref.py check <ภาพ.png> [...]` — ขนาดผืน · พื้นเขียว · ตัวสูง ±5% · แถวเท้า ±15 · กลางตัว ±60 · ตัวไม่ชนขอบ ·
+สีแปลกปลอม ≤ 1% (ต้นฉบับเอง 0.3% · บอกสีที่เกินมา) · แถบครีม/ขาวบนหมวก ≤ 2% · เงาใต้เท้า ≤ 1%
+ผ่านทุกข้อ = ไม่มีปัญหาที่วัดได้เท่านั้น · หน้าตา (ตา ผม ทรงหน้า) ต้องดูด้วยตาเทียบภาพ 1 เสมอ
 
 ## รายการ (เรียงตามความสำคัญ)
 
