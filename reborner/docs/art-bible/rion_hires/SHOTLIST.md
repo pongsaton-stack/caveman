@@ -60,3 +60,25 @@ No characters, no animals, no text, no UI. Landscape 1920x1080.
 
 ## ฝั่ง Claude เมื่อได้ภาพ
 แยกชิ้น (หัว ตัว แขน ขา) ด้วยพิกัดต่อภาพ → ขยับด้วยโค้ดชุด rion_smooth / rion_hd → ย่อ 64 + ล็อกสี Rion → ทับไฟล์ชื่อเดิมใน `rion_lastlight_draft` (ร่าง) → หน้า animation test → kwan ดู → เข้าเกม
+
+## ภาพ 4 · 8 · 10 รอบ 2 — แนบภาพอ้างอิงท่าจากหุ่น 3D (kwan 14 ต.ค. ลอง ActionForge → เลือก "1")
+รอบแรก (ชีต v1) ใช้ไม่ได้ 3 ท่า: หันขวาได้ภาพพลิก · พนมมือหันหน้าตรง · ทรุดเข่าเป็นคลานสี่ขา → รอบนี้แนบภาพหุ่นจัดท่าให้ด้วย
+ภาพหุ่น: `pose_refs/pose_refs_v1.png` (ชีตรวม 3 ท่า) หรือแยก `right_180.png` `pray_0.png` `kneel_0.png` · สร้างซ้ำ `python3 tools/sprites/rion_pose_refs.py <glb>`
+**แนบ 2 ภาพ: ภาพ 1 = `rion_front_src.png` (หน้าตา/ชุด) · ภาพ 2 = `pose_refs_v1.png` (ท่า)** แล้ววางคำสั่งนี้ทั้งก้อน:
+```
+Image 1 is the character (the only source for his face, hair, outfit and colors). Image 2 is a plain 3D mannequin showing POSES ONLY.
+Draw the character from Image 1 in each of the three mannequin poses from Image 2, left to right, as one sheet:
+1) standing straight, true side profile facing RIGHT, arms relaxed at the sides (draw this view, do NOT mirror the left view:
+   his wristwatch stays on his LEFT wrist, which is the far-side arm in this view);
+2) true side profile facing LEFT, palms pressed together in front of the chest (prayer pose), eyes closed, calm and focused;
+3) facing LEFT, collapsed down on ONE knee: front foot flat on the ground, back knee touching the ground, upper body leaning
+   forward and exhausted, head lowered, near hand touching the ground in front, other hand resting on the front knee.
+   Only one knee and one hand on the ground, he is NOT crawling on all fours.
+Copy only the body angles from the mannequin; keep the character's own chibi proportions (big head, short limbs) from Image 1.
+Same character as Image 1, identical design: ALL-BLUE baseball cap (no cream or white panel), brass goggles resting on the cap,
+brown messy hair, brown eyes, white short-sleeve collared shirt, blue necktie, blue shorts with brown belt, brown backpack with
+two shoulder straps and side pouches, blue wristwatch on his left wrist, white socks, brown lace-up boots.
+Clean bold dark outlines, flat cel-shaded colors, no gradients, no texture, NOT pixel art. Full body, feet fully visible.
+Solid pure green background (#00B140), no shadow, no text, no mannequin in the output, characters well separated from each other.
+```
+ได้ภาพแล้วส่งมา → ผมตัด/ย่อด้วย `rion_poses.py` แบบชีต v1 + ตรวจด้วยตาเทียบภาพ 1
