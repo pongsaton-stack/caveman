@@ -1,0 +1,75 @@
+<title>Rion ท่าจากชีต</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&family=Kanit:wght@600&display=swap">
+<style>
+/* Layout: header, background switch, grid of pose cards (front original first), source sheet at the end */
+:root {
+  --bg: #f4f1ec; --surface: #fffdf9; --fg: #241d18; --muted: #6f6359; --line: #e2d8cd;
+  --accent: #2f5fb8; --accent-fg: #ffffff; --ok: #2e7d4f; --warn: #a2611a;
+  --display: "Kanit", "IBM Plex Sans Thai", system-ui, sans-serif; --body: "IBM Plex Sans Thai", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15120f; --surface: #1f1a16; --fg: #f1e9e1; --muted: #a9998c; --line: #352c25; --accent: #7aa3f0; --accent-fg: #10151f; --ok: #6cc596; --warn: #e0a35c; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #15120f; --surface: #1f1a16; --fg: #f1e9e1; --muted: #a9998c; --line: #352c25; --accent: #7aa3f0; --accent-fg: #10151f; --ok: #6cc596; --warn: #e0a35c; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.6; padding: 0 16px; }
+main { max-width: 1100px; margin: 0 auto; padding-block: 28px 48px; display: grid; gap: 18px; }
+h1 { font-family: var(--display); font-size: 1.5rem; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-size: 1.1rem; margin: 6px 0 0; }
+.sub { color: var(--muted); margin: 2px 0 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); gap: 12px; }
+figure { margin: 0; border-radius: 10px; border: 1px solid var(--line); overflow: hidden; background: var(--surface); display: grid; }
+.stage { aspect-ratio: 1; background: var(--stage, #a7b5a0); display: grid; place-items: center; }
+.stage img { width: 100%; height: 100%; object-fit: contain; display: block; }
+figcaption { padding: 8px 12px; font-weight: 600; font-size: .9rem; display: flex; justify-content: space-between; gap: 8px; }
+figcaption span { font-weight: 400; color: var(--muted); font-size: .8rem; }
+.tag-ok { color: var(--ok); } .tag-src { color: var(--warn); }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.note ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.sheet { border-radius: 10px; border: 1px solid var(--line); max-width: 100%; height: auto; display: block; }
+</style>
+<main>
+  <header>
+    <h1>Rion ท่าจากชีตที่ kwan เจน</h1>
+    <p class="sub">8 ท่าที่ใช้ได้ ตัดจากชีต ไม่วาดทับ · ย่อทุกท่าอัตราเดียว (ท่าหันซ้ายยืนตรง = ตัวสูง 464 ในผืน 512 เท่าภาพหน้าตรง) · ร่าง ยังไม่เข้าเกม</p>
+  </header>
+  <div class="seg" role="group" aria-label="พื้นหลัง">
+    <button data-bg="#a7b5a0" aria-pressed="true">พื้นเวที</button>
+    <button data-bg="#ffffff" aria-pressed="false">พื้นขาว</button>
+    <button data-bg="#1e1e28" aria-pressed="false">พื้นมืด</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="note">
+    <ul>
+      <li>ภาพหน้าตรง = ต้นฉบับ (ตัดพื้นอย่างเดียว) · อีก 8 ท่ามาจากชีต ละเอียดราว 1 ใน 3 ของต้นฉบับ จึงขยายขึ้นเล็กน้อย (<span id="k"></span> เท่า)</li>
+      <li>ลบแล้ว: ประกายลอยรอบมีด · วงเวทย์สีฟ้าในท่าผลักปล่อย</li>
+      <li>รอเจนใหม่: หันขวา (เดิมพลิกภาพ นาฬิกาผิดข้าง) · พนมมือ (เดิมหันหน้าตรง) · ทรุดเข่า (เดิมคลานสี่ขา)</li>
+    </ul>
+  </div>
+  <h2>ชีตต้นทาง</h2>
+  <img class="sheet" id="sheet" alt="ชีตท่า Rion ที่ kwan เจน">
+</main>
+<script>
+const D = __DATA__;
+const grid = document.getElementById('grid');
+function card(src, label, tag, cls) {
+  const f = document.createElement('figure');
+  f.innerHTML = '<div class="stage"><img alt=""></div><figcaption></figcaption>';
+  f.querySelector('img').src = src; f.querySelector('img').alt = label;
+  const cap = f.querySelector('figcaption'); cap.textContent = label;
+  const s = document.createElement('span'); s.textContent = tag; s.className = cls; cap.append(s);
+  grid.append(f);
+}
+card(D.front, 'หันหน้า (#1)', 'ต้นฉบับ', 'tag-src');
+D.poses.forEach(p => card(p.src, p.label, 'จากชีต', 'tag-ok'));
+document.getElementById('sheet').src = D.sheet;
+document.getElementById('k').textContent = D.k;
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  document.documentElement.style.setProperty('--stage', b.dataset.bg);
+  document.querySelectorAll('.seg button').forEach(o => o.setAttribute('aria-pressed', o === b));
+}));
+</script>
