@@ -136,7 +136,9 @@ def page(path):
 				"frames": [uri(os.path.join(d, "%s_%d.png" % (n, i))) for i in range(len(cells)) if i not in OMIT.get((sid, n), ())]}
 				for n, lab, cells, ms, lp, want, fl, hit in rows]})
 	tpl = open(os.path.join(ROOT, "tools/web/rion_flow_test.tpl.html"), encoding="utf-8").read()
-	open(path, "w", encoding="utf-8").write(tpl.replace("__DATA__", json.dumps({"sets": sets})))
+	import datetime
+	built = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=7))).strftime("%d/%m/%Y %H:%M") + " (เวลาไทย)"   # ป้ายบนหน้า ให้รู้ว่าเห็นรุ่นล่าสุด
+	open(path, "w", encoding="utf-8").write(tpl.replace("__BUILT__", built).replace("__DATA__", json.dumps({"sets": sets})))
 	print("หน้าเทส →", path, os.path.getsize(path), "bytes")
 
 
