@@ -1,0 +1,90 @@
+<title>Rion Flow ทดลอง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#f3f1ec;--card:#fffdf8;--ink:#2a1a14;--mute:#6d625a;--line:#ded6cb;--acc:#2a70be;--bad:#b4371f;--ok:#2e7d4f;--stage:#9aa7a0;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1916;--card:#25221e;--ink:#efe7dc;--mute:#a99d90;--line:#3b3631;--acc:#6aa5e6;--bad:#e2775f;--ok:#6fc28f;--stage:#3d4642;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1916;--card:#25221e;--ink:#efe7dc;--mute:#a99d90;--line:#3b3631;--acc:#6aa5e6;--bad:#e2775f;--ok:#6fc28f;--stage:#3d4642;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif;padding:20px 16px 48px}
+main{max-width:1100px;margin:0 auto;display:grid;gap:18px}
+h1{font-size:24px;margin:0;text-wrap:balance}
+.sub{color:var(--mute);margin:2px 0 0;max-width:70ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:2}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:6px}
+.card h2{font-size:16px;margin:0;display:flex;justify-content:space-between;gap:8px}
+.card h2 span{font-weight:400;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
+canvas{width:100%;aspect-ratio:180/230;max-width:100%;border-radius:6px;display:block;image-rendering:auto}
+.note{font-size:13px;margin:0;color:var(--mute)}
+.note b{color:var(--bad);font-weight:600}.note i{color:var(--ok);font-style:normal;font-weight:600}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+details img{width:100%;max-width:560px;display:block;margin-top:8px}
+</style>
+<main>
+  <header>
+    <h1>Rion · ชีต Google Flow ทดลอง</h1>
+    <p class="sub">ตัดจากชีตที่ kwan ส่ง 15 ต.ค. (JPG 8×11 ช่อง) ทีละช่อง ลบพื้นเขียว ไม่ย่อ ไม่แก้ภาพ · จังหวะต่อเฟรมเป็นค่าดูในหน้านี้เท่านั้น · ร่าง ยังไม่เข้าเกม</p>
+  </header>
+  <div class="bar">
+    <button id="play" aria-pressed="true">เล่น</button>
+    <button data-spd="0.5">×0.5</button><button data-spd="1" aria-pressed="true">×1</button>
+    <button id="flip" aria-pressed="false">พลิกท่าในศึกให้หันซ้าย</button>
+    <button data-bg="stage" aria-pressed="true">พื้นเทา</button><button data-bg="green">พื้นเขียวเดิม</button><button data-bg="dark">พื้นมืด</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <details><summary>ชีตต้นทาง</summary><img id="sheet" alt="ชีตต้นทางจาก Google Flow"></details>
+</main>
+<script>
+const D = __DATA__;
+// ผลตรวจทีละท่า (ดูภาพ + วัดความต่างระหว่างเฟรม · ดูรายงานในแชท 15 ต.ค.)
+const NOTE = {
+  idle_battle: '<b>หันหน้า 3/4 ไม่ใช่ข้างซ้าย</b> · เฟรม 1 ต่างจากเฟรมอื่น 36% → กระตุกตอนวน',
+  walk_front: '<i>ทิศถูก</i> · ขาขยับน้อย (เปลี่ยน 7–19%/เฟรม) · เฟรม 1 ต่าง 43% → กระตุกตอนวน',
+  walk_back: '<i>ทิศถูก ไม่มีหน้า</i> · เฟรม 1 ต่าง 31% → กระตุกตอนวน',
+  walk_left: '<i>หันซ้ายครบ 8 เฟรม</i> · เฟรม 1 ต่าง 38% → กระตุกตอนวน',
+  walk_right: '<i>หันขวาครบ 8 เฟรม</i> · นาฬิกาอยู่แขนใกล้ (ควรอยู่แขนไกล) · เฟรม 1 ต่าง 42%',
+  attack_knife: '<i>มีดทำครัวแล้ว</i> · <b>ฟันไปทางขวา</b> (สั่งหันซ้าย)',
+  hurt: '<b>หันขวา/3-4</b> (สั่งหันซ้าย) · มีดาวกระแทก หน้าเจ็บ',
+  kneel: '<i>จบคุกเข่าข้างเดียว มือแตะพื้น</i> · <b>หันขวา</b>',
+  death: '<i>จบนอนคว่ำ หัวไปทางซ้าย</i> · <b>ช่วงล้มหันขวา แต่นอนหัวไปซ้าย</b> (ทิศขัดกันในคลิป · ปุ่มพลิกไม่พลิกท่านี้)',
+  cast: '<i>มีพนมมือ + ตัวครบทุกช่อง</i> · <b>คลื่นพุ่งไปทางขวา</b>',
+  run: '<b>วิ่งไปทางขวา</b> · มีจังหวะลอยไม่ชัด',
+};
+const BATTLE = new Set(['idle_battle', 'attack_knife', 'hurt', 'kneel', 'cast', 'run']);   // ล้มนอนไม่พลิก: เฟรมท้ายหัวไปซ้ายถูกแล้ว
+let playing = true, speed = 1, flip = false, bg = 'stage';
+const BG = { stage: () => getComputedStyle(document.documentElement).getPropertyValue('--stage'), green: () => '#03fb04', dark: () => '#141210' };
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+const cards = [];
+(async () => {
+  document.getElementById('sheet').src = D.sheet;
+  const grid = document.getElementById('grid');
+  for (const row of D.rows) {
+    const frames = await Promise.all(row.frames.map(load));
+    const el = document.createElement('section'); el.className = 'card';
+    el.innerHTML = `<h2>${row.label}<span>${frames.length} เฟรม · ${row.ms} ms · สั่ง: ${row.want}</span></h2><canvas width="180" height="230"></canvas><p class="note">${NOTE[row.id] || ''}</p>`;
+    grid.append(el); cards.push({ row, frames, cv: el.querySelector('canvas'), t: 0 });
+  }
+  let last = performance.now();
+  const tick = now => {
+    const dt = Math.max(0, Math.min(60, now - last)); last = now;   // เฟรมแรกของ rAF อาจเร็วกว่า performance.now() → ห้ามติดลบ
+    for (const c of cards) {
+      if (playing) c.t += dt * speed;
+      const n = c.frames.length, dur = c.row.ms * n, hold = c.row.loop ? 0 : 700;
+      const tt = c.t % (dur + hold), i = Math.min(n - 1, Math.floor(tt / c.row.ms));
+      const x = c.cv.getContext('2d'); x.fillStyle = BG[bg](); x.fillRect(0, 0, 180, 230);
+      const im = c.frames[i]; x.save();
+      if (flip && BATTLE.has(c.row.id)) { x.translate(180, 0); x.scale(-1, 1); }
+      x.drawImage(im, (180 - im.width) / 2, 228 - im.height); x.restore();
+      x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(4, 4, 42, 18); x.fillStyle = '#fff'; x.font = '12px system-ui'; x.fillText((i + 1) + '/' + n, 9, 17);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
+document.getElementById('play').onclick = e => { playing = !playing; e.target.setAttribute('aria-pressed', playing); e.target.textContent = playing ? 'เล่น' : 'หยุด'; };
+document.querySelectorAll('[data-spd]').forEach(b => b.onclick = () => { speed = +b.dataset.spd; document.querySelectorAll('[data-spd]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
+document.getElementById('flip').onclick = e => { flip = !flip; e.target.setAttribute('aria-pressed', flip); };
+document.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { bg = b.dataset.bg; document.querySelectorAll('[data-bg]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
+</script>
