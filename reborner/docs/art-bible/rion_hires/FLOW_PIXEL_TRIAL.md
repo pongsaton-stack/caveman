@@ -176,3 +176,25 @@ F6 landing, loops to F1. Strong forward lean, arms pump opposite to the legs, ba
 - คุกเข่าตัดเฟรมคลานสี่ขาท้ายแถว (A เหลือ 4 · B เหลือ 4)
 **แก้ด้วยโค้ดไม่ได้ (ต้องเจนใหม่ถ้าต้องการ)**: คุกเข่าไม่มีมือแตะพื้นทั้งสองชีต · A ตั้งรับ = มือกุมหน้า ไม่ใช่การ์ด · ลงฟันมือเดียว ไม่ใช่สองมือ ·
 ชนะไม่เป็นสามช่าชัด (ชูมือ/โบก/กระโดด) · B เดินซ้าย 6 เฟรม · B มองไกล 3 เฟรม · B เดินขวาเหลือเศษสายนาฬิกา 1–2 จุดที่ขอบข้อมือ
+
+### รอบ 6 — คำสั่งเดียวกับรอบ 5 ให้ Google Flow เจนเทียบกับ GPT (kwan 15 ต.ค.) · แนบ `rion_front_src.png` เป็นภาพ 1
+เพิ่มจากรอบ 5 ตามปัญหาที่เจอ: ทุกแถวขนาดตัวเท่ากัน · มีเส้นตาราง · แถวละ 8 ช่องเต็ม · คุกเข่ามือแตะพื้น · ฟันสองมือ · ตั้งรับไขว้แขน · สามช่าเป็นจังหวะเต้นชัด · นาฬิกาข้อมือซ้าย
+```
+Use Image 1 as the exact character reference: same face, hair, blue cap with gold goggles, white short-sleeve shirt, blue tie, blue shorts, brown backpack, brown boots, small blue watch on his LEFT wrist. Chibi style, bold dark outlines, flat cel shading, no gradients, NOT pixel art. Do not redesign him.
+
+Make ONE sprite sheet, PNG, solid flat green background #00B140 (no shadows, no floor, no text, no labels). Grid of 9 rows x 8 columns, thin dark grid lines between every cell, all cells the same size. Exactly ONE full-body character per cell, fully inside the cell, never touching or crossing grid lines. The character must be THE SAME SIZE in every row (head the same size everywhere, standing height = 85% of cell height, feet on the same baseline in every cell). Every row has exactly 8 frames that play as a smooth animation in order; frame 8 must flow back into frame 1 for looping rows.
+
+Row 1 – walk toward camera (front view), loop, head bobs down on each footstep.
+Row 2 – walk away from camera (back view, no face visible), loop.
+Row 3 – walk facing LEFT (side view), loop, arms swing opposite to legs.
+Rows 4–8 face RIGHT (side view) in every frame:
+Row 4 – stagger and drop to ONE knee; last 3 frames: kneeling on one knee with one hand pressed flat on the ground, head down, tired. Never on all fours.
+Row 5 – guard: raise both forearms crossed in front of his face, brace, take a hit (lean back slightly), then hold the guard.
+Row 6 – dodge: quick backward hop away to the left, land, recover to ready stance.
+Row 7 – crouch, jump forward, tuck into a full somersault in the air, land on one knee and SLASH DOWNWARD WITH BOTH HANDS gripping a small kitchen knife, blue slash arc on the strike frame (frame 6), hold the kneeling pose.
+Rows 8–9 face the camera (front view):
+Row 8 – watch: shade eyes with one hand and look far into the distance, small head turn left and right, loop.
+Row 9 – victory cha-cha dance, loop: step-step-cha-cha-cha with hip sway, pointing fingers, a small spin, then arms up happily. Clear dance poses in every frame.
+
+Keep proportions, colors and outfit identical in all 72 frames. Output PNG only.
+```
