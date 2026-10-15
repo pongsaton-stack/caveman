@@ -30,6 +30,7 @@ details img{width:100%;max-width:560px;display:block;margin-top:8px}
   <div class="bar">
     <button id="play" aria-pressed="true">เล่น</button>
     <button data-spd="0.5">×0.5</button><button data-spd="1" aria-pressed="true">×1</button>
+    <button id="skip1" aria-pressed="false">ท่าวน: ข้ามเฟรม 1</button>
     <button id="flip" aria-pressed="false">พลิกท่าในศึกให้หันซ้าย</button>
     <button data-bg="stage" aria-pressed="true">พื้นเทา</button><button data-bg="green">พื้นเขียวเดิม</button><button data-bg="dark">พื้นมืด</button>
   </div>
@@ -53,7 +54,7 @@ const NOTE = {
   run: '<b>วิ่งไปทางขวา</b> · มีจังหวะลอยไม่ชัด',
 };
 const BATTLE = new Set(['idle_battle', 'attack_knife', 'hurt', 'kneel', 'cast', 'run']);   // ล้มนอนไม่พลิก: เฟรมท้ายหัวไปซ้ายถูกแล้ว
-let playing = true, speed = 1, flip = false, bg = 'stage';
+let playing = true, speed = 1, flip = false, bg = 'stage', skip1 = false;   // skip1: เฟรม 1 ของท่าวนเป็นท่าคนละแบบ (ต่างจากเฟรมถัดไป 31–43%)
 const BG = { stage: () => getComputedStyle(document.documentElement).getPropertyValue('--stage'), green: () => '#03fb04', dark: () => '#141210' };
 const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
 const cards = [];
@@ -71,13 +72,13 @@ const cards = [];
     const dt = Math.max(0, Math.min(60, now - last)); last = now;   // เฟรมแรกของ rAF อาจเร็วกว่า performance.now() → ห้ามติดลบ
     for (const c of cards) {
       if (playing) c.t += dt * speed;
-      const n = c.frames.length, dur = c.row.ms * n, hold = c.row.loop ? 0 : 700;
+      const fs = skip1 && c.row.loop ? c.frames.slice(1) : c.frames, n = fs.length, dur = c.row.ms * n, hold = c.row.loop ? 0 : 700;
       const tt = c.t % (dur + hold), i = Math.min(n - 1, Math.floor(tt / c.row.ms));
       const x = c.cv.getContext('2d'); x.fillStyle = BG[bg](); x.fillRect(0, 0, 180, 230);
-      const im = c.frames[i]; x.save();
+      const im = fs[i]; x.save();
       if (flip && BATTLE.has(c.row.id)) { x.translate(180, 0); x.scale(-1, 1); }
       x.drawImage(im, (180 - im.width) / 2, 228 - im.height); x.restore();
-      x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(4, 4, 42, 18); x.fillStyle = '#fff'; x.font = '12px system-ui'; x.fillText((i + 1) + '/' + n, 9, 17);
+      x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(4, 4, 42, 18); x.fillStyle = '#fff'; x.font = '12px system-ui'; x.fillText((i + 1 + (fs === c.frames ? 0 : 1)) + '/' + c.frames.length, 9, 17);
     }
     requestAnimationFrame(tick);
   };
@@ -85,6 +86,7 @@ const cards = [];
 })();
 document.getElementById('play').onclick = e => { playing = !playing; e.target.setAttribute('aria-pressed', playing); e.target.textContent = playing ? 'เล่น' : 'หยุด'; };
 document.querySelectorAll('[data-spd]').forEach(b => b.onclick = () => { speed = +b.dataset.spd; document.querySelectorAll('[data-spd]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
+document.getElementById('skip1').onclick = e => { skip1 = !skip1; e.target.setAttribute('aria-pressed', skip1); };
 document.getElementById('flip').onclick = e => { flip = !flip; e.target.setAttribute('aria-pressed', flip); };
 document.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { bg = b.dataset.bg; document.querySelectorAll('[data-bg]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
 </script>
