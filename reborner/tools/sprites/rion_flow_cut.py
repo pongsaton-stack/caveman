@@ -59,15 +59,32 @@ V8B_ROWS = [
 	("guard", "ตั้งรับ ไขว้แขน", None, 120, False, "ซ้าย", True, 4),
 	("jump_roll", "กระโดดม้วน → ฟันสองมือ", None, 80, False, "ซ้าย", True, 5),
 	("victory", "ชนะ เต้นสามช่า", None, 120, True, "หน้า", False, None)]
+# รอบ 8-1 (GPT · ต่อจากชีต A · JPG 1438x2576): ยืนในศึก · ฟันมีด · โดนตี · ล้มนอน · วิ่ง
+V8A_ROWS = [
+	("idle_battle", "ยืนในศึก", None, 220, True, "ซ้าย", True, None),
+	("attack_knife", "ฟันมีด (วิ่งเข้าฟันตามแรง)", None, 80, False, "ซ้าย", True, 4),
+	("hurt", "โดนตี", None, 90, False, "ซ้าย", True, 0),
+	("death", "ล้มนอน", None, 100, False, "ซ้าย", True, 3),
+	("run", "วิ่ง", None, 80, True, "ซ้าย", True, None)]
+# ลบส่วนเกินก่อนแยกก้อน (พิกัดชีต x0, y0, x1, y1 · วัดจากภาพ): เฟรมฟัน GPT วาดตัวชูมีดซ้อนอยู่ข้างหลังตัวที่ฟัน → ลบตัวหลัง (ท่าชูมีดมีในเฟรม 4 แล้ว)
+# กล่อง (x0, y0, x1, y1) หรือรูปหลายเหลี่ยม [(x, y), ...] · ขอบขวาไล่ตามขอบหมวก/ผมของตัวที่ฟัน (วัดจากภาพขยาย 5 เท่า)
+ERASE = {"v8a": [[(753, 480), (1000, 480), (1000, 632), (868, 632), (842, 649), (827, 659), (815, 669), (805, 681),
+	(803, 705), (813, 712), (813, 738), (753, 738)]]}
+# ก้อนกว้างเกิน 1.8 เท่าของก้อนทั่วไปในแถว = หลายตัวติดกัน → ผ่าที่คอลัมน์ (พิกัดชีต วัดจากภาพ)
+# เส้นผ่า = x คงที่ หรือ [(ตั้งแต่ y, x), ...] (เส้นหักตามขอบ)
+# ล้มนอน 3 เฟรมท้ายนอนเหลื่อมกัน: ตัวกลางไม่มีขา (ตัวแรกบัง) → ผ่าหลังหมวกตัวแรก (956) และตามขอบแว่นตัวกลาง แล้วตัดตัวกลางทิ้ง (OMIT)
+SPLIT = {("v8a", "death"): [[(0, 945), (1795, 949), (1810, 952), (1825, 955), (1890, 953)], [(0, 1160), (1860, 1144)]]}
 # ชุดหลัก (kwan 15 ต.ค. "เอาชีต A มาต่อยอด"): ท่าจากชีต A + ท่าจากรอบ 8-2 แทนท่าที่ชีต A พลาด (คุกเข่า ตั้งรับ ม้วนฟัน สามช่า) + ร่ายใหม่
 # ไม่ได้ตัดจากชีต — build_main() คัดลอกไฟล์จาก v5a / v8b (ย่อให้เท่าชีต A) · แถว: (ท่า, ป้าย, ชุดต้นทาง, ms, วน, ทิศ, พลิก, กระทบ)
-MAIN_FROM = {"cast": "v8b", "kneel": "v8b", "guard": "v8b", "jump_roll": "v8b", "victory": "v8b"}
-_v5 = {r[0]: r for r in V5_ROWS(5)}; _v8 = {r[0]: r for r in V8B_ROWS}
-MAIN_ROWS = [(_v8 if MAIN_FROM.get(n) else _v5)[n] for n in
-	["walk_front", "walk_back", "walk_left", "walk_right", "cast", "kneel", "guard", "dodge", "watch", "jump_roll", "victory"]]
+MAIN_FROM = {"cast": "v8b", "kneel": "v8b", "guard": "v8b", "jump_roll": "v8b", "victory": "v8b",
+	"idle_battle": "v8a", "attack_knife": "v8a", "hurt": "v8a", "death": "v8a", "run": "v8a"}
+_rows = {"v5a": {r[0]: r for r in V5_ROWS(5)}, "v8a": {r[0]: r for r in V8A_ROWS}, "v8b": {r[0]: r for r in V8B_ROWS}}
+MAIN_ROWS = [_rows[MAIN_FROM.get(n, "v5a")][n] for n in
+	["idle_battle", "walk_front", "walk_back", "walk_left", "walk_right", "run", "attack_knife", "hurt", "death", "cast", "kneel", "guard", "dodge", "watch", "jump_roll", "victory"]]
 SETS = [
 	("main", "★ ชุดหลัก · ชีต A + รอบ 8-2", "flow_trial_v5a.png", None, MAIN_ROWS),
 	("v5a", "รอบ 5 ชีต A · GPT (PNG ไม่มีเส้นตาราง)", "flow_trial_v5a.png", [88, 253, 422, 595, 742, 870, 1003, 1101, 1223], V5_ROWS(5)),
+	("v8a", "รอบ 8-1 · GPT ต่อจากชีต A (ขนาดเดิม)", "flow_trial_v8a.jpg", [221, 730, 1272, 1755, 2377], V8A_ROWS),
 	("v8b", "รอบ 8-2 · GPT ต่อจากชีต A (ขนาดเดิม)", "flow_trial_v8b.jpg", [232, 730, 1274, 1843, 2399], V8B_ROWS),
 	("v6", "รอบ 6 · Flow (JPG · 7x14)", "flow_trial_v6.jpg", V6_Y, [
 		("walk_front", "เดินหน้า", v6(0, 0, 14), 100, True, "หน้า", False, None),
@@ -118,7 +135,12 @@ def cut_free(sid, fn, cen, rows):
 	ก้อนสูงเกิน 1.4 เท่าของความสูงทั่วไป (สองแถวชนกัน) → ผ่าที่กึ่งกลางระหว่างแถวก่อน · ก้อนเล็ก (< 30% ของก้อนกลางในแถว) รวมเข้าตัวที่ใกล้สุด ·
 	ช่องต่อแถว: กว้าง = ตัวกว้างสุด + 16 · สูง = ยอดสุดถึงล่างสุดของทั้งแถว (คงตำแหน่งแนวตั้ง จังหวะกระโดด/หลบไม่หาย) · กลางตัวตรงกลางช่อง · ลบพิกเซลของตัวอื่น"""
 	a = np.array(Image.open(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)).convert("RGB")).astype(np.int32)
-	rgb, al = R.key(a); m = al > .5; H = m.shape[0]
+	rgb, al = R.key(a)
+	for e in ERASE.get(sid, []):
+		if len(e) == 4 and not isinstance(e[0], tuple): x0, y0, x1, y1 = e; al[y0:y1, x0:x1] = 0; continue
+		from PIL import ImageDraw
+		pm = Image.new("L", (al.shape[1], al.shape[0]), 0); ImageDraw.Draw(pm).polygon(e, fill=255); al[np.array(pm) > 0] = 0
+	m = al > .5; H = m.shape[0]
 	mids = [(cen[i] + cen[i + 1]) // 2 for i in range(len(cen) - 1)]; cuts = [0] + mids + [H]
 	lab, k = ndimage.label(ndimage.binary_dilation(m, iterations=2))
 	parts = []
@@ -145,6 +167,28 @@ def cut_free(sid, fn, cen, rows):
 		return np.nonzero(body if body.sum() > .5 * pm.sum() else pm)[1].mean()
 	for (name, *_r), ps in zip(rows[:len(cen)], byrow):
 		flip = _r[5]
+		n_split = SPLIT.get((sid, name))
+		if n_split:
+			wmed = np.median([np.ptp(np.nonzero(q)[1]) for q in ps]); out = []
+			for q in ps:
+				xs = np.nonzero(q)[1]; x0, x1 = xs.min(), xs.max()
+				if x1 - x0 < 1.8 * wmed: out.append(q); continue
+				Y, X = np.indices(q.shape)
+				def bx(c):   # เส้นผ่าเป็นค่า x ต่อแถว
+					if not isinstance(c, list): return np.full(q.shape[0], c)
+					v = np.zeros(q.shape[0], int)
+					for y_from, x in c: v[y_from:] = x
+					return v
+				cuts = [np.full(q.shape[0], x0)] + [bx(c) for c in n_split] + [np.full(q.shape[0], x1 + 1)]
+				for c0, c1 in zip(cuts, cuts[1:]):
+					piece = q & (X >= c0[:, None]) & (X < c1[:, None])
+					# เศษของตัวข้างเคียงที่ติดขอบผ่า: กร่อน 2 → เก็บก้อนใหญ่สุด → คืนขอบเฉพาะที่ติดก้อนนั้น
+					core = ndimage.binary_erosion(piece, iterations=2); lb, kk = ndimage.label(core)
+					if kk > 1:
+						big = lb == 1 + int(np.argmax(ndimage.sum(core, lb, range(1, kk + 1))))
+						piece &= ndimage.binary_dilation(big, iterations=3)
+					if piece.sum() >= 150: out.append(piece)
+			ps = out
 		med = np.median([q.sum() for q in ps]); main = [q.copy() for q in ps if q.sum() >= .3 * med]
 		for q in ps:
 			if q.sum() < .3 * med:
@@ -349,18 +393,19 @@ def build_main():
 	d = os.path.join(OUT, "main"); shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
 	ld = lambda sid, n, i: np.array(Image.open(os.path.join(OUT, sid, "%s_%d.png" % (n, i))))
 	cnt = lambda sid, n: nframes(os.path.join(OUT, sid), n, None)
-	def k_for(ref, rows):
-		rf = [_hcap(ld("v5a", ref, i)) for i in range(cnt("v5a", ref))]; nh = [_hcap(ld("v8b", n, 0)) for n in rows]
+	def k_for(src, ref, rows):
+		rf = [_hcap(ld("v5a", ref, i)) for i in range(cnt("v5a", ref))]; nh = [_hcap(ld(src, n, 0)) for n in rows]
 		hr = np.median([x[0] for x in nh]) / np.median([x[0] for x in rf]); cr = np.median([x[1] for x in nh]) / np.median([x[1] for x in rf])
 		return 1 / np.sqrt(hr * cr)
-	ks = {"side": k_for("walk_left", ["cast", "kneel", "guard"]), "front": k_for("walk_front", ["victory"])}
+	ks = {"v8b": k_for("v8b", "walk_left", ["cast", "kneel", "guard"]), "v8b_front": k_for("v8b", "walk_front", ["victory"]),
+		"v8a": k_for("v8a", "walk_left", ["death", "attack_knife"])}   # รอบ 8-1 เฟรมยืนตรง = ล้มเฟรม 1 · ฟันเฟรม 1
 	for n, *_ in MAIN_ROWS:
-		src = MAIN_FROM.get(n, "v5a"); k = 1 if src == "v5a" else ks["front" if n == "victory" else "side"]
+		src = MAIN_FROM.get(n, "v5a"); k = 1 if src == "v5a" else ks[src + ("_front" if n == "victory" else "")]
 		for i in range(cnt(src, n)):
 			im = Image.open(os.path.join(OUT, src, "%s_%d.png" % (n, i)))
 			if k != 1: im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
 			im.save(os.path.join(d, "%s_%d.png" % (n, i)))
-	print("ชุดหลัก: ย่อแถวรอบ 8-2 หันข้าง ×%.3f · หันหน้า ×%.3f" % (ks["side"], ks["front"]))
+	print("ชุดหลัก: ย่อ", " · ".join("%s ×%.3f" % kv for kv in ks.items()))
 
 
 def page(path):
@@ -374,13 +419,16 @@ def page(path):
 		# รอบ 5: เฟรมท้ายคุกเข่าเป็นคลานสี่ขา → A จบเฟรม 4 (เข่าลง มือใกล้พื้น) · B จบเฟรม 4 (คุกเข่าข้างเดียว มือวางเข่า)
 		("v5a", "kneel"): {4}, ("v5b", "kneel"): {4, 5},
 		# รอบ 6: คุกเข่าทั้งสองชุดจบคลานสี่ขาอีก → ชุด 1 จบเฟรม 3 (ย่อ เข่าลง มือแตะพื้น) · ชุด 2 จบเฟรม 4 (คุกเข่าข้างเดียว)
-		("v6", "kneel"): {3, 4, 5, 6}, ("v6", "kneel_b"): {4, 5, 6}}
+		("v6", "kneel"): {3, 4, 5, 6}, ("v6", "kneel_b"): {4, 5, 6},
+		# รอบ 8-1: ฟันเฟรม 6 (ตามแรง) หมวกสองใบซ้อนกัน แยกไม่สะอาด · โดนตีเฟรม 1 ถือมีดสองเล่ม
+		("v8a", "attack_knife"): {5}, ("v8a", "hurt"): {0}, ("v8a", "death"): {4}}
+	omit = lambda sid, n: OMIT.get((sid, n)) or (OMIT.get((MAIN_FROM.get(n, "v5a"), n), ()) if sid == "main" else ())
 	sets = []
 	for sid, label, fn, _ry, rows in SETS:
 		d = os.path.join(OUT, sid)
 		sets.append({"id": sid, "label": label, "sheet": uri(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)),
 			"rows": [{"id": n, "label": lab, "ms": ms, "loop": lp, "want": want, "flipped": fl, "hit": hit, "skip0": skip0(sid, n),
-				"frames": [uri(os.path.join(d, "%s_%d.png" % (n, i))) for i in range(nframes(d, n, cells)) if i not in OMIT.get((sid, n), ())]}
+				"frames": [uri(os.path.join(d, "%s_%d.png" % (n, i))) for i in range(nframes(d, n, cells)) if i not in omit(sid, n)]}
 				for n, lab, cells, ms, lp, want, fl, hit in rows]})
 	tpl = open(os.path.join(ROOT, "tools/web/rion_flow_test.tpl.html"), encoding="utf-8").read()
 	import datetime
