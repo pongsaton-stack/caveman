@@ -52,8 +52,23 @@ V5_ROWS = lambda roll_hit: [
 V6_X = [0, 97, 195, 294, 392, 490, 589, 688, 786, 885, 984, 1082, 1180, 1278, 1375]
 V6_Y = [0, 108, 218, 329, 439, 549, 659, 768]
 v6 = lambda sr, c0, n=7: [(V6_X[c], V6_X[c + 1], sr) for c in range(c0, c0 + n)]
+# รอบ 8-2 (GPT · ต่อจากชีต A · JPG 1438x2576 · ไม่มีเส้นตาราง): ร่าย · คุกเข่า · ตั้งรับ · ม้วนฟันสองมือ · สามช่า · ตัวสูง ~360 (ชีต A ~155)
+V8B_ROWS = [
+	("cast", "ร่าย: พนมมือ → ผลักปล่อย", None, 110, False, "ซ้าย", True, 5),
+	("kneel", "ล้มคุกเข่า (มือแตะพื้น)", None, 110, False, "ซ้าย", True, 3),
+	("guard", "ตั้งรับ ไขว้แขน", None, 120, False, "ซ้าย", True, 4),
+	("jump_roll", "กระโดดม้วน → ฟันสองมือ", None, 80, False, "ซ้าย", True, 5),
+	("victory", "ชนะ เต้นสามช่า", None, 120, True, "หน้า", False, None)]
+# ชุดหลัก (kwan 15 ต.ค. "เอาชีต A มาต่อยอด"): ท่าจากชีต A + ท่าจากรอบ 8-2 แทนท่าที่ชีต A พลาด (คุกเข่า ตั้งรับ ม้วนฟัน สามช่า) + ร่ายใหม่
+# ไม่ได้ตัดจากชีต — build_main() คัดลอกไฟล์จาก v5a / v8b (ย่อให้เท่าชีต A) · แถว: (ท่า, ป้าย, ชุดต้นทาง, ms, วน, ทิศ, พลิก, กระทบ)
+MAIN_FROM = {"cast": "v8b", "kneel": "v8b", "guard": "v8b", "jump_roll": "v8b", "victory": "v8b"}
+_v5 = {r[0]: r for r in V5_ROWS(5)}; _v8 = {r[0]: r for r in V8B_ROWS}
+MAIN_ROWS = [(_v8 if MAIN_FROM.get(n) else _v5)[n] for n in
+	["walk_front", "walk_back", "walk_left", "walk_right", "cast", "kneel", "guard", "dodge", "watch", "jump_roll", "victory"]]
 SETS = [
-	("v5a", "★ ชุดหลัก · รอบ 5 ชีต A · GPT (PNG ไม่มีเส้นตาราง)", "flow_trial_v5a.png", [88, 253, 422, 595, 742, 870, 1003, 1101, 1223], V5_ROWS(5)),
+	("main", "★ ชุดหลัก · ชีต A + รอบ 8-2", "flow_trial_v5a.png", None, MAIN_ROWS),
+	("v5a", "รอบ 5 ชีต A · GPT (PNG ไม่มีเส้นตาราง)", "flow_trial_v5a.png", [88, 253, 422, 595, 742, 870, 1003, 1101, 1223], V5_ROWS(5)),
+	("v8b", "รอบ 8-2 · GPT ต่อจากชีต A (ขนาดเดิม)", "flow_trial_v8b.jpg", [232, 730, 1274, 1843, 2399], V8B_ROWS),
 	("v6", "รอบ 6 · Flow (JPG · 7x14)", "flow_trial_v6.jpg", V6_Y, [
 		("walk_front", "เดินหน้า", v6(0, 0, 14), 100, True, "หน้า", False, None),
 		("walk_back", "เดินหลัง", v6(1, 0, 14), 100, True, "หลัง", False, None),
@@ -124,7 +139,10 @@ def cut_free(sid, fn, cen, rows):
 		for q in pieces:
 			cy = np.nonzero(q)[0].mean(); r = int(np.argmin([abs(cy - c) for c in cen])); byrow[r].append(q)
 	d = os.path.join(OUT, sid); os.makedirs(d, exist_ok=True); counts = {}
-	cx = lambda pm: np.nonzero(pm)[1].mean()
+	fx = (a[..., 2] > a[..., 0] + 60) & (a[..., 1] > 150)   # แสงเอฟเฟกต์ฟ้าสว่าง (ลูกพลัง รอยมีด) — หมวกน้ำเงินเขียวต่ำ ไม่โดน
+	def cx(pm):   # กลางตัว = ไม่นับแสงเอฟเฟกต์ (เดิมเฟรมปล่อยลูกพลังจัดกลางรวมแสง ตัวเลื่อน ~20 จุด)
+		body = pm & ~fx
+		return np.nonzero(body if body.sum() > .5 * pm.sum() else pm)[1].mean()
 	for (name, *_r), ps in zip(rows[:len(cen)], byrow):
 		flip = _r[5]
 		med = np.median([q.sum() for q in ps]); main = [q.copy() for q in ps if q.sum() >= .3 * med]
@@ -152,6 +170,7 @@ def cut_free(sid, fn, cen, rows):
 
 def cut():
 	for sid, _, fn, ry, rows in SETS:
+		if sid == "main": continue   # ไม่ได้ตัดจากชีต (build_main)
 		if rows[0][2] is None:
 			print(sid, cut_free(sid, fn, ry, rows)); continue
 		a = np.array(Image.open(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)).convert("RGB")).astype(np.int32)
@@ -323,6 +342,27 @@ def norm_rows(sid):
 	print(sid, "ปรับขนาดแถว:", " · ".join(log))
 
 
+def build_main():
+	"""ชุดหลัก = คัดลอก v5a + แถวจาก v8b ย่อด้วยอัตราเดียวต่อทิศ (ข้าง/หน้า) = เฉลี่ยเรขาคณิตของ (สูง ÷ ชีต A) กับ (กว้างหมวก ÷ ชีต A)
+	เทียบเฟรมยืนตรงแรกของแถว (ร่าย/คุกเข่า/ตั้งรับ = หันข้าง เทียบเดินซ้าย · สามช่า = หันหน้า เทียบเดินหน้า)"""
+	import shutil
+	d = os.path.join(OUT, "main"); shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
+	ld = lambda sid, n, i: np.array(Image.open(os.path.join(OUT, sid, "%s_%d.png" % (n, i))))
+	cnt = lambda sid, n: nframes(os.path.join(OUT, sid), n, None)
+	def k_for(ref, rows):
+		rf = [_hcap(ld("v5a", ref, i)) for i in range(cnt("v5a", ref))]; nh = [_hcap(ld("v8b", n, 0)) for n in rows]
+		hr = np.median([x[0] for x in nh]) / np.median([x[0] for x in rf]); cr = np.median([x[1] for x in nh]) / np.median([x[1] for x in rf])
+		return 1 / np.sqrt(hr * cr)
+	ks = {"side": k_for("walk_left", ["cast", "kneel", "guard"]), "front": k_for("walk_front", ["victory"])}
+	for n, *_ in MAIN_ROWS:
+		src = MAIN_FROM.get(n, "v5a"); k = 1 if src == "v5a" else ks["front" if n == "victory" else "side"]
+		for i in range(cnt(src, n)):
+			im = Image.open(os.path.join(OUT, src, "%s_%d.png" % (n, i)))
+			if k != 1: im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
+			im.save(os.path.join(d, "%s_%d.png" % (n, i)))
+	print("ชุดหลัก: ย่อแถวรอบ 8-2 หันข้าง ×%.3f · หันหน้า ×%.3f" % (ks["side"], ks["front"]))
+
+
 def page(path):
 	def uri(p):
 		b = io.BytesIO(); Image.open(p).save(b, "WEBP", quality=90); return "data:image/webp;base64," + base64.b64encode(b.getvalue()).decode()
@@ -351,5 +391,5 @@ def page(path):
 
 if __name__ == "__main__":
 	ap = argparse.ArgumentParser(); ap.add_argument("--page"); a = ap.parse_args()
-	cut(); fix_v3(); fix_free("v5a"); fix_free("v5b"); fix_free("v6")
+	cut(); fix_v3(); fix_free("v5a"); fix_free("v5b"); fix_free("v6"); build_main()
 	if a.page: page(a.page)
