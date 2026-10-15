@@ -14,6 +14,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rion_ref as R
 ROOT = R.ROOT
 OUT = os.path.join(ROOT, "assets/sprites/rion_flow_draft")
+DESPILL = {"v6"}   # JPG รอบ 6: ขอบตัวติดสีเขียวผสมเส้นขอบ → ฟ้าอมเขียว (teal) รอบตัว
+
+
+def despill(rgb, al):
+	"""จุดขอบ (ห่างพื้นโปร่ง ≤ 2) ที่เขียว≈น้ำเงิน และเขียวสูงกว่าแดง > 25 = เส้นขอบเข้มที่ปนเขียวพื้น → ทาเป็นสีเส้นขอบ (หมวกน้ำเงิน b >> g ไม่โดน)"""
+	rgb = rgb.copy().astype(np.int32); r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+	edge = (al > 0) & ndimage.binary_dilation(al < .5, iterations=2)
+	tint = edge & (np.abs(g - b) < 28) & (g - r > 25)
+	rgb[tint] = (38, 28, 24)
+	return rgb
 
 
 def even(xs, n):   # เส้นตารางเท่ากัน → ช่อง n ช่องแรก
@@ -36,7 +46,26 @@ V5_ROWS = lambda roll_hit: [
 	("jump_roll", "กระโดดม้วน → คุกเข่าฟัน", None, 80, False, "ซ้าย", True, roll_hit),
 	("victory", "ชนะ เต้นสามช่า", None, 120, True, "หน้า", False, None),
 	("walk_right", "เดินขวา (พลิกจากเดินซ้าย)", None, 100, True, "ขวา", False, None)]   # ไม่อยู่ในชีต: fix_free() สร้าง (cut_free ข้ามเพราะไม่มีแถว)
+# รอบ 6 (Google Flow · JPG 1376x768): สั่ง 9 แถว x 8 แต่ได้ตาราง 7 แถว x 14 ช่อง · ท่าละ 7 ช่อง (ครึ่งแถว) · บางท่ามา 2 ชุด
+# ช่อง = (x0, x1, แถวในชีต) · เส้นตารางวัดจากภาพ
+V6_X = [0, 97, 195, 294, 392, 490, 589, 688, 786, 885, 984, 1082, 1180, 1278, 1375]
+V6_Y = [0, 108, 218, 329, 439, 549, 659, 768]
+v6 = lambda sr, c0, n=7: [(V6_X[c], V6_X[c + 1], sr) for c in range(c0, c0 + n)]
 SETS = [
+	("v6", "รอบ 6 · Flow (JPG · 7x14)", "flow_trial_v6.jpg", V6_Y, [
+		("walk_front", "เดินหน้า", v6(0, 0, 14), 100, True, "หน้า", False, None),
+		("walk_back", "เดินหลัง", v6(1, 0, 14), 100, True, "หลัง", False, None),
+		("walk_left", "เดินซ้าย (Flow วาดหันขวา → พลิก)", v6(2, 0), 100, True, "ซ้าย", True, None),
+		("kneel", "ล้มคุกเข่า ชุด 1", v6(2, 7), 110, False, "ซ้าย", True, 2),
+		("kneel_b", "ล้มคุกเข่า ชุด 2", v6(3, 0), 110, False, "ซ้าย", True, 3),
+		("guard", "ตั้งรับ", v6(3, 7), 120, False, "ซ้าย", True, 2),
+		("dodge", "หลบ ชุด 1", v6(4, 0), 90, False, "ซ้าย", True, 2),
+		("dodge_b", "หลบ ชุด 2", v6(4, 7), 90, False, "ซ้าย", True, 2),
+		("jump_roll", "กระโดดม้วน → คุกเข่าฟัน", v6(5, 0), 80, False, "ซ้าย", True, 5),
+		("kneel_knife", "ยืน → คุกเข่าถือมีด (ไม่ได้สั่ง)", v6(5, 7), 110, False, "ซ้าย", True, None),
+		("watch", "จับตา", v6(6, 0), 160, True, "หน้า", False, None),
+		("victory", "ชนะ เต้นสามช่า", v6(6, 7), 120, True, "หน้า", False, None),
+		("walk_right", "เดินขวา (เดินซ้าย + ลบนาฬิกา)", None, 100, True, "ขวา", False, None)]),
 	("v5a", "รอบ 5 ชีต A · GPT (PNG ไม่มีเส้นตาราง)", "flow_trial_v5a.png", [88, 253, 422, 595, 742, 870, 1003, 1101, 1223], V5_ROWS(5)),
 	("v5b", "รอบ 5 ชีต B · GPT (PNG ไม่มีเส้นตาราง)", "flow_trial_v5b.png", [92, 261, 422, 586, 733, 827, 927, 1024, 1117], V5_ROWS(5)),
 	("v3", "รอบ 3 · 15 ต.ค. (11 แถว · สั่งหันซ้าย)", "flow_trial_v3.jpg",
@@ -127,13 +156,15 @@ def cut():
 		a = np.array(Image.open(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)).convert("RGB")).astype(np.int32)
 		d = os.path.join(OUT, sid); os.makedirs(d, exist_ok=True)
 		for r, (name, _l, cells, _ms, _lp, _w, flip, _h) in enumerate(rows):
-			for c, (cx0, cx1) in enumerate(cells):
-				x0, x1, y0, y1 = cx0 + 4, cx1 - 3, ry[r] + 3, ry[r + 1] - 3
+			for c, cell in enumerate(cells or []):   # cells None = สร้างทีหลัง (เดินขวา)
+				cx0, cx1 = cell[:2]; sr = cell[2] if len(cell) > 2 else r   # ช่องระบุแถวในชีตเองได้ (รอบ 6)
+				x0, x1, y0, y1 = cx0 + 4, cx1 - 3, ry[sr] + 3, ry[sr + 1] - 3
 				rgb, al = R.key(a[y0:y1, x0:x1])
 				lab, k = ndimage.label(al > .5); sz = ndimage.sum(al > .5, lab, range(1, k + 1))
 				for i, s in enumerate(sz):
 					if s < 40: al[lab == i + 1] = 0
 				al[:3] = 0; al[-3:] = 0; al[:, :3] = 0; al[:, -3:] = 0
+				if sid in DESPILL: rgb = despill(rgb, al)
 				im = Image.fromarray(np.dstack([rgb, al * 255]).astype(np.uint8), "RGBA")
 				(im.transpose(Image.FLIP_LEFT_RIGHT) if flip else im).save(os.path.join(d, "%s_%d.png" % (name, c)))
 
@@ -250,7 +281,7 @@ def fix_free(sid):
 		a, n = erase_watch_free(a, (int(t + (b - t) * .58), int(t + (b - t) * .80) + 1)); found.append(n)
 		Image.fromarray(a.astype(np.uint8), "RGBA").transpose(Image.FLIP_LEFT_RIGHT).save(p("walk_right", i)); i += 1
 	print(sid, "เดินขวา (พลิกเดินซ้าย) ลบนาฬิกาต่อเฟรม", found)
-	norm_rows(sid)
+	if sid != "v6": norm_rows(sid)   # รอบ 6 ช่องตารางเท่ากัน หัวขนาดเท่ากันทุกแถว (ท่าในศึกวาดมุม 3/4 → ความกว้างหมวกแคบกว่า วัดแล้วขยายผิด)
 
 
 # ชีตรอบ 5 วาดแต่ละแถวคนละขนาด (v5b มองไกลสูงแค่ 56% ของท่าเดิน) → ตัวหดตอนสลับท่า
@@ -295,12 +326,14 @@ def page(path):
 	def uri(p):
 		b = io.BytesIO(); Image.open(p).save(b, "WEBP", quality=90); return "data:image/webp;base64," + base64.b64encode(b.getvalue()).decode()
 	# ข้ามเฟรม 1 ในโหมด 70 เฟรม: ท่าเดินทุกชุด (เฟรม 1 ต่างจากเฟรม 2 39–49% · v1 ยืนด้วย 36%) · วัดแล้ว 15 ต.ค.
-	skip0 = lambda sid, n: n.startswith("walk") or (sid == "v1" and n == "idle_battle")
+	skip0 = lambda sid, n: (n.startswith("walk") and sid != "v6") or (sid == "v1" and n == "idle_battle")   # รอบ 6 เดินไม่มีเฟรม 1 โดด (ต่าง 23–54% ทุกคู่)
 	# ช่องที่ไม่มีตัว Rion (มีแต่คลื่น) ไม่ใส่ในคลิป (ไฟล์ยังเก็บไว้) · v3 cast ช่อง 5
 	# คุกเข่ารอบ 3: เฟรม 4–5 สองมือแตะพื้น (คลานสี่ขา ผิดสเปก) → จบที่เฟรม 3 (คุกเข่าข้างเดียว มือวางเข่า) แล้วค้าง
 	OMIT = {("v3", "cast"): {4}, ("v3", "kneel"): {3, 4},
 		# รอบ 5: เฟรมท้ายคุกเข่าเป็นคลานสี่ขา → A จบเฟรม 4 (เข่าลง มือใกล้พื้น) · B จบเฟรม 4 (คุกเข่าข้างเดียว มือวางเข่า)
-		("v5a", "kneel"): {4}, ("v5b", "kneel"): {4, 5}}
+		("v5a", "kneel"): {4}, ("v5b", "kneel"): {4, 5},
+		# รอบ 6: คุกเข่าทั้งสองชุดจบคลานสี่ขาอีก → ชุด 1 จบเฟรม 3 (ย่อ เข่าลง มือแตะพื้น) · ชุด 2 จบเฟรม 4 (คุกเข่าข้างเดียว)
+		("v6", "kneel"): {3, 4, 5, 6}, ("v6", "kneel_b"): {4, 5, 6}}
 	sets = []
 	for sid, label, fn, _ry, rows in SETS:
 		d = os.path.join(OUT, sid)
@@ -317,5 +350,5 @@ def page(path):
 
 if __name__ == "__main__":
 	ap = argparse.ArgumentParser(); ap.add_argument("--page"); a = ap.parse_args()
-	cut(); fix_v3(); fix_free("v5a"); fix_free("v5b")
+	cut(); fix_v3(); fix_free("v5a"); fix_free("v5b"); fix_free("v6")
 	if a.page: page(a.page)
