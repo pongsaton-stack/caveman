@@ -227,3 +227,33 @@ Row 2 – 1 surprised with wide eyes, 2 sad with teary eyes, 3 angry frown with 
 
 Keep his look identical to image 1 in all 8 portraits. Output PNG only.
 ```
+
+## 16-1b · แก้ 16-1 แถว 4–6 (ไม่มีหมวก)
+<!-- note: ผล 16-1 แถว 4–6 (วิ่งออกห่าง · วิ่งไปทางขวา · กระโดด) วาดไม่ใส่หมวกและแว่น — เจนใหม่เฉพาะ 3 แถวนี้ | cells: 18 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. He holds NO weapon in this sheet. His hands are empty.
+IMPORTANT: he wears his bright blue baseball cap with the brass goggles on top in EVERY frame — from behind we see the back of the blue cap and its strap, from the side we see the curved blue brim pointing right. Never draw him bare-headed.
+
+Layout: 3 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except the jump). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+The facing direction is written on each row.
+
+Row 1 – running away from the viewer (back view: back of the blue cap, brown backpack visible), 6-frame run cycle, clear alternating legs, both feet off the ground in frames 2 and 5.
+Row 2 – running toward the RIGHT (side view, cap brim pointing right), 6-frame run cycle, arms pumping, both feet off the ground in frames 2 and 5.
+Row 3 – front view, jump in place, cap on: 1 stand, 2 crouch, 3 push off, 4 highest point with knees tucked, 5 land with knees bent, 6 stand.
+
+Keep his look identical to image 1 in all 18 frames, cap included. Output PNG only.
+```
+
+## ผลตรวจรอบแรก (kwan ส่ง 7 ชีต 16 ต.ค. · Google Flow · JPG 1438x2576 ทุกชีต) — ยังไม่เข้าเกม/หน้าเทส
+ไฟล์ `flow_trial_v14_1.jpg` `v15_6` `v16_1`…`v16_5` · ตัดด้วย `tools/sprites/rion_pack_cut.py` · ภาพตรวจกรอบ+เลข `pack_check/<ชีต>.jpg` · หน้าตาตรงแบบ Flow ทุกชีต (หมวกน้ำเงินสด แว่นทอง chibi)
+- 14-1 ศึก 48/48 ✓ · พลาด: โดนตีช่อง 1–4 และล้มช่อง 1–2 มีดหายจากมือ · วิ่งช่อง 5 มือเปล่า
+- 15-6 ร่าย 24 ตัว แต่ผัง 6x4 (สั่ง 4x6): ขาว 4 · ดำ 8 (2 แถว) · แดง 4 · อัญเชิญ 8 (2 แถว) · ขาว/แดงไม่มีท่ายกมือลงคืน (ใช้ช่อง 1 แทนได้) · ตำราหายหลังช่อง 1 ทุกสาย · ดำผลักฝ่ามือเดียว
+  **แก้ด้วยโค้ดแล้ว**: แถว 2 (ดำ: ตำราลอย · พนมมือ · เรืองส้ม) วาดครึ่งตัวถึงเข็มขัด → ต่อขาจากท่ายืนแถว 3 ช่อง 1 (หัวตรงกัน · ลบมือที่ห้อยข้างสะโพกของท่ายืน)
+- 16-1 ยืน/วิ่ง 36/36 · แถว 1–3 ✓ · **แถว 4–6 ไม่มีหมวกและแว่น** (วิ่งออกห่าง · วิ่งขวา · กระโดด) → เจนใหม่ด้วย 16-1b ข้างบน
+- 16-2 ท่าทาง 33 (สั่ง 36: โบกมือ/เก็บของ/ผลักลังได้แถวละ 5) · ผลักลังช่อง 4 ไม่มีลัง (ต่อยลม)
+- 16-3 พัก/อารมณ์ 30 (แถวละ 5) · หลับหันซ้าย (สั่งขวา · พลิกได้) · วาดเครื่องหมายตกใจ/เงาใต้เท้ามา → ตัวตัดทิ้งก้อนที่ไม่แตะตัวแล้ว
+- 16-4 ศึกเสริม 29 (ใช้ไอเท็ม 5) · ใช้ไอเท็มช่อง 2–4 และเชียร์ช่อง 2–5 ไม่มีมีด · ประกายช่อง 5 ถือมีดหน้าปาก · ฟื้นวาดซ้อนกัน → ผ่าที่คอลัมน์โปร่งสุด ขอบหมวกช่อง 2–3 โดนตัดนิดหน่อย
+- 16-5 ภาพหน้า 8/8 แต่ผัง 4x2 (สั่ง 2x4) · ตลกกับดีใจหน้าคล้ายกัน
