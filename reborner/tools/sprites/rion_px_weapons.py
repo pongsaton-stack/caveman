@@ -12,6 +12,7 @@ from scipy import ndimage
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SHEET = os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v9.jpg")
 OUT = os.path.join(ROOT, "assets/sprites/rion_px_weapons_draft")
+GAME = os.path.join(ROOT, "assets/sprites/rion_px")   # เข้าเกม (kwan 16 ต.ค. "ใส่เข้าเกม"): west_<สาย>_<i>.png ผืนเดียวกับ rion_px · BattleScreen เลือกตามสายของอาวุธที่ติดตั้ง
 W, H, FEET, CX = 96, 112, 109, 48
 EDGE = np.array([42, 26, 20])
 # เลือกเฟรมด้วยตา (แถว, ช่อง) นับจาก 0 ตามที่ GPT วาด (หันขวา ก่อนพลิก)
@@ -102,7 +103,7 @@ def main():
 	extra = np.array(Image.fromarray(uq[None]).quantize(min(12, len(uq)), method=Image.MEDIANCUT).convert("RGB")).reshape(-1, 3) if len(uq) >= 2 else uq
 	pal = np.unique(np.vstack([base, np.array(sorted(set(map(tuple, extra))), float).reshape(-1, 3)]), axis=0)
 	os.makedirs(OUT, exist_ok=True)
-	for f in glob.glob(os.path.join(OUT, "*.png")): os.remove(f)
+	for f in glob.glob(os.path.join(OUT, "*.png")) + [g for c in CLIPS for g in glob.glob(os.path.join(GAME, "west_%s_*.png" % c[0]))]: os.remove(f)
 	idx = {"_doc": __doc__.split("\n")[0], "scale": round(k, 4), "palette": len(pal), "clips": []}
 	for fam, label, picks, hit in CLIPS:
 		for i, rc in enumerate(picks):
@@ -115,6 +116,7 @@ def main():
 			canvas = Image.new("RGBA", (W, H))
 			canvas.paste(Image.fromarray(img, "RGBA"), (CX - hx, FEET - ys.max()), Image.fromarray(img, "RGBA"))
 			canvas.save(os.path.join(OUT, "%s_%d.png" % (fam, i)))
+			canvas.save(os.path.join(GAME, "west_%s_%d.png" % (fam, i)))
 		idx["clips"].append({"family": fam, "label": label, "n": len(picks), "hit": hit, "src": [list(p) for p in picks]})
 	json.dump(idx, open(os.path.join(OUT, "index.json"), "w"), ensure_ascii=False, indent=1)
 	open(os.path.join(OUT, ".gdignore"), "w").close()

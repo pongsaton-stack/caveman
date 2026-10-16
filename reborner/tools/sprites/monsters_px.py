@@ -15,6 +15,7 @@ SHEETS = {"v10": os.path.join(ROOT, "docs/art-bible/rion_hires/monster_trial_v10
 	"v11": os.path.join(ROOT, "docs/art-bible/rion_hires/monster_trial_v11.jpg")}   # รอบ 11 = เจนใหม่ หมาป่า/ค้างคาว/บอส ให้ตรงแบบ (แถวละ 4 ช่อง ตัวละ 2 แถว)
 SHEET = SHEETS["v10"]
 OUT = os.path.join(ROOT, "assets/sprites/monsters_px_draft")
+GAME = os.path.join(ROOT, "assets/sprites/monsters_px")   # เข้าเกม (kwan 16 ต.ค. "ใส่เข้าเกม"): <id>_<บทบาท><ลำดับ>.png ตัดผืนให้ขอบล่าง = เส้นพื้น
 EDGE = np.array([42, 26, 20])
 # (id, ชื่อ, แถวในชีต [แถบที่ 0–5], จำนวนช่องต่อแถว, วัดขนาดด้วย, ล้างขอบเขียวจาก JPG [none = ตัวเขียวเอง · edge = เฉพาะขอบ (มอสเขียวบนหลัง) · all = ทั้งตัว], บทบาทของแต่ละภาพตามลำดับ)
 MONS = [
@@ -134,8 +135,8 @@ def main():
 		uq = np.unique(px // 16 * 16 + 8, axis=0)
 		p2 = np.array(Image.fromarray(uq[None]).quantize(min(8, len(uq)), method=Image.MEDIANCUT).convert("RGB")).reshape(-1, 3)
 		return np.unique(np.vstack([p1, p2]), axis=0).astype(float)
-	os.makedirs(OUT, exist_ok=True)
-	for f in glob.glob(os.path.join(OUT, "*.png")): os.remove(f)
+	os.makedirs(OUT, exist_ok=True); os.makedirs(GAME, exist_ok=True)
+	for f in glob.glob(os.path.join(OUT, "*.png")) + glob.glob(os.path.join(GAME, "*.png")): os.remove(f)
 	idx = {"_doc": __doc__.split("\n")[0], "palette": "ต่อตัว ≤ 32", "rion_ratio": round(ratio, 3), "monsters": []}
 	for mid, (name, roles, k, out) in cuts.items():
 		pal = palette(out)
@@ -149,6 +150,8 @@ def main():
 			cv = Image.new("RGBA", (W, H)); im = Image.fromarray(img, "RGBA")
 			cv.paste(im, (int(round(ax + ox)), int(round(fy + oy))), im)
 			cv.save(os.path.join(OUT, "%s_%d.png" % (mid, i)))
+			nth = roles[:i].count(roles[i])
+			cv.crop((0, 0, W, fy + 1)).save(os.path.join(GAME, "%s_%s%d.png" % (mid, roles[i], nth)))   # BattleScreen/WorldEnemy วางขอบล่างผืนบนพื้น
 		idx["monsters"].append({"id": mid, "name": name, "n": len(out), "roles": roles, "scale": round(k, 4), "size": [W, H], "anchor": [ax, fy]})
 	json.dump(idx, open(os.path.join(OUT, "index.json"), "w"), ensure_ascii=False, indent=1)
 	open(os.path.join(OUT, ".gdignore"), "w").close()

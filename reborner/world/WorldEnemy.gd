@@ -12,13 +12,14 @@ var is_boss := false
 var body_color := Color("b5705a")
 var _label: Label
 # รูปสไตล์ Last Light (kwan อนุมัติแล้ว) · ไม่มีรูป = กล่องสีแบบเดิม
-var frames: Array[Texture2D] = []   # [ท่ายืน, idle เฟรม 2] หันขวา
+var frames: Array[Texture2D] = []   # ลำดับภาพหายใจ หันขวา (เดินทีละ IDLE_SEC/2 · ชุดเดิม 2 ภาพ = [ยืน, ยืน, idle, idle] จังหวะเท่าเดิม)
 var _frame := 0
 var _clock := 0.0
 var _face_left := false
 
 const LEASH := 4
 const SPRITE_DIR := "res://assets/sprites/monsters_ll"
+const PX_DIR := "res://assets/sprites/monsters_px"   # มอนพิกเซลชุดใหม่ (kwan 16 ต.ค. 2026) · <id>_idle<n>.png มีก่อนใช้ก่อน
 const IDLE_SEC := 0.45
 const FEET_Y := 11.0                 # เท้าแตะขอบล่างช่อง (ช่อง 24px · ศูนย์กลาง node = กลางช่อง)
 const RING_RX := 18.0                # วงสีความอันตรายต้องกว้างกว่าตัวมอน (สไลม์ 48px บังวงเล็กมิด)
@@ -29,9 +30,18 @@ func load_sprite() -> void:
 	frames.clear()
 	if group.is_empty():
 		return
+	var n := 0
+	while ResourceLoader.exists("%s/%s_idle%d.png" % [PX_DIR, group[0], n]):
+		frames.append(load("%s/%s_idle%d.png" % [PX_DIR, group[0], n]))
+		n += 1
+	if n > 0:
+		for k in range(n - 2, 0, -1):   # ไป-กลับ 0 1 2 1
+			frames.append(frames[k])
+		return
 	for suffix in ["", "_idle1"]:
 		var path := "%s/%s%s.png" % [SPRITE_DIR, group[0], suffix]
 		if ResourceLoader.exists(path):
+			frames.append(load(path))
 			frames.append(load(path))
 
 func _ready() -> void:
@@ -44,16 +54,20 @@ func _ready() -> void:
 	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_label.size = Vector2(80, 10)
 	# ป้ายชื่ออยู่เหนือหัวรูปจริง (บอส 96px สูงกว่ามอนทั่วไปเท่าตัว)
-	_label.position = Vector2(-40, FEET_Y - frames[0].get_size().y - 2.0 if not frames.is_empty() else -24.0)
+	# วางเหนือส่วนที่มีภาพจริง (ผืนชุดพิกเซลเผื่อที่ว่างเหนือหัวไว้ให้ท่ากระโดด → ใช้ขนาดผืนตรง ๆ ป้ายจะลอยสูงเกิน)
+	var top := 0
+	if not frames.is_empty():
+		top = frames[0].get_image().get_used_rect().position.y
+	_label.position = Vector2(-40, FEET_Y - frames[0].get_size().y + top - 10.0 if not frames.is_empty() else -24.0)
 	add_child(_label)
 
 func _process(delta: float) -> void:
 	if frames.size() < 2:
 		return
 	_clock += delta
-	if _clock >= IDLE_SEC:
+	if _clock >= IDLE_SEC / 2.0:
 		_clock = 0.0
-		_frame = 1 - _frame
+		_frame = (_frame + 1) % frames.size()
 		queue_redraw()
 
 ## รูปหันขวา → หันซ้ายเมื่อเดินซ้าย · ขึ้น/ลง คงทางเดิม

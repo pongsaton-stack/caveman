@@ -64,13 +64,20 @@ const HIRES_FPS := 25.0                   # รอบเดิน 24 เฟร�
 var _hires_idle: Array[Texture2D] = []
 var _hires_t := 0.0
 const FOE_SPRITE_DIR := "res://assets/sprites/monsters_ll"
+# มอนพิกเซลชุดใหม่ (kwan 16 ต.ค. 2026 · tools/sprites/monsters_px.py): <id>_<บทบาท><ลำดับ>.png ขอบล่างผืน = พื้น · ไม่มีไฟล์ = ใช้ monsters_ll เดิม
+const MON_PX_DIR := "res://assets/sprites/monsters_px"
+const MON_ROLES := ["idle", "wind", "atk", "follow", "hurt", "ko"]
+const MON_ACT_SEC := 0.16                 # ต่อภาพตอนมอนโจมตี (ง้าง → โจมตี → ตามแรง)
+var _mon_anim: Dictionary = {}            # Actor → {บทบาท: Array[Texture2D]}
+var _mon_busy: Dictionary = {}            # Actor → true ระหว่างเล่นท่า (ลูปหายใจหยุด)
 const FOE_AREA := Vector2(100, 178)       # ช่วง x ที่ศัตรูยืน (ระหว่างแผงศัตรูกับมอนฝั่งเรา)
 # มอนฝั่งเรายืนหน้า-ซ้ายของ Rion (หันซ้าย = พลิกรูป) · ช่อง 1 พื้น · ช่อง 2 ลอยสูง (ค้างคาวบินได้ ไม่บังกัน)
 const ALLY_SLOTS := [Vector2(188, 102), Vector2(184, 76)]   # หนอนชิดขอบใสด้านซ้ายของรูป Rion · บอส 96px เกยแค่ 6px
 const STAGE_FEET_Y := 100.0               # เท้าแตะพื้นทราย
+const ALLY_PX_CX := [196.0, 166.0]        # มอนฝั่งเราชุดพิกเซล: กลางตัวช่อง 1 (หน้า Rion) · ช่อง 2 (ซ้ายถัดไป · ค้างคาวบินอยู่ในภาพแล้ว)
 const FOE_IDLE_SEC := 0.45
 var _foe_rects: Dictionary = {}           # Actor → TextureRect
-var _foe_frames: Dictionary = {}          # Actor → Array ของ Texture2D [ยืน, idle]
+var _foe_frames: Dictionary = {}          # Actor → ลำดับภาพหายใจ (เดินทีละ FOE_IDLE_SEC/2 · ชุดเดิม 2 ภาพ = [ยืน, ยืน, idle, idle] จังหวะเท่าเดิม)
 var _foe_clock := 0.0
 var _foe_frame := 0
 var _hero_down_seen := false
@@ -392,6 +399,16 @@ func _load_textures() -> void:
 	var p_idle := "%s/west.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
+	# ถืออาวุธตามสายที่ติดตั้ง (ชีตรอบ 9 · tools/sprites/rion_px_weapons.py): west_<สาย>_0–1 ยืนถือ (วน) · _2.. ท่าโจมตี · สาย SL (มีด) = ชุดหลักข้างบน
+	var fam := hero.weapon_id.get_slice("-", 0) if hero != null else ""
+	var wf: Array[Texture2D] = []
+	while ResourceLoader.exists("%s/west_%s_%d.png" % [SPRITE_DIR, fam, wf.size()]):
+		wf.append(load("%s/west_%s_%d.png" % [SPRITE_DIR, fam, wf.size()]))
+	if wf.size() >= 3:
+		_tex_idle_loop.clear(); _tex_idle_loop.append(wf[0]); _tex_idle_loop.append(wf[1])
+		_tex_attack.clear()
+		for i in range(2, wf.size()):
+			_tex_attack.append(wf[i])
 	if not _tex_idle_loop.is_empty():
 		_tex_idle = _tex_idle_loop[0]   # ภาพยืน = เฟรมแรกของวงหายใจ (ให้ _idle_tick รู้ว่ากำลังยืน)
 	# ถืออาวุธจริงตามที่ติดตั้ง (kwan 7 ต.ค. 2026 "แก้ด่วน"): weapons_held/<id>_0 ยืนถือ · _1–4 ง้าง→ฟาด→ฟาดต่อ→ตามแรง
@@ -518,6 +535,7 @@ func _build() -> void:
 
 	_build_foe_sprites(root)
 	_build_ally_sprites(root)
+	root.move_child(_queue_box, -1)   # แถบคิวทับตัวละคร (บอส/หัว Rion สูงเกินเวที ห้ามบังลำดับเทิร์น)
 
 	_foe_box = VBoxContainer.new()
 	_foe_box.position = Vector2(4, 28)
@@ -629,11 +647,7 @@ func _build_foe_sprites(root: Control) -> void:
 	order.sort_custom(func(i, j): return (i % 2) > (j % 2))
 	for i in order:
 		var a: Actor = foes[i]
-		var frames: Array = []
-		for suffix in ["", "_idle1"]:
-			var path := "%s/%s%s.png" % [FOE_SPRITE_DIR, a.id, suffix]
-			if ResourceLoader.exists(path):
-				frames.append(load(path))
+		var frames := _mon_frames(a, [a.id])
 		if frames.is_empty():
 			continue
 		var tex: Texture2D = frames[0]
@@ -654,14 +668,7 @@ func _build_ally_sprites(root: Control) -> void:
 	var allies: Array = b.actors.filter(func(a): return a.side == "ally" and not a.is_hero)
 	for i in mini(allies.size(), ALLY_SLOTS.size()):
 		var a: Actor = allies[i]
-		var frames: Array = []
-		for base in ["COMP-" + a.id, a.id]:
-			for suffix in ["", "_idle1"]:
-				var path := "%s/%s%s.png" % [FOE_SPRITE_DIR, base, suffix]
-				if ResourceLoader.exists(path):
-					frames.append(load(path))
-			if not frames.is_empty():
-				break
+		var frames := _mon_frames(a, ["COMP-" + a.id, a.id])
 		if frames.is_empty():
 			continue
 		var tex: Texture2D = frames[0]
@@ -672,9 +679,59 @@ func _build_ally_sprites(root: Control) -> void:
 		r.size = tex.get_size()
 		var slot: Vector2 = ALLY_SLOTS[i]
 		r.position = Vector2(slot.x, slot.y - tex.get_size().y)
+		if _mon_anim.has(a):   # ชุดพิกเซลใหม่: ความสูงบินอยู่ในภาพแล้ว → ยืนบนพื้น · วางกลางตัวที่ ALLY_PX_CX (ภาพกว้างไม่เท่ากัน)
+			var used := tex.get_image().get_used_rect()
+			r.position = Vector2(ALLY_PX_CX[i] - (used.position.x + used.size.x / 2.0), STAGE_FEET_Y + 2.0 - tex.get_size().y)
 		root.add_child(r)
 		_foe_rects[a] = r       # ใช้ลูป idle/จางตอนล้ม ชุดเดียวกับศัตรู
 		_foe_frames[a] = frames
+
+## ลำดับภาพหายใจของมอนตัวนี้: ชุดพิกเซลใหม่ก่อน (หายใจ 3 ภาพ ไป-กลับ + เก็บท่าอื่นใน _mon_anim) · ไม่มีก็ใช้ monsters_ll เดิม (ลองชื่อตาม bases ทีละชื่อ)
+func _mon_frames(a: Actor, bases: Array) -> Array:
+	var px := {}
+	for role in MON_ROLES:
+		var arr: Array = []
+		var n := 0
+		while ResourceLoader.exists("%s/%s_%s%d.png" % [MON_PX_DIR, a.id, role, n]):
+			arr.append(load("%s/%s_%s%d.png" % [MON_PX_DIR, a.id, role, n]))
+			n += 1
+		px[role] = arr
+	if not px["idle"].is_empty():
+		_mon_anim[a] = px
+		var idle: Array = px["idle"].duplicate()
+		for k in range(idle.size() - 2, 0, -1):
+			idle.append(px["idle"][k])
+		return idle
+	for base in bases:
+		var frames: Array = []
+		for suffix in ["", "_idle1"]:
+			var path := "%s/%s%s.png" % [FOE_SPRITE_DIR, base, suffix]
+			if ResourceLoader.exists(path):
+				frames.append(load(path))
+				frames.append(load(path))
+		if not frames.is_empty():
+			return frames
+	return []
+
+## มอนโจมตี: ง้าง → โจมตี → ตามแรง แล้วกลับลูปหายใจ (เรียกจาก _play_events ไม่ await)
+func _mon_act(a: Actor) -> void:
+	if not _mon_anim.has(a) or a.down or not _foe_rects.has(a):
+		return
+	var seq: Array = _mon_anim[a]["wind"] + _mon_anim[a]["atk"] + _mon_anim[a]["follow"]
+	_mon_busy[a] = true
+	for t in seq:
+		_foe_rects[a].texture = t
+		await get_tree().create_timer(minf(MON_ACT_SEC, step_delay / 3.0)).timeout
+	_mon_busy.erase(a)
+
+## มอนโดนตี: ภาพผงะค้างสั้น ๆ (ล้มแล้ว = ท่าล้มจาก _process)
+func _mon_hurt(a: Actor) -> void:
+	if not _mon_anim.has(a) or a.down or _mon_anim[a]["hurt"].is_empty() or not is_instance_valid(_foe_rects.get(a)):
+		return
+	_mon_busy[a] = true
+	_foe_rects[a].texture = _mon_anim[a]["hurt"][0]
+	await get_tree().create_timer(0.3).timeout
+	_mon_busy.erase(a)
 
 func _process(delta: float) -> void:
 	_hires_tick(delta)
@@ -682,13 +739,20 @@ func _process(delta: float) -> void:
 	if _foe_rects.is_empty():
 		return
 	_foe_clock += delta
-	if _foe_clock < FOE_IDLE_SEC:
+	if _foe_clock < FOE_IDLE_SEC / 2.0:
 		return
 	_foe_clock = 0.0
-	_foe_frame = 1 - _foe_frame
+	_foe_frame += 1
 	for a in _foe_rects:
+		if _mon_busy.has(a):
+			continue
+		var ko: Array = _mon_anim[a]["ko"] if _mon_anim.has(a) else []
+		if a.down and not ko.is_empty():   # ชุดใหม่มีท่าล้ม → ใช้ท่าล้ม ไม่จาง
+			_foe_rects[a].texture = ko[ko.size() - 1]
+			_foe_rects[a].modulate = Color.WHITE
+			continue
 		var fr: Array = _foe_frames[a]
-		_foe_rects[a].texture = fr[mini(_foe_frame, fr.size() - 1)]
+		_foe_rects[a].texture = fr[_foe_frame % fr.size()]
 		_foe_rects[a].modulate = Color(1, 1, 1, 0.3) if a.down else Color.WHITE   # ล้ม = จาง
 
 # ── เอฟเฟกต์สกิล ─────────────────────────────────────────────────
@@ -723,6 +787,14 @@ func _play_events() -> void:
 			if ult:
 				_ultimate_intro(e, evs)
 			break
+	# มอนชุดพิกเซล: ผู้ใช้ท่าเล่นท่าโจมตี · ตัวที่โดนดาเมจผงะ (หลังท่าโจมตีถึงจังหวะกระทบ)
+	for e in evs:
+		if e.has("tech") and e.has("src") and e["src"] != hero:
+			_mon_act(e["src"])
+			break
+	for e in evs:
+		if e.has("tech") and int(e.get("dmg", 0)) > 0 and _mon_anim.has(e["tgt"]):
+			get_tree().create_timer(MON_ACT_SEC * 2.0).timeout.connect(_mon_hurt.bind(e["tgt"]))
 	var nth := 0     # ตัวเลขหลายตัวในครั้งเดียว (ท่าหมู่/ไม้ตาย) → เหลื่อมขึ้นทีละแถว ไม่ทับกัน
 	for e in evs:
 		if _actor_point(e["tgt"]) == Vector2.INF:

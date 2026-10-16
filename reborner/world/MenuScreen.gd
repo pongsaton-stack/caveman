@@ -56,6 +56,15 @@ func _render() -> void:
 	left.add_child(UiKit.label("%s (ค่าอาวุธ %d) · สาย%s%s" % [ps.weapon_name, ps.weapon_base, ps.school,
 		(" · ชี้ทาง " + ps.steer) if ps.steer != "" else ""], 7, UiKit.C_MUTED))
 	left.add_child(UiKit.label("HP %d/%d · SP %d/%d · เงิน %d" % [ps.hp, ps.max_hp(), ps.sp, ps.max_sp(), ps.gold], 7, UiKit.C_TEXT))
+	# ไอคอนอาวุธที่ถือ 48px (ชีตรอบ 12 · tools/sprites/weapons_icons_px.py · kwan 16 ต.ค.) มุมขวาบนของแผง Rion · ไม่มีไฟล์ = ไม่แสดง
+	var icon_path := "res://assets/sprites/weapon_icons/%s.png" % ps.weapon_id
+	if ResourceLoader.exists(icon_path):
+		var ic := TextureRect.new()
+		ic.texture = load(icon_path)
+		ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		ic.position = Vector2(left.position.x + left.size.x - 48.0, left.position.y)
+		ic.size = Vector2(48, 48)
+		_body.add_child(ic)
 	var used := 0
 	for m in ps.active_members(slots):
 		used += PlayerState.slot_cost(m)
