@@ -399,11 +399,15 @@ func _load_textures() -> void:
 	var p_idle := "%s/west.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
-	# ถืออาวุธตามสายที่ติดตั้ง (ชีตรอบ 9 · tools/sprites/rion_px_weapons.py): west_<สาย>_0–1 ยืนถือ (วน) · _2.. ท่าโจมตี · สาย SL (มีด) = ชุดหลักข้างบน
-	var fam := hero.weapon_id.get_slice("-", 0) if hero != null else ""
+	# ถืออาวุธตามที่ติดตั้ง (ชีตรอบ 9/13 · tools/sprites/rion_px_weapons.py): _0–1 ยืนถือ (วน) · _2.. ท่าโจมตี · มีดทำครัว SL-1 = ชุดหลักข้างบน
+	# ชิ้นที่ถือพอดี (west_CR-2_*) ก่อน · ไม่มีใช้ชุดระดับ 1 ของสาย (west_CR_*) (รอบ 13 ระดับ 2 · kwan 16 ต.ค.)
 	var wf: Array[Texture2D] = []
-	while ResourceLoader.exists("%s/west_%s_%d.png" % [SPRITE_DIR, fam, wf.size()]):
-		wf.append(load("%s/west_%s_%d.png" % [SPRITE_DIR, fam, wf.size()]))
+	if hero != null:
+		for name in [hero.weapon_id, hero.weapon_id.get_slice("-", 0)]:
+			while ResourceLoader.exists("%s/west_%s_%d.png" % [SPRITE_DIR, name, wf.size()]):
+				wf.append(load("%s/west_%s_%d.png" % [SPRITE_DIR, name, wf.size()]))
+			if not wf.is_empty():
+				break
 	if wf.size() >= 3:
 		_tex_idle_loop.clear(); _tex_idle_loop.append(wf[0]); _tex_idle_loop.append(wf[1])
 		_tex_attack.clear()

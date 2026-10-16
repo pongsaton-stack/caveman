@@ -447,3 +447,63 @@ Row 6 – gardening gloves covered in many sewn patches that glow warmly, worn o
 
 Keep proportions, colors and outfit identical in all 36 frames. Output PNG only.
 ```
+
+### รอบ 13 แก้ไข (หลังผลระดับ 2) — prompt ใหม่ 3 ชีต
+ผลระดับ 2 (`flow_trial_v13_t2.jpg`): GPT ลอกผังรอบ 9 (8x6) · ใช้ได้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต · **ดินสอ/หนังสติ๊กยังวาดของระดับ 1** (ลอกจากภาพ 1)
+แก้: บอกให้ไม่สนใจอาวุธในภาพ 1 · ระบุชื่อ + บอกว่า "ไม่ใช่" ของเดิมในแถวที่หน้าตาคล้ายกัน · ชีตระดับ 3 แถม PC-2/ST-2 ที่พลาด (8 แถว = ผังที่ GPT ชอบวาด)
+
+#### ชีตระดับ 3 (SL-3 CR-3 PC-3 ST-3 DV-3 BD-3 PC-2 ST-2)
+```
+Image 1 shows ONLY the character Rion and his poses. IGNORE THE WEAPONS IN IMAGE 1 COMPLETELY: every weapon in this sheet is a different, upgraded weapon described below (image 2 shows the weapon designs). Draw ONE new sprite sheet with the same character, same poses, same outline thickness, same flat cel colors, same character size and same solid green background #01DA0D as image 1.
+
+Layout: 8 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, never an old weapon from image 1.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all frames.
+
+Row 1 – a MACHETE with a jagged SAW BLADE welded along its back edge and a grey PVC-pipe handle (long blade, not a small knife), 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – an ALUMINUM baseball bat with many NAILS hammered around the tip, bound with wire, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – a long silver METAL MECHANICAL PENCIL as long as a short spear, with a pocket clip and a steel spike tip (NOT a yellow wooden pencil), held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a WRIST-BRACE slingshot: a metal fork with a brace that rests on the forearm and a wooden RULER mounted on top as a sight (NOT a tree-branch slingshot), stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – a red-and-black PNEUMATIC NAIL GUN with a hose connected to a small blue AIR TANK hanging from his side, held in both hands like a small gun, stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – yellow gloves with a ring of silver CAR KEYS threaded across the knuckles like brass knuckles, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+Row 7 – TWO yellow pencils TAPED together side by side with grey duct tape and a long NAIL sticking out of the tip (NOT a single pencil), held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 8 – a slingshot made of grey STEEL PIPE bent into a Y-fork with a thick black bicycle INNER-TUBE band (NOT a tree-branch slingshot), stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+
+Keep proportions, colors and outfit identical in all frames. Output PNG only.
+```
+
+#### ชีตระดับ 4 (SL-4 CR-4 PC-4 ST-4 DV-4 BD-4)
+```
+Image 1 shows ONLY the character Rion and his poses. IGNORE THE WEAPONS IN IMAGE 1 COMPLETELY: every weapon in this sheet is a different, upgraded weapon described below (image 2 shows the weapon designs). Draw ONE new sprite sheet with the same character, same poses, same outline thickness, same flat cel colors, same character size and same solid green background #01DA0D as image 1.
+
+Layout: 6 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, never an old weapon from image 1.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all frames.
+
+Row 1 – a sharpened CEILING-FAN BLADE mounted on a knife handle with a small round motor at the hub, 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – a baseball bat with a heavy round CAR GEAR WHEEL fitted on the end, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – a long black FOUNTAIN PEN whose big brass nib is a spearhead, held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a CROSSBOW built from a broken umbrella's bent steel frame, loaded with an umbrella rib as the bolt, stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – a heavy olive-green FIELD STAPLER wired by red and black cables to a car battery worn on his back, held in both hands like a small gun, stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – gloves with a coiled DOOR-CLOSER SPRING mounted on the back of each hand, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+
+Keep proportions, colors and outfit identical in all frames. Output PNG only.
+```
+
+#### ชีตระดับ 5 (SL-5 CR-5 PC-5 ST-5 DV-5 BD-5)
+```
+Image 1 shows ONLY the character Rion and his poses. IGNORE THE WEAPONS IN IMAGE 1 COMPLETELY: every weapon in this sheet is a different, upgraded weapon described below (image 2 shows the weapon designs). Draw ONE new sprite sheet with the same character, same poses, same outline thickness, same flat cel colors, same character size and same solid green background #01DA0D as image 1.
+
+Layout: 6 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, never an old weapon from image 1.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all frames.
+
+Row 1 – a chef's knife whose blade GLOWS bright ORANGE like a live ember, with small sparks, 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – a baseball bat with a faded autograph and a GLOWING gold band wrapped around it, tiny star sparkles, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – a wooden pen covered in carved tally marks with a GLOWING blue nib, held like a spear, held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a polished BRASS slingshot with a GLOWING band, firing a glass marble with a star inside, stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – an antique BRASS stapler firing GLOWING light-blue staples, held in both hands like a small gun, stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – gardening gloves covered in many sewn patches that GLOW warm orange, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+
+Keep proportions, colors and outfit identical in all frames. Output PNG only.
+```

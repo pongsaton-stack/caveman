@@ -11,18 +11,25 @@ from scipy import ndimage
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SHEET = os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v9.jpg")
+# รอบ 13 ระดับ 2 (kwan 16 ต.ค.): GPT ลอกผังรอบ 9 (8x6) · แถวดินสอ/หนังสติ๊กยังเป็นของระดับ 1 → ไม่ใช้ · ใช้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต
+SHEETS = {"v9": SHEET, "t2": os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v13_t2.jpg")}
 OUT = os.path.join(ROOT, "assets/sprites/rion_px_weapons_draft")
 GAME = os.path.join(ROOT, "assets/sprites/rion_px")   # เข้าเกม (kwan 16 ต.ค. "ใส่เข้าเกม"): west_<สาย>_<i>.png ผืนเดียวกับ rion_px · BattleScreen เลือกตามสายของอาวุธที่ติดตั้ง
 W, H, FEET, CX = 96, 112, 109, 48
 EDGE = np.array([42, 26, 20])
 # เลือกเฟรมด้วยตา (แถว, ช่อง) นับจาก 0 ตามที่ GPT วาด (หันขวา ก่อนพลิก)
 # แถว 2 ทั้งแถว (วิ่ง/ต่อยไม่เห็นดินสอ) และแถว 3 ช่อง 3 = ต่อยมือเปล่า · แถว 4 ช่อง 5 และแถว 5 ช่อง 2–5 = ไม่มีหนังสติ๊ก → ไม่ใช้
+# ชื่อ = ไฟล์ในเกม west_<ชื่อ>_<i>: ระดับ 1 = รหัสสาย (CR) ใช้เป็นค่าตั้งต้นของทั้งสาย · ระดับอื่น = รหัสอาวุธ (CR-2) ใช้เมื่อถือชิ้นนั้นพอดี
 CLIPS = [
-	("CR", "ไม้เบสบอล (ทุบ)", [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5)], 4),
-	("PC", "ดินสอ (แทง)", [(2, 0), (2, 1), (2, 2), (2, 4), (2, 5)], 3),
-	("ST", "หนังสติ๊ก (ยิง)", [(3, 0), (3, 1), (3, 2), (3, 3), (3, 4), (4, 0)], 4),
-	("DV", "ที่เย็บกระดาษ (กล)", [(5, 0), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5)], 4),
-	("BD", "ถุงมือ (มือเปล่า)", [(7, 0), (6, 2), (7, 2), (7, 3), (7, 4), (7, 5)], 2),
+	("CR", "ไม้เบสบอล (ทุบ)", "v9", [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5)], 4),
+	("PC", "ดินสอ (แทง)", "v9", [(2, 0), (2, 1), (2, 2), (2, 4), (2, 5)], 3),
+	("ST", "หนังสติ๊ก (ยิง)", "v9", [(3, 0), (3, 1), (3, 2), (3, 3), (3, 4), (4, 0)], 4),
+	("DV", "ที่เย็บกระดาษ (กล)", "v9", [(5, 0), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5)], 4),
+	("BD", "ถุงมือ (มือเปล่า)", "v9", [(7, 0), (6, 2), (7, 2), (7, 3), (7, 4), (7, 5)], 2),
+	("SL-2", "มีดอีโต้พันเทป (คม · ระดับ 2)", "t2", [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (0, 5)], 4),
+	("CR-2", "ไม้เบสบอลอลูมิเนียม (ทุบ · ระดับ 2)", "t2", [(1, 0), (1, 1), (1, 2), (1, 3), (1, 4), (1, 5)], 4),
+	("DV-2", "แม็กยิงบอร์ด (กล · ระดับ 2)", "t2", [(5, 0), (5, 1), (5, 2), (5, 3), (5, 4), (5, 5)], 4),
+	("BD-2", "ถุงมือหนังเย็บน็อต (มือเปล่า · ระดับ 2)", "t2", [(7, 0), (6, 2), (7, 2), (7, 3), (7, 4), (7, 5)], 2),
 ]   # ตัวเลขท้าย = ลำดับเฟรมกระทบ (ใช้ในหน้าเทส)
 REF_CELL = (5, 0)   # ยืนถือที่เย็บกระดาษ: ไม่มีของเหนือหัว ใช้วัดความสูงตัว
 
@@ -79,21 +86,23 @@ def shrink(rgb, al, k):
 
 
 def main():
-	rgb, a = key_green(np.array(Image.open(SHEET).convert("RGB")).astype(float))
-	got = cells(rgb, a)
 	ref = np.array(Image.open(os.path.join(ROOT, "assets/sprites/rion_px/west_i0.png")))
 	ys = np.where((ref[..., 3] > 0).any(1))[0]
 	ref_h = ys[-1] - ys[0] + 1
-	k = ref_h / got[REF_CELL][1].shape[0]
+	GOT, K = {}, {}
+	for sk, path in SHEETS.items():   # ย่อต่อชีต ให้ท่ายืนสูงเท่า Rion ในเกม
+		rgb, a = key_green(np.array(Image.open(path).convert("RGB")).astype(float))
+		GOT[sk] = cells(rgb, a); K[sk] = ref_h / GOT[sk][REF_CELL][1].shape[0]
+	k = K["v9"]
 	# พาเลตต์ = 40 สีของชุดหลัก + สีใหม่ของอาวุธ (ไกลจากพาเลตต์เดิม) ≤ 8
 	base = set()
 	for f in glob.glob(os.path.join(ROOT, "assets/sprites/rion_flow_draft/main_px/*.png")):
 		b = np.array(Image.open(f)); base |= set(map(tuple, b[b[..., 3] > 0][:, :3]))
 	base = np.array(sorted(base), float)
 	frames = {}
-	for fam, _, picks, _ in CLIPS:
+	for fam, _, sk, picks, _ in CLIPS:
 		for rc in picks:
-			c, m = shrink(*got[rc], k)
+			c, m = shrink(*GOT[sk][rc], K[sk])
 			frames[(fam, rc)] = (c[:, ::-1], m[:, ::-1])   # พลิกหันซ้าย
 	px = np.concatenate([c[m] for c, m in frames.values()])
 	d = np.sqrt(((px[:, None, :] - base[None]) ** 2).sum(-1)).min(1)
@@ -105,7 +114,7 @@ def main():
 	os.makedirs(OUT, exist_ok=True)
 	for f in glob.glob(os.path.join(OUT, "*.png")) + [g for c in CLIPS for g in glob.glob(os.path.join(GAME, "west_%s_*.png" % c[0]))]: os.remove(f)
 	idx = {"_doc": __doc__.split("\n")[0], "scale": round(k, 4), "palette": len(pal), "clips": []}
-	for fam, label, picks, hit in CLIPS:
+	for fam, label, sk, picks, hit in CLIPS:
 		for i, rc in enumerate(picks):
 			c, m = frames[(fam, rc)]
 			q = pal[((c[:, :, None, :] - pal[None, None]) ** 2).sum(-1).argmin(-1)]
@@ -117,10 +126,10 @@ def main():
 			canvas.paste(Image.fromarray(img, "RGBA"), (CX - hx, FEET - ys.max()), Image.fromarray(img, "RGBA"))
 			canvas.save(os.path.join(OUT, "%s_%d.png" % (fam, i)))
 			canvas.save(os.path.join(GAME, "west_%s_%d.png" % (fam, i)))
-		idx["clips"].append({"family": fam, "label": label, "n": len(picks), "hit": hit, "src": [list(p) for p in picks]})
+		idx["clips"].append({"family": fam, "label": label, "sheet": sk, "n": len(picks), "hit": hit, "src": [list(p) for p in picks]})
 	json.dump(idx, open(os.path.join(OUT, "index.json"), "w"), ensure_ascii=False, indent=1)
 	open(os.path.join(OUT, ".gdignore"), "w").close()
-	print("rion_px_weapons: ย่อ ×%.3f · %d เฟรม · พาเลตต์ %d สี (เดิม %d + ใหม่ %d) · ช่องที่เจอ %d" % (k, len(frames), len(pal), len(base), len(pal) - len(base), len(got)))
+	print("rion_px_weapons: ย่อ ×%.3f · %d เฟรม · พาเลตต์ %d สี (เดิม %d + ใหม่ %d) · ช่องที่เจอ %d" % (k, len(frames), len(pal), len(base), len(pal) - len(base), sum(len(g) for g in GOT.values())))
 
 
 if __name__ == "__main__":
