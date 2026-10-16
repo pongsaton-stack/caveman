@@ -371,3 +371,79 @@ Keep all 30 icons consistent in style, outline thickness and scale. Output PNG o
 `tools/sprites/weapons_icons_px.py` → `assets/sprites/weapons_icons_draft/<id>.png` (32px) + `<id>_48.png` (.gdignore · ร่าง) · อัตราเดียวทุกชิ้น (ชิ้นใหญ่ในชีตยังใหญ่) · สีต่อชิ้น ≤ 16
 แก้ด้วยโค้ด: แสงเรืองระดับ 5 โปร่งทับพื้นเขียว → ทั้งชิ้นอมเขียว → ตัดเขียวที่เกินแดง/น้ำเงินทุกจุด (ไม่มีอาวุธสีเขียว)
 ข้อจำกัด: แสงเรืองนุ่มทำเป็นพิกเซลคมไม่ได้ ระดับ 5 จึงดูหม่นกว่าชีต · ที่ 32px รายละเอียดเล็กหาย (กุญแจบนถุงมือ BD-3 · ไม้บรรทัด ST-3) → 48 อ่านง่ายกว่า
+
+## รอบ 13 — ท่าถืออาวุธระดับ 2–5 (kwan 16 ต.ค. เลือกข้อ 2 "ทำ prompt เจนท่าถืออาวุธระดับ 2–5")
+ชีตละระดับ (4 ชีต) · ท่าเหมือนรอบ 9 ทุกช่อง เปลี่ยนแค่อาวุธ · รวมสายคม (มีด) ด้วย เพราะระดับ 1 ใช้ชุดหลัก · ผัง 6x6 (GPT วาด 6 ช่องเองในรอบ 9)
+แนบ ภาพ 1 `flow_trial_v9.jpg` (ท่า) + ภาพ 2 `docs/art-bible/weapons/weapon_icons_v12.jpg` (หน้าตาอาวุธ) · สั่งหันขวาตามรอบ 9 (เราพลิกเอง)
+
+### ระดับ 2
+```
+Image 1 is Rion's weapon pose sheet. Image 2 shows the weapon designs (row = family, column = tier). Draw ONE new sprite sheet that copies image 1 exactly: same character, same poses, same outline thickness, same flat cel colors, same character size, same solid green background #01DA0D. The ONLY change is the weapon in his hands, which must now be the TIER 2 weapon from column 2 of image 2.
+
+Layout: 6 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, every cell must show the weapon in his hands.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all 36 frames.
+
+Row 1 – a heavy cleaver with a cloth-tape-wrapped handle and a thickened spine. 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – a dented aluminum baseball bat with a cloth-wrapped grip, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – two pencils taped together with a nail stuck in the tip, held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a slingshot with a steel-pipe fork and a bicycle inner-tube band. Stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – a handheld staple gun with a tape-wrapped grip, held in both hands like a small gun. Stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – leather welder's gloves with bolts sewn over the knuckles, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+
+Keep proportions, colors and outfit identical in all 36 frames. Output PNG only.
+```
+
+### ระดับ 3
+```
+Image 1 is Rion's weapon pose sheet. Image 2 shows the weapon designs (row = family, column = tier). Draw ONE new sprite sheet that copies image 1 exactly: same character, same poses, same outline thickness, same flat cel colors, same character size, same solid green background #01DA0D. The ONLY change is the weapon in his hands, which must now be the TIER 3 weapon from column 3 of image 2.
+
+Layout: 6 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, every cell must show the weapon in his hands.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all 36 frames.
+
+Row 1 – a machete with a saw blade welded along its spine and a PVC-pipe handle. 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – an aluminum baseball bat with nails hammered around the tip, bound with wire, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – a long metal mechanical pencil the size of a short spear, steel spike lead, held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a wrist-brace slingshot with a ruler used as a sight. Stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – a pneumatic nail gun connected to a small air tank on a strap, held in both hands like a small gun. Stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – gloves with a ring of car keys threaded across the knuckles like brass knuckles, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+
+Keep proportions, colors and outfit identical in all 36 frames. Output PNG only.
+```
+
+### ระดับ 4
+```
+Image 1 is Rion's weapon pose sheet. Image 2 shows the weapon designs (row = family, column = tier). Draw ONE new sprite sheet that copies image 1 exactly: same character, same poses, same outline thickness, same flat cel colors, same character size, same solid green background #01DA0D. The ONLY change is the weapon in his hands, which must now be the TIER 4 weapon from column 4 of image 2.
+
+Layout: 6 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, every cell must show the weapon in his hands.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all 36 frames.
+
+Row 1 – a sharpened ceiling-fan blade mounted on a knife handle with a small motor at the hub. 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – a baseball bat with a heavy car gear wheel fitted on the end, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – a long fountain pen whose brass nib is a spearhead, held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a crossbow built from a broken umbrella's bent steel frame, loaded with an umbrella rib. Stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – a heavy field stapler wired to a car battery worn on the back, held in both hands like a small gun. Stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – gloves with a door-closer spring mounted on the back of each hand, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+
+Keep proportions, colors and outfit identical in all 36 frames. Output PNG only.
+```
+
+### ระดับ 5
+```
+Image 1 is Rion's weapon pose sheet. Image 2 shows the weapon designs (row = family, column = tier). Draw ONE new sprite sheet that copies image 1 exactly: same character, same poses, same outline thickness, same flat cel colors, same character size, same solid green background #01DA0D. The ONLY change is the weapon in his hands, which must now be the TIER 5 weapon from column 5 of image 2.
+
+Layout: 6 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, every cell must show the weapon in his hands.
+
+Every frame faces RIGHT, like image 1. Keep the blue cap with goggles, white shirt, blue tie, blue shorts, brown backpack and brown boots identical in all 36 frames.
+
+Row 1 – a chef's knife whose blade glows orange like a live ember. 1–2 battle stance holding it low and forward. 3 run forward with it raised. 4 still running, cocked back over the shoulder. 5 arriving: big slash with a white swing arc. 6 recover to stance.
+Row 2 – a baseball bat with a faded autograph and a glowing band wrapped around it, two-handed. 1–2 stance, held up over the shoulder. 3 run forward with it raised behind the head. 4 still running, cocked far back. 5 arriving: full horizontal swing with a white swing arc. 6 recover to stance.
+Row 3 – a pen covered in carved tally marks with a glowing nib, held like a spear, held like a short spear. 1–2 stance, pointing forward. 3 dash forward, pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, short white thrust line. 6 recover to stance.
+Row 4 – a polished brass slingshot with a glowing band, firing a glass marble with a star inside. Stands in place. 1–2 stance, held low in front. 3 raise to eye level, aiming. 4 pull back fully, aiming. 5 release: the shot flies right. 6 recover to stance.
+Row 5 – an antique brass stapler firing glowing light-blue staples, held in both hands like a small gun. Stands in place. 1–2 stance at the waist. 3 lift and aim at chest height. 4 brace, lean forward. 5 fire: a shot flies right with a small spark. 6 recover to stance.
+Row 6 – gardening gloves covered in many sewn patches that glow warmly, worn on both hands. 1–2 boxing guard. 3 dash forward. 4 straight punch with a small white impact star. 5 rising uppercut. 6 recover to guard.
+
+Keep proportions, colors and outfit identical in all 36 frames. Output PNG only.
+```
