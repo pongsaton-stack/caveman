@@ -35,13 +35,34 @@ static func choose_buff(a: Actor, pool: Array[Tech], threats: Array) -> Tech:
 	for th in threats:
 		var best := 0.0
 		for t in pool:
-			if t.is_attack() and (t.sp == 0 or t.sp <= a.sp):
+			if t.is_attack() and not t.is_counter() and (t.sp == 0 or t.sp <= a.sp):
 				best = maxf(best, estimate(a, th["actor"], t))
 		if best * int(th["turns"]) >= float(th["gap"]):
 			continue   # ขัดได้ทัน — ตีดีกว่า
 		var saved := estimate(th["actor"], a, th["sig"]) * (1.0 - keep)
 		if saved > best:
 			return buff
+	return null
+
+## ท่าตั้งท่าสวน — ใช้เมื่อมีศัตรูเปิดท่าเด่นแบบโจมตีที่จะลงมือก่อนตาถัดไปของเรา (turns = 1)
+## และท่าที่แรงที่สุดตานี้ตีไม่ถึงเกณฑ์ขัด · เงื่อนไขแคบตามบทเรียน 11.18 · ไม่สุ่ม (seed ต้องคงที่)
+static func choose_counter(a: Actor, pool: Array[Tech], threats: Array) -> Tech:
+	var stance: Tech = null
+	for t in pool:
+		if t.is_counter() and (t.sp == 0 or t.sp <= a.sp):
+			stance = t
+			break
+	if stance == null:
+		return null
+	for th in threats:
+		if int(th["turns"]) != 1:
+			continue
+		var best := 0.0
+		for t in pool:
+			if t.is_attack() and not t.is_counter() and (t.sp == 0 or t.sp <= a.sp):
+				best = maxf(best, estimate(a, th["actor"], t))
+		if best < float(th["gap"]):
+			return stance
 	return null
 
 ## ดาเมจคาดหวังต่อเป้าหนึ่งตัว (ไม่สุ่ม) — สูตรเดียวกับที่ choose ใช้
@@ -64,7 +85,7 @@ static func choose(attacker: Actor, target: Actor, pool: Array[Tech], foe_count:
 	var best: Tech = null
 	var best_score := -1.0
 	for t in pool:
-		if not t.is_attack():
+		if not t.is_attack() or t.is_counter():
 			continue
 		if t.sp > attacker.sp and t.sp > 0:
 			continue

@@ -112,6 +112,7 @@ var capture := false        # เก็บบรรทัดบันทึก�
 ## {src, tgt, tech, school, dmg, weak, glimmer, dot}
 var events: Array = []
 var _fx_glimmer := false    # ท่าที่กำลังตีเป็นท่าประกายไหม (คอมโบก็ส่ง bonus > 1 จึงแยกธงไว้)
+var _fx_counter := false    # ฮิตที่กำลังตีเป็นการฟันสวนจากท่าตั้งท่าสวนไหม
 var log_lines: Array[String] = []
 
 func run() -> Dictionary:
@@ -215,6 +216,7 @@ func player_act(action: Dictionary) -> void:
 	var cur := current
 	if cur == null or not cur.is_hero:
 		return
+	cur.counter_tech = null
 	var kind := str(action.get("kind", "tech"))
 	if kind == "guard":
 		cur.guarding = false
@@ -379,6 +381,7 @@ func _do_guard(a: Actor) -> void:
 
 func _take_turn(cur: Actor, target: Actor) -> void:
 	cur.guarding = false
+	cur.counter_tech = null
 
 	# ศัตรูที่เปิดท่าไว้ — ถ้าโดนตีถึงเกณฑ์ก่อนถึงคิว ท่าถูกยกเลิก
 	if cur.side == "foe" and _check_interrupt(cur):
@@ -398,6 +401,10 @@ func _take_turn(cur: Actor, target: Actor) -> void:
 		var buff := Ai.choose_buff(cur, pool, _attack_threats(cur)) if not insight_full else null
 		if buff != null:
 			_execute(cur, cur, buff)
+			return
+		var stance := Ai.choose_counter(cur, pool, _attack_threats(cur)) if not insight_full else null
+		if stance != null:
+			_execute(cur, target, stance)
 			return
 		tech = Ai.choose(cur, target, pool, foes().size())
 		# คอมโบ — Insight เต็มแล้วไม่ยิงคอมโบ เพราะคอมโบไม่ประกาย
@@ -483,13 +490,19 @@ func _execute(cur: Actor, target: Actor, tech: Tech) -> void:
 		if h != null and not h.down:
 			_note_understanding(cur, h)
 
-	if tech.is_attack():
+	if tech.is_counter():
+		cur.counter_tech = tech
+		_log("  รอบ %2d  %s ใช้ %s — ตั้งท่าสวน" % [rounds, cur.name, tech.name])
+		if capture:
+			events.append({"src": cur, "tgt": cur, "tech": tech.name, "school": tech.school, "dmg": 0,
+				"weak": false, "glimmer": false, "stance": true})
+	elif tech.is_attack():
 		var targets := _resolve_scope(tech, target)
 		var bonus := 1.5 if free else 1.0
 		_fx_glimmer = free
 		for _i in tech.hits:
 			for t in targets:
-				if not t.down:
+				if not t.down and not cur.down:   # ผู้ตีล้มกลางท่าได้ (โดนฟันสวน) → ฮิตที่เหลือไม่ออก
 					_strike(cur, t, tech, bonus)
 		_fx_glimmer = false
 
@@ -628,8 +641,11 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 	_log("  รอบ %2d  %s → %s [%s] : %d (เหลือ %d/%d)%s"
 		% [rounds, src.name, tgt.name, tech.name, dmg, tgt.hp, tgt.max_hp, tag])
 	if capture:
-		events.append({"src": src, "tgt": tgt, "tech": tech.name, "school": tech.school, "dmg": dmg,
-			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer, "body": bsign, "aff": _affinity(elem, bsign)})
+		var ev := {"src": src, "tgt": tgt, "tech": tech.name, "school": tech.school, "dmg": dmg,
+			"weak": elem == Formulas.WEAK_MULT, "glimmer": _fx_glimmer, "body": bsign, "aff": _affinity(elem, bsign)}
+		if _fx_counter:
+			ev["counter"] = true
+		events.append(ev)
 
 	# ฝ่ายเราโดนตี = สะสม Insight
 	# ศัตรูเล็งตัวที่ HP น้อยที่สุด มอนร่วมทีมจึงเป็นแท้งก์และตัวเอกแทบไม่โดน
@@ -665,6 +681,18 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 			if not tgt.is_hero:
 				_gain_insight(hero(), Insight.ALLY_DOWN, "เพื่อนล้ม")
 		_log("    %s ล้ม (ถูกตี %d ครั้ง)" % [tgt.name, tgt.hits])
+
+	if tgt.counter_tech != null and src.side != tgt.side and not tgt.down and not src.down:
+		_counter_strike(tgt, src)
+
+## ตั้งท่าสวนอยู่แล้วโดนศัตรูตี → ฟันสวนผู้ตีทันที 1 ครั้ง นอกคิว · ล้างท่าก่อนตี กันสวนซ้อนและฮิตถัดไปของท่าหลายครั้ง
+func _counter_strike(h: Actor, src: Actor) -> void:
+	var ct := h.counter_tech
+	h.counter_tech = null
+	_log("    สวน! %s ฟันสวน %s" % [h.name, src.name])
+	_fx_counter = true
+	_strike(h, src, ct, 1.0)
+	_fx_counter = false
 
 func _resolve_scope(tech: Tech, target: Actor) -> Array:
 	var side := "foe" if target.side == "foe" else "ally"
