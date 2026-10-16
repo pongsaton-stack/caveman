@@ -241,3 +241,28 @@ kwan ถามว่าถ้าอาร์ตเป็นพิกเซลแ
 - หน้าเทส: ปุ่ม "◆ ชุดหลัก แบบพิกเซล 32-bit" เล่นคู่ ซ้ายภาพคม ขวาพิกเซล (ขยาย 2 เท่าแบบไม่ลื่นภาพ)
 - ที่เห็น: หน้า แว่น เนคไท มีด อ่านออกครบ · อารมณ์หน้ายังเห็น · เอฟเฟกต์ที่ติดมากับภาพ (ลำแสงร่าย รอยมีด) เป็นขั้นบันไดหยาบ
 - ถ้าจะใช้จริง: ต้องวาดเอฟเฟกต์ใหม่เป็นพิกเซล · ตัดสินว่าเปลี่ยนแนวภาพทั้งเกมหรือไม่ · ตัวสูง 128 ต้องขยายจอเกม
+
+## รอบ 9 — ท่าถืออาวุธ 5 สายที่เหลือ (kwan 16 ต.ค. "ขอแบบ prompt เดียว")
+ชุดหลักถือมีดอย่างเดียว → ทุกสายในเกมโผล่เป็นมีด · รอบนี้ขอ 1 ชีต 5 แถว x 8 ช่อง (ผังเดียวกับรอบ 8 ที่ได้ผล) · แนบ ภาพ 1 `rion_front_src.png` + ภาพ 2 `flow_trial_v8a.jpg` (ให้ขนาด/ลายเส้นตามท่าศึกที่ใช้อยู่)
+อาวุธ = ระดับ 1 ของแต่ละตระกูลใน `docs/art-bible/weapons/weapons_full.json`: ไม้เบสบอลไม้ร้าว (ทุบ) · ดินสอ (แทง) · หนังสติ๊กกิ่งไม้ (ยิง) · ที่เย็บกระดาษ (กล) · ถุงมือผ้าทำสวน (มือเปล่า)
+ท่าประชิดเขียนตามหลักโมเมนตัมที่ kwan ชอบ (ตีทันทีตอนถึงตัว ไม่ยืนง้าง) · ทุกท่าหันซ้าย
+
+```
+Image 1 is the main character Rion. Image 2 is his existing battle sprite sheet. Draw ONE new sprite sheet that continues image 2 exactly: same character, same outline thickness, same flat cel colors, same head-to-body proportions, same character height per cell as image 2, same solid green background #01DA0D, same canvas size.
+
+Layout: 5 rows x 8 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell. No grid lines, no text, no labels, no numbers, no shadows on the ground, no extra characters, no duplicate Rion inside a cell.
+
+Every frame faces LEFT (Rion looks and attacks toward the left edge of the image). Keep the blue cap with goggles, white short-sleeve shirt, blue tie, blue shorts, brown backpack and brown boots identical in all 40 frames. He does NOT hold a knife anywhere in this sheet; each row uses only the weapon named for that row, held firmly in his hands.
+
+Row 1 – old cracked wooden baseball bat wrapped with tape, two-handed. 1–2 battle stance, bat held up over the right shoulder, slight breathing. 3 running forward step with bat raised behind the head. 4 still moving, body twisted back, bat cocked far back. 5 arriving: full horizontal swing, bat across the front of the body, white swing arc. 6 follow-through, bat past the left side, body twisted. 7 sliding to a stop with momentum. 8 recover to stance.
+
+Row 2 – yellow wooden pencil with pink eraser, sharpened tip, held like a short spear in the front hand, back hand on the end. 1–2 battle stance, pencil pointing forward. 3 dash step forward, pencil pulled back to the chest. 4 still dashing, lowered. 5 arriving: straight lunge thrust, front arm fully extended, pencil tip forward, short white thrust line. 6 hold the thrust. 7 pull back while sliding to a stop. 8 recover to stance.
+
+Row 3 – slingshot made of a forked tree branch and rubber band. Stands in place, no running. 1–2 stance, slingshot held low in front. 3 raise the slingshot to eye level with the front arm straight. 4 pull the band far back to the cheek with the back hand, aiming. 5 release: the band snaps forward, a small stone flies left. 6 recoil, hand open. 7 lower the arm. 8 recover to stance.
+
+Row 4 – large grey desktop stapler, held in both hands like a small gun. Stands in place, no running. 1–2 stance, stapler held at the waist. 3 lift and aim the stapler forward at chest height. 4 brace, lean slightly forward. 5 slam the top: a small silver staple shoots left with a small spark. 6 recoil, arms bounce up. 7 second quick shot with spark. 8 recover to stance.
+
+Row 5 – dirty cotton gardening gloves on both hands, bare-handed fighting. 1–2 boxing guard, fists up near the chin. 3 dash step forward. 4 still moving, front fist pulled back. 5 arriving: straight punch, arm fully extended, small white impact star. 6 second punch with the other fist. 7 rising uppercut. 8 recover to guard.
+
+Keep proportions, colors and outfit identical in all 40 frames. Output PNG only.
+```
