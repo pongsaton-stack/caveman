@@ -336,6 +336,63 @@ for (const c of (DATA.rion_pack || [])) {
 	addClip(c.group, 'rpk_' + c.id, `${c.label} · ${c.frames.length} เฟรม`, c.frames.map(f => 'rpk/' + f), c.ms / 1000,
 		Object.assign({ stage: [c.w ? c.w + 16 : 96, c.w ? 116 : 80] }, c.loop ? {} : { hold: true }));
 }
+// ทดลอง VFX บนชุดท่าครบ (kwan 16 ต.ค. "ลองใส่ vfx สักท่า") · เวทย์ดำ 8 เฟรม (15-6) + ลูกไฟพิกเซลชุดเดียวกับห่าลูกไฟ (FB_PAL · fbPixBall · fbPixHit)
+// รวมพลัง: ประกายไฟพิกเซลวนเข้าอก + วงแสงใต้เท้า · ปล่อย: วาบที่มือ → ลูกไฟโค้งเข้าเป้า → ระเบิดพิกเซล + จอสั่น + มอนวาบขาว กระเด็น ร้อนแดงแล้วจาง + ควันลอย · ค่าภาพ ไม่ใช่ค่าเกม
+const PKV = { N: 56, SEC: 0.06, W: 240, H: 124, GROUND: 116, RX: 14, HAND: [57, 77], CHEST: [34, 74], FOE: 'M01', FX: 188,
+	pose: F => F < 6 ? 0 : F < 12 ? 1 : F < 20 ? 2 : F < 26 ? 3 : F < 28 ? 4 : F < 34 ? 5 : F < 38 ? 6 : 7, REL: 28, HIT: 37 };
+{
+	const bl = (DATA.rion_pack || []).find(c => c.id === 'black');
+	if (bl) addClip('Rion พิกเซล · ชุดครบ · ทดลอง VFX', 'rpk_vfx_black', `เวทย์ดำ → ลูกไฟพิกเซลใส่ ${PKV.FOE} · ${PKV.N} เฟรม`,
+		Array.from({ length: PKV.N }, (_, F) => 'rpk/' + bl.frames[PKV.pose(F)]), PKV.SEC, { pkv: true, stage: [PKV.W, PKV.H] });
+}
+function pkvView(c) {
+	const F = S.frame, P = FB_PAL.fire, { W, H, GROUND: G, RX } = PKV, rion = c.frames[F], mim = IMG['mon/' + PKV.FOE];
+	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false; drawBg(); ctx.save();   // วาดพื้นก่อนเขย่า 1 ครั้ง ขอบจอไม่เป็นแถบดำตอนสั่น
+	const d = F - PKV.HIT, shk = d >= 0 && d < 4 ? 3 - d * 0.7 : 0, rs = vRng(F * 31 + 7);
+	ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk));
+	drawBg();
+	const dim = F < 12 ? 0 : F < 20 ? (F - 12) / 8 : F < PKV.HIT + 4 ? 1 : Math.max(0, 1 - (F - PKV.HIT - 4) / 8);
+	if (dim) { ctx.fillStyle = `rgba(28,8,4,${0.4 * dim})`; ctx.fillRect(-8, -8, W + 16, H + 16); }
+	const ry = G - 108, cx = RX + PKV.CHEST[0], cy = ry + PKV.CHEST[1], hx = RX + PKV.HAND[0], hy = ry + PKV.HAND[1];
+	// วงแสงพิกเซลใต้เท้าตอนรวมพลัง
+	if (F >= 12 && F < PKV.REL + 2) { const k = Math.min(1, (F - 12) / 8), rr = 12 + 3 * k;
+		for (let i = 0; i < 24; i++) { const a = i / 24 * 6.283 + F * 0.15; if ((i + F) % 3 === 0) continue; fbPx(RX + 34 + Math.cos(a) * rr * 1.6, G - 2 + Math.sin(a) * rr * 0.35, P[(i + F) % 2 ? 2 : 1]); } }
+	if (IMG[rion]) spr(rion, RX, ry);
+	// ประกายไฟวนเข้าอก (เกลียว รัศมีหด) + แกนเรืองที่อกโตขึ้น
+	if (F >= 12 && F < PKV.REL) { const t = (F - 12) / (PKV.REL - 12);
+		for (let i = 0; i < 12; i++) { const ph = (t * 1.6 + i / 12) % 1, r = 26 * (1 - ph), a = i * 2.4 + ph * 5; if (fbHash(i, F, 3) < 0.15) continue;
+			const s = ph > 0.6 ? 2 : 1; fbPx(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.8, P[ph > 0.7 ? 0 : ph > 0.4 ? 1 : 2], s, s); }
+		const R = 1 + Math.round(t * 3); fbPx(cx - R, cy - R + 1, P[3], 2 * R + 1, 2 * R - 1); fbPx(cx - R + 1, cy - R, P[3], 2 * R - 1, 2 * R + 1); fbPx(cx - R + 1, cy - R + 1, P[2], 2 * R - 1, 2 * R - 1);
+		fbPx(cx - (R >> 1), cy - (R >> 1), P[F % 2 ? 0 : 1], Math.max(1, R), Math.max(1, R)); }
+	// วาบที่มือตอนปล่อย
+	if (F >= PKV.REL && F < PKV.REL + 2) fbPixHit(hx, hy, F - PKV.REL, true, P, 11);
+	// ลูกไฟ: โค้งจากมือ → กลางเป้า
+	const fy = mim ? G - mim.height * 0.55 : G - 24, path = p => [hx + (PKV.FX - hx) * p, hy + (fy - hy) * p - 10 * Math.sin(p * Math.PI)];
+	if (F >= PKV.REL && F < PKV.HIT) fbPixBall(path, (F - PKV.REL) / (PKV.HIT - PKV.REL), true, P, F, 5, 'fire');
+	// มอน: พลิกหันซ้ายเข้าหา Rion · โดนแล้วกระเด็นขวา 5 จุดแล้วค่อยกลับ · วาบขาว 2 เฟรม · ร้อนแดงจางใน 20 เฟรม · ควันลอย
+	if (mim) { const kb = d >= 0 ? Math.round(5 * Math.max(0, 1 - d / 10)) : 0, mx = Math.round(PKV.FX - mim.width / 2 + kb), my = G - mim.height;
+		const oc = document.createElement('canvas'); oc.width = mim.width; oc.height = mim.height; const o = oc.getContext('2d');
+		o.translate(mim.width, 0); o.scale(-1, 1); o.drawImage(mim, 0, 0); o.setTransform(1, 0, 0, 1, 0, 0);
+		const heat = d >= 0 ? Math.max(0, 1 - d / 20) : 0;
+		if (d === 0 || d === 1) { o.globalCompositeOperation = 'source-atop'; o.fillStyle = '#fff'; o.fillRect(0, 0, oc.width, oc.height); }
+		else if (heat) { o.globalCompositeOperation = 'source-atop'; o.fillStyle = `rgba(255,90,20,${0.55 * heat})`; o.fillRect(0, 0, oc.width, oc.height); }
+		ctx.drawImage(oc, mx, my);
+		if (d >= 2 && d < 22) for (let i = 0; i < 6; i++) { const u = d - 2 + i * 3, t = u % 12; if (fbHash(i, Math.floor(u / 12), 2) < 0.3) continue;
+			const s = t < 6 ? 2 : 1; fbPx(mx + 8 + fbHash(i, 1, 1) * (mim.width - 16) + Math.sin(t + i), my + 6 - t * 1.6, t < 4 ? '#7a6a62' : t < 8 ? '#9a8c84' : '#c4bab2', s, s); }
+		if (d >= 0 && d < 6) for (let i = 0; i < 16; i++) { if ((i + d) % 4 === 0) continue; const a = i / 16 * 6.283, r = 5 + d * 4;   // วงระเบิดพิกเซลขยาย (ส้ม/แดง เห็นบนตัวที่วาบขาว)
+			fbPx(PKV.FX + kb + Math.cos(a) * r - 1, fy + Math.sin(a) * r * 0.8 - 1, P[d < 2 ? 2 : d < 4 ? 3 : 4], d < 3 ? 2 : 1, d < 3 ? 2 : 1); }
+		if (d >= 0) fbPixHit(PKV.FX + kb, fy, d, true, P, 17);
+		if (d >= 0 && d < 14) { ctx.save(); ctx.font = 'bold 12px system-ui, sans-serif'; ctx.lineWidth = 3; ctx.strokeStyle = '#2a1a14'; ctx.fillStyle = '#ffd24a';
+			const ty = Math.round(my - 4 - Math.min(6, d)); ctx.strokeText('ตูม!', PKV.FX - 14, ty); ctx.fillText('ตูม!', PKV.FX - 14, ty); ctx.restore(); } }
+	ctx.restore();
+	if (S.grid) drawGrid();
+}
+function pkvSound(F) {
+	if (!S.sound || !AU) return;
+	if (F === 12) AU_SFX.charge('DV');
+	if (F === PKV.REL) { auNoise(0.22, 'bandpass', 700, 2200, 0.5, 1.5); auTone(0.14, 'sawtooth', 240, 110, 0.14, 0, 0.004, { lp: 900 }); }
+	if (F === PKV.HIT) { AU_SFX.hit('DV', false); auMon(monVoice(PKV.FOE), false, 1); }
+}
 // Rion พิกเซลถืออาวุธ 6 สาย (ชีต 15-1 จาก Google Flow แบบหมวกน้ำเงิน · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — ยืนถือ 3 จังหวะ แล้วเล่นท่าโจมตีครบชุด · ความเร็ว ATTACK_FRAME_SEC เท่าท่าฟันในเกม
 for (const w of (DATA.px_weapons || [])) {
 	const k = Array.from({ length: w.n }, (_, i) => `pxw/${w.family}_${i}`);
@@ -1786,6 +1843,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.pkv) return pkvView(c);
 	if (c.fire) return fireView(c);
 	if (c.fireLab) return fbLabView(c);
 	if (c.vxg) return vxgView(c);
@@ -2918,7 +2976,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		LOGICAL_H = 0; clipView();
 	} else {
