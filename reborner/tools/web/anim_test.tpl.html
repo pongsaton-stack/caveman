@@ -199,7 +199,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		</section>
 
 		<section class="box" id="paneWeapons" hidden>
-			<p class="muted wnote">Rion ถืออาวุธร่าง 30 ชิ้น (weapons_full.json) · ขนาดตามของจริง · ท่าตามการจับ — ยังไม่เข้าเกม</p>
+			<p class="muted wnote">อาวุธร่าง 30 ชิ้น (weapons_full.json) · Rion แบบ Flow ถืออาวุธระดับ 1 จากชีต 15-1 · ระดับ 2–5 รอชีต — ร่าง ยังไม่เข้าเกม</p>
 			<div class="tabs" id="wSchool"></div>
 			<div class="wgrid" id="wGrid"></div>
 			<div class="wcard" id="wCard"></div>
@@ -286,7 +286,7 @@ const DIRS = [['south', 'ลง'], ['north', 'ขึ้น'], ['west', 'ซ้�
 const CLIPS = {};
 const GROUPS = [];
 function addClip(group, id, label, frames, sec, opt = {}) {
-	if (['clips', 'arms', 'vxsheet'].includes(opt.tab || 'clips') && [...frames, ...(opt.panels || []).flatMap(p => p.keys || [])].some(k => typeof k === 'string' && /^(rion\/|held\/|rig\/|pxw\/|cut\/|spl\/|p64\/rion_|npc\/)/.test(k))) return;   // kwan 16 ต.ค.: Rion แบบเก่าออกจากทุกหน้า
+	if (['clips', 'arms', 'vxsheet'].includes(opt.tab || 'clips') && [...frames, ...(opt.panels || []).flatMap(p => p.keys || [])].some(k => typeof k === 'string' && /^(rion\/|held\/|rig\/|cut\/|spl\/|p64\/rion_|npc\/)/.test(k))) return;   // kwan 16 ต.ค.: Rion แบบเก่าออกจากทุกหน้า
 	CLIPS[id] = Object.assign({ id, label, frames, sec, loop: true }, opt);
 	let g = GROUPS.find(x => x.name === group);
 	if (!g) GROUPS.push(g = { name: group, ids: [], tab: opt.tab || 'clips' });
@@ -330,10 +330,10 @@ for (const m of (DATA.monsters_px || [])) {
 			{ tab: 'arms', panels: [{ label: 'เดิม', keys: ['wpn/' + id] }, { label: 'ใหม่ 32', keys: [key] }, { label: 'ใหม่ 48', keys: [key + '_48'] }] });
 	}
 }
-// Rion พิกเซลถืออาวุธ 5 สาย (ชีตรอบ 9 จาก Google Flow · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — ยืนถือ 3 จังหวะ แล้วเล่นท่าโจมตีครบชุด · ความเร็ว ATTACK_FRAME_SEC เท่าท่าฟันในเกม
+// Rion พิกเซลถืออาวุธ 6 สาย (ชีต 15-1 จาก Google Flow แบบหมวกน้ำเงิน · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — ยืนถือ 3 จังหวะ แล้วเล่นท่าโจมตีครบชุด · ความเร็ว ATTACK_FRAME_SEC เท่าท่าฟันในเกม
 for (const w of (DATA.px_weapons || [])) {
 	const k = Array.from({ length: w.n }, (_, i) => `pxw/${w.family}_${i}`);
-	addClip('Rion พิกเซล · ถืออาวุธ (รอบ 9 · ร่าง)', 'pxw_' + w.family, `${w.label} · ${w.n} เฟรม · กระทบเฟรม ${w.hit + 1}`, [k[0], k[0], k[1], k[1], ...k.slice(2), k[0], k[0]], K.ATTACK_FRAME_SEC, { stage: [112, 116] });
+	addClip('Rion พิกเซล · ถืออาวุธ ระดับ 1 (ชีต 15-1 · ร่าง)', 'pxw_' + w.family, `${w.label} · ${w.n} เฟรม · กระทบเฟรม ${w.hit + 1}`, [k[0], k[0], k[1], k[1], ...k.slice(2), k[0], k[0]], K.ATTACK_FRAME_SEC, { stage: [112, 116] });
 }
 // ทุกคลิปในแท็บนี้ = 64 เฟรม (tools/sprites/poses64.py · kwan สั่ง 5 ต.ค.) · เฟรมที่ปัดพิกเซลแล้วซ้ำกันใช้ไฟล์เดียว
 // รอบ: เดิน = 2 ช่อง (2 × MOVE_TIME) · หายใจในศึก = 2 × FOE_IDLE_SEC · ฟัน 4 / โดนตี 2 / ล้ม 3 × ATTACK_FRAME_SEC (เท่ากับชุด 4 เฟรมเดิม) · ท่าร่าง = ยาวเท่ารอบเดิม
@@ -2938,9 +2938,9 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', env: 'env_sheet_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', env: 'env_sheet_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll', px: 'rion_px', pxw: 'rion_px_weapons_draft', mpx: 'monsters_px_draft', wic: 'weapons_icons_draft' }[k.split('/')[0]];
 		$('rdFile').textContent = c.vx ? `${VXS.sheet} · ${c.pieces ? 'กรอบ ' + c.pieces[S.frame].box.join(',') : 'แถว ' + c.label + ' · แสง ' + fold + '/' + c.vx.atlas + '.png'}`
-			: `assets/sprites/${fold}/${k.split('/')[1]}.png`;
+			: fold === undefined ? k : `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {
 		const tt = t || S.tech;
 		$('rdClip').textContent = tt ? 'สกิล · ' + tt.name_th : 'สกิล — เลือกท่าด้านขวา';
@@ -3069,23 +3069,26 @@ function renderTechs() {
 	}
 }
 function updPlay() { $('btnPlay').textContent = S.playing ? '⏸ หยุด' : '▶ เล่น'; $('btnPlay').setAttribute('aria-pressed', String(S.playing)); }
-const GRIP_TH = { SL: 'มือเดียว จับด้าม ฟัน', PC: 'มือเดียว จับด้าม แทง', CR: 'สองมือ ตั้ง → ง้างหลังหัว → เหวี่ยง', ST: 'แขนหน้าถือง่าม มือหลังดึงยาง', DV: 'จับแบบปืน ยกแขนเล็ง มือหลังประคอง', BD: 'สวมที่มือ การ์ด → ต่อยตรง' };
 let wSchool = null, wPick = null;
+// แท็บติดตั้งอาวุธ (เปิดคืน 16 ต.ค. · kwan เลือก "1 ลงหน้าเทสก่อน"): ท่าแบบ Flow มีแค่ระดับ 1 (ชีต 15-1) · ระดับ 2–5 รอชีต 15-2…15-5 → เล่นท่าระดับ 1 ของสายเดียวกัน + บอกในการ์ด
+const wClip = id => CLIPS['pxw_' + id.split('-')[0]] ? 'pxw_' + id.split('-')[0] : null;
 function showWeapon(id) {
 	const w = (DATA.weapons || []).find(x => x.id === id); if (!w) return;
-	wPick = id; S.clip = 'held_' + id; S.frame = 0; S.acc = 0; S.playing = true; updPlay(); press($('wGrid'), id); buildStrip();
-	const fam = id.split('-')[0], grip = id === 'ST-4' ? 'จับแบบปืน ประทับยิงแนวนอน' : GRIP_TH[fam];
+	wPick = id; const c = wClip(id); if (c) { S.clip = c; S.frame = 0; S.acc = 0; S.playing = true; updPlay(); }
+	press($('wGrid'), id); buildStrip();
+	const pose = !c ? 'ยังไม่มีท่าแบบ Flow' : w.tier === 1 ? 'ชีต Flow 15-1 (ระดับ 1)' : `ยังไม่มีของระดับ ${w.tier} — แสดงท่าระดับ 1 ของสายนี้แทน (รอชีต 15-${w.tier})`;
 	$('wCard').innerHTML = `<b>${w.name}</b> <span class="muted">${w.id} · ระดับ ${w.tier} · สาย${w.school}${w.existing_id ? ' · ในเกม ' + w.existing_id : ''}</span><br>`
-		+ `${w.concept}<br><span class="muted">การจับ: ${grip} · ค่าอาวุธ: ${w.weapon_base ?? 'ยังไม่กำหนด'}</span>`;
+		+ `${w.concept}<br><span class="muted">ท่า: ${pose} · ค่าอาวุธ: ${w.weapon_base ?? 'ยังไม่กำหนด'}</span>`;
 }
 function buildWeapons() {
 	const ws = DATA.weapons || [], schools = [...new Set(ws.map(w => w.school))];
-	if (!ws.length) { $('tabWeapons').hidden = true; return; }
+	if (!ws.length || !(DATA.px_weapons || []).length) { $('tabWeapons').hidden = true; return; }
+	$('tabWeapons').hidden = false;
 	const showSchool = sc => {
 		wSchool = sc; press($('wSchool'), sc); const g = $('wGrid'); g.innerHTML = '';
 		for (const w of ws.filter(x => x.school === sc)) {
 			const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.v = w.id;
-			b.innerHTML = `<img src="${DATA.sprites['wpn/' + w.id]}" alt=""><span>${w.name}</span><small>${w.id} · T${w.tier}</small>`;
+			b.innerHTML = `<img src="${DATA.sprites['wic/' + w.id] || DATA.sprites['wpn/' + w.id]}" alt=""><span>${w.name}</span><small>${w.id} · T${w.tier}${w.tier > 1 ? ' · ท่ารอชีต' : ''}</small>`;
 			b.addEventListener('click', () => showWeapon(w.id)); g.append(b);
 		}
 		showWeapon(ws.find(x => x.school === sc).id);
@@ -3180,7 +3183,7 @@ function buildGalleries() {
 		group: x => x.kind, frames: x => frameKeys('veh/' + x.id), sec: 0.16,
 		thumb: x => `<img src="${DATA.sprites['veh/' + x.id + '_0']}" alt=""><span>${x.name}</span><small>${x.kind}</small>`,
 		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.kind}</span><br>${x.use}<br><span class="muted">GDD ยังไม่มีระบบยานพาหนะ${x.source ? ' · ที่มา: ' + x.source : ''}</span>` });
-	const np = (DATA.npcs || { npcs: [] }).npcs;
+	const np = (DATA.npcs || { npcs: [] }).npcs.filter(x => DATA.sprites['npc/' + x.id + '_0']);   // ภาพ NPC (ทาสีจาก Rion เก่า) ไม่ฝังแล้ว → ว่าง = ซ่อนแท็บ ไม่สร้างรูปเสีย
 	gallery('npcs', 'npc', np, {
 		group: x => x.source.startsWith('STORY_DRAFT 5') ? 'NPC ร่วมทาง' : 'ชาวบ้าน',
 		frames: x => [0, 0, 1, 1, 0, 0, 1, 1, 2, 3, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7].map(i => `npc/${x.id}_${i}`), sec: 0.25,
@@ -3191,7 +3194,7 @@ const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
 	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }
-	if (t === 'weapons' && wPick) { S.clip = 'held_' + wPick; S.frame = 0; S.acc = 0; }
+	if (t === 'weapons' && wPick && wClip(wPick)) { S.clip = wClip(wPick); S.frame = 0; S.acc = 0; }
 	if (t === 'spells' && sPick) { S.clip = 'spell_' + sPick; S.frame = 0; S.acc = 0; }
 	if (GAL[t]) { S.clip = t + ':' + GAL[t]; S.frame = 0; S.acc = 0; }
 	if (GROUP_BOX[t] && S.last[t] && CLIPS[S.clip].tab !== t) { S.clip = S.last[t]; S.frame = 0; S.acc = 0; press($(GROUP_BOX[t]), S.clip); }
@@ -3239,7 +3242,7 @@ function boot() {
 	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); for (const [k, n] of Object.entries(TAB_IDS)) $('tab' + n).onclick = () => setTab(k);
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
-	buildSkillRef(); buildClips(); buildBosses(); /* แท็บติดตั้งอาวุธ/เวทย์มนต์ซ่อน (Rion แบบเก่า · kwan 16 ต.ค.) */ buildGalleries(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	buildSkillRef(); buildClips(); buildBosses(); buildWeapons(); /* แท็บเวทย์มนต์ยังซ่อน (Rion แบบเก่า · รอชีต 15-6) */ buildGalleries(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
 	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_anim}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ

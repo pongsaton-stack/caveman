@@ -43,7 +43,7 @@ def sprites():
 	for f in sorted(os.listdir(xd)):
 		if f.endswith('.png'):
 			out['px/' + f[:-4]] = png(os.path.join(xd, f))
-	# Rion พิกเซลถืออาวุธ 5 สาย (tools/sprites/rion_px_weapons.py · ชีตรอบ 9 · ร่าง)
+	# Rion พิกเซลถืออาวุธ 6 สาย (tools/sprites/rion_px_weapons.py · ชีต Flow 15-1 หมวกน้ำเงิน · ร่าง · kwan 16 ต.ค. เลือก "ลงหน้าเทสก่อน")
 	wd = os.path.join(SPR, 'rion_px_weapons_draft')
 	if os.path.isdir(wd):
 		for f in sorted(os.listdir(wd)):
@@ -172,14 +172,14 @@ def sprites():
 			out['tile/' + n] = png(f)
 	# kwan 16 ต.ค. "หน้า rion ที่ไม่ตรงกับที่บอก ให้เอาออกจากทุกอาติแฟค" — Rion ยึดแบบ Flow หมวกน้ำเงินทั้งใบเท่านั้น
 	# ไม่ฝังภาพ Rion แบบเก่า: Last Light (rion/ grips) · ถืออาวุธเก่า (held/) · ริก (rig/) · poses64 ของ Rion · ตัดชีตจำลอง (cut/) · ท่าร่าย (spl/) ·
-	# ถืออาวุธหมวกครีม (pxw/) · ช่องชีตสกิล (skc/ มีตัวเอกของชีต) · ชีต VFX ตัวเอก (vxs/) · NPC (ทาสีจาก Rion เก่า)
+	# ช่องชีตสกิล (skc/ มีตัวเอกของชีต) · ชีต VFX ตัวเอก (vxs/) · NPC (ทาสีจาก Rion เก่า)
 	# ฉากที่ยังเรียกชื่อภาพเก่า → pxMap() ในเทมเพลตแทนด้วยภาพ px/ (Flow) ทุกจุด
 	for k in [k for k in out if OLD_RION.match(k)]: del out[k]
 	out.update(px_extra())
 	return out
 
 
-OLD_RION = re.compile(r'^(rion/|held/|rig/|pxw/|cut/|spl/|skc/|vxs/|npc/|p64/rion_)')
+OLD_RION = re.compile(r'^(rion/|held/|rig/|cut/|spl/|skc/|vxs/|npc/|p64/rion_)')
 PX_EXTRA = {'dodge': 'dodge', 'watch': 'watch', 'roll': 'jump_roll', 'victory': 'victory'}   # ท่าแบบ Flow 14-2 ที่เกมยังไม่ใช้ → ผืนเดียวกับ rion_px (96x112 เท้าแถว 110)
 
 
@@ -272,7 +272,7 @@ def main(out_path):
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
 		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
-		'px_weapons': [],   # ถืออาวุธรอบ 9/13 = Rion หมวกครีม (ไม่ตรงแบบที่ยึด) → ไม่แสดง
+		'px_weapons': json.load(open(os.path.join(SPR, 'rion_px_weapons_draft/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_px_weapons_draft/index.json')) else [],   # ชีต 15-1 (แบบ Flow)
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
 		'sheet_cut': sheet_cut(),
