@@ -342,6 +342,28 @@ Row 3 (6 cells) – he holds the small kitchen knife low in his front hand in al
 One weapon per row. No umbrella. Only one knife. Output PNG only.
 ```
 
+## 18-1 · ท่าสายคม 7 ท่า (มีดทำครัว)
+<!-- note: ⚠ แนบแค่ rion_flow_ref.png ภาพเดียว (บทเรียน 17-4) · techs.csv สายคม: ฟัน เขี้ยวพุ่ง เขี้ยวพัน★ กวาด วงล้อ★ ปาดไว เงาสองคม★ · หลักโมเมนตัม (kwan 10 ต.ค.): ฟาดทันทีตอนถึงตัว ไม่ยืนง้างนิ่ง · แสงใหญ่/ร่างแยกใส่ด้วยโค้ด | cells: 42 -->
+```
+The attached image is Rion, the ONLY character reference. Copy him exactly: chibi, very big round head, big round eyes, bright blue baseball cap with brass goggles on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack, blue shorts, blue watch on his LEFT wrist, white socks, brown boots. Thick dark outline, flat cel colors.
+
+Make a NEW sprite sheet with ONLY the 42 poses below: 7 sword techniques with a small KITCHEN KNIFE (short steel blade, wooden handle). The knife is gripped in his front hand in EVERY frame, never dropped, never a second knife.
+
+Solid green background #01DA0D. 7 rows x 6 columns, exactly 6 cells per row, one full-body Rion per cell, all facing RIGHT, same size, feet on one baseline (except jumps). No grid lines, no text, no shadows, no duplicate or ghost Rion. Keep slash trails SMALL: one thin white arc next to the knife only, never covering his body.
+
+Every attack follows momentum: he moves toward the right and the blade hits at the moment he arrives. No standing still to wind up.
+
+Row 1 – BASIC SLASH: 1 ready stance, knife low. 2 step forward, knife rising. 3 knife raised beside his head while still stepping. 4 arriving: diagonal downward slash, thin white arc. 5 follow-through, knife low behind, leaning forward. 6 back to ready stance.
+Row 2 – FANG LUNGE: 1 ready stance, crouched low. 2 push off, body low and forward. 3 long lunge, knife pointed forward at chest height. 4 arriving: upward slash from the lunge, thin white arc. 5 sliding to a stop, knife high. 6 ready stance.
+Row 3 – TRIPLE FANG (3 fast slashes): 1 ready stance. 2 first slash diagonal down. 3 second slash diagonal up, reversed. 4 third slash, a strong horizontal cut, thin white arc. 5 follow-through, knife far behind. 6 ready stance.
+Row 4 – SWEEP (wide horizontal cut across a row of enemies): 1 ready stance. 2 knife pulled back to his far side at waist height, body twisted, stepping forward. 3 swinging across, arm straight. 4 wide horizontal cut fully extended, long thin white arc. 5 body turned by the momentum. 6 ready stance.
+Row 5 – WHEEL (spinning attack): 1 crouch low, knife out to the side. 2 jump and start spinning. 3 mid-air spin, seen from the side, knife outward. 4 spin continues, his back toward us. 5 landing with knees bent, knife out wide, thin circular white arc. 6 ready stance.
+Row 6 – QUICK SLICE (very fast, light cut): 1 ready stance. 2 small fast step forward, knife low. 3 quick low slice at knee height, thin white line. 4 already passing through, knife behind. 5 small hop back. 6 ready stance.
+Row 7 – TWIN SHADOW (two fast slashes): 1 ready stance, eyes narrowed. 2 dash forward, knife low. 3 first slash upward. 4 second slash downward crossing the first, thin white X arc. 5 skidding past, knife behind. 6 ready stance.
+
+Keep his look identical to the attached image in all 42 frames. Output PNG only.
+```
+
 ## ผลตรวจรอบแรก (kwan ส่ง 7 ชีต 16 ต.ค. · Google Flow · JPG 1438x2576 ทุกชีต) — ยังไม่เข้าเกม/หน้าเทส
 ไฟล์ `flow_trial_v14_1.jpg` `v15_6` `v16_1`…`v16_5` · ตัดด้วย `tools/sprites/rion_pack_cut.py` · ภาพตรวจกรอบ+เลข `pack_check/<ชีต>.jpg` · หน้าตาตรงแบบ Flow ทุกชีต (หมวกน้ำเงินสด แว่นทอง chibi)
 - 14-1 ศึก 48/48 ✓ · พลาด: โดนตีช่อง 1–4 และล้มช่อง 1–2 มีดหายจากมือ · วิ่งช่อง 5 มือเปล่า
