@@ -13,6 +13,7 @@ h1{font-size:24px;margin:0;text-wrap:balance}
 button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
 button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.grid.pairs{grid-template-columns:repeat(auto-fill,minmax(min(100%,480px),1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:6px}
 .card h2{font-size:16px;margin:0;display:flex;justify-content:space-between;gap:8px}
 .card h2 span{font-weight:400;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
@@ -184,11 +185,15 @@ async function build(sid) {
   document.querySelectorAll('#sets button').forEach(b => b.setAttribute('aria-pressed', b.dataset.set === sid));
   document.getElementById('sheet').src = set.sheet;
   const grid = document.getElementById('grid'); grid.textContent = ''; const out = [];
+  const pairSet = set.pair && D.sets.find(s => s.id === set.pair);   // ชุดพิกเซล: เล่นคู่กับภาพคม ซ้าย = ภาพคม · ขวา = พิกเซล
+  grid.classList.toggle('pairs', !!pairSet);
   for (const row of set.rows) {
     const frames = await Promise.all(row.frames.map(load));
+    const pr = pairSet && pairSet.rows.find(r => r.id === row.id), pframes = pr ? await Promise.all(pr.frames.map(load)) : null;
+    const W = pframes ? 520 : 260;
     const el = document.createElement('section'); el.className = 'card';
-    el.innerHTML = `<h2>${row.label}<span>${frames.length} เฟรม · สั่ง: ${row.want}${row.flipped ? ' · พลิก' : ''}</span></h2><canvas width="260" height="230"></canvas><p class="note">${(NOTE[sid] || {})[row.id] || ''}</p>`;
-    grid.append(el); out.push({ row, frames, cv: el.querySelector('canvas'), t: 0 });
+    el.innerHTML = `<h2>${row.label}<span>${frames.length} เฟรม · สั่ง: ${row.want}${row.flipped ? ' · พลิก' : ''}</span></h2><canvas width="${W}" height="230" style="aspect-ratio:${W}/230"></canvas><p class="note">${pframes ? 'ซ้าย = ภาพคม (ชุดหลัก) · ขวา = พิกเซล ตัวยืนสูง ~' + set.pxh + ' จุด · ' + set.pxc + ' สี · แสดงขยาย ×' + set.px + ' (ตัวเล็กกว่าซ้าย ~7%) · ' : ''}${(NOTE[sid] || {})[row.id] || ''}</p>`;
+    grid.append(el); out.push({ row, frames, pframes, px: set.px || 0, W, cv: el.querySelector('canvas'), t: 0 });
   }
   cards = out;
 }
@@ -201,14 +206,21 @@ async function build(sid) {
     const dt = Math.max(0, Math.min(60, now - last)); last = now;   // เฟรมแรกของ rAF อาจเร็วกว่า performance.now() → ห้ามติดลบ
     for (const c of cards) {
       if (playing) c.t += dt * speed;
-      const x = c.cv.getContext('2d'); x.fillStyle = BG[bg](); x.fillRect(0, 0, 260, 230);
+      const x = c.cv.getContext('2d'); x.fillStyle = BG[bg](); x.fillRect(0, 0, c.W, 230);
       const n = c.frames.length; let o = {}, label;
       if (m70) { const f = ((Math.floor(c.t / SEC70) % N70) + N70) % N70; o = t70(c.row, n, f); label = (f + 1) + '/70'; }
       else { const dur = c.row.ms * n, hold = c.row.loop ? 0 : 700, tt = ((c.t % (dur + hold)) + dur + hold) % (dur + hold); o = { i: Math.min(n - 1, Math.floor(tt / c.row.ms)) }; label = (o.i + 1) + '/' + n; }
-      const im = c.frames[o.i], sh = o.shake || 0, f0 = Math.floor(c.t / SEC70);
-      x.save(); x.translate(130 + (o.dx || 0) + (sh ? Math.sin(f0 * 2.3) * sh : 0), 226 + (o.dy || 0) + (sh ? Math.cos(f0 * 3.1) * sh * .6 : 0));
-      x.scale(o.sx || 1, o.sy || 1); x.drawImage(im, -im.width / 2, -im.height); x.restore();
-      if (o.flash) { x.fillStyle = 'rgba(255,255,255,' + o.flash + ')'; x.fillRect(0, 0, 260, 230); }
+      const sh = o.shake || 0, f0 = Math.floor(c.t / SEC70);
+      const ox = (o.dx || 0) + (sh ? Math.sin(f0 * 2.3) * sh : 0), oy = (o.dy || 0) + (sh ? Math.cos(f0 * 3.1) * sh * .6 : 0);
+      const put = (im, cx, k) => {   // k > 0 = พิกเซล: ขยายจำนวนเต็ม ไม่ลื่นภาพ ตำแหน่งลงตารางเม็ด
+        x.save(); x.imageSmoothingEnabled = !k;
+        const q = k ? v => Math.round(v / k) * k : v => v;
+        x.translate(q(cx + ox), q(226 + oy)); x.scale((o.sx || 1) * (k || 1), (o.sy || 1) * (k || 1));
+        x.drawImage(im, -Math.round(im.width / 2), -im.height); x.restore();
+      };
+      if (c.pframes) { put(c.pframes[o.i], 130, 0); put(c.frames[o.i], 390, c.px); x.fillStyle = 'rgba(0,0,0,.25)'; x.fillRect(259, 0, 2, 230); }
+      else put(c.frames[o.i], 130, c.px);
+      if (o.flash) { x.fillStyle = 'rgba(255,255,255,' + o.flash + ')'; x.fillRect(0, 0, c.W, 230); }
       x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(4, 4, 46, 18); x.fillStyle = '#fff'; x.font = '12px system-ui'; x.fillText(label, 9, 17);
     }
     requestAnimationFrame(tick);

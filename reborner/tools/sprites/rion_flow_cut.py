@@ -410,9 +410,38 @@ def build_main():
 	print("ชุดหลัก: ย่อ", " · ".join("%s ×%.3f" % kv for kv in ks.items()))
 
 
+PX_H, PX_COLORS, PX_SHOW = 72, 40, 2   # พิกเซลแนว 32-bit: ตัวสูง ~72 (พอดีจอเกม 384x216) · สีร่วม 40 · หน้าเทสขยาย 2 เท่า (ค่าภาพ ไม่ใช่ค่าเกม)
+
+
+def build_pixel():
+	"""ชุดหลัก → พิกเซล (kwan 16 ต.ค. เลือกข้อ 1 · ทดลองเท่านั้น ขัดแนว 14 ต.ค. "ไม่ใช่พิกเซล")
+	ย่อ BOX แบบ premultiplied อัตราเดียวทั้งชุด (ตัวยืนชุดหลัก ref_h → PX_H) → ความทึบ > 0.5 = มีตัว → ขอบ 1 จุดผสมสีเส้นขอบ #2a1a14 →
+	สีร่วม median cut จากทุกเฟรม ไม่ dither"""
+	import shutil
+	src = os.path.join(OUT, "main"); d = os.path.join(OUT, "main_px"); shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
+	k = PX_H / json.load(open(os.path.join(src, "scale.json")))["ref_h"]
+	items = []
+	for n, *_ in MAIN_ROWS:
+		for i in range(nframes(src, n, None)):
+			a = np.array(Image.open(os.path.join(src, "%s_%d.png" % (n, i))).convert("RGBA")).astype(float)
+			al = a[..., 3:] / 255; pre = a.copy(); pre[..., :3] *= al
+			w, h = max(1, round(a.shape[1] * k)), max(1, round(a.shape[0] * k))
+			sm = np.array(Image.fromarray(pre.astype(np.uint8), "RGBA").resize((w, h), Image.BOX)).astype(float)
+			A = sm[..., 3] / 255; rgb = np.where(A[..., None] > 0, sm[..., :3] / np.maximum(A[..., None], 1e-6), 0).clip(0, 255)
+			m = A > .5; e = m & ~ndimage.binary_erosion(m)
+			rgb[e] = rgb[e] * .35 + np.array([42, 26, 20]) * .65
+			items.append((n, i, rgb.astype(np.uint8), m))
+	pal = Image.fromarray(np.concatenate([r[m] for *_, r, m in items])[None]).quantize(PX_COLORS, method=Image.MEDIANCUT)
+	for n, i, rgb, m in items:
+		o = np.zeros(rgb.shape[:2] + (4,), np.uint8)
+		o[..., :3] = np.array(Image.fromarray(rgb).quantize(palette=pal, dither=Image.NONE).convert("RGB")); o[..., 3] = m * 255
+		Image.fromarray(o, "RGBA").save(os.path.join(d, "%s_%d.png" % (n, i)))
+	print("ชุดพิกเซล: ย่อ ×%.3f · %d เฟรม · %d สี" % (k, len(items), PX_COLORS))
+
+
 def page(path):
 	def uri(p):
-		b = io.BytesIO(); Image.open(p).save(b, "WEBP", quality=90); return "data:image/webp;base64," + base64.b64encode(b.getvalue()).decode()
+		b = io.BytesIO(); Image.open(p).save(b, "WEBP", **({"lossless": True} if os.sep + "main_px" + os.sep in p else {"quality": 90})); return "data:image/webp;base64," + base64.b64encode(b.getvalue()).decode()   # พิกเซลห้ามบีบแบบเสีย (ขอบเม็ดเลอะ)
 	# ข้ามเฟรม 1 ในโหมด 70 เฟรม: ท่าเดินทุกชุด (เฟรม 1 ต่างจากเฟรม 2 39–49% · v1 ยืนด้วย 36%) · วัดแล้ว 15 ต.ค.
 	skip0 = lambda sid, n: (n.startswith("walk") and sid != "v6") or (sid == "v1" and n == "idle_battle")   # รอบ 6 เดินไม่มีเฟรม 1 โดด (ต่าง 23–54% ทุกคู่)
 	# ช่องที่ไม่มีตัว Rion (มีแต่คลื่น) ไม่ใส่ในคลิป (ไฟล์ยังเก็บไว้) · v3 cast ช่อง 5
@@ -424,11 +453,11 @@ def page(path):
 		("v6", "kneel"): {3, 4, 5, 6}, ("v6", "kneel_b"): {4, 5, 6},
 		# รอบ 8-1: ฟันเฟรม 6 (ตามแรง) หมวกสองใบซ้อนกัน แยกไม่สะอาด · โดนตีเฟรม 1 ถือมีดสองเล่ม
 		("v8a", "attack_knife"): {5}, ("v8a", "hurt"): {0}, ("v8a", "death"): {4}}
-	omit = lambda sid, n: OMIT.get((sid, n)) or (OMIT.get((MAIN_FROM.get(n, "v5a"), n), ()) if sid == "main" else ())
+	omit = lambda sid, n: OMIT.get((sid, n)) or (OMIT.get((MAIN_FROM.get(n, "v5a"), n), ()) if sid in ("main", "main_px") else ())
 	sets = []
-	for sid, label, fn, _ry, rows in SETS:
+	for sid, label, fn, _ry, rows in SETS[:1] + [("main_px", "◆ ชุดหลัก แบบพิกเซล 32-bit (ทดลอง)", SETS[0][2], None, MAIN_ROWS)] + SETS[1:]:
 		d = os.path.join(OUT, sid)
-		sets.append({"id": sid, "label": label, "sheet": uri(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)),
+		sets.append({"id": sid, "label": label, **({"px": PX_SHOW, "pxh": PX_H, "pxc": PX_COLORS, "pair": "main"} if sid == "main_px" else {}), "sheet": uri(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)),
 			"rows": [{"id": n, "label": lab, "ms": ms, "loop": lp, "want": want, "flipped": fl, "hit": hit, "skip0": skip0(sid, n),
 				"frames": [uri(os.path.join(d, "%s_%d.png" % (n, i))) for i in range(nframes(d, n, cells)) if i not in omit(sid, n)]}
 				for n, lab, cells, ms, lp, want, fl, hit in rows]})
@@ -441,5 +470,5 @@ def page(path):
 
 if __name__ == "__main__":
 	ap = argparse.ArgumentParser(); ap.add_argument("--page"); a = ap.parse_args()
-	cut(); fix_v3(); fix_free("v5a"); fix_free("v5b"); fix_free("v6"); build_main()
+	cut(); fix_v3(); fix_free("v5a"); fix_free("v5b"); fix_free("v6"); build_main(); build_pixel()
 	if a.page: page(a.page)
