@@ -152,7 +152,7 @@ func _commit(action: Dictionary) -> void:
 	_flush_log()
 	_refresh()
 	_play_events()
-	if kind != "guard" and kind != "watch":
+	if kind != "guard" and kind != "watch" and hero.counter_tech == null:
 		await _play_attack()
 	await _await_fx()
 	await get_tree().create_timer(step_delay).timeout
@@ -201,7 +201,7 @@ func _hero_auto_turn() -> void:
 	_flush_log()
 	_refresh()
 	_play_events()
-	if not hero.guarding:
+	if not hero.guarding and hero.counter_tech == null:
 		await _play_attack()
 	await _await_fx()
 
@@ -240,7 +240,7 @@ func _show_commands() -> void:
 
 func _on_tech(t: Tech) -> void:
 	_pending = {"kind": "tech", "tech": t}
-	_ask_target(t == null or t.scope != "all")
+	_ask_target(t == null or (t.scope != "all" and not t.is_counter()))
 
 func _on_combo() -> void:
 	var opts := b.hero_options(hero)
@@ -319,6 +319,8 @@ func _describe(t: Tech) -> void:
 		s += " · %d ครั้ง" % t.hits
 	if t.status != "":
 		s += " · %s" % t.status
+	if t.is_counter():
+		s += " · ตั้งท่าสวน"
 	_info_label.text = s
 
 func _hint(text: String) -> void:
@@ -823,6 +825,11 @@ func _strike_fx(e: Dictionary, ult: bool, nth: int) -> void:
 	if e.get("dodge", false):   # อ่านทางหลบท่าเด่นได้ — ไม่มีดาเมจ ไม่วาบโดนตี
 		_float_number(to, "หลบ!", Color("8af0c0"))
 		return
+	if e.get("stance", false):
+		_float_number(to, "ตั้งท่าสวน", Color("8ad0f0"))
+		return
+	if e.get("counter", false) and _actor_point(e["src"]) != Vector2.INF:
+		_float_number(_actor_point(e["src"]), "สวน!", Color("f2c94c"))
 	var from := _actor_point(e["src"])
 	var col: Color = Color("f2c94c") if e["glimmer"] or str(e["tech"]).begins_with("คอมโบ") else FX_COLOR.get(e["school"], FX_DEFAULT)
 	match str(e["school"]):
@@ -861,7 +868,7 @@ func _is_ultimate(e: Dictionary) -> bool:
 	if b.techs == null:
 		return false
 	var t: Tech = b.techs.get_tech(str(e["tech"]))
-	return t != null and t.req_prof >= ULT_PROF
+	return t != null and t.req_prof >= ULT_PROF and not t.is_counter()
 
 ## ไม้ตาย: จอมืดลง · จอสั่น · ท่ากวาดทั้งหมด (scope all) = วงล้อคมหมุนรอบกลุ่มศัตรู
 func _ultimate_intro(e: Dictionary, evs: Array) -> void:
