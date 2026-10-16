@@ -367,14 +367,14 @@ const PKV = { SEC: 0.06, W: 300, H: 168, G: 158, MX: 74,
 	// ท่าสายคม 7 ท่า (ชีต 18-1 · techs.csv) · extra = ฟันซ้ำกี่เฟรมหลังครั้งแรก · bleed = เลือดไหลตาม techs.csv
 	BLADE: [
 		// arcs = รอยฟันเสี้ยวต่อครั้งที่ฟัน (ครั้งที่ i = ฟันครั้งที่ i): a0→a1 องศา (0 = ขวา · 90 = ล่าง) · R = เท่าของขนาดมอน · sy = หดแนวตั้ง · oy = เลื่อนลง (เท่าความสูงมอน)
-		{ id: 'bl0', name: 'ฟัน', clip: 'sl_bl0', strike: 3, hit: 'SLASH', death: 'SL', sfx: 'ฉัวะ!', arcs: [[{ a0: -70, a1: 160, R: 0.62 }]] },
-		{ id: 'bl1', name: 'เขี้ยวพุ่ง', clip: 'sl_bl1', strike: 3, hit: 'SLASH', death: 'SL', sfx: 'ฉึบ!!', push: 12, arcs: [[{ a0: 150, a1: -80, R: 0.7, th: 5 }]] },
-		{ id: 'bl2', name: '★ เขี้ยวพัน', clip: 'sl_bl2', strike: 1, extra: [4, 8], hit: 'SLASH', death: 'SL', bleed: true, ult: true, sfx: 'ฉัวะ ฉัวะ ฉัวะ!!',
+		{ id: 'bl0', move: 'hop', name: 'ฟัน', clip: 'sl_bl0', strike: 3, hit: 'SLASH', death: 'SL', sfx: 'ฉัวะ!', arcs: [[{ a0: -70, a1: 160, R: 0.62 }]] },
+		{ id: 'bl1', move: 'lunge', name: 'เขี้ยวพุ่ง', clip: 'sl_bl1', strike: 3, hit: 'SLASH', death: 'SL', sfx: 'ฉึบ!!', push: 12, arcs: [[{ a0: 150, a1: -80, R: 0.7, th: 5 }]] },
+		{ id: 'bl2', move: 'flip', name: '★ เขี้ยวพัน', clip: 'sl_bl2', strike: 1, extra: [4, 8], hit: 'SLASH', death: 'SL', bleed: true, ult: true, sfx: 'ฉัวะ ฉัวะ ฉัวะ!!',
 			arcs: [[{ a0: -60, a1: 150, R: 0.6 }], [{ a0: 150, a1: -60, R: 0.66 }], [{ a0: -185, a1: 5, R: 0.95, sy: 0.3, th: 6 }]] },
-		{ id: 'bl3', name: 'กวาด', clip: 'sl_bl3', strike: 3, hit: 'SLASH', death: 'SL', sfx: 'วืดด!', arcs: [[{ a0: 200, a1: -20, R: 1.25, sy: 0.24, th: 5 }]] },
-		{ id: 'bl4', name: '★ วงล้อ', clip: 'sl_bl4', strike: 4, hit: 'SLASH', death: 'SL', ult: true, sfx: 'ฟิ้ววว!!', arcs: [[{ a0: 0, a1: 720, R: 0.8, sy: 0.5, th: 4 }, { a0: 180, a1: 900, R: 1.05, sy: 0.42, th: 3, delay: 2 }]] },
-		{ id: 'bl5', name: 'ปาดไว', clip: 'sl_bl5', strike: 2, hit: 'SLASH', death: 'SL', sfx: 'ฉึบ!', arcs: [[{ a0: -10, a1: 200, R: 0.5, sy: 0.38, oy: 0.25, th: 3 }]] },
-		{ id: 'bl6', name: '★ เงาสองคม', clip: 'sl_bl6', strike: 2, extra: [4], hit: 'SLASH', death: 'SL', bleed: true, ult: true, sfx: 'ฉัวะ ฉัวะ!!',
+		{ id: 'bl3', move: 'spin', name: 'กวาด', clip: 'sl_bl3', strike: 3, hit: 'SLASH', death: 'SL', sfx: 'วืดด!', arcs: [[{ a0: 200, a1: -20, R: 1.25, sy: 0.24, th: 5 }]] },
+		{ id: 'bl4', move: 'cartwheel', name: '★ วงล้อ', clip: 'sl_bl4', strike: 4, hit: 'SLASH', death: 'SL', ult: true, sfx: 'ฟิ้ววว!!', arcs: [[{ a0: 0, a1: 720, R: 0.8, sy: 0.5, th: 4 }, { a0: 180, a1: 900, R: 1.05, sy: 0.42, th: 3, delay: 2 }]] },
+		{ id: 'bl5', move: 'slide', name: 'ปาดไว', clip: 'sl_bl5', strike: 2, hit: 'SLASH', death: 'SL', sfx: 'ฉึบ!', arcs: [[{ a0: -10, a1: 200, R: 0.5, sy: 0.38, oy: 0.25, th: 3 }]] },
+		{ id: 'bl6', move: 'flip2', name: '★ เงาสองคม', clip: 'sl_bl6', strike: 2, extra: [4], hit: 'SLASH', death: 'SL', bleed: true, ult: true, sfx: 'ฉัวะ ฉัวะ!!',
 			arcs: [[{ a0: -70, a1: 150, R: 0.66, th: 5 }], [{ a0: -110, a1: 30, R: 0.66, th: 5, flip: true }]] }],
 	SPELLS: [
 		// ขาว + RD-1 = ใส่ตัวเอง (kwan 16 ต.ค. "เพิ่มเวทย์ขาวด้วย เอฟเฟคเกิดกับตัวเอง") · self = ไม่พุ่งใส่มอน เอฟเฟกต์อยู่ที่ Rion
@@ -468,6 +468,25 @@ function pkvView(c) {
 	const pkRx = f => !a.blade ? (a.proj || a.self ? home : near) : f < tl.pre ? home : f < tl.S0 ? home + (near - home) * ((f - tl.pre) / (tl.S0 - tl.pre)) ** 2 :
 		f < lastHit + 8 ? near : f < lastHit + 18 ? near + (home - near) * (1 - (1 - (f - lastHit - 8) / 10) ** 2) : home;   // พุ่งเร่งเข้า (ฟาดตอนถึง) · กลับแบบช้าลง
 	const rx = Math.round(pkRx(F)), ry = G - 108;
+	// กายกรรมของสายคม (kwan 16 ต.ค. "เพิ่มการเคลื่อนไหวของร่างกาย กระโดด ตีลังกา กายกรรม"): ยก (lift) · หมุน (rot · ลบ = ตีลังกาหน้าเมื่อหันซ้าย) · ยืด/ยุบ (sx sy)
+	// เข้า: hop กระโดดสั้น · lunge พุ่งต่ำยืดตัว · flip ตีลังกาหน้า 1 รอบ · flip2 กระโดดสูงตีลังกา 2 รอบ · cartwheel ตีลังกา 2 รอบโค้งสูงสุด · slide สไลด์ต่ำ · spin หมุนตัวกวาด · ออก: ตีลังกาหลังกลับที่ทุกท่า
+	const pkBody = f => { const b = { lift: 0, rot: 0, sx: 1, sy: 1 }; if (!a.blade) return b; const u = (f - tl.pre) / (tl.S0 - tl.pre), mv = a.move;
+		if (f >= tl.pre && f < tl.S0) { const sn = Math.sin(Math.PI * u);
+			if (mv === 'hop' || mv === 'spin') b.lift = (mv === 'hop' ? 16 : 8) * sn;
+			if (mv === 'lunge') { b.lift = 4 * sn; b.sx = 1 + 0.2 * u; b.sy = 1 - 0.12 * u; }
+			if (mv === 'flip') { b.lift = 36 * sn; b.rot = -2 * Math.PI * u; }
+			if (mv === 'flip2') { b.lift = 50 * sn; b.rot = -4 * Math.PI * u; }
+			if (mv === 'cartwheel') { b.lift = 56 * sn; b.rot = -4 * Math.PI * u; }
+			if (mv === 'slide') { b.sy = 0.84; b.sx = 1.1; b.rot = -0.12; }
+			if (f < tl.pre + 2 && mv !== 'slide') { b.sy = 0.82; b.sx = 1.1; } }   // ย่อก่อนดีด
+		else if (f >= tl.S0 && f < lastHit + 8) { const q = f - tl.S0;
+			if (q < 2 && mv !== 'slide') { b.sy = 0.8; b.sx = 1.14; }   // ลงพื้นยุบตัว
+			if (mv === 'spin') b.sx *= Math.cos(2 * Math.PI * Math.min(1, q / 8));   // หมุนตัวรอบหนึ่งระหว่างกวาด
+			for (const off of a.extra || []) { const w = f - (tl.HIT + off - 3); if (w >= 0 && w < 4) { b.lift = 12 * Math.sin(Math.PI * w / 4); b.rot = mv === 'flip' ? -Math.PI * 2 * w / 4 : 0; } } }   // เด้งขึ้นฟันซ้ำ
+		else if (f >= lastHit + 8 && f < lastHit + 18) { const u2 = (f - lastHit - 8) / 10; b.lift = 30 * Math.sin(Math.PI * u2); b.rot = 2 * Math.PI * u2; }   // ตีลังกาหลังกลับที่
+		return b; };
+	const pkDrawRion = (key, x, f, alpha = 1) => { const im = IMG[key]; if (!im) return; const b = pkBody(f), pv = b.rot ? 72 : 108;
+		ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x + im.width / 2), Math.round(ry + pv - b.lift)); ctx.rotate(b.rot); ctx.scale(-b.sx, b.sy); ctx.drawImage(im, -Math.round(im.width / 2), -pv); ctx.restore(); };
 	const cp = PK_COL[a.charge === 'rune' ? 'fire' : a.charge] || FB_PAL.fire, big = a.hit === 'BOOM';
 	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false; drawBg(); ctx.save();
 	const shk = d >= 0 && d < (big ? 8 : 4) ? (a.hit === 'CR' || big ? 4 : 2) * (1 - d / (big ? 8 : 4)) : 0, rs = vRng(F * 31 + 7);
@@ -506,14 +525,15 @@ function pkvView(c) {
 		ctx.drawImage(oc, mx + shiv, Math.round(G - im.height * sy), im.width, Math.round(im.height * sy));
 	} else pkDeath(a.death, hurt, mx, G, t);
 	// ── Rion (พลิกหันซ้าย) ──
-	if (a.blade) { const v = pkRx(F) - pkRx(F - 1);   // ร่างติดตาตอนพุ่ง/กลับ + ฝุ่นที่เท้า
-		if (Math.abs(v) > 3) for (let k = 3; k >= 1; k--) { const key = c.frames[Math.max(0, F - k)]; if (IMG[key]) spr(key, Math.round(pkRx(F - k * 1.5)), ry, { flip: true, alpha: 0.12 + 0.08 * (3 - k) }); }
+	if (a.blade) { const v = pkRx(F) - pkRx(F - 1), bb = pkBody(F);   // ร่างติดตาตอนพุ่ง/ตีลังกา + ฝุ่นที่เท้า + เงาพื้นตอนลอย
+		if (bb.lift > 2) { const k = Math.max(0.3, 1 - bb.lift / 70); for (let i = -10; i <= 10; i++) if (Math.abs(i) < 10 * k) fbPx(rx + rim.width / 2 + i * 1.6, G - 1, 'rgba(40,30,24,0.45)', 2, 1); }
+		if (Math.abs(v) > 3 || bb.rot) for (let k = 3; k >= 1; k--) { const key = c.frames[Math.max(0, F - k)]; pkDrawRion(key, Math.round(pkRx(F - k * 1.2)), F - k * 1.2, 0.12 + 0.08 * (3 - k)); }
 		if (Math.abs(v) > 3) for (let i = 0; i < 4; i++) fbPx(rx + rim.width / 2 + 8 + i * 5 + fbHash(F, i, 1) * 4, G - 2 - fbHash(F, i, 2) * 4, '#d8ccb8', 3, 2);
 		if (a.ult && F < tl.S0 + 2) { const k = Math.min(1, F / 8);   // ออร่าเปลวฟ้ารอบตัว
 			for (let i = 0; i < 26; i++) { const q = (F * 0.7 + i * 3.1) % 12, x = rx + rim.width / 2 - 20 + fbHash(i, 3, 1) * 40, y = G - 4 - q * 6 * k; if (fbHash(i, F, 2) < 0.2) continue;
 				fbPx(x + Math.sin(q + i) * 2, y, q < 3 ? '#ffffff' : q < 7 ? '#9ae6ff' : '#3a6ad8', q < 5 ? 2 : 1, q < 5 ? 3 : 2); } } }
 	if (IMG[rion]) { if (a.self === 'CLEANSE' && d < 4) { const oc = pkTint(rion, '#8a3cc0', d < 0 ? 0.35 : 0.35 * (1 - d / 4)); ctx.save(); ctx.translate(rx + oc.width, ry); ctx.scale(-1, 1); ctx.drawImage(oc, 0, 0); ctx.restore(); }   // ติดพิษม่วงก่อนล้าง
-		else spr(rion, rx, ry, { flip: true }); }
+		else if (a.blade) pkDrawRion(rion, rx, F); else spr(rion, rx, ry, { flip: true }); }
 	if (a.self) pkSelf(a, d, F, { rx, ry, rw: rim.width, mcx, mcy, mx, mw, my0, G });
 	const strikeKey = 'rpk/' + tl.pk.frames[a.strike], [tx, ty] = pkTip(strikeKey), hx = rx + (IMG[strikeKey] ? IMG[strikeKey].width - 1 - tx : 0), hy = ry + ty;
 	// รวมพลัง: ประกายธาตุวนเข้าอก + แกนเรืองโตขึ้น · อัญเชิญ = วงรูนพื้นใต้เท้า
