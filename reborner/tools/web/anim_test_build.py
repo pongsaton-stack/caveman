@@ -212,7 +212,7 @@ def techs():
 	rows = []
 	for r in csv.DictReader(open(os.path.join(ROOT, 'data/techs.csv'), encoding='utf-8')):
 		rows.append({k: r[k] for k in ('tech_id', 'name_th', 'school', 'branch', 'parent', 'req_prof', 'power',
-			'weight', 'sp', 'element', 'scope', 'hits', 'ignore_def', 'note', 'status', 'status_chance')})
+			'weight', 'sp', 'element', 'scope', 'hits', 'ignore_def', 'note', 'status', 'status_chance', 'effect') if k in r})
 	# ท่ายึด (GDD 5.2) — สาย "ยึด" ในหน้าทดลอง · ค่าจาก seize_techs.csv ตรง ๆ
 	for r in csv.DictReader(open(os.path.join(ROOT, 'data/seize_techs.csv'), encoding='utf-8')):
 		eff = {'def_up': 'DEF ตัวเอง +%d%% %s เทิร์น' % (round(float(r['value']) * 100), r['turns']),

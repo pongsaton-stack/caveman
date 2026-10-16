@@ -3232,7 +3232,7 @@ function foeTint(color, a, life) { S.fx.push({ t: 0, dur: life, draw: () => {}, 
 
 function sagaPlay(t) {
 	S.hero = { x: HERO.x, y: HERO.y }; S.zoom = { k: 1, x: 0, y: 0 }; S.hitstop = 0; S.slow = null; S.rgb = null; S.cam = { x: 120, y: 60, k: 1 }; S.foeOff = {}; S.heroFrame = 'rion/west'; S.dimT = undefined; S.dim = 0;
-	const m = DATA.monsters.find(x => x.monster_id === S.foe), ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
+	const m = DATA.monsters.find(x => x.monster_id === S.foe), ult = (+t.req_prof >= K.ULT_PROF && t.effect !== 'counter'), col = COL[t.school] || COL_DEF;
 	const foes = foeLayout(), tg = (t.scope === 'single' ? foes.slice(0, 1) : foes).map(f => ({ ...f.pt, i: f.i, f }));
 	const r = dmgRange(t, m), numTxt = String(r.mid), numCol = AFF_COL(r);
 	let T = 0;
@@ -3317,7 +3317,7 @@ function playTech(t) {
 	S.rigW = RIG_ON ? rigCodes(RIG_FAM[t.school]).slice(-1)[0] || null : null;   // ท่าในแท็บสกิล = อาวุธชิ้นแรงสุดของสาย
 	if (S.saga) { sagaPlay(t); setRead(t); return; }
 	const m = DATA.monsters.find(x => x.monster_id === S.foe);
-	const ult = +t.req_prof >= K.ULT_PROF, col = COL[t.school] || COL_DEF;
+	const ult = (+t.req_prof >= K.ULT_PROF && t.effect !== 'counter'), col = COL[t.school] || COL_DEF;
 	const foes = foeLayout(), tg = t.scope === 'single' ? foes.slice(0, 1) : foes;
 	const from = heroPt();
 	banner((ult ? '◆ ไม้ตาย! ' : S.glim ? '★ ประกาย! ' : '') + 'Rion · ' + t.name_th, ult ? '#ffd27a' : S.glim ? '#f2c94c' : shade(col, 0.3), ult);
@@ -3508,11 +3508,11 @@ function renderTechs() {
 	press(sp, S.school);
 	const m = DATA.monsters.find(x => x.monster_id === S.foe), list = $('techList'); list.innerHTML = '';
 	for (const t of DATA.techs.filter(t => t.school === S.school).sort((a, b) => +a.req_prof - +b.req_prof)) {
-		const r = dmgRange(t, m), ult = +t.req_prof >= K.ULT_PROF, b = document.createElement('button');
+		const r = dmgRange(t, m), ult = (+t.req_prof >= K.ULT_PROF && t.effect !== 'counter'), b = document.createElement('button');
 		b.className = 'tech'; b.type = 'button'; b.setAttribute('aria-pressed', String(S.tech === t));
 		const cls = r.aff > 0 ? 'weak' : r.aff < 0 ? 'res' : '';
 		const hits = +t.hits > 1 ? ` ×${t.hits}` : '';
-		b.innerHTML = `<span class="nm">${t.name_th}${ult ? '<span class="ult">◆ ไม้ตาย</span>' : ''}</span>
+		b.innerHTML = `<span class="nm">${t.name_th}${ult ? '<span class="ult">◆ ไม้ตาย</span>' : ''}${t.effect === 'counter' ? '<span class="ult">↺ สวน</span>' : ''}</span>
 			<span class="dmg ${cls}">${+t.power === 0 ? 'ไม่โจมตี' : r.lo + '–' + r.hi}${hits}${r.e === 0 ? ' ไม่ระคาย' : AFF_TAG(r) ? ' ' + AFF_TAG(r) : ''}</span>
 			<span class="meta">ต้องชำนาญ ${t.req_prof} · พลัง ${t.power} · SP ${t.sp} · ${SCOPE[t.scope] || t.scope} · ธาตุ ${t.element || '—'}${+t.ignore_def ? ' · เจาะเกราะ ' + Math.round(t.ignore_def * 100) + '%' : ''}${t.note ? ' · ' + t.note : ''}</span>`;
 		b.addEventListener('click', () => { S.playing = true; updPlay(); playTech(t); for (const x of list.children) x.setAttribute('aria-pressed', String(x === b)); });
@@ -3683,7 +3683,7 @@ function boot() {
 			b.onclick = () => { S.labSheet = v; for (const x of box.children) x.setAttribute('aria-pressed', String(x.dataset.v === v)); }; box.append(b); } }
 	for (const b of document.querySelectorAll('.vxsBtn')) b.onclick = () => { S.vxs = !S.vxs; for (const x of document.querySelectorAll('.vxsBtn')) x.setAttribute('aria-pressed', String(S.vxs)); };
 	for (const sc of Object.keys(FXDB.by_school)) {   // ไม้ตายสายละท่า: ท่าแรกใน techs.csv ที่ความชำนาญถึงขั้นไม้ตาย · เล่นแบบซินีมา
-		const t = DATA.techs.find(x => x.school === sc && +x.req_prof >= K.ULT_PROF); if (!t) continue;
+		const t = DATA.techs.find(x => x.school === sc && +x.req_prof >= K.ULT_PROF && x.effect !== 'counter'); if (!t) continue;
 		const b = document.createElement('button'); b.className = 'btn'; b.textContent = sc + ' · ' + t.name_th;
 		b.onclick = () => { S.style = 'cine'; S.cine = true; S.saga = false; setHome(); press($('segStyle'), 'cine'); playTech(t); };
 		$('ultPick').append(b);
