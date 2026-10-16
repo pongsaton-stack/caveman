@@ -308,6 +308,24 @@ Row 2 – pushing a heavy wooden crate (a brown crate as tall as his chest, draw
 Keep his look identical to image 1 in all 12 frames. Output PNG only.
 ```
 
+## 17-4 · แก้ใบพัดลม + โดนตี/เชียร์ถือมีด
+<!-- note: 17-1b แถว 4 ใบพัดลมถูกแค่ช่อง 2/4 (ที่เหลือถือร่ม) · 17-2 โดนตีช่อง 2–5 และเชียร์ช่อง 2/4/5 มีดหาย — 3 แถว แถวละอาวุธเดียว | cells: 17 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1; draw only the poses and the weapons written below. He wears his blue cap with goggles and his backpack in every frame.
+
+Layout: 3 rows, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. Row 1 has exactly 5 cells, rows 2 and 3 have exactly 6 cells. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never an extra Rion.
+
+Every frame faces RIGHT. Each row has ONE weapon only, and it is gripped in his FRONT hand in EVERY frame of that row. No umbrella anywhere in this sheet.
+
+Row 1 – a sharpened white CEILING-FAN BLADE (one long flat curved blade, as long as his arm) fixed to a black knife handle, with a small round silver MOTOR as the hilt. It is always attached to his hand, never floating, never an umbrella. 1 battle stance holding it low and forward. 2 run forward with it raised. 3 cocked back over the shoulder while still running. 4 arriving: big slash with a white swing arc. 5 recover to stance holding it.
+Row 2 – hurt, holding a small KITCHEN KNIFE with a wooden handle in the front hand in all 6 frames: 1 hit (eyes shut, body jolts back), 2 stagger back, 3 stagger, 4 catch balance, 5 straighten, 6 back to stance. The knife stays in his fist in every frame.
+Row 3 – cheer an ally, holding the same small kitchen knife low in the FRONT hand in all 6 frames: 1 stance, 2 raise the BACK fist, 3 pump the back fist upward (face stays visible), 4 shout encouragingly, 5 pump the back fist again, 6 stance. Only ONE knife, never a second knife at his hip.
+
+Keep his look identical to image 1 in all 17 frames. Output PNG only.
+```
+
 ## ผลตรวจรอบแรก (kwan ส่ง 7 ชีต 16 ต.ค. · Google Flow · JPG 1438x2576 ทุกชีต) — ยังไม่เข้าเกม/หน้าเทส
 ไฟล์ `flow_trial_v14_1.jpg` `v15_6` `v16_1`…`v16_5` · ตัดด้วย `tools/sprites/rion_pack_cut.py` · ภาพตรวจกรอบ+เลข `pack_check/<ชีต>.jpg` · หน้าตาตรงแบบ Flow ทุกชีต (หมวกน้ำเงินสด แว่นทอง chibi)
 - 14-1 ศึก 48/48 ✓ · พลาด: โดนตีช่อง 1–4 และล้มช่อง 1–2 มีดหายจากมือ · วิ่งช่อง 5 มือเปล่า
