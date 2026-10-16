@@ -630,6 +630,7 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
         **รอบ 10 มอนภูมิภาค 1 (16 ต.ค.)**: ชีต GPT `monster_trial_v10.jpg` + ภาพอ้างอิง `monster_ref_region1.png` → `tools/sprites/monsters_px.py` → `assets/sprites/monsters_px_draft/` (ร่าง) ·
           หน้า animation test Version 90 แท็บมอนสเตอร์/บอส กลุ่ม "มอนภูมิภาค 1 · พิกเซล (รอบ 10 · ร่าง)" (หายใจ + โจมตี→โดนตี→ล้ม) · M01 M03 M06 M15 B1 · ขนาดในเกมยังไม่ตัดสิน · รายละเอียด FLOW_PIXEL_TRIAL.md "ผลรอบ 10"
           **รอบ 11 (kwan เลือกเจนใหม่ตัวที่ไม่ตรงแบบ)**: หมาป่า/ค้างคาว/บอสจาก `monster_trial_v11.jpg` (มีท่ากัด · ค้างคาวหน้าหมา · บอสเกราะหิน+ตา 10 ดวง) · พาเลตต์ต่อตัว · หน้าเทส Version 91 · "ผลรอบ 11"
+        **รอบ 12 ไอคอนอาวุธ 30 ชิ้น (16 ต.ค.)**: `weapon_icons_v12.jpg` → `tools/sprites/weapons_icons_px.py` → `assets/sprites/weapons_icons_draft/` (32 + 48px · ร่าง) · หน้าเทส Version 92 แท็บอาวุธ กลุ่ม "ไอคอนอาวุธ รอบ 12" เทียบ เดิม | 32 | 48 · "ผลรอบ 12"
         ยังไม่ได้ทำ: ใส่ท่าถืออาวุธ 5 สายและมอนชุดใหม่เข้าเกม · หมา/ไทล์ใช้พิกเซลชุดเดิม
   Blender (apt) นำเข้า glb ต้องมี numpy → `start_blender_mcp.sh` ลง python3-numpy ให้เองแล้ว (kwan 14 ต.ค. "ลง numpy") · **รอ kwan เจนชีตใหม่**
 

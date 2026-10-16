@@ -55,6 +55,12 @@ def sprites():
 		for f in sorted(os.listdir(md)):
 			if f.endswith('.png'):
 				out['mpx/' + f[:-4]] = png(os.path.join(md, f))
+	# ไอคอนอาวุธ 30 ชิ้น พิกเซล (tools/sprites/weapons_icons_px.py · ชีตรอบ 12 · ร่าง)
+	wi = os.path.join(SPR, 'weapons_icons_draft')
+	if os.path.isdir(wi):
+		for f in sorted(os.listdir(wi)):
+			if f.endswith('.png'):
+				out['wic/' + f[:-4]] = png(os.path.join(wi, f))
 	# ร่างศัตรูจากชีต Last Light (tools/sprites/ll_enemies.py) — แสดงในหน้านี้อย่างเดียว ยังไม่เข้าเกม
 	dd = os.path.join(SPR, 'monsters_ll_draft')
 	if os.path.isdir(dd):

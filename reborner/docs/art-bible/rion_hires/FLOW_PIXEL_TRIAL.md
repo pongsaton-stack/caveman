@@ -365,3 +365,9 @@ Row 6 – Gloves (show one right-hand glove each, back of the hand facing us): 1
 
 Keep all 30 icons consistent in style, outline thickness and scale. Output PNG only.
 ```
+
+### ผลรอบ 12 (GPT · JPG) — `docs/art-bible/weapons/weapon_icons_v12.jpg` · หน้า animation test Version 92
+ได้ครบ 30 ชิ้น 6x5 ตามผัง · วางเฉียงตามสั่ง · ระดับ 5 เรืองแสง · หน้าตาตรงแนวคิดใน weapons_full.json
+`tools/sprites/weapons_icons_px.py` → `assets/sprites/weapons_icons_draft/<id>.png` (32px) + `<id>_48.png` (.gdignore · ร่าง) · อัตราเดียวทุกชิ้น (ชิ้นใหญ่ในชีตยังใหญ่) · สีต่อชิ้น ≤ 16
+แก้ด้วยโค้ด: แสงเรืองระดับ 5 โปร่งทับพื้นเขียว → ทั้งชิ้นอมเขียว → ตัดเขียวที่เกินแดง/น้ำเงินทุกจุด (ไม่มีอาวุธสีเขียว)
+ข้อจำกัด: แสงเรืองนุ่มทำเป็นพิกเซลคมไม่ได้ ระดับ 5 จึงดูหม่นกว่าชีต · ที่ 32px รายละเอียดเล็กหาย (กุญแจบนถุงมือ BD-3 · ไม้บรรทัด ST-3) → 48 อ่านง่ายกว่า

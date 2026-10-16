@@ -314,6 +314,17 @@ for (const m of (DATA.monsters_px || [])) {
 	addClip(G, `mpx_${m.id}_idle`, `${m.name} ${m.id} · หายใจ ${idle.length} ภาพ`, [...idle, ...idle.slice(1, -1).reverse()], K.FOE_IDLE_SEC / 2, { tab: m.id.startsWith('B') ? 'bosses' : 'monsters', stage: st, mon: m.id });
 	addClip(G, `mpx_${m.id}_act`, `${m.name} ${m.id} · โจมตี → โดนตี → ล้ม`, seq, K.ATTACK_FRAME_SEC * 1.5, { tab: m.id.startsWith('B') ? 'bosses' : 'monsters', stage: st, hold: true, mon: m.id });
 }
+// ไอคอนอาวุธ 30 ชิ้น พิกเซล (ชีตรอบ 12 จาก GPT · kwan 16 ต.ค. · ร่าง) — คู่เทียบ ไอคอนเดิม (วาดด้วยโค้ด) | ใหม่ 32px | ใหม่ 48px · แท็บอาวุธ กลุ่มละตระกูล
+{
+	const FAM = { SL: 'คม', PC: 'แทง', CR: 'ทุบ', ST: 'ยิง', DV: 'กล', BD: 'มือเปล่า' };
+	const WN = Object.fromEntries((DATA.weapons || []).map(w => [w.id, w.name]));
+	for (const key of Object.keys(DATA.sprites)) {
+		const m = key.match(/^wic\/([A-Z]{2})-(\d)$/); if (!m) continue;
+		const id = `${m[1]}-${m[2]}`;
+		addClip(`ไอคอนอาวุธ รอบ 12 · สาย${FAM[m[1]] || m[1]} (ร่าง)`, 'wic_' + id, `${id} ${WN[id] || ''} · ระดับ ${m[2]}`, [key], 1,
+			{ tab: 'arms', panels: [{ label: 'เดิม', keys: ['wpn/' + id] }, { label: 'ใหม่ 32', keys: [key] }, { label: 'ใหม่ 48', keys: [key + '_48'] }] });
+	}
+}
 // Rion พิกเซลถืออาวุธ 5 สาย (ชีตรอบ 9 จาก GPT · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — ยืนถือ 3 จังหวะ แล้วเล่นท่าโจมตีครบชุด · ความเร็ว ATTACK_FRAME_SEC เท่าท่าฟันในเกม
 for (const w of (DATA.px_weapons || [])) {
 	const k = Array.from({ length: w.n }, (_, i) => `pxw/${w.family}_${i}`);
