@@ -148,6 +148,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" hidden id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
 			<button class="btn" role="tab" hidden id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
 			<button class="btn" role="tab" id="tabMagic" aria-pressed="false">เวทย์</button>
+			<button class="btn" role="tab" id="tabSkillnew" aria-pressed="false">สกิล ชุดใหม่</button>
 			<button class="btn" role="tab" id="tabItems" aria-pressed="false">ไอเท็ม</button>
 			<button class="btn" role="tab" id="tabStructs" aria-pressed="false">อาคาร · สิ่งก่อสร้าง</button>
 			<button class="btn" role="tab" id="tabVehicles" aria-pressed="false">ยานพาหนะ</button>
@@ -205,6 +206,12 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<div class="tabs" id="wSchool"></div>
 			<div class="wgrid" id="wGrid"></div>
 			<div class="wcard" id="wCard"></div>
+		</section>
+
+		<section class="box" id="paneSkillnew" hidden>
+			<p class="muted wnote">ท่าในต้นไม้ (techs.csv) ใส่มอนชุดใหม่ · ตอนนี้สายคม 7 ท่า (ชีต 18-1 จาก Google Flow · ช่องที่ลืมมีดแปะด้วยโค้ด) · Rion หันซ้ายแบบจอสู้ · ภาพเท่านั้น ไม่ใช่ค่าเกม · ท่าแถว/ทั้งหมดยังเล่นใส่เป้าเดียว</p>
+			<p class="seg pkFoeBox" id="pkFoe3" role="group" aria-label="มอนที่โดน (สกิล)"></p>
+			<div class="clips" id="skillnewGroups"></div>
 		</section>
 
 		<section class="box" id="paneMagic" hidden>
@@ -357,6 +364,15 @@ const PKV = { SEC: 0.06, W: 300, H: 168, G: 158, MX: 74,
 		{ id: 'BD', name: 'ถุงมือ (มือเปล่า)', clip: 'w2_BD', strike: 3, hit: 'BD', death: 'BD', sfx: 'ปั้ก!' },
 		{ id: 'ST', name: 'หนังสติ๊ก (ยิง)', clip: 'w2_ST', strike: 3, proj: 'stone', fly: 9, hit: 'ST', death: 'ST', sfx: 'ป๊อก!' },
 		{ id: 'DV', name: 'ที่เย็บ (กล · ไฟฟ้า)', clip: 'w2_DV', strike: 3, proj: 'staple', fly: 9, hit: 'DV', death: 'DV', sfx: 'ซ่าาา!' }],
+	// ท่าสายคม 7 ท่า (ชีต 18-1 · techs.csv) · extra = ฟันซ้ำกี่เฟรมหลังครั้งแรก · bleed = เลือดไหลตาม techs.csv
+	BLADE: [
+		{ id: 'bl0', name: 'ฟัน', clip: 'sl_bl0', strike: 3, hit: 'SL', death: 'SL', sfx: 'ฉัวะ!' },
+		{ id: 'bl1', name: 'เขี้ยวพุ่ง', clip: 'sl_bl1', strike: 3, hit: 'SL', death: 'SL', sfx: 'ฉึบ!!', push: 9 },
+		{ id: 'bl2', name: '★ เขี้ยวพัน', clip: 'sl_bl2', strike: 1, extra: [4, 8], hit: 'SL', death: 'SL', bleed: true, sfx: 'ฉัวะ ฉัวะ ฉัวะ!' },
+		{ id: 'bl3', name: 'กวาด', clip: 'sl_bl3', strike: 3, hit: 'SWEEP', death: 'SL', sfx: 'วืดด!' },
+		{ id: 'bl4', name: '★ วงล้อ', clip: 'sl_bl4', strike: 4, hit: 'WHEEL', death: 'SL', sfx: 'ฟิ้ววว!!' },
+		{ id: 'bl5', name: 'ปาดไว', clip: 'sl_bl5', strike: 2, hit: 'QUICK', death: 'SL', sfx: 'ฉึบ!' },
+		{ id: 'bl6', name: '★ เงาสองคม', clip: 'sl_bl6', strike: 2, extra: [4], hit: 'XCUT', death: 'SL', bleed: true, sfx: 'ฉัวะ ฉัวะ!' }],
 	SPELLS: [
 		// ขาว + RD-1 = ใส่ตัวเอง (kwan 16 ต.ค. "เพิ่มเวทย์ขาวด้วย เอฟเฟคเกิดกับตัวเอง") · self = ไม่พุ่งใส่มอน เอฟเฟกต์อยู่ที่ Rion
 		{ id: 'WH-1', name: 'กำแพงธาตุ', school: 'ขาว', el: 'แสง', clip: 'white', strike: 2, self: 'SHIELD', status: 'ลดดาเมจ 45% · 3 เทิร์น', sfx: 'วิ้ง!', charge: 'holy' },
@@ -395,12 +411,18 @@ function pkTimeline(a, die) {
 	const pk = (DATA.rion_pack || []).find(c => c.id === a.clip), n = pk ? pk.frames.length : 1, pre = a.charge ? 14 : 8, step = a.charge ? 5 : 4;
 	const S0 = pre + step * a.strike, HIT = S0 + (a.proj ? a.fly : 0);
 	const pose = F => F < pre ? 0 : F < S0 ? Math.min(a.strike, Math.floor((F - pre) / step) + 1) : F < S0 + 6 ? a.strike : Math.min(n - 1, a.strike + 1 + Math.floor((F - S0 - 6) / 4));
-	return { pk, pre, S0, HIT, D0: HIT + (a.proj === 'flame' || a.proj === 'wind' ? 12 : 8), N: HIT + (die ? 50 : a.self === 'SHIELD' ? 40 : a.status ? 34 : 28), pose };
+	const last = HIT + Math.max(0, ...(a.extra || [0]));
+	return { pk, pre, S0, HIT, D0: last + (a.proj === 'flame' || a.proj === 'wind' ? 12 : 8), N: HIT + (die ? 50 : a.self === 'SHIELD' ? 40 : a.status ? 34 : 28), pose };
 }
 for (const die of [false, true]) for (const a of PKV.ATK) {
 	const tl = pkTimeline(a, die); if (!tl.pk) continue;
 	addClip(die ? 'ทดลอง VFX · มอนชุดใหม่ · โดนแล้วตาย' : 'ทดลอง VFX · มอนชุดใหม่ · โดน', `pkv_${a.id}_${die ? 'die' : 'hit'}`, `${a.name}${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
 		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H] });
+}
+for (const die of [false, true]) for (const a of PKV.BLADE) {
+	const tl = pkTimeline(a, die); if (!tl.pk) continue;
+	addClip(`สายคม · ${die ? 'โดนแล้วตาย' : 'โดน'}`, `pkb_${a.id}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name}${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
+		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'skillnew' });
 }
 for (const die of [false, true]) for (const a of PKV.SPELLS) {
 	if (die && a.status) continue;   // คาถาสถานะไม่มีดาเมจ → ไม่มีท่าตาย
@@ -451,13 +473,13 @@ function pkvView(c) {
 	// อัญเชิญ: ยักษ์ไฟลุกหลังมอน (วาดก่อนมอน)
 	if (a.proj === 'summon' && F >= tl.S0) { const u = F - tl.S0, k = Math.min(1, u / 8), fade = d > 6 ? Math.max(0, 1 - (d - 6) / 8) : 1; if (fade > 0) { ctx.save(); ctx.globalAlpha = fade; pkGuardian(MX, G, k, F, d >= 0 && d < 6); ctx.restore(); } }
 	// ── มอน ──
-	const kb = d >= 0 && !a.status && !a.self ? Math.round(-5 * Math.max(0, 1 - d / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0, mx = mx0 + kb;
+	const dl = d - Math.max(0, ...(a.extra || [0]).filter(o => d >= o)), kb = d >= 0 && !a.status && !a.self ? Math.round(-(a.push || 5) * Math.max(0, 1 - dl / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0, mx = mx0 + kb;
 	const mcx = mx + mw / 2, mcy = my0 + mh * 0.55;
 	if (!dying) {
 		let key = d >= 0 && (d < 9 || c.die) && !a.self ? hurt : idle;
 		if (a.self === 'SHIELD' && d >= 6 && d < 16) key = pkRole(m, d < 11 ? 'wind' : 'atk');   // มอนโจมตีใส่โล่
 		let tint = ['#000', 0]; const lasting = d >= 0 ? Math.max(0, 1 - d / 22) : 0;
-		if ((d === 0 || d === 1) && !a.status && !a.self) tint = ['#fff', 1];
+		if ((dl === 0 || dl === 1) && d >= 0 && !a.status && !a.self) tint = ['#fff', 1];   // วาบขาวทุกครั้งที่ฟันโดน
 		else if (a.hit === 'DV' && d >= 0 && d < 12 && F % 2) tint = ['#7fd0ff', 0.6];
 		else if ((a.hit === 'FI' || big) && d >= 0) tint = ['#ff5a14', 0.55 * lasting];
 		else if ((a.hit === 'ICE' || a.hit === 'NEEDLE') && d >= 0) tint = ['#9ad8ff', 0.6 * Math.max(0.35, lasting)];
@@ -501,16 +523,26 @@ function pkvView(c) {
 	}
 	if (a.proj && a.proj !== 'summon' && F >= tl.S0 && F < tl.S0 + 2) fbPixHit(hx, hy, F - tl.S0, false, cp, 11);
 	// ── เอฟเฟกต์ตอนโดน ตามชนิด ──
-	if (d >= 0 && !dying && !a.self) pkHit(a, d, F, { mx, my0, mw, mh, mcx, mcy, G, cp });
+	if (d >= 0 && !dying && !a.self) { const o = { mx, my0, mw, mh, mcx, mcy, G, cp }; pkHit(a, d, F, o);
+		(a.extra || []).forEach((off, i) => { if (d >= off) pkHit({ ...a, sfx: '', mirror: i % 2 === 0 }, d - off, F, o); });   // ฟันซ้ำ: ครั้งที่ 2 กลับทิศ
+		if (a.bleed && d >= 6) for (let i = 0; i < 5; i++) { const q = (d + i * 4) % 14, x = mcx - 10 + i * 5, y = mcy - 6 + q * 2; if (y < G - 2) fbPx(x, y, q < 6 ? '#e8401a' : '#8a1a10', 2, q < 4 ? 3 : 2); }   // เลือดไหล
+		if (a.bleed && d >= 14 && !dying) pkText('เลือดไหล', Math.max(4, mcx - 24), Math.max(28, my0 - 14), '#ff8a7a'); }
 	ctx.restore();
 	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(`${m.name} ${m.id} · ${a.id && a.school ? a.id + ' ' : ''}${a.name}${c.die ? ' · ตาย' : ''}`, 4, H - 2);   // ป้ายล่าง ไม่ทับข้อความเสียง
 	if (S.grid) drawGrid();
 }
 function pkHit(a, d, F, o) {
 	const { mx, my0, mw, mh, mcx, mcy, G, cp } = o, P = FB_PAL.fire, h = a.hit;
-	if (h === 'SL' && d < 4) { const L = Math.max(mw, mh) * 0.7, th = [3, 2, 1, 1][d];   // รอยฟันเฉียงขาว ขอบเข้ม
-		for (let k = -L / 2; k <= L / 2; k++) { const x = mcx + k * 0.75, y = mcy - k * 0.66; fbPx(x - th, y - th, '#2a1a14', th * 2 + 1, 1); fbPx(x - th + 1, y - th + 1, d < 2 ? '#ffffff' : '#d8d0ff', th * 2 - 1, th); }
+	if ((h === 'SL' || h === 'QUICK' || h === 'XCUT') && d < 4) { const L = Math.max(mw, mh) * (h === 'QUICK' ? 0.45 : 0.7), th = [3, 2, 1, 1][d], sg = a.mirror ? -1 : 1, yo = h === 'QUICK' ? mh * 0.25 : 0;   // รอยฟันเฉียงขาว ขอบเข้ม · ปาดไว = สั้นต่ำ · X = สองเส้นไขว้
+		for (const s2 of h === 'XCUT' ? [1, -1] : [sg]) for (let k = -L / 2; k <= L / 2; k++) { const x = mcx + k * 0.75, y = mcy + yo - s2 * k * 0.66; fbPx(x - th, y - th, '#2a1a14', th * 2 + 1, 1); fbPx(x - th + 1, y - th + 1, d < 2 ? '#ffffff' : '#d8d0ff', th * 2 - 1, th); }
 		for (let i = 0; i < 6; i++) { const an = fbHash(i, 9, 1) * 6.28, r = 4 + d * 4; fbPx(mcx + Math.cos(an) * r, mcy + Math.sin(an) * r, '#ffffff'); } }
+	if (h === 'SWEEP' && d < 5) { const L = mw * 1.5, th = [3, 3, 2, 1, 1][d];   // กวาดแนวนอนยาวเลยตัวทั้งสองข้าง (โดนทั้งแถว)
+		for (let k = -L / 2; k <= L / 2; k++) { const y = mcy + 4 + (k / L) * (k / L) * 10; fbPx(mcx + k, y - th, '#2a1a14', 1, th * 2 + 1); fbPx(mcx + k, y - th + 1, d < 2 ? '#ffffff' : '#d8d0ff', 1, th * 2 - 1); }
+		for (let i = 0; i < 8; i++) fbPx(mcx - L / 2 - d * 4 - i * 3, mcy + 4 + (fbHash(i, 2, 2) - 0.5) * 6, '#ffffff', 2, 1); }
+	if (h === 'WHEEL' && d < 7) { const R = Math.max(mw, mh) * 0.45 + d * 5;   // วงล้อ: วงฟันรอบตัวขยาย (โดนทุกตัว)
+		for (let i = 0; i < 48; i++) { const an = i / 48 * 6.283 + d * 0.6; if ((i + d) % 6 === 0) continue; const x = mcx + Math.cos(an) * R, y = mcy + Math.sin(an) * R * 0.6;
+			fbPx(x - 1, y - 1, '#2a1a14', 3, 3); fbPx(x, y, d < 3 ? '#ffffff' : '#d8d0ff', 2, 2); }
+		if (d < 3) pkStar(mcx, mcy, 8 + d * 3, '#ffffff', '#d8d0ff'); }
 	if (h === 'CR') { if (d < 4) pkStar(mcx + 6, mcy - 6, 8 + d * 3, '#ffffff', d < 2 ? '#ffd24a' : '#ff8a1e');
 		if (d >= 1 && d < 10) for (const s of [-1, 1]) for (let i = 0; i < 3; i++) { const q = d - 1; fbPx(mcx + s * (mw / 2 + q * 2 + i * 3), G - 2 - i * 2 - q * 0.6, q < 4 ? '#c8b89a' : '#e0d6c4', q < 5 ? 3 : 2, 2); } }
 	if (h === 'PC' && d < 5) { const ext = mw * 0.6 + d * 4;   // แทงทะลุออกหลัง (ซ้าย)
@@ -545,6 +577,7 @@ function pkHit(a, d, F, o) {
 			for (let i = 0; i < 4; i++) fbPx(ex + (fbHash(d, i, 1) - 0.5) * 16, ey + 6 + fbHash(d, i, 2) * 8, '#f0e6e0', 2, 1); }
 		for (let i = 0; i < 3; i++) { const q = d - i * 3; if (q < 0 || q > 14) continue; const x = mx + mw * (0.2 + i * 0.3), y = my0 - q * 1.5, col = q > 9 ? '#9a8c84' : '#ffd24a';   // ลูกศรบัฟจางหาย
 			fbPx(x - 1, y, col, 3, 6); fbPx(x - 3, y + 2, col, 7, 1); fbPx(x - 2, y + 1, col, 5, 1); } }
+	if (!a.sfx) return;
 	const sfxCol = { DV: '#a8e0ff', ICE: '#d4f1ff', NEEDLE: '#d4f1ff', DARK: '#b088f0', LIGHT: '#fffbd8', TAPE: '#ff8a7a', MARK: '#ff8a7a', ERASE: '#ff8a7a' }[h] || '#ffd24a';
 	if (d < (a.status ? 9 : 12)) pkText(a.sfx, mcx - 14, Math.max(14, Math.round(my0 - 4 - Math.min(6, d))), sfxCol);
 	if (a.status && d >= 9) pkText(a.status, Math.max(4, mcx - 30), Math.max(28, my0 - 14), '#ff8a7a');
@@ -652,6 +685,7 @@ function pkvSound(F) {
 		else { AU_SFX.hit(a.hit === 'ICE' || a.hit === 'NEEDLE' || a.hit === 'LIGHT' || a.hit === 'DARK' || a.hit === 'FI' ? 'DV' : a.hit === 'BOOM' ? 'CR' : a.id, a.hit === 'CR' || a.hit === 'BOOM');
 			if (a.hit === 'ICE' || a.hit === 'NEEDLE') auNoise(0.12, 'highpass', 2500, 7000, 0.4, 4); }
 		auMon(monVoice(m.id), false, big); }
+	(a.extra || []).forEach(off => { if (F === tl.HIT + off) { (AU_SFX.release.SL)(); AU_SFX.hit('SL', false); } });   // ฟันซ้ำ
 	if (c.die && F === tl.D0) auMon(monVoice(m.id), true, big);
 	if (c.die && F === tl.D0 + 7 && a.death === 'CR') AU_SFX.hit('CR', true);
 	if (c.die && F === tl.D0 + 10 && a.death === 'ICE') auNoise(0.3, 'highpass', 3000, 8000, 0.6, 3);
@@ -2060,7 +2094,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 }
 
 // ── สถานะผู้ชม ──
-const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'magic', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups', magic: 'magicGroups' };
+const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'magic', 'skillnew', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups', magic: 'magicGroups', skillnew: 'skillnewGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
 const S = { tab: 'clips', last: { clips: 'px_west_w' }, clip: 'px_west_w', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', rollFoe: 'M01', fbElem: 'fire', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
@@ -3517,7 +3551,7 @@ function buildGalleries() {
 		thumb: x => `<img src="${DATA.sprites['npc/' + x.id + '_0']}" alt=""><span>${x.name}</span><small>${x.where}</small>`,
 		card: x => `<b>${x.name}</b> <span class="muted">${x.id} · ${x.where}</span><br>${x.role}<br><span class="muted">ที่มา: ${x.source} · คลิป: ยืนหายใจ → คุย (...) → เดิน</span>` });
 }
-const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', sksheet: 'Sksheet', vxsheet: 'Vxsheet', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', magic: 'Magic', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
+const TAB_IDS = { clips: 'Clips', monsters: 'Monsters', bosses: 'Bosses', skills: 'Skills', sksheet: 'Sksheet', vxsheet: 'Vxsheet', arms: 'Arms', weapons: 'Weapons', spells: 'Spells', magic: 'Magic', skillnew: 'Skillnew', items: 'Items', structs: 'Structs', vehicles: 'Vehicles', npcs: 'Npcs' };
 function setTab(t) {
 	S.tab = t; try { localStorage.setItem('at_tab', t); } catch (e) {}
 	for (const [k, n] of Object.entries(TAB_IDS)) { $('tab' + n).setAttribute('aria-pressed', String(t === k)); $('pane' + n).hidden = t !== k; }
@@ -3537,7 +3571,7 @@ function boot() {
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
 	for (const b of document.querySelectorAll('.rigBtn')) b.onclick = () => { RIG_ON = !RIG_ON; for (const x of document.querySelectorAll('.rigBtn')) x.setAttribute('aria-pressed', String(RIG_ON)); };
-	S.last.magic = S.last.magic || 'pks_BK-1_hit';
+	S.last.magic = S.last.magic || 'pks_BK-1_hit'; S.last.skillnew = S.last.skillnew || 'pkb_bl0_hit';
 	for (const box of document.querySelectorAll('.pkFoeBox')) { const lab = document.createElement('span'); lab.className = 'muted'; lab.textContent = box.id === 'pkFoe' ? 'ทดลอง VFX · มอนที่โดน:' : 'มอนที่โดน:'; box.append(lab);   // kwan 16 ต.ค. มอนชุดใหม่ 5 ตัว
 		for (const m of (DATA.monsters_px || [])) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = m.id; const k = `mpx/${m.id}_0`, im = IMG[k];
 			if (im) { const ic = document.createElement('canvas'), z = 24 / Math.max(im.width, im.height); ic.width = 24; ic.height = 24; ic.style.cssText = 'width:24px;height:24px;image-rendering:pixelated;vertical-align:middle;margin-right:4px';

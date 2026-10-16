@@ -32,6 +32,11 @@ KNIFE_TIP = np.array([232.0, 180.0])
 # ช่องมือว่าง → กลางกำปั้นมือที่ถือมีด (มือขวาของภาพ ข้างเดียวกับเฟรมที่มีมีด) · โดนตี 2–5 · เชียร์ 2 4 5 (ชูกำปั้นข้างที่ถือมีด จึงชูมีดด้วย)
 KNIFE_AT = {"0_1": (201, 267), "0_2": (205, 269), "0_3": (187, 298), "0_4": (163, 324),
 	"4_1": (218, 163), "4_3": (217, 209), "4_4": (213, 255)}
+# 18-1 ท่าสายคม: ช่องที่ Flow ลืมมีด → มีดจากช่อง 1-1 (แถว 0 ช่อง 0) แปะที่กำปั้นมือหน้า · 5-4 (หันหลัง) ถือสองเล่ม → ลบเล่มซ้าย (กรอบเหนือมือ)
+K18_SRC = ("18-1", "0_0")
+K18_FIST, K18_GRIP, K18_TIP = np.array([145.0, 217.0]), np.array([150.0, 202.0]), np.array([190.0, 142.0])
+K18_AT = {"0_1": (156, 210), "1_1": (178, 168), "5_4": (152, 167), "6_1": (171, 177), "6_4": (149, 212)}
+K18_ERASE = {"4_3": (0, 30, 44, 106)}   # x0 y0 x1 y1 ในภาพ (ใบมีดเล่มซ้าย เหนือกำปั้น)
 HURT = ["0_0", "0_1", "0_2", "0_3", "0_4", "0_5"]
 CHEER = ["4_0", "4_1", "4_2", "4_3", "4_4"]
 
@@ -162,6 +167,25 @@ def fix_knife(order):
 	return res
 
 
+def fix_18_1():
+	src = load(*K18_SRC)
+	piece = src.copy()
+	piece[~(axis_mask(src, K18_GRIP, K18_TIP, -4, 11) & (src[..., 3] > 0)), 3] = 0
+	L = np.linalg.norm(K18_TIP - K18_GRIP)
+	d = (K18_TIP - K18_GRIP) / L
+	out = {}
+	for f, fist in K18_AT.items():
+		img = np.pad(load("18-1", f), ((PAD, PAD), (PAD, PAD), (0, 0)))
+		img = paste_rotated(img, piece, K18_GRIP, K18_TIP, np.array(fist, float) + (K18_GRIP - K18_FIST) + PAD, d, L)
+		ys, xs = np.nonzero(img[..., 3] > 0)
+		out[f] = img[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+	for f, (x0, y0, x1, y1) in K18_ERASE.items():
+		img = load("18-1", f)
+		img[y0:y1, x0:x1, 3] = 0
+		out[f] = img
+	return out
+
+
 def save(name, frames):
 	os.makedirs(OUT, exist_ok=True)
 	for i, f in enumerate(frames):
@@ -188,4 +212,8 @@ if __name__ == "__main__":
 	hurt, cheer = fix_knife(HURT), fix_knife(CHEER)
 	save("hurt", hurt)
 	save("cheer", cheer)
-	sheet([fan, hurt, cheer])
+	k18 = fix_18_1()
+	os.makedirs(OUT, exist_ok=True)
+	for f, im in k18.items():
+		Image.fromarray(np.clip(im, 0, 255).astype(np.uint8), "RGBA").save(os.path.join(OUT, f"18-1_{f}.png"))
+	sheet([fan, hurt, cheer, list(k18.values())])
