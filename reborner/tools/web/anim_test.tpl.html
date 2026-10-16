@@ -358,6 +358,12 @@ const PKV = { SEC: 0.06, W: 300, H: 168, G: 158, MX: 74,
 		{ id: 'ST', name: 'หนังสติ๊ก (ยิง)', clip: 'w2_ST', strike: 3, proj: 'stone', fly: 9, hit: 'ST', death: 'ST', sfx: 'ป๊อก!' },
 		{ id: 'DV', name: 'ที่เย็บ (กล · ไฟฟ้า)', clip: 'w2_DV', strike: 3, proj: 'staple', fly: 9, hit: 'DV', death: 'DV', sfx: 'ซ่าาา!' }],
 	SPELLS: [
+		// ขาว + RD-1 = ใส่ตัวเอง (kwan 16 ต.ค. "เพิ่มเวทย์ขาวด้วย เอฟเฟคเกิดกับตัวเอง") · self = ไม่พุ่งใส่มอน เอฟเฟกต์อยู่ที่ Rion
+		{ id: 'WH-1', name: 'กำแพงธาตุ', school: 'ขาว', el: 'แสง', clip: 'white', strike: 2, self: 'SHIELD', status: 'ลดดาเมจ 45% · 3 เทิร์น', sfx: 'วิ้ง!', charge: 'holy' },
+		{ id: 'WH-2', name: 'ปกป้องชีวิต', school: 'ขาว', el: 'แสง', clip: 'white', strike: 2, self: 'GUARD', status: 'กันการล้ม 1 ครั้ง', sfx: 'วิ้ง!', charge: 'holy' },
+		{ id: 'WH-3', name: 'ล้างสถานะ', school: 'ขาว', el: 'แสง', clip: 'white', strike: 2, self: 'CLEANSE', status: 'ล้างสถานะผิดปกติ', sfx: 'ซ่า…', charge: 'holy' },
+		{ id: 'WH-4', name: 'คืน LP', school: 'ขาว', el: 'แสง', clip: 'white', strike: 2, self: 'LP', status: '+1 LP', sfx: 'วิ้ง!', charge: 'holy' },
+		{ id: 'RD-1', name: 'นาฬิกาปลุกเร่ง', school: 'แดง', el: '—', clip: 'red', strike: 3, self: 'HASTE', status: 'เร็วขึ้น (เร่งคิว)', sfx: 'กริ๊งงง!' },
 		{ id: 'BK-1', name: 'ไฟแช็กพ่น', school: 'ดำ', el: 'ไฟ', clip: 'black', strike: 5, proj: 'flame', fly: 4, hit: 'FI', death: 'FI', sfx: 'พรึ่บ!', charge: 'fire' },
 		{ id: 'BK-2', name: 'ลมตู้แช่', school: 'ดำ', el: 'น้ำแข็ง', clip: 'black', strike: 5, proj: 'wind', fly: 5, hit: 'ICE', death: 'ICE', sfx: 'วู้ววว!', charge: 'ice' },
 		{ id: 'BK-3', name: 'ไฟฉายแสงจ้า', school: 'ดำ', el: 'แสง', clip: 'black', strike: 5, proj: 'beam', fly: 2, hit: 'LIGHT', death: 'LIGHT', sfx: 'วิ้ง!!', charge: 'light' },
@@ -369,7 +375,7 @@ const PKV = { SEC: 0.06, W: 300, H: 168, G: 158, MX: 74,
 		{ id: 'RD-4', name: 'รอยปากกาแดง: ทุบ', school: 'แดง', el: 'ทุบ', clip: 'red', strike: 3, proj: 'x', fly: 8, hit: 'MARK', status: 'จุดอ่อน: ทุบ', sfx: 'ขีด!' },
 		{ id: 'RD-5', name: 'ยางลบบัฟ', school: 'แดง', el: '—', clip: 'red', strike: 3, proj: 'x', fly: 8, hit: 'ERASE', status: 'ลบบัฟ', sfx: 'ฟืด ฟืด!' },
 		{ id: 'SM-1', name: 'ผู้เฝ้าเตาเถ้า', school: 'อัญเชิญ', el: 'ไฟ', clip: 'summon', strike: 5, proj: 'summon', fly: 14, hit: 'BOOM', death: 'FI', sfx: 'ครืนนน!!', charge: 'rune' }] };
-const PK_COL = { fire: ['#fff4c0', '#ffd24a', '#ff8a1e', '#e8401a', '#8a1a10'], ice: ['#ffffff', '#d4f1ff', '#7fd0ff', '#3a8ad8', '#1d3f78'], light: ['#ffffff', '#fffbd8', '#ffe97a', '#f0c030', '#9a7410'], dark: ['#e8d8ff', '#b088f0', '#6a3cc0', '#3a1a70', '#140828'], red: ['#ffffff', '#ffb0a8', '#ff4a3a', '#c01a10', '#5a0a06'] };
+const PK_COL = { holy: ['#ffffff', '#fffbe8', '#fff0a8', '#e8c860', '#8a7020'], fire: ['#fff4c0', '#ffd24a', '#ff8a1e', '#e8401a', '#8a1a10'], ice: ['#ffffff', '#d4f1ff', '#7fd0ff', '#3a8ad8', '#1d3f78'], light: ['#ffffff', '#fffbd8', '#ffe97a', '#f0c030', '#9a7410'], dark: ['#e8d8ff', '#b088f0', '#6a3cc0', '#3a1a70', '#140828'], red: ['#ffffff', '#ffb0a8', '#ff4a3a', '#c01a10', '#5a0a06'] };
 const pkMon = () => (DATA.monsters_px || []).find(m => m.id === (S.pkFoe || 'M01')) || (DATA.monsters_px || [])[0];
 const pkRole = (m, r, i = 0) => { const ks = m.roles.map((x, j) => x === r ? `mpx/${m.id}_${j}` : null).filter(Boolean); return ks[Math.min(i, ks.length - 1)] || `mpx/${m.id}_0`; };
 const PK_PIX = {};   // พิกเซลของภาพ (แคช) → [{x, y, c}]
@@ -389,7 +395,7 @@ function pkTimeline(a, die) {
 	const pk = (DATA.rion_pack || []).find(c => c.id === a.clip), n = pk ? pk.frames.length : 1, pre = a.charge ? 14 : 8, step = a.charge ? 5 : 4;
 	const S0 = pre + step * a.strike, HIT = S0 + (a.proj ? a.fly : 0);
 	const pose = F => F < pre ? 0 : F < S0 ? Math.min(a.strike, Math.floor((F - pre) / step) + 1) : F < S0 + 6 ? a.strike : Math.min(n - 1, a.strike + 1 + Math.floor((F - S0 - 6) / 4));
-	return { pk, pre, S0, HIT, D0: HIT + (a.proj === 'flame' || a.proj === 'wind' ? 12 : 8), N: HIT + (die ? 50 : a.status ? 34 : 28), pose };
+	return { pk, pre, S0, HIT, D0: HIT + (a.proj === 'flame' || a.proj === 'wind' ? 12 : 8), N: HIT + (die ? 50 : a.self === 'SHIELD' ? 40 : a.status ? 34 : 28), pose };
 }
 for (const die of [false, true]) for (const a of PKV.ATK) {
 	const tl = pkTimeline(a, die); if (!tl.pk) continue;
@@ -399,7 +405,7 @@ for (const die of [false, true]) for (const a of PKV.ATK) {
 for (const die of [false, true]) for (const a of PKV.SPELLS) {
 	if (die && a.status) continue;   // คาถาสถานะไม่มีดาเมจ → ไม่มีท่าตาย
 	const tl = pkTimeline(a, die); if (!tl.pk) continue;
-	addClip(`เวทย์${a.school}${die ? ' · โดนแล้วตาย' : a.status ? ' · ใส่สถานะ' : ' · โดน'}`, `pks_${a.id}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} (${a.el})${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
+	addClip(`เวทย์${a.school}${die ? ' · โดนแล้วตาย' : a.self ? ' · ใส่ตัวเอง' : a.status ? ' · ใส่สถานะ' : ' · โดน'}`, `pks_${a.id}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} (${a.el})${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
 		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'magic' });
 }
 function pkTint(key, col, a) {   // ภาพ + ย้อมสีทับเฉพาะส่วนที่มีภาพ
@@ -432,25 +438,26 @@ function pkvView(c) {
 	const idle = pkRole(m, 'idle', Math.floor(F / 4) % 3), hurt = pkRole(m, 'hurt'), mim = IMG[idle];
 	if (!mim) return;
 	const mw = mim.width, mh = mim.height, mx0 = Math.round(MX - mw / 2), my0 = G - mh;
-	const rx = a.proj ? W - 8 - rim.width : Math.min(W - 8 - rim.width, mx0 + mw - 22), ry = G - 108;
+	const rx = a.proj || a.self ? W - 8 - rim.width : Math.min(W - 8 - rim.width, mx0 + mw - 22), ry = G - 108;
 	const cp = PK_COL[a.charge === 'rune' ? 'fire' : a.charge] || FB_PAL.fire, big = a.hit === 'BOOM';
 	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false; drawBg(); ctx.save();
 	const shk = d >= 0 && d < (big ? 8 : 4) ? (a.hit === 'CR' || big ? 4 : 2) * (1 - d / (big ? 8 : 4)) : 0, rs = vRng(F * 31 + 7);
 	ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk));
 	drawBg();
 	// คาถา: จอมืดลงตามธาตุตั้งแต่รวมพลังจนหลังโดน (มืด = ดับเกือบสนิท)
-	if (a.charge) { const dim = F < 8 ? 0 : F < tl.HIT + 8 ? Math.min(1, (F - 8) / 8) : Math.max(0, 1 - (F - tl.HIT - 8) / 10), col = { fire: '28,8,4', ice: '4,14,32', light: '40,32,0', dark: '6,2,14', rune: '28,8,4' }[a.charge];
+	if (a.charge) { const dim = F < 8 ? 0 : F < tl.HIT + 8 ? Math.min(1, (F - 8) / 8) : Math.max(0, 1 - (F - tl.HIT - 8) / 10), col = { fire: '28,8,4', ice: '4,14,32', light: '40,32,0', dark: '6,2,14', rune: '28,8,4', holy: '30,28,10' }[a.charge];
 		if (dim) { ctx.fillStyle = `rgba(${col},${(a.charge === 'dark' ? 0.7 : 0.35) * dim})`; ctx.fillRect(-8, -8, W + 16, H + 16); } }
 	if (a.school === 'แดง' && F >= 6 && F < tl.HIT + 10) { ctx.fillStyle = 'rgba(60,0,0,0.18)'; ctx.fillRect(-8, -8, W + 16, H + 16); }
 	// อัญเชิญ: ยักษ์ไฟลุกหลังมอน (วาดก่อนมอน)
 	if (a.proj === 'summon' && F >= tl.S0) { const u = F - tl.S0, k = Math.min(1, u / 8), fade = d > 6 ? Math.max(0, 1 - (d - 6) / 8) : 1; if (fade > 0) { ctx.save(); ctx.globalAlpha = fade; pkGuardian(MX, G, k, F, d >= 0 && d < 6); ctx.restore(); } }
 	// ── มอน ──
-	const kb = d >= 0 && !a.status ? Math.round(-5 * Math.max(0, 1 - d / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0, mx = mx0 + kb;
+	const kb = d >= 0 && !a.status && !a.self ? Math.round(-5 * Math.max(0, 1 - d / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0, mx = mx0 + kb;
 	const mcx = mx + mw / 2, mcy = my0 + mh * 0.55;
 	if (!dying) {
-		const key = d >= 0 && (d < 9 || c.die) ? hurt : idle;
+		let key = d >= 0 && (d < 9 || c.die) && !a.self ? hurt : idle;
+		if (a.self === 'SHIELD' && d >= 6 && d < 16) key = pkRole(m, d < 11 ? 'wind' : 'atk');   // มอนโจมตีใส่โล่
 		let tint = ['#000', 0]; const lasting = d >= 0 ? Math.max(0, 1 - d / 22) : 0;
-		if ((d === 0 || d === 1) && !a.status) tint = ['#fff', 1];
+		if ((d === 0 || d === 1) && !a.status && !a.self) tint = ['#fff', 1];
 		else if (a.hit === 'DV' && d >= 0 && d < 12 && F % 2) tint = ['#7fd0ff', 0.6];
 		else if ((a.hit === 'FI' || big) && d >= 0) tint = ['#ff5a14', 0.55 * lasting];
 		else if ((a.hit === 'ICE' || a.hit === 'NEEDLE') && d >= 0) tint = ['#9ad8ff', 0.6 * Math.max(0.35, lasting)];
@@ -463,7 +470,9 @@ function pkvView(c) {
 		ctx.drawImage(oc, mx + shiv, Math.round(G - im.height * sy), im.width, Math.round(im.height * sy));
 	} else pkDeath(a.death, hurt, mx, G, t);
 	// ── Rion (พลิกหันซ้าย) ──
-	if (IMG[rion]) spr(rion, rx, ry, { flip: true });
+	if (IMG[rion]) { if (a.self === 'CLEANSE' && d < 4) { const oc = pkTint(rion, '#8a3cc0', d < 0 ? 0.35 : 0.35 * (1 - d / 4)); ctx.save(); ctx.translate(rx + oc.width, ry); ctx.scale(-1, 1); ctx.drawImage(oc, 0, 0); ctx.restore(); }   // ติดพิษม่วงก่อนล้าง
+		else spr(rion, rx, ry, { flip: true }); }
+	if (a.self) pkSelf(a, d, F, { rx, ry, rw: rim.width, mcx, mcy, mx, mw, my0, G });
 	const strikeKey = 'rpk/' + tl.pk.frames[a.strike], [tx, ty] = pkTip(strikeKey), hx = rx + (IMG[strikeKey] ? IMG[strikeKey].width - 1 - tx : 0), hy = ry + ty;
 	// รวมพลัง: ประกายธาตุวนเข้าอก + แกนเรืองโตขึ้น · อัญเชิญ = วงรูนพื้นใต้เท้า
 	if (a.charge && F >= 8 && F < tl.S0) { const u = (F - 8) / (tl.S0 - 8), cx = rx + rim.width - 34, cy = ry + 74;
@@ -492,7 +501,7 @@ function pkvView(c) {
 	}
 	if (a.proj && a.proj !== 'summon' && F >= tl.S0 && F < tl.S0 + 2) fbPixHit(hx, hy, F - tl.S0, false, cp, 11);
 	// ── เอฟเฟกต์ตอนโดน ตามชนิด ──
-	if (d >= 0 && !dying) pkHit(a, d, F, { mx, my0, mw, mh, mcx, mcy, G, cp });
+	if (d >= 0 && !dying && !a.self) pkHit(a, d, F, { mx, my0, mw, mh, mcx, mcy, G, cp });
 	ctx.restore();
 	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(`${m.name} ${m.id} · ${a.id && a.school ? a.id + ' ' : ''}${a.name}${c.die ? ' · ตาย' : ''}`, 4, H - 2);   // ป้ายล่าง ไม่ทับข้อความเสียง
 	if (S.grid) drawGrid();
@@ -539,6 +548,37 @@ function pkHit(a, d, F, o) {
 	const sfxCol = { DV: '#a8e0ff', ICE: '#d4f1ff', NEEDLE: '#d4f1ff', DARK: '#b088f0', LIGHT: '#fffbd8', TAPE: '#ff8a7a', MARK: '#ff8a7a', ERASE: '#ff8a7a' }[h] || '#ffd24a';
 	if (d < (a.status ? 9 : 12)) pkText(a.sfx, mcx - 14, Math.max(14, Math.round(my0 - 4 - Math.min(6, d))), sfxCol);
 	if (a.status && d >= 9) pkText(a.status, Math.max(4, mcx - 30), Math.max(28, my0 - 14), '#ff8a7a');
+}
+// เวทย์ใส่ตัวเอง: โล่ / รัศมีกันล้ม / ล้างพิษ / คืน LP / เร่งเวลา · วาดทับ Rion (d = เฟรมนับจากร่ายเสร็จ)
+function pkSelf(a, d, F, o) {
+	const { rx, ry, rw, mcx, mcy, G } = o, cx = rx + rw / 2, cy = ry + 74, top = ry + 36, P = PK_COL.holy, k = a.self;
+	if (k === 'CLEANSE' && d < 4) for (let i = 0; i < 7; i++) { const q = (F + i * 5) % 18; if (d >= 0 && fbHash(i, 2, 2) < d / 4) continue;   // ฟองพิษลอยรอบตัว
+		const x = cx - 14 + fbHash(i, 1, 1) * 28, y = G - 6 - q * 3; fbPx(x - 1, y - 1, '#6a3cc0', 3, 3); fbPx(x - 1, y - 1, '#b088f0', 2, 2); }
+	if (d < 0) return;
+	if (k === 'SHIELD') { const g = Math.min(1, d / 4), hit = d >= 15 && d < 19, R = 26 * g, RY = 42 * g;   // โดมแสงหกเหลี่ยมรอบตัว
+		for (let i = 0; i < 40; i++) { const an = i / 40 * 6.283, x = cx + Math.cos(an) * R, y = cy - 6 + Math.sin(an) * RY; if (y > G) continue;
+			fbPx(x, y, hit ? '#ffffff' : (i + (F >> 1)) % 5 === 0 ? P[0] : P[2], hit ? 2 : 1, hit ? 2 : 1); }
+		if (g >= 1) for (let i = 0; i < 6; i++) { const y = cy - 30 + i * 10, half = R * Math.sqrt(Math.max(0, 1 - ((y - cy + 6) / RY) ** 2)); if ((i + (F >> 2)) % 3) continue; for (let x = -half; x <= half; x += 3) fbPx(cx + x, y, P[1]); }
+		if (d >= 9 && d < 15) { const q = (d - 9) / 6, x = mcx + 20 + (cx - R - mcx - 20) * q; for (let i = 0; i < 5; i++) fbPx(x - i * 4, mcy + (fbHash(i, d, 1) - 0.5) * 8, i ? '#c8b89a' : '#ffffff', 4, 2); }   // แรงกระแทกจากมอน
+		if (hit) { pkStar(cx - R, cy, 6 + (d - 15) * 3, '#ffffff', P[3]); for (let i = 0; i < 6; i++) { const q = d - 15; fbPx(cx - R - q * 3, cy - 8 + i * 4 - q * (i - 3), P[2], 2, 2); } }
+		if (d >= 15 && d < 26) pkText('กันได้!', cx - 26, top - 4, '#fff0a8'); }
+	if (k === 'GUARD') { const g = Math.min(1, d / 5);   // วงแสงทองเหนือหัว + ขอบตัวเรือง + ขนนกร่วง
+		for (let i = 0; i < 24; i++) { const an = i / 24 * 6.283 + F * 0.08; fbPx(cx + Math.cos(an) * 12 * g, top - 6 + Math.sin(an) * 3 * g, (i + F) % 3 ? P[2] : P[0], 2, 1); }
+		if (d < 18) for (let i = 0; i < 16; i++) { const an = i / 16 * 6.283, r = 6 + d * 3; fbPx(cx + Math.cos(an) * r, cy + Math.sin(an) * r * 1.3, P[d < 8 ? 1 : 3]); }
+		for (let i = 0; i < 5; i++) { const q = (d + i * 6) % 24, x = cx - 20 + i * 10 + Math.sin(q * 0.4 + i) * 4, y = top - 10 + q * 3; if (y > G - 4) continue; fbPx(x, y, '#ffffff', 3, 1); fbPx(x + 1, y + 1, P[2], 1, 1); } }
+	if (k === 'CLEANSE') { if (d < 12) for (let i = 0; i < 14; i++) { const x = cx - 22 + i * 3.3, y = top - 30 + ((d * 7 + i * 13) % 30) * 3; if (y > G - 2) continue; fbPx(x, y, i % 3 ? '#d4f1ff' : '#ffffff', 1, 4); }   // ฝนแสงล้าง
+		if (d < 5) for (let i = 0; i < 7; i++) { const x = cx - 14 + fbHash(i, 1, 1) * 28, y = G - 20 - fbHash(i, 4, 4) * 40, r = 1 + d; for (let j = 0; j < 8; j++) { const an = j / 8 * 6.283; fbPx(x + Math.cos(an) * r, y + Math.sin(an) * r, '#e8d8ff'); } }   // ฟองแตก
+		if (d >= 6 && d < 20) for (let i = 0; i < 6; i++) { const q = (d + i * 3) % 10; fbPx(cx - 15 + i * 6, cy - q * 4, q < 5 ? '#ffffff' : P[2], 2, 2); } }
+	if (k === 'LP') { for (let i = 0; i < 20; i++) { const an = i / 20 * 6.283 + F * 0.1, r = 16 + Math.min(1, d / 4) * 6; fbPx(cx + Math.cos(an) * r * 1.3, G - 2 + Math.sin(an) * r * 0.25, (i + F) % 2 ? '#8ae07a' : P[2], 2, 1); }   // วงพื้นเขียวทอง
+		for (let i = 0; i < 6; i++) { const q = (d + i * 4) % 22, x = cx - 18 + i * 7, y = G - 6 - q * 3.4; if (d > 26) break; const c = q < 11 ? '#c8ffb8' : '#8ae07a'; fbPx(x - 2, y, c, 5, 1); fbPx(x, y - 2, c, 1, 5); }   // เครื่องหมายบวกลอยขึ้น
+		if (d < 4) { ctx.fillStyle = `rgba(220,255,200,${0.3 - d * 0.07})`; ctx.fillRect(-8, -8, PKV.W + 16, PKV.H + 16); } }
+	if (k === 'HASTE') { const C = PK_COL.red, ox = cx, oy = top - 14;   // นาฬิกาเหนือหัว เข็มหมุนเร็ว + เส้นความเร็ว + ร่างติดตา
+		for (let i = 0; i < 20; i++) { const an = i / 20 * 6.283; fbPx(ox + Math.cos(an) * 7, oy + Math.sin(an) * 7, i % 5 ? '#ffffff' : C[2], 2, 2); }
+		fbPx(ox - 6, oy - 10, C[2], 4, 3); fbPx(ox + 3, oy - 10, C[2], 4, 3);   // กระดิ่ง
+		pkLine(ox, oy, ox + Math.cos(F * 0.9) * 5, oy + Math.sin(F * 0.9) * 5, '#2a1a14'); pkLine(ox, oy, ox + Math.cos(F * 0.25) * 3, oy + Math.sin(F * 0.25) * 3, C[3]);
+		if (d < 26) for (let i = 0; i < 6; i++) { const y = top + 8 + i * 11, L = 10 + fbHash(i, F, 1) * 14, x = rx + rw - 6 + ((F * 4 + i * 9) % 20); fbPx(x, y, '#ffffff', L, 1); } }
+	if (d < 10) pkText(a.sfx, cx - 18, Math.max(14, top - 22 - Math.min(6, d)), k === 'HASTE' ? '#ff8a7a' : '#fff0a8');
+	if (d >= 10 && !(k === 'SHIELD' && d >= 15 && d < 26)) pkText(a.status, Math.max(4, Math.min(PKV.W - 130, cx - 50)), Math.max(28, top - 18), k === 'HASTE' ? '#ff8a7a' : k === 'LP' ? '#c8ffb8' : '#fff0a8');
 }
 // ── ท่าตายตามชนิดการโจมตี (t = เฟรมนับจากเริ่มตาย) · ใช้ภาพผงะ (hurt) ของมอนเป็นฐาน แตกเป็นพิกเซลทีละจุด ──
 function pkDeath(id, key, mx, G, t) {
@@ -603,9 +643,11 @@ function pkDeath(id, key, mx, G, t) {
 }
 function pkvSound(F) {
 	const c = CLIPS[S.clip]; if (!S.sound || !AU || !c || !c.pkv) return; const a = c.atk, tl = pkTimeline(a, c.die), m = pkMon(), big = m.id === 'B1' ? 0.6 : 1;
-	if (a.charge && F === 8) AU_SFX.charge(a.charge === 'ice' || a.charge === 'light' ? 'DV' : 'CR');
+	if (a.charge && F === 8) AU_SFX.charge(a.charge === 'holy' ? 'DV' : a.charge === 'ice' || a.charge === 'light' ? 'DV' : 'CR');
 	if (F === tl.S0) { if (a.school) { auNoise(0.3, 'bandpass', a.charge === 'ice' ? 2000 : 700, a.charge === 'ice' ? 6000 : 2200, 0.5, 1.5); auTone(0.16, 'sawtooth', a.charge === 'dark' ? 90 : 240, a.charge === 'dark' ? 45 : 110, 0.14, 0, 0.004, { lp: 900 }); }
 		else (AU_SFX.release[a.id] || AU_SFX.release.SL)(); }
+	if (F === tl.HIT && a.self) { auTone(0.5, 'sine', 660, 990, 0.18, 0, 0.02); auTone(0.5, 'sine', 990, 1320, 0.12, 0.1, 0.02); if (a.self === 'HASTE') auNoise(0.25, 'highpass', 4000, 9000, 0.3, 6); return; }
+	if (a.self === 'SHIELD' && F === tl.HIT + 15) { AU_SFX.hit('PC', false); return; }
 	if (F === tl.HIT) { if (a.status) { auTone(0.12, 'square', 660, 520, 0.12, 0, 0.002, { lp: 2400 }); auTone(0.12, 'square', 880, 700, 0.1, 0.08, 0.002, { lp: 2400 }); }
 		else { AU_SFX.hit(a.hit === 'ICE' || a.hit === 'NEEDLE' || a.hit === 'LIGHT' || a.hit === 'DARK' || a.hit === 'FI' ? 'DV' : a.hit === 'BOOM' ? 'CR' : a.id, a.hit === 'CR' || a.hit === 'BOOM');
 			if (a.hit === 'ICE' || a.hit === 'NEEDLE') auNoise(0.12, 'highpass', 2500, 7000, 0.4, 4); }
