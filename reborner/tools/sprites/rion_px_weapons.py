@@ -11,7 +11,7 @@ from scipy import ndimage
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SHEET = os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v9.jpg")
-# รอบ 13 ระดับ 2 (kwan 16 ต.ค.): GPT ลอกผังรอบ 9 (8x6) · แถวดินสอ/หนังสติ๊กยังเป็นของระดับ 1 → ไม่ใช้ · ใช้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต
+# รอบ 13 ระดับ 2 (kwan 16 ต.ค. · เจนด้วย Google Flow): Flow ลอกผังรอบ 9 (8x6) · แถวดินสอ/หนังสติ๊กยังเป็นของระดับ 1 → ไม่ใช้ · ใช้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต
 SHEETS = {"v9": SHEET, "t2": os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v13_t2.jpg")}
 OUT = os.path.join(ROOT, "assets/sprites/rion_px_weapons_draft")
 GAME = os.path.join(ROOT, "assets/sprites/rion_px")   # เข้าเกม (kwan 16 ต.ค. "ใส่เข้าเกม"): west_<สาย>_<i>.png ผืนเดียวกับ rion_px · BattleScreen เลือกตามสายของอาวุธที่ติดตั้ง
