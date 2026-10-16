@@ -178,7 +178,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSksheet" hidden>
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
-			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></p>
+			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button><button class="btn pxBtn" aria-pressed="true">👦 Rion พิกเซล (ในเกม)</button></p>
 			<p class="seg" id="labSheet" role="group" aria-label="ซ้อนแล็บ VFX"></p>
 			<p class="seg" id="rollFoe" role="group" aria-label="มอนที่โดน (ท่ากระโดดม้วน)"></p>
 			<p class="seg" id="fbElem" role="group" aria-label="ธาตุของห่าลูกไฟ"></p>
@@ -258,7 +258,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<p class="lbl" style="margin-top:12px">แล็บ VFX (ไฟล์จาก night-forge-vfx-lab · ยังไม่ผูกกับท่า)</p>
 			<div class="row"><span class="seg" id="labPick"></span></div>
 			<p class="lbl" style="margin-top:12px">ไม้ตาย 6 สาย × แสงจากชีต VFX ตัวเอก (ร่าง)</p>
-			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></div>
+			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button><button class="btn pxBtn" aria-pressed="true">👦 Rion พิกเซล (ในเกม)</button></div>
 			<p class="note" id="styleNote">ซินีมา = คัตอิน · มุมกล้อง · ร่างแยก (6 สาย) · SaGa = แนว Romancing SaGa 3: ฉากเต็มจอ · ทีมเรียงทแยง · วิ่งเข้าตี · กล่องชื่อท่ามุมขวาบน · ไม้ตายเปลี่ยนสีทั้งจอ (ตัวอย่าง: คม · ยิง)</p>
 			<p class="lbl" style="margin-top:12px">สาย (techs.csv)</p>
 			<div class="schools" id="schoolPick"></div>
@@ -405,6 +405,31 @@ function heldPose(it, p) { const w = RIG_ON && rigWeapon(it); if (w) return rigK
 const P64_TOP = 12, P64 = Object.fromEntries((DATA.poses64 || []).map(p => [p.id, p]));
 const p64Key = (id, u) => { const p = P64[id]; return p ? `p64/${id}_${p.order[Math.floor((((u % 1) + 1) % 1) * p.order.length)]}` : null; };
 const rspr = (key, x, y, opt) => spr(key, x, y - (key && key.startsWith('p64/') ? P64_TOP : 0), opt);
+// Rion พิกเซลที่เกมใช้ (rion_px · kwan 16 ต.ค. "เปลี่ยน Rion ในฉาก VFX สกิล ไม้ตาย") — ทุกฉากที่วาดภาพ Rion เก่า (rion/ · held/ · rig/ · p64/rion_)
+// ถูกแทนด้วยภาพ px/ ตามจังหวะท่า ณ จุดวาด (spr · tinted · ghost) · ปุ่ม "Rion พิกเซล" ปิดเพื่อเทียบของเดิม
+// ผืนเก่า 64x64 เท้าแถว 62 กลางคอลัมน์ 32 · ผืน px 96x112 เท้าแถว 109 กลาง 48 → เลื่อน (-16, -47) · p64 สูง 76 (rspr ลบ 12 ไว้แล้ว) → (-16, -35)
+// ไม่แทนในคลิปท่าขยับธรรมดา/คู่เทียบ/แท็บอาวุธ (ดูภาพเดิมได้ตรง ๆ) · ภาพที่ไม่มีคู่ (เต้นสามช่า อีโมต ท่าขดตัวกลางอากาศของริก) = ใช้ภาพเดิม
+let PX_ON = true, PX_NOW = true;
+const PX_PAD = 24;
+const PX_ATK = [3, 3, 4, 5], PX_POSE5 = [0, 3, 4, 4, 5, 5];   // ฟันเก่า 4 ภาพ (ง้าง→พุ่ง→ฟัน→ถอย) · ท่าถือ 5–6 ช่อง (ยืน ง้าง ฟาด ตาม คืน)
+const PX_RIG = i => i <= 0 ? 0 : i <= 5 ? 3 : i <= 7 ? 4 : 5;    // ริก 12 เฟรม: 0 ยืน · 1–5 ง้าง · 6 ฟาด · 7 ตาม · 8–11 คืน
+const pxIdle = () => `px/west_i${Math.floor(performance.now() / 1000 / (K.HERO_IDLE_SEC || 0.22)) % 6}`;
+function pxMap(key) {
+	if (!PX_ON || !PX_NOW || !key || !DATA.sprites['px/west_i0']) return null;
+	let m;
+	if (key === 'rion/west') return pxIdle();
+	if ((m = key.match(/^rion\/west_([ahk])(\d)$/))) return m[1] === 'a' ? `px/west_a${PX_ATK[+m[2]] ?? 5}` : m[1] === 'h' ? `px/west_h${+m[2] ? 4 : 1}` : `px/west_k${+m[2] ? 4 : 1}`;
+	if ((m = key.match(/^rion\/(south|north|west|east)(?:_w(\d))?$/))) return `px/${m[1]}_w${2 * +(m[2] || 0)}`;
+	if ((m = key.match(/^rion\/grips\/[a-z_]+?_(\d)$/)) || (m = key.match(/^held\/.+_(\d)$/))) return `px/west_a${PX_POSE5[+m[1]] ?? 5}`;
+	if ((m = key.match(/^rig\/(SL01T)_/))) return null;
+	if ((m = key.match(/^rig\/.+_(\d+)$/))) return `px/west_a${PX_RIG(+m[1])}`;
+	if ((m = key.match(/^p64\/rion_(run|walk)_(west|east|south|north)_(\d+)$/))) return `px/${m[2]}_w${+m[3] % 8}`;
+	if ((m = key.match(/^p64\/rion_idle_west_(\d+)$/))) return `px/west_i${+m[1] % 6}`;
+	if ((m = key.match(/^p64\/rion_hurt_(\d+)$/))) return `px/west_h${Math.min(5, Math.floor(+m[1] / 11))}`;
+	return null;
+}
+const PX_FEET = 109;   // แถวเท้าของผืน px (rion_px_game.py)
+const pxOff = (key, pk) => [-16, (key.startsWith('p64/') ? -35 : -47) + PX_FEET - ((DATA.px_feet || {})[pk.slice(3)] || PX_FEET)];   // ภาพที่ลอยในชีต → วางเท้าแตะพื้น
 const RIG = DATA.rion_rig, RIG_POSE = [0, 4, 6, 7, 10], RIG_HIT = 6;
 let RIG_ON = true;   // ปุ่ม 🦴 (ตัวแปรแยกจาก S: heldPose ถูกเรียกตอนลงทะเบียนคลิป ก่อนประกาศ S)
 const RIG_FAM = { 'คม': 'SL', 'แทง': 'PC', 'ทุบ': 'CR', 'ยิง': 'ST', 'มือเปล่า': 'BD', 'กล': 'DV' };
@@ -726,14 +751,17 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 	const hits = c.epic ? [HIT, HIT + 6, HIT + 12] : fam === 'BD' ? [HIT - 4, HIT - 2, HIT] : [HIT];   // epic: ฟันวิญญาณ 3 ระลอก
 	const since = Math.min(...hits.map(h => t >= h ? t - h : 99)), fsince0 = f >= HIT ? f - HIT : 99, fsince = c.epic ? Math.min(fsince0, since) : fsince0;   // fsince = เวลาจริง (นับรวมหยุดภาพ) · epic: ทุกระลอกได้ซูม/จอวาบ
 	const fw = fx ? fx.width : 40, k80 = Math.min(1, 80 / fw);
-	cv.width = W0; cv.height = H0; ctx.imageSmoothingEnabled = false;
+	// Rion พิกเซลสูง ~79 (เดิม ~58) → ฉากสูงเท่าเดิมหัวโดนตัด: เผื่อแถบบน PX_PAD แล้วเลื่อนทั้งฉากลง · พื้นหลังแถบบนยืดจากแถวบนสุดของฉาก
+	const PADY = PX_ON ? PX_PAD : 0;
+	cv.width = W0; cv.height = H0 + PADY; ctx.imageSmoothingEnabled = false; LOGICAL_H = H0; ctx.translate(0, PADY);
 	ctx.save();
 	// กล้อง: ซูมเข้าเป้าตอนกระทบ + จอสั่น
 	// L.push = กล้องค่อย ๆ ดันเข้าหาจุดอื่นก่อนกระทบ ({x, y, z} · แนว Eiyuden)
 	const pz = fsince0 >= 8 && L.push ? L.push : null, cx = pz ? pz.x : T.x, cy = pz ? pz.y : T.y;
 	const zoom = fsince < 8 ? 1 + 0.16 * (1 - fsince / 8) : pz ? pz.z : 1, sh = since < 5 ? VFX.SHAKE[fam] * (1 - since / 5) : 0, rs = vRng(vHash(it.code) + f * 31);
 	ctx.translate(cx, cy); ctx.scale(zoom, zoom); ctx.translate(-cx + Math.round((rs() * 2 - 1) * sh), -cy + Math.round((rs() * 2 - 1) * sh));
-	L.bg(); if (L.under) L.under(t, since);
+	L.bg(); if (PADY) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(cv, 0, PADY, W0, 1, 0, 0, W0, PADY); ctx.restore(); }
+	if (L.under) L.under(t, since);
 	// ฟ้าเปลี่ยนสีตามแสงของท่า + มืดลง
 	const dm = L.dim ?? 0.5, ex = c.epic ? 12 : 0, dim = c.epic && t < 3 ? (t > 2 - RS3.ATK ? dm * 0.45 * Math.min(1, (t + RS3.ATK - 2) / 20) : 0) : t < 3 ? 0 : t < REL ? Math.max(c.epic ? dm * 0.45 : 0, dm * 0.2 * (t - 2)) : t < HIT + 12 + ex ? dm : t < HIT + 16 + ex ? dm * (1 - (t - HIT - 12 - ex) / 4) : 0;
 	if (dim) { ctx.fillStyle = L.dimCol ? L.dimCol(dim) : `rgba(6,8,20,${dim})`; ctx.fillRect(-40, -40, W0 + 80, H0 + 80);
@@ -798,7 +826,7 @@ function vfxScene(c, L) {   // L = ผังฉาก: size · hand · rion (ม
 			const ox = (r() * 2 - 1) * 9, oy = (r() * 2 - 1) * 7; vfxImg(fx, T.x + ox, T.y + oy, 0.6 + d * 0.1, 0.6 + d * 0.1, (r() - 0.5) * 0.6, 1 - d / 5, d > 0);
 			vfxRing(T.x + ox, T.y + oy, 4 + d * 8, 4 + d * 8, col[0], 1 - d / 5, 2); vfxRing(T.x + ox, T.y + oy, 2 + d * 4, 2 + d * 4, '#ffffff', 1 - d / 4, 1); }
 		if (t >= REL - 2 && t < HIT + 2) { vfxDot(Hx - 6, Hy, 3 + (t % 2) * 2, col[0], 0.85);
-			const ghost = IMG['rion/' + SKS.poses.BD[2]]; if (ghost) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.28; ctx.drawImage(ghost, L.rion[0] - 30 - (t % 3) * 8, L.rion[1]); ctx.restore(); } }
+			ctx.save(); ctx.globalCompositeOperation = 'lighter'; spr('rion/' + SKS.poses.BD[2], L.rion[0] - 30 - (t % 3) * 8, L.rion[1], { alpha: 0.28 }); ctx.restore(); }
 		if (since < 10) vfxBurst(it.code, HIT, t, T.x, T.y, 26, col, { speed: 4.2, life: 10, streak: true, salt: 9 });
 	} else if (fam === 'DV') {   // ชาร์จลูกพลังดูดอนุภาค → ลำแสงยืดจากมือถึงเป้า กะพริบ + แกนขาว → ระเบิด + วง
 		if (t >= 1 && t < REL + 1) { const q = (t - 1) / REL; vfxDot(Hx - 6, Hy - 2, 3 + q * 9, col[0], 0.5 + q * 0.4); vfxDot(Hx - 6, Hy - 2, 1 + q * 4, '#ffffff', 0.85);
@@ -955,7 +983,7 @@ function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟัน�
 			ctx.fillStyle = i % 2 ? '#7a6a58' : '#9a8670'; ctx.fillRect(Math.round(x), Math.round(feetY - 1 - lift * (5 + (i * 7) % 11) + Math.sin(F * 0.9 + i) * lift), 2, 2); }
 	} : null;
 	const auraFront = pw > 0 ? () => {
-		const ti = tinted(pose, AP.tint); if (ti && !rot) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (0.22 + 0.12 * (F % 2)) * pw; ctx.drawImage(ti, Math.round(pos[0]), Math.round(pos[1] - (pose.startsWith('p64/') ? P64_TOP : 0))); ctx.restore(); }
+		const ti = tinted(pose, AP.tint); if (ti && !rot) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (0.22 + 0.12 * (F % 2)) * pw; ctx.drawImage(ti, Math.round(pos[0]) + (ti.ox || 0), Math.round(pos[1] - (pose.startsWith('p64/') ? P64_TOP : 0)) + (ti.oy || 0)); ctx.restore(); }
 		flame(0.55, AP.fr, 0.35);
 		ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = AP.spark;
 		for (let i = 0; i < 12; i++) { const r = (i * 37 % 11) / 11, x = cx - 16 + r * 32, y = cy + 18 - ((F * 3.5 + i * 9) % 46); ctx.globalAlpha = pw * (0.5 + 0.5 * ((F + i) % 2)); ctx.fillRect(Math.round(x), Math.round(y), 1, 2 + (i % 2)); }   // ประกายพุ่งขึ้น
@@ -987,12 +1015,13 @@ function rollView(c, Fin, mode = '') {   // mode: '' = ปกติ (ฟัน�
 // → 100– เต้นสามช่าที่จุดคุกเข่า (หมาแจม/ขโมยของ ยกเลิก 13 ต.ค.) · อัตราการเกิดยังไม่กำหนด (kwan จะสรุป) → คลิปโชว์กรณีเกิดเสมอ
 const rollStop = () => { const foe = rollFoe(), fw = (IMG[foe.key] || { width: 48 }).width, land = [foe.x + (fw >> 1) - 2 + ROLL.SKID, SKS.rion_at[1]]; return { land, stop: [land[0] - ROLL.SKID, land[1]] }; };
 function drawAngry(pos, F, standing) {   // โกรธ: เส้นเลือด 💢 แดงเด้งที่มุมหัว · ขมวดคิ้ว (ตอนยืน) · ควันพุ่งจากหัว
-	const x0 = Math.round(pos[0]), y0 = Math.round(pos[1]), pop = F < 2 ? 1 : F % 6 < 3 ? 0 : 1;
+	const px = !!pxMap('rion/west');   // Rion พิกเซล: หัวสูงกว่าเดิม 21 จุด · คิ้วชุดนี้วัดจากหน้าริกเก่า → ไม่วาด (หน้า px ขมวดคิ้วอยู่แล้ว)
+	const x0 = Math.round(pos[0]), y0 = Math.round(pos[1]) - (px ? 21 : 0), pop = F < 2 ? 1 : F % 6 < 3 ? 0 : 1;
 	const V = ['.XX...XX.', 'XXX...XXX', 'XX.....XX', '.........', '.........', '.........', 'XX.....XX', 'XXX...XXX', '.XX...XX.'], vx = x0 + 37 - pop, vy = y0 + 1 - pop;
 	ctx.save();
 	for (let j = 0; j < 9; j++) for (let i = 0; i < 9; i++) if (V[j][i] === 'X') { ctx.fillStyle = '#3a0a0a'; ctx.fillRect(vx + i - 1, vy + j, 3, 1); ctx.fillRect(vx + i, vy + j - 1, 1, 3); }
 	for (let j = 0; j < 9; j++) for (let i = 0; i < 9; i++) if (V[j][i] === 'X') { ctx.fillStyle = '#ff2a2a'; ctx.fillRect(vx + i, vy + j, 1, 1); }
-	if (standing) { ctx.fillStyle = '#140806'; for (const [bx, by] of BROW) ctx.fillRect(x0 + bx, y0 + by, 1, 1);   // คิ้วหนาขมวดลงหาจมูก (หันซ้าย)
+	if (standing && !px) { ctx.fillStyle = '#140806'; for (const [bx, by] of BROW) ctx.fillRect(x0 + bx, y0 + by, 1, 1);   // คิ้วหนาขมวดลงหาจมูก (หันซ้าย)
 		ctx.globalAlpha = 0.55; ctx.fillStyle = '#3a1a4a'; for (const gx of [21, 23, 25]) ctx.fillRect(x0 + gx, y0 + 15 + (gx & 1), 1, 5);   // เส้นเงาหน้าผากแบบการ์ตูนโกรธ
 		ctx.globalAlpha = 1; ctx.fillStyle = '#140806'; ctx.fillRect(x0 + 21, y0 + 29, 4, 1); ctx.fillStyle = '#ffffff'; ctx.fillRect(x0 + 22, y0 + 29, 2, 1); ctx.globalAlpha = 1; }   // กัดฟัน
 	for (let k = 0; k < 2; k++) { const t = (F + k * 3) % 6, a = 1 - t / 6; ctx.globalAlpha = 0.8 * a; ctx.fillStyle = '#f2f2f2';   // ควันพ่นจากหัวสองข้าง
@@ -1028,7 +1057,7 @@ function fbLabView(c) {
 		if (hit) { ox.globalCompositeOperation = 'lighter'; ox.globalAlpha = 0.7; ox.drawImage(im, 0, 0); }
 		if (fall >= 1) { ox.globalCompositeOperation = 'source-atop'; ox.globalAlpha = Math.min(0.45, (t - boomT - 0.35) * 0.8); ox.fillStyle = '#1a0c08'; ox.fillRect(0, 0, im.width, im.height); }
 		ctx.save(); ctx.translate(f.x + (hit ? -1 : 0), GROUND); ctx.scale(1 + 0.25 * e, 1 - 0.7 * e); ctx.drawImage(o, -(im.width >> 1), -im.height); ctx.restore(); }
-	const pose = c.frames[S.frame]; if (IMG[pose]) ctx.drawImage(IMG[pose], X0 - 33, GROUND - 62);
+	const pose = c.frames[S.frame]; spr(pose, X0 - 33, GROUND - 62);
 	layer(false);
 	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText('แล็บ · ' + comp.name + ' · ' + t.toFixed(2) + ' วิ', 4, 9);
 	if (S.grid) drawGrid();
@@ -1125,7 +1154,7 @@ function fireView(c) {
 		if (p >= 0 && p <= 0.15) { fbPx(hx - 3, hy - 1, P[1], 3, 3); fbPx(hx - 2, hy - 2, P[1], 1, 5); fbPx(hx - 4, hy, P[0]); }   // แสงพิกเซลที่ฝ่ามือตอนยิง
 		fbPixHit(ex, ey, F - b.t1, !!b.big, P, bi); });
 	// Rion + พายุชั้นหน้า
-	const pose = fbPose(F); if (IMG[pose]) ctx.drawImage(IMG[pose], rx, ry);
+	const pose = fbPose(F); spr(pose, rx, ry);
 	tornado(true);
 	if (storm >= 1 && F < FB.BAR0) vfxBurst('FBup', FB.BURST, F, cx, ground - 6, 28, P, { speed: 2.6, dir: -Math.PI / 2, spread: 0.7, life: 16, grav: -0.02 });
 	// ของดรอปกลิ้งมาหา Rion (คอลัมน์ drop ใน monsters.csv → ไอคอน items_draft) + ป้ายชื่อ
@@ -1679,7 +1708,8 @@ const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_we
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
 
 // ── วาด ──
-const W = () => cv.width, H = () => cv.height;
+let LOGICAL_H = 0;   // ฉาก VFX ที่เผื่อเหนือหัวให้ Rion พิกเซล (vfxScene) = ความสูงฉากเดิม ไม่นับแถบที่เผื่อ
+const W = () => cv.width, H = () => LOGICAL_H || cv.height;
 function drawBg() {
 	if (S.bg === 'stage') {
 		ctx.fillStyle = '#a7b5a0'; ctx.fillRect(0, 0, W(), H());
@@ -1700,6 +1730,7 @@ function drawGrid() {
 	for (let y = 0; y < H(); y += 8) ctx.fillRect(0, y, W(), 1);
 }
 function spr(key, x, y, opt = {}) {
+	const pk = pxMap(key); if (pk && IMG[pk]) { const [dx, dy] = pxOff(key, pk); key = pk; x += dx; y += dy; }
 	const im = IMG[key]; if (!im) return;
 	ctx.save();
 	ctx.globalAlpha = opt.alpha ?? 1;
@@ -1722,6 +1753,7 @@ function clipView() {
 	if (c.panels) return panelView(c);
 	if (c.skill) return sheetSkillView(c);
 	if (c.lab) return labSpellView(c);
+	PX_NOW = false;   // คลิปท่าขยับธรรมดา = ดูภาพตามชื่อจริง ไม่แทนด้วย Rion พิกเซล
 	const [SW, SH] = c.stage || [96, 96], base = SH - 4;   // ผืนสูงกว่า 96 (Rion พิกเซล 112) → เวทีสูงตาม ไม่ตัดเท้า
 	cv.width = SW; cv.height = SH; ctx.imageSmoothingEnabled = false;
 	drawBg();
@@ -1735,6 +1767,7 @@ function clipView() {
 
 // คู่เทียบ: แต่ละช่องเล่นชุดของตัวเองพร้อมกัน เฟรมเท่ากัน รอบเท่ากัน (ซ้าย = ท่าเดิม)
 function panelView(c) {
+	PX_NOW = false;
 	const n = c.panels.length; cv.width = 96 * n; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
 	ctx.font = '7px system-ui, sans-serif';
 	c.panels.forEach((p, k) => {
@@ -2187,9 +2220,11 @@ function heroTo(to, sec, ease = easeOut, delay = 0) {
 }
 const tintCache = new Map();
 function tinted(key, col) {
-	const id = key + col; if (tintCache.has(id)) return tintCache.get(id);
-	const im = IMG[key]; if (!im) return null;
+	const pk = pxMap(key), id = (pk ? pk + '@' + (key.startsWith('p64/') ? 'p' : 'r') : key) + col; if (tintCache.has(id)) return tintCache.get(id);
+	const im = IMG[pk && IMG[pk] ? pk : key]; if (!im) return null;
+	// ภาพ px: ผืนที่วาดตรงจุดเดิมได้ (ตัวเลื่อนขึ้น/ซ้ายตาม pxOff) → ผู้เรียกวาดที่ (x, y) เดิมไม่ต้องรู้ · ส่วนที่ล้นขอบบน/ซ้ายของผืนเก่าเก็บใน .ox/.oy
 	const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d');
+	if (pk && IMG[pk]) { const [dx, dy] = pxOff(key, pk); c.ox = dx; c.oy = dy; }
 	x.drawImage(im, 0, 0); x.globalCompositeOperation = 'source-atop'; x.fillStyle = col; x.fillRect(0, 0, c.width, c.height);
 	tintCache.set(id, c); return c;
 }
@@ -2197,7 +2232,7 @@ function tinted(key, col) {
 function ghost(col, life = 0.3, key, pos) {
 	const k = key || S.heroFrame, p = pos || { ...S.hero }, im = tinted(k, col);
 	const oy = k && k.startsWith('p64/') ? P64_TOP : 0;
-	fx(life, q => { if (!im) return; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.6 * (1 - q); ctx.drawImage(im, Math.round(p.x), Math.round(p.y) - oy); ctx.restore(); });
+	fx(life, q => { if (!im) return; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 0.6 * (1 - q); ctx.drawImage(im, Math.round(p.x) + (im.ox || 0), Math.round(p.y) - oy + (im.oy || 0)); ctx.restore(); });
 }
 function flash(col, peak, sec) { S.fx.push({ t: 0, dur: sec, ui: true, draw: p => { ctx.save(); ctx.globalAlpha = peak * (1 - p); ctx.fillStyle = col; ctx.fillRect(0, 0, W(), H()); ctx.restore(); } }); }
 function shake(amp, sec) { S.shake = sec; S.shakeAmp = amp; S.shakeDur = sec; }
@@ -2847,7 +2882,7 @@ function tick(now) {
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
 				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
-		clipView();
+		PX_NOW = true; LOGICAL_H = 0; clipView();
 	} else {
 		if (S.playing) {
 			if (S.seq) { S.seq.acc += dt; while (S.seq && S.seq.acc >= S.seq.sec) { S.seq.acc -= S.seq.sec; S.seq.i++;
@@ -2858,7 +2893,7 @@ function tick(now) {
 			if (S.shake > 0) S.shake = Math.max(0, S.shake - dt);
 			if (S.dimT !== undefined) { S.dimT += dt; const t = S.dimT, hold = (S.dimTotal || 0.85) - 0.03; S.dim = t < 0.12 ? 0.55 * t / 0.12 : t < hold ? 0.55 : t < hold + 0.35 ? 0.55 * (1 - (t - hold) / 0.35) : 0; if (t >= hold + 0.35) S.dimT = undefined; }
 		}
-		skillView(S.playing ? dt : 0);
+		PX_NOW = true; LOGICAL_H = 0; skillView(S.playing ? dt : 0);
 	}
 	requestAnimationFrame(tick);
 }
@@ -3139,6 +3174,7 @@ function boot() {
 	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
+	for (const b of document.querySelectorAll('.pxBtn')) b.onclick = () => { PX_ON = !PX_ON; for (const x of document.querySelectorAll('.pxBtn')) x.setAttribute('aria-pressed', String(PX_ON)); };
 	for (const b of document.querySelectorAll('.rigBtn')) b.onclick = () => { RIG_ON = !RIG_ON; for (const x of document.querySelectorAll('.rigBtn')) x.setAttribute('aria-pressed', String(RIG_ON)); };
 	{ const box = $('fbElem'), lab = document.createElement('span'); lab.className = 'muted'; lab.textContent = 'ธาตุเวทย์ (ห่าลูกไฟ):'; box.append(lab);   // kwan 13 ต.ค. มอนร้อน/หนาวตามเวทย์
 		for (const [v, t] of [['fire', '🔥 ไฟ (ร้อน)'], ['ice', '❄ น้ำแข็ง (หนาว)']]) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = v; b.textContent = t; b.setAttribute('aria-pressed', String(v === S.fbElem));

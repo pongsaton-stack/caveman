@@ -2,6 +2,7 @@
 # อ่านสไปรต์จาก assets/ + techs.csv + monsters.csv + ค่าคงที่จาก Formulas.gd / BattleScreen.gd / Overworld.gd
 # ข้อมูลฝังในไฟล์ HTML · ภาพแยกเป็นก้อน JSON ข้างหน้าเว็บ (อัปโหลดเป็นไฟล์ประกอบของ Artifact) · รัน: python3 tools/web/anim_test_build.py <out.html>
 import glob, base64, csv, json, os, re, sys
+from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPR = os.path.join(ROOT, 'assets/sprites')
@@ -223,6 +224,8 @@ def main(out_path):
 		'structures': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/structures.json'), encoding='utf-8')),
 		'vehicles': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/vehicles.json'), encoding='utf-8')),
 		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
+		# Rion พิกเซล: แถวล่างสุดของตัวต่อภาพ (ฉาก VFX วางเท้าลงพื้นเสมอ · ภาพวิ่ง/ง้างในชีตลอยอยู่ 17–21 จุด)
+		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
 		'sheet_cut': sheet_cut(),
