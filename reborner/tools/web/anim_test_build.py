@@ -49,6 +49,12 @@ def sprites():
 		for f in sorted(os.listdir(wd)):
 			if f.endswith('.png'):
 				out['pxw/' + f[:-4]] = png(os.path.join(wd, f))
+	# มอนภูมิภาค 1 พิกเซล (tools/sprites/monsters_px.py · ชีตรอบ 10 · ร่าง)
+	md = os.path.join(SPR, 'monsters_px_draft')
+	if os.path.isdir(md):
+		for f in sorted(os.listdir(md)):
+			if f.endswith('.png'):
+				out['mpx/' + f[:-4]] = png(os.path.join(md, f))
 	# ร่างศัตรูจากชีต Last Light (tools/sprites/ll_enemies.py) — แสดงในหน้านี้อย่างเดียว ยังไม่เข้าเกม
 	dd = os.path.join(SPR, 'monsters_ll_draft')
 	if os.path.isdir(dd):
@@ -232,6 +238,7 @@ def main(out_path):
 		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
 		# Rion พิกเซล: แถวล่างสุดของตัวต่อภาพ (ฉาก VFX วางเท้าลงพื้นเสมอ · ภาพวิ่ง/ง้างในชีตลอยอยู่ 17–21 จุด)
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
+		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
 		'px_weapons': json.load(open(os.path.join(SPR, 'rion_px_weapons_draft/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_px_weapons_draft/index.json')) else [],
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
