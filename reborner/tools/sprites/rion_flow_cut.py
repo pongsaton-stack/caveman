@@ -74,15 +74,31 @@ ERASE = {"v8a": [[(753, 480), (1000, 480), (1000, 632), (868, 632), (842, 649), 
 # เส้นผ่า = x คงที่ หรือ [(ตั้งแต่ y, x), ...] (เส้นหักตามขอบ)
 # ล้มนอน 3 เฟรมท้ายนอนเหลื่อมกัน: ตัวกลางไม่มีขา (ตัวแรกบัง) → ผ่าหลังหมวกตัวแรก (956) และตามขอบแว่นตัวกลาง แล้วตัดตัวกลางทิ้ง (OMIT)
 SPLIT = {("v8a", "death"): [[(0, 945), (1795, 949), (1810, 952), (1825, 955), (1890, 953)], [(0, 1160), (1860, 1144)]]}
+# รอบ 14-2 (Google Flow · JPG 1438x2576 · ไม่มีเส้นตาราง · 8x6) — kwan 16 ต.ค. "ยึดตัวเอกตามแบบนี้เท่านั้น" (หมวกน้ำเงินทั้งใบ · ภาพ 1 = rion_flow_ref.png)
+# ส่งมา 3 ชีต (v14b_1–3) · ใช้ชีต 3 ทั้งชุด: แถว 7 ถือมีดครบทุกเฟรม (ชีต 1–2 มีดหายกลางท่า) · แถวอื่นใช้ได้ทั้ง 3 ชีต
+# Flow วาดเดินซ้าย/ขวาเองทั้งสองทิศ (ไม่ต้องพลิก+ลบนาฬิกา) · หลบวาดหันขวา → พลิก · กระโดดม้วนวาดหันซ้ายแล้ว (prompt สั่งขวา) → ไม่พลิก
+V14_ROWS = [
+	("walk_front", "เดินหน้า", None, 100, True, "หน้า", False, None),
+	("walk_back", "เดินหลัง", None, 100, True, "หลัง", False, None),
+	("walk_left", "เดินซ้าย", None, 100, True, "ซ้าย", False, None),
+	("walk_right", "เดินขวา", None, 100, True, "ขวา", False, None),
+	("dodge", "หลบ", None, 90, False, "ซ้าย", True, 2),
+	("watch", "จับตา (มองไกล)", None, 160, True, "หน้า", False, None),
+	("jump_roll", "กระโดดม้วน → คุกเข่าฟัน", None, 80, False, "ซ้าย", False, 4),
+	("victory", "ชนะ เต้นสามช่า", None, 120, True, "หน้า", False, None)]
+V14 = ["walk_front", "walk_back", "walk_left", "walk_right", "dodge", "watch", "jump_roll", "victory"]
 # ชุดหลัก (kwan 15 ต.ค. "เอาชีต A มาต่อยอด"): ท่าจากชีต A + ท่าจากรอบ 8-2 แทนท่าที่ชีต A พลาด (คุกเข่า ตั้งรับ ม้วนฟัน สามช่า) + ร่ายใหม่
 # ไม่ได้ตัดจากชีต — build_main() คัดลอกไฟล์จาก v5a / v8b (ย่อให้เท่าชีต A) · แถว: (ท่า, ป้าย, ชุดต้นทาง, ms, วน, ทิศ, พลิก, กระทบ)
-MAIN_FROM = {"cast": "v8b", "kneel": "v8b", "guard": "v8b", "jump_roll": "v8b", "victory": "v8b",
-	"idle_battle": "v8a", "attack_knife": "v8a", "hurt": "v8a", "death": "v8a", "run": "v8a"}
-_rows = {"v5a": {r[0]: r for r in V5_ROWS(5)}, "v8a": {r[0]: r for r in V8A_ROWS}, "v8b": {r[0]: r for r in V8B_ROWS}}
+# 16 ต.ค. ท่าที่ชีต 14-2 มี → ใช้ v14 (แบบ Flow ที่ kwan ยึด) · ท่าศึกยังเป็น GPT รอบ 8 จนกว่าจะได้ชีต 14-1
+MAIN_FROM = {"cast": "v8b", "kneel": "v8b", "guard": "v8b",
+	"idle_battle": "v8a", "attack_knife": "v8a", "hurt": "v8a", "death": "v8a", "run": "v8a", **{n: "v14" for n in V14}}
+_rows = {"v5a": {r[0]: r for r in V5_ROWS(5)}, "v8a": {r[0]: r for r in V8A_ROWS}, "v8b": {r[0]: r for r in V8B_ROWS},
+	"v14": {r[0]: r for r in V14_ROWS}}
 MAIN_ROWS = [_rows[MAIN_FROM.get(n, "v5a")][n] for n in
 	["idle_battle", "walk_front", "walk_back", "walk_left", "walk_right", "run", "attack_knife", "hurt", "death", "cast", "kneel", "guard", "dodge", "watch", "jump_roll", "victory"]]
 SETS = [
-	("main", "★ ชุดหลัก · ชีต A + รอบ 8-2", "flow_trial_v5a.png", None, MAIN_ROWS),
+	("main", "★ ชุดหลัก · Flow 14-2 + GPT รอบ 8 (ท่าศึก)", "flow_trial_v5a.png", None, MAIN_ROWS),
+	("v14", "รอบ 14-2 · Flow หมวกน้ำเงิน (ชีต 3 · แบบที่ kwan ยึด)", "flow_trial_v14b_3.jpg", [181, 499, 816, 1132, 1446, 1760, 2071, 2406], V14_ROWS),
 	("v5a", "รอบ 5 ชีต A · GPT (PNG ไม่มีเส้นตาราง)", "flow_trial_v5a.png", [88, 253, 422, 595, 742, 870, 1003, 1101, 1223], V5_ROWS(5)),
 	("v8a", "รอบ 8-1 · GPT ต่อจากชีต A (ขนาดเดิม)", "flow_trial_v8a.jpg", [221, 730, 1272, 1755, 2377], V8A_ROWS),
 	("v8b", "รอบ 8-2 · GPT ต่อจากชีต A (ขนาดเดิม)", "flow_trial_v8b.jpg", [232, 730, 1274, 1843, 2399], V8B_ROWS),
@@ -194,7 +210,7 @@ def cut_free(sid, fn, cen, rows):
 			if q.sum() < .3 * med:
 				j = min(range(len(main)), key=lambda t: abs(cx(main[t]) - cx(q))); main[j] |= q
 		frames = sorted(main, key=cx)
-		ys = np.concatenate([np.nonzero(f)[0] for f in frames]); y0, y1 = ys.min() - 4, ys.max() + 5
+		ys = np.concatenate([np.nonzero(f)[0] for f in frames]); y0, y1 = max(0, ys.min() - 4), min(H, ys.max() + 5)   # รอบ 14 แถวล่างชิดขอบชีต
 		W = int(max(np.ptp(np.nonzero(f)[1]) for f in frames)) + 17
 		for c, f in enumerate(frames):
 			fm = ndimage.binary_dilation(f, iterations=2) & (al > 0)
@@ -398,9 +414,10 @@ def build_main():
 		hr = np.median([x[0] for x in nh]) / np.median([x[0] for x in rf]); cr = np.median([x[1] for x in nh]) / np.median([x[1] for x in rf])
 		return 1 / np.sqrt(hr * cr)
 	ks = {"v8b": k_for("v8b", "walk_left", ["cast", "kneel", "guard"]), "v8b_front": k_for("v8b", "walk_front", ["victory"]),
-		"v8a": k_for("v8a", "walk_left", ["death", "attack_knife"])}   # รอบ 8-1 เฟรมยืนตรง = ล้มเฟรม 1 · ฟันเฟรม 1
+		"v8a": k_for("v8a", "walk_left", ["death", "attack_knife"]),   # รอบ 8-1 เฟรมยืนตรง = ล้มเฟรม 1 · ฟันเฟรม 1
+		"v14": k_for("v14", "walk_left", ["walk_left", "walk_right"])}   # ชีตเดียว ทุกแถวขนาดเดียวกัน → อัตราเดียว
 	for n, *_ in MAIN_ROWS:
-		src = MAIN_FROM.get(n, "v5a"); k = 1 if src == "v5a" else ks[src + ("_front" if n == "victory" else "")]
+		src = MAIN_FROM.get(n, "v5a"); k = 1 if src == "v5a" else ks[src + ("_front" if n == "victory" and src == "v8b" else "")]
 		for i in range(cnt(src, n)):
 			im = Image.open(os.path.join(OUT, src, "%s_%d.png" % (n, i)))
 			if k != 1: im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)

@@ -10,8 +10,10 @@ SRC = os.path.join(ROOT, "assets/sprites/rion_flow_draft/main_px")
 OUT = os.path.join(ROOT, "assets/sprites/rion_px")
 W, H, FEET = 96, 112, 110   # ผืนกว้างพอท่าล้มนอน/รอยมีด · สูงพอมีดชูเหนือหัว · เท้าแถว 110
 # (ชื่อไฟล์ในเกม, แถวในชุดหลัก, เฟรมที่ใช้) — เฟรมที่ตัดตาม OMIT ของหน้าเทส (ฟันเฟรม 5 หมวกซ้อน · โดนตีเฟรม 0 มีดสองเล่ม · ล้มเฟรม 4 ตัวไม่มีขา)
-MAP = [("south_w", "walk_front", range(8)), ("north_w", "walk_back", range(8)),
-	("west_w", "walk_left", range(8)), ("east_w", "walk_right", range(8)),
+# เดิน 4 ทิศ = ทุกเฟรมที่มี (16 ต.ค. ชีต Flow 14-2 = 6 เฟรม · เดิม GPT 8)
+_n = lambda row: range(sum(1 for f in os.listdir(SRC) if f.startswith(row + "_") and f[len(row) + 1:-4].isdigit()))
+MAP = [("south_w", "walk_front", _n("walk_front")), ("north_w", "walk_back", _n("walk_back")),
+	("west_w", "walk_left", _n("walk_left")), ("east_w", "walk_right", _n("walk_right")),
 	("west_i", "idle_battle", range(6)), ("west_a", "attack_knife", [0, 1, 2, 3, 4, 6]),
 	("west_h", "hurt", [1, 2, 3, 4, 5, 6]), ("west_k", "death", [0, 1, 2, 3, 5])]
 
@@ -19,7 +21,9 @@ MAP = [("south_w", "walk_front", range(8)), ("north_w", "walk_back", range(8)),
 def main():
 	os.makedirs(OUT, exist_ok=True)
 	for f in os.listdir(OUT):
-		if f.endswith(".png"): os.remove(os.path.join(OUT, f))
+		# ลบเฉพาะไฟล์ของสคริปต์นี้ (west_<อาวุธ>_<i> เขียนโดย rion_px_weapons.py ห้ามลบ)
+		stem = f[:-4].rstrip("0123456789")
+		if f.endswith(".png") and (stem in [m[0] for m in MAP] or f == "west.png"): os.remove(os.path.join(OUT, f))
 	clip, info = 0, {}
 	for name, row, idx in MAP:
 		for j, i in enumerate(idx):
