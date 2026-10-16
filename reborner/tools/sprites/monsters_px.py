@@ -1,6 +1,6 @@
 """มอนภูมิภาค 1 พิกเซล 32-bit จากชีตรอบ 10 (GPT · kwan 16 ต.ค. 2026)
   python3 tools/sprites/monsters_px.py
-ชีต docs/art-bible/rion_hires/monster_trial_v10.jpg: แถวละตัว 8 ช่อง หันขวา · บอสแยก 2 แถว แถวละ 4 · หมาป่าได้ 7 ภาพ (ไม่มีท่ากัด)
+ชีตรอบ 10 monster_trial_v10.jpg: สไลม์ หนอน (แถวละตัว 8 ช่อง) · ชีตรอบ 11 monster_trial_v11.jpg: หมาป่า ค้างคาว บอส (ตัวละ 2 แถว แถวละ 4) · หันขวาทั้งหมด
 ทำ: ลบพื้นเขียว → ก้อนต่อแถว (ก้อนที่ช่วง x ซ้อนกัน = ตัวเดียว · ก้อนเล็กติดตัวที่ใกล้สุด) → ช่องตามตำแหน่ง x →
 ย่อต่อตัว ให้สัดส่วนเทียบ Rion เท่ามอนในเกมเดิม (ความสูงเดิม × Rion ใหม่ 79 / Rion เดิม · ค้างคาวใช้ความกว้างปีก) →
 พาเลตต์ร่วมทุกตัว 48 สี → ผืนต่อตัวขนาดเดียวทุกเฟรม: ตำแหน่งเทียบกลางช่องและเส้นพื้นของแถวเดิม (ท่ากระโดด/บินขึ้นลงยังอยู่)
@@ -11,16 +11,18 @@ from PIL import Image
 from scipy import ndimage
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-SHEET = os.path.join(ROOT, "docs/art-bible/rion_hires/monster_trial_v10.jpg")
+SHEETS = {"v10": os.path.join(ROOT, "docs/art-bible/rion_hires/monster_trial_v10.jpg"),
+	"v11": os.path.join(ROOT, "docs/art-bible/rion_hires/monster_trial_v11.jpg")}   # รอบ 11 = เจนใหม่ หมาป่า/ค้างคาว/บอส ให้ตรงแบบ (แถวละ 4 ช่อง ตัวละ 2 แถว)
+SHEET = SHEETS["v10"]
 OUT = os.path.join(ROOT, "assets/sprites/monsters_px_draft")
 EDGE = np.array([42, 26, 20])
 # (id, ชื่อ, แถวในชีต [แถบที่ 0–5], จำนวนช่องต่อแถว, วัดขนาดด้วย, ล้างขอบเขียวจาก JPG [none = ตัวเขียวเอง · edge = เฉพาะขอบ (มอสเขียวบนหลัง) · all = ทั้งตัว], บทบาทของแต่ละภาพตามลำดับ)
 MONS = [
 	("M01", "สไลม์เถ้า", [0], 8, "h", "none", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
 	("M03", "หนอนหิน", [1], 8, "h", "edge", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
-	("M06", "ค้างคาวเงา", [2], 8, "w", "all", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
-	("M15", "หมาป่า", [3], 8, "h", "all", ["idle", "idle", "idle", "wind", "atk", "hurt", "ko"]),
-	("B1", "ราชาหนอนเถ้า", [4, 5], 4, "h", "all", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
+	("M06", "ค้างคาวเงา", ("v11", [2, 3]), 4, "w", "all", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
+	("M15", "หมาป่า", ("v11", [0, 1]), 4, "h", "all", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
+	("B1", "ราชาหนอนเถ้า", ("v11", [4, 5]), 4, "h", "all", ["idle", "idle", "idle", "wind", "atk", "follow", "hurt", "ko"]),
 ]
 OLD_RION = os.path.join(ROOT, "assets/sprites/rion_lastlight_draft/west.png")
 NEW_RION = os.path.join(ROOT, "assets/sprites/rion_px/west_i0.png")
@@ -85,19 +87,30 @@ def vis_h(path):
 
 
 def main():
-	src = np.array(Image.open(SHEET).convert("RGB")).astype(float)
-	rgb, a = key_green(src)
-	m = ndimage.binary_opening(a > 0.5, iterations=1)
-	bd = bands(m); H0, W0 = m.shape
+	SH = {}
+	for sk, path in SHEETS.items():
+		rgb, a = key_green(np.array(Image.open(path).convert("RGB")).astype(float))
+		m = ndimage.binary_opening(a > 0.5, iterations=1)
+		SH[sk] = (rgb, a, m, bands(m))
 	ratio = vis_h(NEW_RION)[0] / vis_h(OLD_RION)[0]
 	cuts = {}
 	for mid, name, rows, ncol, dim, spill, roles in MONS:
+		sk, rows = rows if isinstance(rows, tuple) else ("v10", rows)   # แถวในชีตไหน
+		rgb, a, m, bd = SH[sk]; H0, W0 = m.shape
 		fr = []
 		for ri, r in enumerate(rows):
 			y0, y1 = bd[r]
 			for col, mk in sorted(figures(m, y0, y1, ncol, W0), key=lambda t: t[0]):
 				fr.append((ri * ncol + col, mk, y0, y1, ncol))
 		assert len(fr) == len(roles), (mid, len(fr), len(roles))
+		# เส้นพื้นต่อแถว = จุดต่ำสุดในแถว · ตัวบิน (dim "w"): แถวที่ไม่มีภาพล้ม (ทุกภาพลอย) ใช้ความสูงบินที่วัดจากแถวที่มีภาพล้มบนพื้น
+		bot = lambda f: np.where(f[1])[0].max()
+		bases = {y0: max(bot(f) for f in fr if f[2] == y0) for y0 in {f[2] for f in fr}}
+		if dim == "w":
+			ko_row = fr[roles.index("ko")][2]
+			lift = bases[ko_row] - max(bot(f) for i, f in enumerate(fr) if f[2] == ko_row and roles[i] != "ko")
+			for y0 in bases:
+				if y0 != ko_row: bases[y0] += lift
 		oh, ow = vis_h(os.path.join(ROOT, "assets/sprites/monsters_ll/%s.png" % mid))
 		ys, xs = np.where(fr[0][1])
 		k = (oh * ratio) / (ys.max() - ys.min() + 1) if dim == "h" else (ow * ratio) / (xs.max() - xs.min() + 1)
@@ -110,19 +123,22 @@ def main():
 				mx = np.maximum(crop[..., 0], crop[..., 2]) + 8
 				crop[..., 1] = np.where(zone, np.minimum(crop[..., 1], mx), crop[..., 1])
 			c, mm = shrink(crop, np.where(mk, a[y0:y1], 0)[by0:by1, bx0:bx1], k)
-			cw = W0 / ncol; ccx = (slot % ncol + 0.5) * cw; base = max(np.where(f[1])[0].max() for f in fr if f[2] == y0)
+			cw = W0 / ncol; ccx = (slot % ncol + 0.5) * cw; base = bases[y0]
 			out.append((c, mm, (bx0 - ccx) * k, (by0 - base) * k))   # มุมซ้ายบนเทียบ (กลางช่อง, เส้นพื้นของแถว)
 		cuts[mid] = (name, roles, k, out)
-	# พาเลตต์ร่วม 48 สี: 32 ตามจำนวนพิกเซล + 16 จากสีไม่ซ้ำ (ตาส้ม/ประกายจุดเล็กได้สีของตัวเอง)
-	px = np.concatenate([c[mm] for _, _, _, o in cuts.values() for c, mm, _, _ in o]).astype(np.uint8)
-	p1 = np.array(Image.fromarray(px[None]).quantize(32, method=Image.MEDIANCUT).convert("RGB")).reshape(-1, 3)
-	uq = np.unique(px // 16 * 16 + 8, axis=0)
-	p2 = np.array(Image.fromarray(uq[None]).quantize(16, method=Image.MEDIANCUT).convert("RGB")).reshape(-1, 3)
-	pal = np.unique(np.vstack([p1, p2]), axis=0).astype(float)
+	# พาเลตต์ต่อตัว 32 สี: 24 ตามจำนวนพิกเซล + 8 จากสีไม่ซ้ำ (ตาส้ม/ประกายจุดเล็กได้สีของตัวเอง)
+	# (พาเลตต์ร่วมทุกตัว ทำให้ไฮไลต์ของหนอนไปได้สีเขียวอ่อนของสไลม์ เมื่อมอนชุดอื่นเปลี่ยน)
+	def palette(o):
+		px = np.concatenate([c[mm] for c, mm, _, _ in o]).astype(np.uint8)
+		p1 = np.array(Image.fromarray(px[None]).quantize(24, method=Image.MEDIANCUT).convert("RGB")).reshape(-1, 3)
+		uq = np.unique(px // 16 * 16 + 8, axis=0)
+		p2 = np.array(Image.fromarray(uq[None]).quantize(min(8, len(uq)), method=Image.MEDIANCUT).convert("RGB")).reshape(-1, 3)
+		return np.unique(np.vstack([p1, p2]), axis=0).astype(float)
 	os.makedirs(OUT, exist_ok=True)
 	for f in glob.glob(os.path.join(OUT, "*.png")): os.remove(f)
-	idx = {"_doc": __doc__.split("\n")[0], "palette": len(pal), "rion_ratio": round(ratio, 3), "monsters": []}
+	idx = {"_doc": __doc__.split("\n")[0], "palette": "ต่อตัว ≤ 32", "rion_ratio": round(ratio, 3), "monsters": []}
 	for mid, (name, roles, k, out) in cuts.items():
+		pal = palette(out)
 		L = min(ox for _, _, ox, _ in out); R = max(ox + c.shape[1] for c, _, ox, _ in out)
 		T = min(oy for _, _, _, oy in out); B = max(oy + c.shape[0] for c, _, _, oy in out)
 		pad = 2; W, H = int(np.ceil(R - L)) + 2 * pad, int(np.ceil(B - T)) + 2 * pad
@@ -136,7 +152,7 @@ def main():
 		idx["monsters"].append({"id": mid, "name": name, "n": len(out), "roles": roles, "scale": round(k, 4), "size": [W, H], "anchor": [ax, fy]})
 	json.dump(idx, open(os.path.join(OUT, "index.json"), "w"), ensure_ascii=False, indent=1)
 	open(os.path.join(OUT, ".gdignore"), "w").close()
-	print("monsters_px: Rion ใหม่/เดิม ×%.2f · พาเลตต์ %d สี · " % (ratio, len(pal)) + " · ".join("%s %d ภาพ ×%.3f %dx%d" % (x["id"], x["n"], x["scale"], *x["size"]) for x in idx["monsters"]))
+	print("monsters_px: Rion ใหม่/เดิม ×%.2f · พาเลตต์ต่อตัว ≤ 32 สี · " % ratio + " · ".join("%s %d ภาพ ×%.3f %dx%d" % (x["id"], x["n"], x["scale"], *x["size"]) for x in idx["monsters"]))
 
 
 if __name__ == "__main__":

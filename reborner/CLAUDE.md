@@ -628,7 +628,8 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
         **รอบ 9 ถืออาวุธ 5 สาย (16 ต.ค.)**: ชีต GPT `flow_trial_v9.jpg` → `tools/sprites/rion_px_weapons.py` → `assets/sprites/rion_px_weapons_draft/` (ร่าง · .gdignore) · หน้า animation test Version 89 กลุ่ม "Rion พิกเซล · ถืออาวุธ (รอบ 9 · ร่าง)"
           ไม้เบสบอล ดินสอ หนังสติ๊ก ที่เย็บกระดาษ ถุงมือ (ระดับ 1 ของแต่ละตระกูล) · รายละเอียด/สิ่งที่ตัดทิ้ง FLOW_PIXEL_TRIAL.md "ผลรอบ 9" · **ยังไม่เข้าเกม รอ kwan ดู**
         **รอบ 10 มอนภูมิภาค 1 (16 ต.ค.)**: ชีต GPT `monster_trial_v10.jpg` + ภาพอ้างอิง `monster_ref_region1.png` → `tools/sprites/monsters_px.py` → `assets/sprites/monsters_px_draft/` (ร่าง) ·
-          หน้า animation test Version 90 แท็บมอนสเตอร์/บอส กลุ่ม "มอนภูมิภาค 1 · พิกเซล (รอบ 10 · ร่าง)" (หายใจ + โจมตี→โดนตี→ล้ม) · M01 M03 M06 M15 (7 ภาพ) B1 · ขนาดในเกมยังไม่ตัดสิน · รายละเอียด FLOW_PIXEL_TRIAL.md "ผลรอบ 10"
+          หน้า animation test Version 90 แท็บมอนสเตอร์/บอส กลุ่ม "มอนภูมิภาค 1 · พิกเซล (รอบ 10 · ร่าง)" (หายใจ + โจมตี→โดนตี→ล้ม) · M01 M03 M06 M15 B1 · ขนาดในเกมยังไม่ตัดสิน · รายละเอียด FLOW_PIXEL_TRIAL.md "ผลรอบ 10"
+          **รอบ 11 (kwan เลือกเจนใหม่ตัวที่ไม่ตรงแบบ)**: หมาป่า/ค้างคาว/บอสจาก `monster_trial_v11.jpg` (มีท่ากัด · ค้างคาวหน้าหมา · บอสเกราะหิน+ตา 10 ดวง) · พาเลตต์ต่อตัว · หน้าเทส Version 91 · "ผลรอบ 11"
         ยังไม่ได้ทำ: ใส่ท่าถืออาวุธ 5 สายและมอนชุดใหม่เข้าเกม · หมา/ไทล์ใช้พิกเซลชุดเดิม
   Blender (apt) นำเข้า glb ต้องมี numpy → `start_blender_mcp.sh` ลง python3-numpy ให้เองแล้ว (kwan 14 ต.ค. "ลง numpy") · **รอ kwan เจนชีตใหม่**
 
