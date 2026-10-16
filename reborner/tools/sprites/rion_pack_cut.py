@@ -26,11 +26,26 @@ SHEETS = {
 	"16-3": ("flow_trial_v16_3.jpg", 6, True),
 	"16-4": ("flow_trial_v16_4.jpg", 5, True),
 	"16-5": ("flow_trial_v16_5.jpg", 4, False),
+	"16-1b": ("flow_trial_v16_1b.jpg", 4, False),
+	"15-2": ("flow_trial_v15_2.jpg", 6, False),
+	"15-3": ("flow_trial_v15_3.jpg", 6, False),
+	"15-4": ("flow_trial_v15_4.jpg", 6, False),
+	"15-5": ("flow_trial_v15_5.jpg", 6, False),
 }
+# กลางแถว (y ในชีต) วัดด้วยตา สำหรับชีตที่แถวสูงไม่เท่ากัน (16-1b: กระโดดแบ่ง 4 + 2 ตัว) · ชีตอื่นใช้ตารางเท่ากัน
+ROW_CY = {"16-1b": [386, 992, 1649, 2222]}
 GRID = {"16-5": 2}   # ชีตที่ตัดเป็นตารางเท่ากัน: จำนวนคอลัมน์
 # จำนวนตัวต่อแถวที่นับด้วยตาจากภาพ (ไม่ใช่ที่สั่ง) · ก้อนเกิน (ตำราลอย กล่อง) = รวมเข้าตัวใกล้สุด · ก้อนขาด (ตัวชิดกัน) = ผ่าที่คอลัมน์โปร่งสุด
-EXPECT = {"14-1": [6] * 8, "15-6": [4] * 6, "16-1": [6] * 6, "16-2": [5, 6, 6, 6, 5, 5], "16-3": [5] * 6, "16-4": [5, 6, 6, 6, 6]}
+EXPECT = {"14-1": [6] * 8, "15-6": [4] * 6, "16-1": [6] * 6, "16-2": [5, 6, 6, 6, 5, 5], "16-3": [5] * 6, "16-4": [5, 6, 6, 6, 6],
+	"16-1b": [6, 4, 4, 2], "15-2": [5] * 6, "15-3": [5] * 6, "15-4": [5] * 6, "15-5": [5] * 6}
 BIG = 6000
+# เฟรมที่มือว่าง (อาวุธหาย) → ใช้เฟรมอื่นในแถวเดียวกันแทน (kwan 16 ต.ค. เลือก "1" กับ 15-1: ช่องคืนท่ามือว่าง = ช่อง 1 ยืนถืออาวุธ) · (แถว, ช่อง) นับจาก 0
+REUSE = {
+	"15-2": {(0, 4): (0, 0), (1, 4): (1, 0), (2, 4): (2, 0), (4, 2): (4, 1)},
+	"15-3": {(0, 4): (0, 0), (1, 4): (1, 0), (2, 4): (2, 0), (3, 4): (3, 0)},
+	"15-4": {(0, 4): (0, 0), (1, 4): (1, 0), (2, 4): (2, 0), (4, 2): (4, 1)},
+	"15-5": {(0, 4): (0, 0), (1, 4): (1, 0), (2, 4): (2, 0), (3, 4): (3, 0)},
+}
 # 15-6 แถว 2 (ดำ: ตำราลอย · พนมมือ · เรืองส้ม) Flow วาดครึ่งตัวถึงเข็มขัด → ต่อขาจากท่ายืนของสายเดียวกัน (แถว 3 ช่อง 1)
 #   วางให้หัวตรงกัน (บนสุดของภาพ) · คอลัมน์ตามกลางลำตัวแถวล่างสุดของภาพครึ่งตัว · ทับขึ้นมา OVERLAP แถวให้รอยตัดหาย
 LEGS = {"15-6": {"rows": [1], "donor": (2, 0)}}
@@ -58,7 +73,8 @@ def cut(key):
 		big = [i for i in range(n) if area[i] > BIG]
 		cy = lambda i: (objs[i][0].start + objs[i][0].stop) / 2
 		cx = lambda i: (objs[i][1].start + objs[i][1].stop) / 2
-		row_of = {i: min(range(nrows), key=lambda r: abs(cy(i) - (r + .5) * H / nrows)) for i in big}
+		rcy = ROW_CY.get(key) or [(r + .5) * H / nrows for r in range(nrows)]
+		row_of = {i: min(range(nrows), key=lambda r: abs(cy(i) - rcy[r])) for i in big}
 		own = {i: [i] for i in big}
 		for i in range(n):
 			if i in own or area[i] < 12: continue
@@ -147,6 +163,11 @@ def cut(key):
 			Image.fromarray(out.clip(0, 255).astype(np.uint8), "RGBA").save(f)
 			e["legs_from"] = "%d_%d" % (dr_, dc_)
 		print(key, "ต่อขาแถว", [r + 1 for r in fx["rows"]], "จากแถว %d ช่อง %d" % (dr_ + 1, dc_ + 1))
+	for (r, c), (sr, sc) in REUSE.get(key, {}).items():
+		Image.open(os.path.join(d, "%d_%d.png" % (sr, sc))).save(os.path.join(d, "%d_%d.png" % (r, c)))
+		for e in idx:
+			if (e["row"], e["col"]) == (r, c): e["reuse"] = "%d_%d" % (sr, sc)
+	if key in REUSE: print(key, "ใช้เฟรมแทนช่องมือว่าง", len(REUSE[key]), "ช่อง")
 	json.dump({"sheet": key, "file": fn, "frames": idx}, open(os.path.join(d, "index.json"), "w"), indent=1)
 	open(os.path.join(OUT, ".gdignore"), "w").close()
 	# ภาพตรวจ: ชีตย่อครึ่ง + กรอบ + เลขแถว-ช่อง (นับจาก 1)
