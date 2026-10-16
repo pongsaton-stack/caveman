@@ -274,3 +274,29 @@ Keep proportions, colors and outfit identical in all 40 frames. Output PNG only.
 ใช้ได้: ไม้เบสบอล 6 · ดินสอ 5 · หนังสติ๊ก 6 · ที่เย็บกระดาษ 6 · ถุงมือ 6 (ถุงมือเอาท่าวิ่งเข้าจากแถว 7 มาแทรก)
 ตัดทิ้ง: แถว 2 ทั้งแถว (วิ่ง/ต่อยไม่เห็นดินสอ) · แถว 3 ช่อง 4 ต่อยมือเปล่า · แถว 4 ช่อง 6 + แถว 5 ช่อง 3–6 ไม่มีหนังสติ๊ก
 ยังไม่ดี: ไม้เบสบอลช่องฟาดยังพาดบ่า มีแค่ส่วนโค้ง (ไม่ใช่ท่าเหวี่ยงเต็ม) · ได้ 5–6 ภาพต่อสาย (สั่ง 8) · ท่าวิ่งเข้าวางเท้าแตะพื้น
+
+## รอบ 10 — มอนภูมิภาค 1 แบบท่าขยับ (kwan 16 ต.ค. "ลองให้เขาเจนมอนมาดูไหม")
+มอนที่อยู่ใน encounters.csv ตอนนี้ครบ 5 ตัว: M01 สไลม์เถ้า · M03 หนอนหิน · M06 ค้างคาวเงา · M15 หมาป่า · B1 ราชาหนอนเถ้า
+แนบ ภาพ 1 `flow_trial_v8a.jpg` (ลายเส้น/สีแบบ Rion) + ภาพ 2 `monster_ref_region1.png` (หน้าตามอนที่ kwan อนุมัติ 3 ต.ค. · ขยายจากสไปรต์ในเกม 6 เท่า)
+ศัตรูหันขวา (ยืนซ้ายของจอศึก หันเข้าหาปาร์ตี้) · M15 ในเกมเป็นหมาป่าทีละตัว (ภาพเดิมมี 2 ตัวในรูปเดียว) → สั่งวาดตัวเดียว
+ขนาดในเกมยังไม่ตัดสิน (เดิม M 48 · L 96) → ได้ภาพแล้วผมจะแปลงพิกเซลแล้วเทียบกับ Rion 72 ให้เลือก
+
+```
+Image 1 shows the art style to copy: chibi game sprites with thick dark outlines and flat cel-shaded colors. Image 2 shows the five monster designs (small pixel versions). Draw ONE sprite sheet of these five monsters in the art style of image 1, keeping each monster's design, colors and features from image 2.
+
+Layout: 5 rows x 8 columns, one pose per cell, evenly spaced, each monster fully inside its cell, all on the same ground baseline. Solid green background #01DA0D. No grid lines, no text, no labels, no numbers, no ground shadows, no extra creatures, only one monster per cell.
+
+Every frame faces RIGHT (the monster looks and attacks toward the right edge of the image). Monsters in rows 1–4 are about the same height as a small child character; the boss in row 5 is about twice as big as the others.
+
+Row 1 – Ash Slime: round green jelly blob, two big black eyes, small open mouth, glossy highlight. 1–3 idle bounce loop (squash down, stretch up, normal). 4 squash low to charge. 5 leap forward to the right, stretched. 6 land on the target, flattened wide with a splash. 7 hurt: squished, eyes shut, wobbling. 8 defeated: melted into a flat puddle with eyes closed.
+
+Row 2 – Stone Worm: short plump worm with warm skin-colored body in three soft segments, sleepy face at the right end, mossy grey rocks stuck on its back. 1–3 idle crawl loop (segments ripple). 4 rear the head back. 5 lunge forward headbutt. 6 recoil. 7 hurt: curled up, rocks rattling, eyes squeezed. 8 defeated: lying flat, rocks fallen off beside it.
+
+Row 3 – Shadow Bat: dark grey round body with a dog-like face and pointed ears, orange eyes, small fangs, wide leathery brown wings, flying above the ground. 1–3 idle flap loop (wings up, middle, down). 4 pull wings back and dive. 5 swoop bite toward the right with fangs. 6 fly back up. 7 hurt: tumbling in the air, wings bent. 8 defeated: fallen on the ground, wings spread flat.
+
+Row 4 – Wolf: ONE grey-brown wolf on four legs, scruffy fur, lighter muzzle and chest, bushy tail. 1–3 idle growling loop (breathing, head low). 4 crouch to pounce. 5 leap forward, jaws open. 6 bite with a small white claw-slash mark. 7 hurt: yelping, recoiling back. 8 defeated: lying on its side.
+
+Row 5 – Ash Worm King (boss, twice as big): huge segmented worm, dark ash-brown slimy body, a row of round charcoal stone armor plates along its back, a crown of five black thorns on its head, ten small glowing orange eyes, two long curved white fangs. 1–3 idle loop (rising and swaying, eyes glowing). 4 rear up tall. 5 slam down forward with fangs. 6 ground cracks and dust burst. 7 hurt: recoiling, armor plates cracking. 8 defeated: collapsed flat, eyes dark, crown tilted.
+
+Keep each monster's design and colors identical across its 8 frames. Output PNG only.
+```
