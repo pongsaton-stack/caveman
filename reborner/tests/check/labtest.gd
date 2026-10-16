@@ -51,7 +51,10 @@ func _step() -> void:
 			shots = 1
 			var h: Actor = bs.hero
 			ok(h.learned.has("วงล้อ") and h.learned.has("เขี้ยวพัน"), "ตัวเอกทดลองรู้ไม้ตาย (%d ท่า)" % h.learned.size())
-			ok(h.tier == 45, "ความชำนาญชั่วคราว = req_prof สูงสุดของสาย (%d)" % h.tier)
+			var top_req := 0
+			for t in ow.techs.all:
+				if t.school == ow.ps.school: top_req = maxi(top_req, t.req_prof)
+			ok(h.tier == maxi(top_req, int(before["prof"])), "ความชำนาญชั่วคราว = req_prof สูงสุดของสาย (%d/%d)" % [h.tier, top_req])
 			root.get_viewport().get_texture().get_image().save_png(_shot() % 1)
 			bs.auto = true; bs.step_delay = 0.02; bs.end_delay = 0.05
 			bs._commit({"kind": "guard"})

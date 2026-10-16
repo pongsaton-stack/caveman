@@ -21,7 +21,7 @@ var ignore_pos: bool = false
 var free_row: bool = false
 var note: String
 # ── ผลพิเศษของท่า (ท่าเด่นมอนที่มีผลจริง · ท่าที่ตัวเอกยึดมา — GDD 5.2) ──
-var effect: String = ""          # "" = ไม่มี · def_up = DEF ตัวเอง +value · av_cut = AV ตัวเองหลังลงมือ x(1-value)
+var effect: String = ""          # "" = ไม่มี · def_up = DEF ตัวเอง +value · av_cut = AV ตัวเองหลังลงมือ x(1-value) · counter = ตั้งท่าสวน (ไม่ตีตอนใช้)
 var effect_value: float = 0.0
 var effect_turns: int = 0        # def_up: จำนวนเทิร์นของตัวที่ใช้
 var once: bool = false           # ใช้ได้ครั้งเดียวต่อการต่อสู้
@@ -52,10 +52,15 @@ static func from_csv(d: Dictionary) -> Tech:
 	t.note = str(d.get("note", ""))
 	t.status = str(d.get("status", ""))
 	t.status_chance = float(d.get("status_chance", 0.0))
+	t.effect = str(d.get("effect", ""))
 	return t
 
 func is_attack() -> bool:
 	return power > 0.0
+
+## ท่าตั้งท่าสวน — นับเป็นท่าโจมตี (ประกาย/Insight ตอนใช้) แต่ตอนใช้ไม่ตี ตีเมื่อโดนตีก่อนตาถัดไป
+func is_counter() -> bool:
+	return effect == "counter"
 
 ## ท่าที่กดใช้ได้ในเมนู — ท่าโจมตี หรือท่าที่มีผลพิเศษกับตัวเอง (เช่น เกราะแข็ง)
 func is_usable() -> bool:
