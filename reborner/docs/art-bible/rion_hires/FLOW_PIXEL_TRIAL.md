@@ -337,3 +337,31 @@ Keep each monster's design and colors identical across all its frames. Output PN
 แก้ด้วยโค้ด: ค้างคาว 2 แถวมีเส้นพื้นคนละเส้น → ภาพแถวบน (บินทุกภาพ) ไปยืนบนพื้น → วัดความสูงบินจากแถวล่างที่มีภาพล้มบนพื้น แล้วใช้กับแถวบน ·
   พาเลตต์ร่วมทุกตัว ทำให้ไฮไลต์หนอนกลายเป็นเขียวอ่อนเมื่อชุดหมาป่าเปลี่ยน → พาเลตต์ต่อตัว ≤ 32 สี
 ข้อสังเกต: หมาป่าชุดนี้ลายเส้นสมจริงกว่าตัวอื่น (ไม่ chibi เท่า) · ค้างคาวบินต่ำ (ความสูงบินจาก GPT) · ขนาดในเกมยังไม่ตัดสิน
+
+## รอบ 12 — ไอคอนอาวุธ 30 ชิ้น (kwan 16 ต.ค. "ให้เขาลองเจนอาวุธในเกมมาไหม")
+รายการ = `docs/art-bible/weapons/weapons_full.json` (6 ตระกูล × 5 ระดับ · ของใช้ในบ้าน/สำนักงานดัดแปลง) · ไอคอนเดิมวาดด้วยโค้ด (`weapons_draft` 32px)
+แนบ ภาพ 1 `flow_trial_v9.jpg` (Rion ถืออาวุธระดับ 1 → ให้หน้าตาอาวุธตรงกับที่ถือในท่า) · ทุกชิ้นวางเฉียงแนวเดียวกัน (ด้ามล่างซ้าย ปลายบนขวา) ไว้หมุนติดมือได้ทีหลัง
+
+```
+Image 1 shows our game's art style and the tier-1 weapons Rion holds (baseball bat, pencil, slingshot, stapler, gardening gloves). Draw ONE sprite sheet of 30 weapon item icons in exactly that style: thick dark outlines, flat cel-shaded colors, chunky readable shapes, slightly cartoonish.
+
+Layout: 6 rows x 5 columns, one weapon per cell, evenly spaced, each weapon centered and fully inside its cell, all drawn at a similar size so each fills most of its cell. Solid green background #01DA0D. No grid lines, no text, no labels, no numbers, no hands, no characters, no shadows.
+
+Orientation: every long weapon lies diagonally at 45 degrees with the handle at the lower-left and the tip or head at the upper-right. Slingshots, staplers and gloves are shown in a clear three-quarter view.
+
+Each row is one weapon family; columns 1→5 go from a cheap scavenged item to a legendary one, so each step looks a bit sturdier and more modified, and only column 5 glows.
+
+Row 1 – Knives: 1 small kitchen vegetable knife with a wooden handle and a chipped blade. 2 heavy cleaver with a cloth-tape-wrapped handle and a thickened spine. 3 machete with a saw blade welded along its spine and a PVC-pipe handle. 4 a sharpened ceiling-fan blade mounted on a knife handle, with a small motor at the hub. 5 chef's knife forged from ash-stove iron, blade glowing orange like a live ember.
+
+Row 2 – Pencils and pens used like spears: 1 yellow wooden pencil with a pink eraser, sharpened tip. 2 two pencils taped together with a nail stuck in the tip. 3 a long metal mechanical pencil the size of a short spear, steel spike lead and a pocket clip. 4 a long fountain pen whose brass nib is a spearhead. 5 a pen covered in rows of carved tally marks along the barrel, glowing nib.
+
+Row 3 – Baseball bats: 1 old cracked wooden bat patched with tape. 2 dented aluminum bat with a cloth-wrapped grip. 3 aluminum bat with nails hammered around the tip, bound with wire. 4 bat with a heavy car gear wheel fitted on the end. 5 a bat with a faded autograph and a glowing band wrapped around it, tiny star sparkles.
+
+Row 4 – Slingshots and launchers: 1 forked tree-branch slingshot with a rubber band. 2 slingshot with a steel-pipe fork and a bicycle inner-tube band. 3 wrist-brace slingshot with a ruler used as a sight. 4 a crossbow built from a broken umbrella's bent steel frame, loaded with an umbrella rib. 5 polished brass slingshot with a glowing band and a glass marble with a star inside.
+
+Row 5 – Staplers and nailers: 1 desktop office stapler. 2 handheld staple gun with a tape-wrapped grip. 3 pneumatic nail gun connected to a small air tank. 4 a heavy field stapler wired to a car battery. 5 an antique brass stapler with glowing light-blue staples.
+
+Row 6 – Gloves (show one right-hand glove each, back of the hand facing us): 1 dirty cotton gardening glove. 2 leather welder's glove with bolts sewn over the knuckles. 3 glove with a ring of car keys threaded across the knuckles like brass knuckles. 4 glove with a door-closer spring mounted on the back of the hand. 5 a gardening glove covered in many sewn patches that glow warmly.
+
+Keep all 30 icons consistent in style, outline thickness and scale. Output PNG only.
+```
