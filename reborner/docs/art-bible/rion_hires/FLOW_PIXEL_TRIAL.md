@@ -510,3 +510,84 @@ Keep proportions, colors and outfit identical in all frames. Output PNG only.
 
 
 > แก้บันทึก 16 ต.ค.: kwan ยืนยันว่ารอบ 9–13 เจนด้วย **Google Flow** ทั้งหมด (เดิมบันทึกว่า GPT ผิด) · รอบ 5 และรอบ 8 = GPT ตามเดิม
+
+## รอบ 14 — ตัวเอกชุดหลักใหม่ด้วย Flow (kwan 16 ต.ค. "ต้องเจนตัวเอกให้เหมือนกับ flow ด้วย")
+ชุดหลักปัจจุบัน (เดิน/ยืนศึก/ฟัน/โดนตี/ล้ม/ร่าย ฯลฯ 16 ท่า) มาจาก GPT รอบ 5 + 8 · มอน/อาวุธ/ท่าถืออาวุธมาจาก Flow → เจนชุดหลักใหม่ด้วย Flow ให้ลายเส้นเดียวกันทั้งเกม
+ภาพ 1 = `rion_flow_ref.png` (Flow เจนจากต้นฉบับ 1145x1374 · **หมวกมีแผงหน้าสีครีม** ขัดกับที่ตัดสิน 14 ต.ค. "หมวกน้ำเงินทั้งใบ" → prompt มี 2 แบบ รอ kwan เลือก) · ภาพ 2 = `flow_trial_v9.jpg` (ผัง 8x6 + ขนาด/ลายเส้นแบบ Flow)
+2 ชีต x 8 แถว x 6 ช่อง = 16 ท่าครบชุดหลัก · ท่าในศึกสั่งหันขวา (Flow วาดหันขวาเองเสมอ เราพลิก) · เดินซ้าย/ขวาสั่งแยก (นาฬิกาข้อมือซ้ายถูกข้างทั้งสองทิศ)
+
+### หมวกน้ำเงินทั้งใบ
+#### ชีต 14-1 (ศึก)
+```
+Image 1 is the main character Rion (front view). Image 2 is an existing sprite sheet of Rion: copy its art style, outline thickness, flat cel colors, character size per cell and solid green background #01DA0D exactly, but IGNORE the weapons in image 2. Rion must look exactly like image 1 in every frame: a cap that is ENTIRELY BLUE (blue crown and blue brim, no cream panel) with brass goggles on it, brown messy hair, white short-sleeve shirt, blue tie, blue suspender straps, blue shorts, brown backpack, wristwatch on his LEFT wrist, white socks, brown boots.
+
+Layout: 8 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except jumps). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Rows 1–5 face RIGHT (he looks and moves toward the right edge). Rows 6–8 are described per row.
+
+Row 1 – battle idle holding a small kitchen knife low in his front hand, loop: breathing in and out, slight bob.
+Row 2 – knife attack with momentum: 1 stance, 2 run forward, 3 still running, raising the knife, 4 raised high mid-step, 5 arriving: slash downward with a white arc, 6 recover to stance.
+Row 3 – hurt: 1 hit (eyes shut, body jolts back), 2 stagger back, 3 stagger, 4 catch balance, 5 straighten, 6 back to stance holding the knife.
+Row 4 – defeated: 1 staggering, 2 knees buckle, 3 falling forward, 4 hits the ground, 5 lying face down, 6 lying still (knife on the ground beside him).
+Row 5 – run cycle (no weapon visible, knife held low), 6 frames, clear alternating legs, both feet off the ground in frames 2 and 5.
+Row 6 – facing RIGHT, cast a spell: 1 stand, 2 press palms together at the chest, eyes closed, 3 glow appears at his hands, 4 glow grows, 5 push both palms forward releasing a ball of light, 6 recover.
+Row 7 – facing RIGHT, kneel: 1 stand, 2 bend down, 3 one knee down, 4 one knee down with one hand touching the ground, 5 hold, 6 stand back up. Never crawling on all fours.
+Row 8 – facing RIGHT, guard: 1 stand, 2 cross both forearms in front of the face, 3 hold guard, 4 hit on the guard with a small white spark, 5 hold, 6 lower arms.
+
+Keep proportions, colors and outfit identical in all 48 frames. Output PNG only.
+```
+#### ชีต 14-2 (เดิน/อื่น ๆ)
+```
+Image 1 is the main character Rion (front view). Image 2 is an existing sprite sheet of Rion: copy its art style, outline thickness, flat cel colors, character size per cell and solid green background #01DA0D exactly, but IGNORE the weapons in image 2. Rion must look exactly like image 1 in every frame: a cap that is ENTIRELY BLUE (blue crown and blue brim, no cream panel) with brass goggles on it, brown messy hair, white short-sleeve shirt, blue tie, blue suspender straps, blue shorts, brown backpack, wristwatch on his LEFT wrist, white socks, brown boots.
+
+Layout: 8 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except jumps). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Row 1 – walk toward the viewer (front view), 6-frame loop, alternating legs, arms swinging, head bobs slightly.
+Row 2 – walk away from the viewer (back view, backpack visible), 6-frame loop.
+Row 3 – walk to the LEFT (side view facing left), 6-frame loop.
+Row 4 – walk to the RIGHT (side view facing right), 6-frame loop.
+Row 5 – facing RIGHT, dodge: 1 stand, 2 crouch, 3 hop backward leaning back, 4 in the air, 5 land, 6 recover.
+Row 6 – front view, watch: shade the eyes with one hand and look into the distance, turning the head left then right, 6-frame loop.
+Row 7 – facing RIGHT, jump-roll attack with the knife: 1 crouch, 2 jump, 3 curled roll in the air, 4 roll, 5 land on one knee slashing downward with a white arc, 6 rise.
+Row 8 – front view, victory cha-cha dance loop: step-step-cha-cha-cha with hip sway, pointing fingers, a small spin, arms up happily.
+
+Keep proportions, colors and outfit identical in all 48 frames. Output PNG only.
+```
+
+### หมวกแผงหน้าครีม (ตามภาพ 1)
+#### ชีต 14-1 (ศึก)
+```
+Image 1 is the main character Rion (front view). Image 2 is an existing sprite sheet of Rion: copy its art style, outline thickness, flat cel colors, character size per cell and solid green background #01DA0D exactly, but IGNORE the weapons in image 2. Rion must look exactly like image 1 in every frame: the blue cap with the cream front panel and brass goggles exactly as in image 1, brown messy hair, white short-sleeve shirt, blue tie, blue suspender straps, blue shorts, brown backpack, wristwatch on his LEFT wrist, white socks, brown boots.
+
+Layout: 8 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except jumps). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Rows 1–5 face RIGHT (he looks and moves toward the right edge). Rows 6–8 are described per row.
+
+Row 1 – battle idle holding a small kitchen knife low in his front hand, loop: breathing in and out, slight bob.
+Row 2 – knife attack with momentum: 1 stance, 2 run forward, 3 still running, raising the knife, 4 raised high mid-step, 5 arriving: slash downward with a white arc, 6 recover to stance.
+Row 3 – hurt: 1 hit (eyes shut, body jolts back), 2 stagger back, 3 stagger, 4 catch balance, 5 straighten, 6 back to stance holding the knife.
+Row 4 – defeated: 1 staggering, 2 knees buckle, 3 falling forward, 4 hits the ground, 5 lying face down, 6 lying still (knife on the ground beside him).
+Row 5 – run cycle (no weapon visible, knife held low), 6 frames, clear alternating legs, both feet off the ground in frames 2 and 5.
+Row 6 – facing RIGHT, cast a spell: 1 stand, 2 press palms together at the chest, eyes closed, 3 glow appears at his hands, 4 glow grows, 5 push both palms forward releasing a ball of light, 6 recover.
+Row 7 – facing RIGHT, kneel: 1 stand, 2 bend down, 3 one knee down, 4 one knee down with one hand touching the ground, 5 hold, 6 stand back up. Never crawling on all fours.
+Row 8 – facing RIGHT, guard: 1 stand, 2 cross both forearms in front of the face, 3 hold guard, 4 hit on the guard with a small white spark, 5 hold, 6 lower arms.
+
+Keep proportions, colors and outfit identical in all 48 frames. Output PNG only.
+```
+#### ชีต 14-2 (เดิน/อื่น ๆ)
+```
+Image 1 is the main character Rion (front view). Image 2 is an existing sprite sheet of Rion: copy its art style, outline thickness, flat cel colors, character size per cell and solid green background #01DA0D exactly, but IGNORE the weapons in image 2. Rion must look exactly like image 1 in every frame: the blue cap with the cream front panel and brass goggles exactly as in image 1, brown messy hair, white short-sleeve shirt, blue tie, blue suspender straps, blue shorts, brown backpack, wristwatch on his LEFT wrist, white socks, brown boots.
+
+Layout: 8 rows x 6 columns, one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except jumps). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Row 1 – walk toward the viewer (front view), 6-frame loop, alternating legs, arms swinging, head bobs slightly.
+Row 2 – walk away from the viewer (back view, backpack visible), 6-frame loop.
+Row 3 – walk to the LEFT (side view facing left), 6-frame loop.
+Row 4 – walk to the RIGHT (side view facing right), 6-frame loop.
+Row 5 – facing RIGHT, dodge: 1 stand, 2 crouch, 3 hop backward leaning back, 4 in the air, 5 land, 6 recover.
+Row 6 – front view, watch: shade the eyes with one hand and look into the distance, turning the head left then right, 6-frame loop.
+Row 7 – facing RIGHT, jump-roll attack with the knife: 1 crouch, 2 jump, 3 curled roll in the air, 4 roll, 5 land on one knee slashing downward with a white arc, 6 rise.
+Row 8 – front view, victory cha-cha dance loop: step-step-cha-cha-cha with hip sway, pointing fingers, a small spin, arms up happily.
+
+Keep proportions, colors and outfit identical in all 48 frames. Output PNG only.
+```
