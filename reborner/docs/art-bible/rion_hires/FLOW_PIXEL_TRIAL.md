@@ -267,7 +267,7 @@ Row 5 – dirty cotton gardening gloves on both hands, bare-handed fighting. 1�
 Keep proportions, colors and outfit identical in all 40 frames. Output PNG only.
 ```
 
-### ผลรอบ 9 (GPT · JPG 1438x2576) — `flow_trial_v9.jpg` · หน้า animation test Version 89
+### ผลรอบ 9 (Flow · JPG 1438x2576) — `flow_trial_v9.jpg` · หน้า animation test Version 89
 สั่ง 5 แถว x 8 ช่อง หันซ้าย → ได้ **8 แถว x 6 ช่อง หันขวา** · ลายเส้น/สี/ชุดตรงชุดหลัก · ไม่มีมีดตามสั่ง
 `tools/sprites/rion_px_weapons.py` → `assets/sprites/rion_px_weapons_draft/<สาย>_<i>.png` (.gdignore · ผืน 96x112 เท้าแถว 109 เท่า rion_px) · ย่อ ×0.273 ให้ท่ายืนสูงเท่า west_i0 (79) · พลิกหันซ้าย
 พาเลตต์ = 40 สีชุดหลัก + สีใหม่ 12 (นับสีไม่ซ้ำ ไม่งั้นดินสอเหลืองถูกกลืนเป็นน้ำตาล)
@@ -301,7 +301,7 @@ Row 5 – Ash Worm King (boss, twice as big): huge segmented worm, dark ash-brow
 Keep each monster's design and colors identical across its 8 frames. Output PNG only.
 ```
 
-### ผลรอบ 10 (GPT · JPG 1438x2576) — `monster_trial_v10.jpg` · หน้า animation test Version 90
+### ผลรอบ 10 (Flow · JPG 1438x2576) — `monster_trial_v10.jpg` · หน้า animation test Version 90
 ได้ครบ 5 ตัว หันขวาตามสั่ง · สไลม์/หนอน/ค้างคาว 8 ภาพ · **หมาป่า 7 ภาพ (ไม่มีท่ากัด)** · บอสแยก 2 แถว แถวละ 4
 `tools/sprites/monsters_px.py` → `assets/sprites/monsters_px_draft/<id>_<i>.png` + index.json (.gdignore · ร่าง) · พาเลตต์ร่วม 48 สี
 ขนาด = สัดส่วนเทียบ Rion เท่ามอนในเกมเดิม (สูงเดิม × 1.36 · ค้างคาวใช้ความกว้างปีก) → สไลม์ ~52 · หนอน ~41 · ค้างคาวปีก ~64 · หมาป่า ~48 · บอส ~107 (Rion 79) · **ขนาดในเกมยังไม่ตัดสิน**
@@ -312,7 +312,7 @@ Keep each monster's design and colors identical across its 8 frames. Output PNG 
 ## รอบ 11 — เจนใหม่เฉพาะตัวที่ไม่ตรงแบบ (kwan 16 ต.ค. เลือกข้อ 3)
 หมาป่า (ขาดท่ากัด) · ค้างคาว (ต้องหน้าหมา) · บอส (ต้องมีเกราะหินถ่านเป็นแผ่น + ตาเล็ก 10 ดวง) · สไลม์/หนอนใช้รอบ 10 ต่อ
 แนบ ภาพ 1 `monster_trial_v10.jpg` (ให้ลายเส้น/ขนาดตรงกับตัวที่ผ่านแล้ว) + ภาพ 2 `monster_ref_region1.png` (แบบที่อนุมัติ)
-ผัง 4 แถว: หมาป่า 8 · ค้างคาว 8 · บอส 4+4 (บอสตัวใหญ่ GPT วางแถวละ 4 เองในรอบ 10 → สั่งตามนั้น ตัดง่าย)
+ผัง 4 แถว: หมาป่า 8 · ค้างคาว 8 · บอส 4+4 (บอสตัวใหญ่ Flow วางแถวละ 4 เองในรอบ 10 → สั่งตามนั้น ตัดง่าย)
 
 ```
 Image 1 is our current monster sprite sheet; copy its exact art style, outline thickness, flat cel colors and monster sizes. Image 2 shows the approved monster designs. Redraw ONLY these three monsters so they match image 2 more closely, in the style of image 1.
@@ -330,13 +330,13 @@ Rows 3–4 – Ash Worm King (boss, same size as the boss in image 1): huge segm
 Keep each monster's design and colors identical across all its frames. Output PNG only.
 ```
 
-### ผลรอบ 11 (GPT · JPG 1438x2576) — `monster_trial_v11.jpg` · หน้า animation test Version 91
+### ผลรอบ 11 (Flow · JPG 1438x2576) — `monster_trial_v11.jpg` · หน้า animation test Version 91
 ได้ 6 แถว แถวละ 4 (หมาป่า 2 แถว · ค้างคาว 2 แถว · บอส 2 แถว) ครบตัวละ 8 ภาพ หันขวา
 ตรงแบบแล้ว: หมาป่ามีท่ากัด · ค้างคาวหน้าลูกหมา (จมูกสั้น หูตั้ง ตาส้ม) · บอสมีเกราะหินถ่านบนหลัง + ตาเล็ก 10 ดวง 2 แถว + เขี้ยวขาว
 `monsters_px.py` อ่าน 2 ชีต (`SHEETS`): สไลม์/หนอนจากรอบ 10 · หมาป่า/ค้างคาว/บอสจากรอบ 11
 แก้ด้วยโค้ด: ค้างคาว 2 แถวมีเส้นพื้นคนละเส้น → ภาพแถวบน (บินทุกภาพ) ไปยืนบนพื้น → วัดความสูงบินจากแถวล่างที่มีภาพล้มบนพื้น แล้วใช้กับแถวบน ·
   พาเลตต์ร่วมทุกตัว ทำให้ไฮไลต์หนอนกลายเป็นเขียวอ่อนเมื่อชุดหมาป่าเปลี่ยน → พาเลตต์ต่อตัว ≤ 32 สี
-ข้อสังเกต: หมาป่าชุดนี้ลายเส้นสมจริงกว่าตัวอื่น (ไม่ chibi เท่า) · ค้างคาวบินต่ำ (ความสูงบินจาก GPT) · ขนาดในเกมยังไม่ตัดสิน
+ข้อสังเกต: หมาป่าชุดนี้ลายเส้นสมจริงกว่าตัวอื่น (ไม่ chibi เท่า) · ค้างคาวบินต่ำ (ความสูงบินจาก Flow) · ขนาดในเกมยังไม่ตัดสิน
 
 ## รอบ 12 — ไอคอนอาวุธ 30 ชิ้น (kwan 16 ต.ค. "ให้เขาลองเจนอาวุธในเกมมาไหม")
 รายการ = `docs/art-bible/weapons/weapons_full.json` (6 ตระกูล × 5 ระดับ · ของใช้ในบ้าน/สำนักงานดัดแปลง) · ไอคอนเดิมวาดด้วยโค้ด (`weapons_draft` 32px)
@@ -366,14 +366,14 @@ Row 6 – Gloves (show one right-hand glove each, back of the hand facing us): 1
 Keep all 30 icons consistent in style, outline thickness and scale. Output PNG only.
 ```
 
-### ผลรอบ 12 (GPT · JPG) — `docs/art-bible/weapons/weapon_icons_v12.jpg` · หน้า animation test Version 92
+### ผลรอบ 12 (Flow · JPG) — `docs/art-bible/weapons/weapon_icons_v12.jpg` · หน้า animation test Version 92
 ได้ครบ 30 ชิ้น 6x5 ตามผัง · วางเฉียงตามสั่ง · ระดับ 5 เรืองแสง · หน้าตาตรงแนวคิดใน weapons_full.json
 `tools/sprites/weapons_icons_px.py` → `assets/sprites/weapons_icons_draft/<id>.png` (32px) + `<id>_48.png` (.gdignore · ร่าง) · อัตราเดียวทุกชิ้น (ชิ้นใหญ่ในชีตยังใหญ่) · สีต่อชิ้น ≤ 16
 แก้ด้วยโค้ด: แสงเรืองระดับ 5 โปร่งทับพื้นเขียว → ทั้งชิ้นอมเขียว → ตัดเขียวที่เกินแดง/น้ำเงินทุกจุด (ไม่มีอาวุธสีเขียว)
 ข้อจำกัด: แสงเรืองนุ่มทำเป็นพิกเซลคมไม่ได้ ระดับ 5 จึงดูหม่นกว่าชีต · ที่ 32px รายละเอียดเล็กหาย (กุญแจบนถุงมือ BD-3 · ไม้บรรทัด ST-3) → 48 อ่านง่ายกว่า
 
 ## รอบ 13 — ท่าถืออาวุธระดับ 2–5 (kwan 16 ต.ค. เลือกข้อ 2 "ทำ prompt เจนท่าถืออาวุธระดับ 2–5")
-ชีตละระดับ (4 ชีต) · ท่าเหมือนรอบ 9 ทุกช่อง เปลี่ยนแค่อาวุธ · รวมสายคม (มีด) ด้วย เพราะระดับ 1 ใช้ชุดหลัก · ผัง 6x6 (GPT วาด 6 ช่องเองในรอบ 9)
+ชีตละระดับ (4 ชีต) · ท่าเหมือนรอบ 9 ทุกช่อง เปลี่ยนแค่อาวุธ · รวมสายคม (มีด) ด้วย เพราะระดับ 1 ใช้ชุดหลัก · ผัง 6x6 (Flow วาด 6 ช่องเองในรอบ 9)
 แนบ ภาพ 1 `flow_trial_v9.jpg` (ท่า) + ภาพ 2 `docs/art-bible/weapons/weapon_icons_v12.jpg` (หน้าตาอาวุธ) · สั่งหันขวาตามรอบ 9 (เราพลิกเอง)
 
 ### ระดับ 2
@@ -449,8 +449,8 @@ Keep proportions, colors and outfit identical in all 36 frames. Output PNG only.
 ```
 
 ### รอบ 13 แก้ไข (หลังผลระดับ 2) — prompt ใหม่ 3 ชีต
-ผลระดับ 2 (`flow_trial_v13_t2.jpg` · **เจนด้วย Google Flow** ไม่ใช่ GPT · kwan แจ้ง 16 ต.ค.): Flow ลอกผังรอบ 9 (8x6) · ใช้ได้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต · **ดินสอ/หนังสติ๊กยังวาดของระดับ 1** (ลอกจากภาพ 1)
-แก้: บอกให้ไม่สนใจอาวุธในภาพ 1 · ระบุชื่อ + บอกว่า "ไม่ใช่" ของเดิมในแถวที่หน้าตาคล้ายกัน · ชีตระดับ 3 แถม PC-2/ST-2 ที่พลาด (8 แถว = ผังที่ GPT ชอบวาด)
+ผลระดับ 2 (`flow_trial_v13_t2.jpg` · **เจนด้วย Google Flow** · kwan แจ้ง 16 ต.ค.): Flow ลอกผังรอบ 9 (8x6) · ใช้ได้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต · **ดินสอ/หนังสติ๊กยังวาดของระดับ 1** (ลอกจากภาพ 1)
+แก้: บอกให้ไม่สนใจอาวุธในภาพ 1 · ระบุชื่อ + บอกว่า "ไม่ใช่" ของเดิมในแถวที่หน้าตาคล้ายกัน · ชีตระดับ 3 แถม PC-2/ST-2 ที่พลาด (8 แถว = ผังที่ Flow ชอบวาด)
 
 #### ชีตระดับ 3 (SL-3 CR-3 PC-3 ST-3 DV-3 BD-3 PC-2 ST-2)
 ```
@@ -507,3 +507,6 @@ Row 6 – gardening gloves covered in many sewn patches that GLOW warm orange, w
 
 Keep proportions, colors and outfit identical in all frames. Output PNG only.
 ```
+
+
+> แก้บันทึก 16 ต.ค.: kwan ยืนยันว่ารอบ 9–13 เจนด้วย **Google Flow** ทั้งหมด (เดิมบันทึกว่า GPT ผิด) · รอบ 5 และรอบ 8 = GPT ตามเดิม

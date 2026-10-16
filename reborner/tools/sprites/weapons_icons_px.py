@@ -1,4 +1,4 @@
-"""ไอคอนอาวุธ 30 ชิ้น พิกเซล จากชีตรอบ 12 (GPT · kwan 16 ต.ค. 2026)
+"""ไอคอนอาวุธ 30 ชิ้น พิกเซล จากชีตรอบ 12 (Google Flow · kwan 16 ต.ค. 2026)
   python3 tools/sprites/weapons_icons_px.py
 ชีต docs/art-bible/weapons/weapon_icons_v12.jpg: 6 แถว (ตระกูล SL PC CR ST DV BD) x 5 ช่อง (ระดับ 1–5) ตามลำดับใน weapons_full.json
 ทำ: ตัดพื้นด้วยระยะสีจากสีพื้นจริง → ช่องตามตาราง (แบ่งเท่า) เก็บทุกก้อนในช่อง (ประกายรอบชิ้นระดับ 5 ด้วย) →
