@@ -1,0 +1,84 @@
+<title>ชุดคำสั่งเจนท่า Rion</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&family=Mitr:wght@500&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout: แถบหัวบอกความคืบหน้า + ภาพแนบ → การ์ดชีตเรียงตามลำดับที่ควรเจน คอลัมน์เดียว อ่านง่ายบนมือถือ */
+:root {
+	--bg: #f3f5f8; --surface: #ffffff; --ink: #1d2533; --muted: #5d6779; --line: #d6dce6;
+	--cap: #2a70be; --oncap: #ffffff; --brass: #9a6b1f; --done: #2f7d4f;
+	--display: "Mitr", "Sarabun", system-ui, sans-serif; --body: "Sarabun", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #10151d; --surface: #182029; --ink: #e5eaf2; --muted: #9aa6b8; --line: #2b3644; --cap: #6aa6ea; --oncap: #0b1a2e; --brass: #d7a654; --done: #6cc28f; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #10151d; --surface: #182029; --ink: #e5eaf2; --muted: #9aa6b8; --line: #2b3644; --cap: #6aa6ea; --oncap: #0b1a2e; --brass: #d7a654; --done: #6cc28f; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 24px 48px; }
+main { max-width: 760px; margin: 0 auto; display: grid; gap: 20px; }
+h1 { font: 500 1.7rem/1.25 var(--display); margin: 0; text-wrap: balance; }
+h1 small { display: block; font: 400 .95rem var(--body); color: var(--muted); margin-top: 6px; }
+.prog { display: flex; align-items: center; gap: 12px; font-variant-numeric: tabular-nums; }
+.bar { flex: 1; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--done); transition: width .3s; }
+.rules { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 12px; }
+.rules h2 { font: 500 1.05rem var(--display); margin: 0; }
+.rules ol { margin: 0; padding-left: 1.3em; }
+.atts { display: flex; flex-wrap: wrap; gap: 12px; }
+.att { margin: 0; flex: 1 1 200px; min-width: 0; display: grid; gap: 6px; }
+.att img { width: 100%; max-height: 220px; object-fit: contain; background: #01da0d; border-radius: 4px; }
+.att figcaption { font-size: .9rem; color: var(--muted); }
+.att a { color: var(--cap); font-family: var(--mono); font-size: .82rem; word-break: break-all; }
+.sheet { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--cap); border-radius: 6px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.sheet.is-done { border-left-color: var(--done); }
+.sheet.is-done h2 { color: var(--muted); }
+.sheet header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.sheet h2 { font: 500 1.15rem/1.3 var(--display); margin: 0; flex: 1; min-width: 12em; }
+.sid { font-family: var(--mono); color: var(--brass); font-size: .95rem; margin-right: 4px; }
+.step { font: .8rem var(--mono); color: var(--muted); letter-spacing: .04em; }
+.done { display: flex; align-items: center; gap: 6px; font-size: .95rem; cursor: pointer; }
+.done input { width: 20px; height: 20px; accent-color: var(--done); }
+.note { margin: 0; }
+.meta { margin: 0; color: var(--muted); font-size: .9rem; }
+.actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.copy { font: 600 1rem var(--body); background: var(--cap); color: var(--oncap); border: 0; border-radius: 6px; padding: 10px 18px; cursor: pointer; }
+.copy:focus-visible, summary:focus-visible, .done input:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+.msg { color: var(--done); font-size: .9rem; }
+summary { cursor: pointer; color: var(--muted); font-size: .9rem; }
+pre { font: .78rem/1.5 var(--mono); white-space: pre-wrap; word-break: break-word; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 12px; margin: 8px 0 0; max-height: 360px; overflow: auto; }
+.foot { color: var(--muted); font-size: .88rem; }
+</style>
+<main>
+	<h1>ชุดคำสั่งเจนท่า Rion<small>%%N%% ชีต · รวม %%CELLS%% ช่อง · เรียงตามลำดับที่ควรเจน ชีตละหนึ่งภาพ</small></h1>
+	<div class="prog" aria-live="polite"><div class="bar"><i id="barFill"></i></div><span id="progTxt">0/%%N%%</span></div>
+	<section class="rules">
+		<h2>ทำแบบนี้ทุกชีต</h2>
+		<ol>
+			<li>แนบ 2 ภาพนี้ <b>ตามลำดับ</b> (ภาพ 1 ก่อน) ไม่แนบภาพอื่นเพิ่ม</li>
+			<li>กด "คัดลอก prompt" ของชีตนั้น แล้ววางใน Google Flow</li>
+			<li>ส่งภาพที่ได้มาให้ผม ผมตรวจ ตัด และแก้ที่โค้ดแก้ได้ก่อนลงหน้าเทส</li>
+		</ol>
+		<div class="atts">%%ATTACH%%</div>
+	</section>
+%%CARDS%%
+	<p class="foot">ข้อความทั้งหมดมาจาก docs/art-bible/rion_hires/PROMPT_PACK.md ในโปรเจกต์ · ช่องติ๊ก "เจนแล้ว" จำไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น</p>
+</main>
+<script>
+const KEY = 'rion_pack_done';
+let done = {};
+try { done = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+const cards = [...document.querySelectorAll('.sheet')];
+function paint() {
+	let n = 0;
+	for (const c of cards) { const on = !!done[c.dataset.id]; c.classList.toggle('is-done', on); c.querySelector('.done input').checked = on; if (on) n++; }
+	document.getElementById('progTxt').textContent = n + '/' + cards.length;
+	document.getElementById('barFill').style.width = (100 * n / cards.length) + '%';
+}
+for (const c of cards) {
+	c.querySelector('.done input').addEventListener('change', e => { done[c.dataset.id] = e.target.checked; try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (er) {} paint(); });
+	const btn = c.querySelector('.copy'), msg = c.querySelector('.msg'), pre = c.querySelector('pre');
+	btn.addEventListener('click', () => {
+		const t = pre.textContent;
+		const ok = () => { msg.textContent = 'คัดลอกแล้ว'; setTimeout(() => msg.textContent = '', 2500); };
+		const fallback = () => { c.querySelector('details').open = true; const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); msg.textContent = 'คัดลอกอัตโนมัติไม่ได้ ข้อความถูกเลือกไว้แล้ว กดคัดลอกเอง'; };
+		try { navigator.clipboard.writeText(t).then(ok, fallback); } catch (e) { fallback(); }
+	});
+}
+paint();
+</script>

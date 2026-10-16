@@ -1,0 +1,229 @@
+# ชุดคำสั่งเจนท่า Rion (kwan 16 ต.ค. 2026 เลือก "1 หน้าเดียวรวมทุกชีต")
+
+แหล่งความจริงของ prompt ท่าตัวเอกทุกชีตที่ยังขาด · หน้าเว็บสร้างจากไฟล์นี้ด้วย `python3 tools/web/prompt_pack_build.py <out.html>`
+แนบทุกชีต 2 ภาพ ตามลำดับ: ภาพ 1 = `flow_trial_v14b_3.jpg` · ภาพ 2 = `rion_flow_ref.png` · ไม่แนบภาพอื่น (บทเรียน 15-1: ภาพหน้าตรงเป็นภาพ 1 หรือแนบไอคอนอาวุธ = หน้าตาเพี้ยน)
+14-1 = prompt เดิม (หมวกน้ำเงินทั้งใบ) เปลี่ยนสองย่อหน้าแรกเป็นแบบ 15-1 แก้ไข + ระบุมีดทำครัว · 15-2…15-5 = "แก้ไข" เดิมทุกตัวอักษร · 15-6 = แถวเดิม หัวแบบ 15-1 แก้ไข · 16-1…16-5 = ใหม่
+
+## 14-1 · ท่าศึก
+<!-- note: ยืนศึก · ฟัน · โดนตี · ล้ม · วิ่ง · ร่ายพนมมือ · คุกเข่า · ตั้งรับ — เกมใช้ท่าแทนจาก 14-2 อยู่ ได้ชีตนี้แล้วเปลี่ยนเป็นท่าจริงทั้งหมด | cells: 48 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses of image 1; draw only the poses written below. The only weapon in this sheet is a small KITCHEN KNIFE with a wooden handle.
+
+Layout: 8 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except jumps). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Every frame faces RIGHT (he looks and moves toward the right edge).
+
+Row 1 – battle idle holding the kitchen knife low in his front hand, loop: breathing in and out, slight bob.
+Row 2 – knife attack with momentum: 1 stance, 2 run forward, 3 still running, raising the knife, 4 raised high mid-step, 5 arriving: slash downward with a white arc, 6 recover to stance. The knife stays in his hand in every frame.
+Row 3 – hurt: 1 hit (eyes shut, body jolts back), 2 stagger back, 3 stagger, 4 catch balance, 5 straighten, 6 back to stance holding the knife.
+Row 4 – defeated: 1 staggering, 2 knees buckle, 3 falling forward, 4 hits the ground, 5 lying face down, 6 lying still (knife on the ground beside him).
+Row 5 – run cycle holding the knife low, 6 frames, clear alternating legs, both feet off the ground in frames 2 and 5.
+Row 6 – cast a spell, no knife: 1 stand, 2 press palms together at the chest, eyes closed, 3 small glow appears at his hands, 4 glow grows, 5 push both palms forward releasing a small ball of light, 6 recover.
+Row 7 – kneel, no knife: 1 stand, 2 bend down, 3 one knee down, 4 one knee down with one hand touching the ground, 5 hold, 6 stand back up. Never crawling on all fours.
+Row 8 – guard, no knife: 1 stand, 2 cross both forearms in front of the face, 3 hold guard, 4 hit on the guard with a small white spark, 5 hold, 6 lower arms.
+
+Keep his look identical to image 1 in all 48 frames. Output PNG only.
+```
+
+## 15-6 · ท่าร่ายเวทย์ 4 สาย
+<!-- note: ขาว · ดำ (พนมมือ → ผลักฝ่ามือ) · แดง · อัญเชิญ — เปิดแท็บเวทย์มนต์ในหน้าเทสคืน | cells: 24 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. He holds NO weapon in this sheet.
+
+Layout: 4 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell. Keep magic effects SMALL and close to his hands (no big beams or explosions, no effect touching the cell edges).
+
+Every frame faces RIGHT (he looks and casts toward the right edge).
+
+Row 1 – WHITE magic (protective light), a small open brown spell book held in his back hand at the chest. 1 stand. 2 lift the front hand diagonally upward (not straight up, his face must stay visible). 3 small soft white-gold glow at the raised palm. 4 a thin glowing dome line appears in front of him. 5 hold, glow pulses. 6 lower the hand back to stance.
+Row 2 – BLACK magic (elemental attack). 1 stand, the spell book floating open beside his shoulder. 2 press both palms together at the chest, eyes closed. 3 a small orange glow between the palms. 4 glow grows, knees bend slightly. 5 push both palms forward, releasing a small fireball flying right. 6 recover, arms lowering.
+Row 3 – RED magic (tricks with time and marks), a small open brown spell book held in his back hand. 1 stand. 2 pull the front hand back, holding a red marker pen. 3 swing forward, drawing a small red X mark in the air. 4 the red X glows. 5 push the front palm forward and the X flies right. 6 recover to stance.
+Row 4 – SUMMON (calls a guardian from the ash stove), a small open brown spell book held in his back hand. 1 stand. 2 raise the front hand diagonally upward (face still visible). 3 a small circle of orange runes appears on the ground at his feet. 4 the runes glow brighter, small embers rise. 5 sweep the raised hand forward toward the right. 6 recover to stance, embers fading.
+
+Keep his look identical to image 1 in all 24 frames. Output PNG only.
+```
+
+## 15-2 · ถืออาวุธระดับ 2
+<!-- note: มีดอีโต้ · ไม้อลูมิเนียม · ดินสอคู่ตอกตะปู · หนังสติ๊กท่อเหล็ก · แม็กยิงบอร์ด · ถุงมือหนังน็อต | cells: 30 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1; draw only the poses and the weapons written below. No weapon images are attached — follow the text descriptions.
+
+Layout: 6 rows x 5 columns (exactly 5 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, even during the attack and the follow-through.
+
+Every frame faces RIGHT. Only one weapon per row.
+
+Row 1 – a heavy CLEAVER with a cloth-tape-wrapped handle and a thickened spine (bigger than a kitchen knife), 1 battle stance holding it low and forward. 2 run forward with it raised. 3 cocked back over the shoulder while still running. 4 arriving: big slash with a white swing arc, the weapon still in his hand. 5 recover to stance.
+Row 2 – a dented ALUMINUM baseball bat with a cloth-wrapped grip (silver metal, NOT wood), two-handed. 1 stance, held up over the shoulder. 2 run forward with it raised behind the head. 3 cocked far back while still running. 4 arriving: full horizontal swing with a white swing arc. 5 recover to stance.
+Row 3 – TWO yellow pencils TAPED together side by side with grey duct tape and a long NAIL sticking out of the tip (NOT a single pencil), held like a short spear in BOTH hands. 1 stance, pointing forward. 2 dash forward, pulled back to the chest. 3 still dashing, lowered. 4 arriving: straight lunge thrust, the weapon clearly visible at the end of his arms, short white thrust line. 5 recover to stance.
+Row 4 – a slingshot made of grey STEEL PIPE bent into a Y-fork with a thick black bicycle INNER-TUBE band (NOT a tree-branch slingshot), stands in place. 1 stance, held low in front. 2 raise to eye level, aiming. 3 pull back fully, aiming. 4 release: the shot flies right while he STILL HOLDS the weapon up. 5 recover to stance, weapon in hand.
+Row 5 – a handheld STAPLE GUN with a tape-wrapped grip (NOT a desktop stapler), held in both hands like a small gun, stands in place. 1 stance at the waist. 2 lift and aim at chest height. 3 brace, lean forward. 4 fire: a shot flies right with a small spark. 5 recover to stance.
+Row 6 – brown leather WELDER'S GLOVES with bolts sewn over the knuckles, worn on both hands. 1 boxing guard. 2 dash forward. 3 straight punch with a small white impact star. 4 rising uppercut. 5 recover to guard.
+
+Keep his look identical to image 1 in all 30 frames. Output PNG only.
+```
+
+## 15-3 · ถืออาวุธระดับ 3
+<!-- note: มีดพร้าใบเลื่อย · ไม้ตอกตะปู · ดินสอกดเหล็ก · หนังสติ๊กรั้งแขน · ปืนยิงตะปูลม · ถุงมือพวงกุญแจ | cells: 30 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1; draw only the poses and the weapons written below. No weapon images are attached — follow the text descriptions.
+
+Layout: 6 rows x 5 columns (exactly 5 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, even during the attack and the follow-through.
+
+Every frame faces RIGHT. Only one weapon per row.
+
+Row 1 – a MACHETE with a jagged SAW BLADE welded along its back edge and a grey PVC-pipe handle (long blade, not a small knife), 1 battle stance holding it low and forward. 2 run forward with it raised. 3 cocked back over the shoulder while still running. 4 arriving: big slash with a white swing arc, the weapon still in his hand. 5 recover to stance.
+Row 2 – an ALUMINUM baseball bat with many NAILS hammered around the tip, bound with wire, two-handed. 1 stance, held up over the shoulder. 2 run forward with it raised behind the head. 3 cocked far back while still running. 4 arriving: full horizontal swing with a white swing arc. 5 recover to stance.
+Row 3 – a long silver METAL MECHANICAL PENCIL as long as a short spear, with a pocket clip and a steel spike tip (NOT a yellow wooden pencil), held like a short spear in BOTH hands. 1 stance, pointing forward. 2 dash forward, pulled back to the chest. 3 still dashing, lowered. 4 arriving: straight lunge thrust, the weapon clearly visible at the end of his arms, short white thrust line. 5 recover to stance.
+Row 4 – a WRIST-BRACE slingshot: a metal fork with a brace that rests on the forearm and a wooden RULER mounted on top as a sight (NOT a tree-branch slingshot), stands in place. 1 stance, held low in front. 2 raise to eye level, aiming. 3 pull back fully, aiming. 4 release: the shot flies right while he STILL HOLDS the weapon up. 5 recover to stance, weapon in hand.
+Row 5 – a red-and-black PNEUMATIC NAIL GUN with a hose connected to a small blue AIR TANK hanging from his side, held in both hands like a small gun, stands in place. 1 stance at the waist. 2 lift and aim at chest height. 3 brace, lean forward. 4 fire: a shot flies right with a small spark. 5 recover to stance.
+Row 6 – yellow gloves with a ring of silver CAR KEYS threaded across the knuckles like brass knuckles, worn on both hands. 1 boxing guard. 2 dash forward. 3 straight punch with a small white impact star. 4 rising uppercut. 5 recover to guard.
+
+Keep his look identical to image 1 in all 30 frames. Output PNG only.
+```
+
+## 15-4 · ถืออาวุธระดับ 4
+<!-- note: ใบพัดลมคมกริบ · ไม้เฟืองรถ · ปากกาหมึกซึม · หน้าไม้ร่ม · ที่เย็บต่อแบตเตอรี่ · ถุงมือสปริง | cells: 30 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1; draw only the poses and the weapons written below. No weapon images are attached — follow the text descriptions.
+
+Layout: 6 rows x 5 columns (exactly 5 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, even during the attack and the follow-through.
+
+Every frame faces RIGHT. Only one weapon per row.
+
+Row 1 – a sharpened CEILING-FAN BLADE mounted on a knife handle with a small round motor at the hub, 1 battle stance holding it low and forward. 2 run forward with it raised. 3 cocked back over the shoulder while still running. 4 arriving: big slash with a white swing arc, the weapon still in his hand. 5 recover to stance.
+Row 2 – a baseball bat with a heavy round CAR GEAR WHEEL fitted on the end, two-handed. 1 stance, held up over the shoulder. 2 run forward with it raised behind the head. 3 cocked far back while still running. 4 arriving: full horizontal swing with a white swing arc. 5 recover to stance.
+Row 3 – a long black FOUNTAIN PEN whose big brass nib is a spearhead, held like a short spear in BOTH hands. 1 stance, pointing forward. 2 dash forward, pulled back to the chest. 3 still dashing, lowered. 4 arriving: straight lunge thrust, the weapon clearly visible at the end of his arms, short white thrust line. 5 recover to stance.
+Row 4 – a CROSSBOW built from a broken umbrella's bent steel frame, loaded with an umbrella rib as the bolt, stands in place. 1 stance, held low in front. 2 raise to eye level, aiming. 3 pull back fully, aiming. 4 release: the shot flies right while he STILL HOLDS the weapon up. 5 recover to stance, weapon in hand.
+Row 5 – a heavy olive-green FIELD STAPLER wired by red and black cables to a car battery worn on his back, held in both hands like a small gun, stands in place. 1 stance at the waist. 2 lift and aim at chest height. 3 brace, lean forward. 4 fire: a shot flies right with a small spark. 5 recover to stance.
+Row 6 – gloves with a coiled DOOR-CLOSER SPRING mounted on the back of each hand, worn on both hands. 1 boxing guard. 2 dash forward. 3 straight punch with a small white impact star. 4 rising uppercut. 5 recover to guard.
+
+Keep his look identical to image 1 in all 30 frames. Output PNG only.
+```
+
+## 15-5 · ถืออาวุธระดับ 5
+<!-- note: มีดเชฟเรืองไฟ · ไม้เบสบอลลายเซ็น · ปากกาผู้นับเหตุการณ์ · หนังสติ๊กทองเหลือง · ที่เย็บทองเหลือง · ถุงมือปะเรือง | cells: 30 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1; draw only the poses and the weapons written below. No weapon images are attached — follow the text descriptions.
+
+Layout: 6 rows x 5 columns (exactly 5 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell. EVERY cell must clearly show that row's weapon in his hands — never an empty hand, even during the attack and the follow-through.
+
+Every frame faces RIGHT. Only one weapon per row.
+
+Row 1 – a chef's knife whose blade GLOWS bright ORANGE like a live ember, with small sparks, 1 battle stance holding it low and forward. 2 run forward with it raised. 3 cocked back over the shoulder while still running. 4 arriving: big slash with a white swing arc, the weapon still in his hand. 5 recover to stance.
+Row 2 – a baseball bat with a faded autograph and a GLOWING gold band wrapped around it, tiny star sparkles, two-handed. 1 stance, held up over the shoulder. 2 run forward with it raised behind the head. 3 cocked far back while still running. 4 arriving: full horizontal swing with a white swing arc. 5 recover to stance.
+Row 3 – a wooden pen covered in carved tally marks with a GLOWING blue nib, held like a short spear in BOTH hands. 1 stance, pointing forward. 2 dash forward, pulled back to the chest. 3 still dashing, lowered. 4 arriving: straight lunge thrust, the weapon clearly visible at the end of his arms, short white thrust line. 5 recover to stance.
+Row 4 – a polished BRASS slingshot with a GLOWING band, firing a glass marble with a star inside, stands in place. 1 stance, held low in front. 2 raise to eye level, aiming. 3 pull back fully, aiming. 4 release: the shot flies right while he STILL HOLDS the weapon up. 5 recover to stance, weapon in hand.
+Row 5 – an antique BRASS stapler firing GLOWING light-blue staples, held in both hands like a small gun, stands in place. 1 stance at the waist. 2 lift and aim at chest height. 3 brace, lean forward. 4 fire: a shot flies right with a small spark. 5 recover to stance.
+Row 6 – gardening gloves covered in many sewn patches that GLOW warm orange, worn on both hands. 1 boxing guard. 2 dash forward. 3 straight punch with a small white impact star. 4 rising uppercut. 5 recover to guard.
+
+Keep his look identical to image 1 in all 30 frames. Output PNG only.
+```
+
+## 16-1 · ท่านอกศึก · ยืนและวิ่ง
+<!-- note: ยืนหายใจหน้า/หลัง · วิ่ง 3 ทิศ · กระโดดอยู่กับที่ — ใช้บนแผนที่ | cells: 36 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. He holds NO weapon in this sheet. His hands are empty.
+
+Layout: 6 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except the jump). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+The facing direction is written on each row.
+
+Row 1 – facing the viewer (front view), idle breathing loop: 1–6 chest rises and falls slightly, tiny head bob, arms relaxed at his sides.
+Row 2 – seen from the BACK (we see his backpack, not his face), idle breathing loop, same subtle motion.
+Row 3 – running toward the viewer (front view), 6-frame run cycle, clear alternating legs, arms pumping, both feet off the ground in frames 2 and 5.
+Row 4 – running away from the viewer (back view, backpack visible), 6-frame run cycle, same rules.
+Row 5 – running toward the RIGHT (side view), 6-frame run cycle, arms pumping, both feet off the ground in frames 2 and 5.
+Row 6 – front view, jump in place: 1 stand, 2 crouch, 3 push off, 4 highest point with knees tucked, 5 land with knees bent, 6 stand.
+
+Keep his look identical to image 1 in all 36 frames. Output PNG only.
+```
+
+## 16-2 · ท่าทาง · ทักทายและหยิบของ
+<!-- note: โบกมือ · พยักหน้า · ส่ายหน้า · มองหา · เก็บของ · ผลักลัง | cells: 36 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. He holds NO weapon in this sheet. Only rows 5 and 6 contain an object (a small box and a wooden crate).
+
+Layout: 6 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+The facing direction is written on each row.
+
+Row 1 – front view, wave: 1 stand, 2 raise his front hand to shoulder height (the hand never covers his face), 3–5 wave the open hand side to side with a smile, 6 lower the hand.
+Row 2 – front view, nod yes: 1 stand, 2 head tilts down, 3 up, 4 down, 5 up, 6 stand smiling.
+Row 3 – front view, shake head no: 1 stand, 2 head turned to his left, 3 to his right, 4 left, 5 right, 6 stand with a small frown.
+Row 4 – front view, look around: 1 stand, 2 turn his head to one side, 3 shade his eyes with one hand looking that way, 4 turn to the other side, 5 shade his eyes looking that way, 6 back to front, puzzled.
+Row 5 – facing RIGHT, pick up an item: 1 stand, 2 bend his knees and lean forward, 3 crouch reaching to the ground, 4 grab a small brown box, 5 stand up holding it at his chest, 6 hold it happily.
+Row 6 – facing RIGHT, push a heavy wooden crate (the crate touches his hands in every frame): 1 hands on the crate, 2 lean in, 3 step and push, 4 strain hard, 5 step and push, 6 lean in.
+
+Keep his look identical to image 1 in all 36 frames. Output PNG only.
+```
+
+## 16-3 · พักและอารมณ์
+<!-- note: นั่ง · นอนหลับ · ตกใจ · งง · ดีใจ · โกรธ — สัญลักษณ์ ! ? ♪ ผมวาดเพิ่มเองด้วยโค้ด | cells: 36 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. He holds NO weapon in this sheet. Do NOT draw speech bubbles, symbols, hearts, music notes, sweat drops or Zzz — facial expression and body only.
+
+Layout: 6 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell. No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Rows 1 and 3–6 face the viewer (front view). Row 2 faces RIGHT.
+
+Row 1 – sit down: 1 stand, 2 bend knees, 3 sit on the ground cross-legged, 4 sitting relaxed, 5 sitting, swaying a little, 6 sitting, looking up.
+Row 2 – sleep, facing RIGHT: 1 sitting, yawning, 2 lying down on his side, 3–6 sleeping with eyes closed, slow breathing, mouth slightly open.
+Row 3 – surprised: 1 stand, 2 jump back a little with wide eyes and open mouth, 3 both arms up in shock, 4 hold, 5 relax, 6 stand.
+Row 4 – confused: 1 stand, 2 tilt his head, 3 scratch the back of his head, 4 hold, 5 shrug, 6 stand.
+Row 5 – happy: 1 stand, 2 big smile with happy closed eyes, 3 small hop, 4 both fists up at his chest, 5 small hop, 6 stand smiling.
+Row 6 – angry: 1 stand, 2 frown with gritted teeth, 3 stomp one foot, 4 fists clenched, shaking, 5 stomp, 6 stand, still angry.
+
+Keep his look identical to image 1 in all 36 frames. Output PNG only.
+```
+
+## 16-4 · ท่าศึกเสริม
+<!-- note: ใช้ไอเท็ม · HP ต่ำ · ฟื้น · เชียร์เพื่อน · ประกาย (คิดท่าออก) | cells: 30 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same character size per cell, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. In this sheet he holds the small KITCHEN KNIFE with a wooden handle in his front hand in every frame (except where written).
+
+Layout: 5 rows x 6 columns (exactly 6 poses per row), one pose per cell, evenly spaced, Rion fully inside each cell, feet on the same baseline in every cell (except lying). No grid lines, no text, no labels, no numbers, no shadows, only one Rion per cell, never a duplicate Rion overlapping in a cell.
+
+Every frame faces RIGHT.
+
+Row 1 – use an item: 1 battle stance, knife low, 2 take a small round glass bottle with green liquid from his backpack strap with his back hand, 3 lift the bottle, 4 drink, 5 lower the bottle and wipe his mouth, 6 back to stance.
+Row 2 – low HP, loop: hunched over, panting, back hand on his knee, knife lowered, 1–6 heavy breathing, shoulders rise and fall, tired eyes.
+Row 3 – revive: 1 lying face down with the knife on the ground beside him, 2 push up on his arms, 3 one knee up, 4 rise, grabbing the knife, 5 stand, shaky, 6 battle stance.
+Row 4 – cheer an ally: 1 stance, 2 raise his back fist, 3 pump the fist upward (his face stays visible), 4 shout encouragingly, 5 pump again, 6 stance.
+Row 5 – sudden insight: 1 stance, 2 eyes widen, 3 looks up as if getting an idea, 4 a small sparkle in his eyes, determined smile, 5 grips the knife tighter, 6 confident stance.
+
+Keep his look identical to image 1 in all 30 frames. Output PNG only.
+```
+
+## 16-5 · ภาพหน้าสำหรับบทพูด
+<!-- note: 8 อารมณ์ ครึ่งตัวใหญ่ — ใช้ในกล่องบทพูดและคัตอินสกิล | cells: 8 -->
+```
+Image 1 is the ONLY style and character reference: copy this exact sprite sheet's character — same chibi proportions (very big round head, about 40% of his total height, short small body), same big round eyes and young face, same bright royal-blue BASEBALL cap with a curved front brim (bright blue like image 1, NOT dark navy, NOT a flat newsboy cap) with brass goggles with blue lenses on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack and straps, bright blue shorts, blue wristwatch on his LEFT wrist, white socks, brown boots. Same thick dark outline, same flat cel colors, same solid green background #01DA0D.
+Image 2 shows the same character from the front for extra detail. Do NOT change his look, age or proportions in any frame.
+Ignore the poses and weapons of image 1. This sheet is large portraits, not full-body sprites.
+
+Layout: 2 rows x 4 columns, evenly spaced. Each cell is one large BUST portrait (head and shoulders only, the head fills most of the cell), facing three-quarters to the RIGHT, on the same solid green background #01DA0D. No grid lines, no text, no labels, no numbers, no shadows, no speech bubbles or symbols, only one Rion per cell.
+
+Row 1 – 1 neutral and calm, 2 happy with a big smile, 3 laughing with eyes closed, 4 determined and serious.
+Row 2 – 1 surprised with wide eyes, 2 sad with teary eyes, 3 angry frown with gritted teeth, 4 hurt, wincing in pain.
+
+Keep his look identical to image 1 in all 8 portraits. Output PNG only.
+```

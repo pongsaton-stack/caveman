@@ -848,3 +848,6 @@ Keep his look identical to image 1 in all 30 frames. Output PNG only.
 - `rion_px_weapons.py` ใช้ชีตนี้แทนรอบ 9/13 (หมวกครีม · ลบออกจาก CLIPS) · ความสูงอ้างอิง = `rion_px/west_w0` · ย่อ ×0.175 · 26 เฟรม · พาเลตต์ 52 สี (เดิม 40 + ใหม่ 12) · `TO_GAME = False`
 - ผล `assets/sprites/rion_px_weapons_draft/<SL|CR|PC|ST|DV|BD>_<0–4>.png` · ภาพตรวจ `flow_v15_1_cut_check.png` (ซ้ายสุด = ท่าเดินในเกมเทียบขนาด · เส้นแดง = พื้น)
 - ข้อสังเกต: มุม 3/4 ค่อนหน้า (ท่าเดินในเกมเป็นด้านข้าง) · ลูกหินหนังสติ๊กเล็กเกินจนหายตอนย่อ · ซูมดูเห็นจุดเล็กๆ ตรงรอยลบมีด (เล็กกว่า 1 พิกเซลที่ขนาดเกม)
+
+### ชุดคำสั่งครบทุกท่า (16 ต.ค.) → `PROMPT_PACK.md`
+prompt ท่าตัวเอกที่ยังขาดทั้งหมด 11 ชีต (14-1 ปรับลำดับภาพแล้ว · 15-2…15-6 · 16-1…16-5 ใหม่) ย้ายไปอยู่ใน `PROMPT_PACK.md` · หน้าคัดลอก https://claude.ai/artifact/VfPTXa1bVmwSrg7GZWWzsY
