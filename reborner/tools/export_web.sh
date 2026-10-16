@@ -10,7 +10,7 @@ G="${GODOT:?ตั้ง GODOT=/path/to/godot}"; OUT="${1:?ระบุโฟล
 rm -rf "$OUT"; mkdir -p "$OUT/raw"
 "$G" --headless --path . --export-release "Web" "$OUT/raw/index.html" > "$OUT/export.log" 2>&1 || { tail -20 "$OUT/export.log"; exit 1; }
 cp "$OUT/raw/index.js" "$OUT/raw/index.png" "$OUT/raw/index.icon.png" "$OUT/raw/index.apple-touch-icon.png" "$OUT/" 2>/dev/null || true
-cp "$OUT/raw/index.js" "$OUT/"
+cp "$OUT/raw/"index*.js "$OUT/"   # index.js + index.audio*.worklet.js (ไม่มี worklet = เสียงไม่โหลด)
 gzip -9 -c "$OUT/raw/index.wasm" > "$OUT/index.wasm.gz.wasm"
 cp "$OUT/raw/index.pck" "$OUT/index.pck.wasm"
 PCK=$(stat -c %s "$OUT/raw/index.pck"); WASM=$(stat -c %s "$OUT/raw/index.wasm")

@@ -27,13 +27,18 @@ func _process(_d: float) -> bool:
 
 func _done(r: Dictionary) -> void:
 	print("seen ", seen.keys(), " won=", r["won"])
-	# ถืออาวุธที่ติดตั้ง (kwan 7 ต.ค. 2026): เริ่มเกม = มีดทำครัว → ภาพ weapons_held/<id>_0–4 แทน west/west_a
+	# Rion พิกเซล 32-bit (kwan 16 ต.ค. 2026): ถือมีดในภาพเอง · ภาพ weapons_held (วาดบน Rion เก่า) ไม่ใช้แล้ว
 	var wid: String = screen.hero.weapon_id
 	ok(wid != "", "ตัวเอกรู้อาวุธที่ถือ (%s)" % wid)
-	for n in ["%s_0.png" % wid, "%s_1.png" % wid, "%s_3.png" % wid, "west_h0.png"]:
-		ok(seen.has(n), "เห็น " + n)
-	ok(not seen.has("west_a0.png"), "ไม่ใช้ท่าฟันมีดเดิมเมื่อมีภาพถืออาวุธ")
+	ok(screen._hero_tex.texture.resource_path.begins_with(BattleScreen.SPRITE_DIR), "ภาพมาจาก " + BattleScreen.SPRITE_DIR)
+	for i in screen._tex_attack.size():
+		ok(seen.has("west_a%d.png" % i), "ท่าฟันครบทุกเฟรม: west_a%d" % i)
+	ok(screen._tex_attack.size() >= 4, "ท่าฟัน %d เฟรม" % screen._tex_attack.size())
+	ok(seen.has("west_h0.png"), "เห็น west_h0.png")
+	ok(not seen.has("%s_0.png" % wid), "ไม่ปนภาพ Rion เก่าถืออาวุธ")
+	ok(screen._tex_idle_loop.size() >= 2 and screen._tex_idle == screen._tex_idle_loop[0], "ยืนหายใจวน %d เฟรม" % screen._tex_idle_loop.size())
 	if hero_down_ever:
-		ok(seen.has("west_k1.png"), "ตัวเอกล้ม → ท่านอน")
+		var last := "west_k%d.png" % (screen._tex_ko.size() - 1)
+		ok(seen.has(last), "ตัวเอกล้ม → ท่านอน " + last)
 	print("FAILS ", fails)
 	quit()

@@ -8,23 +8,18 @@ extends Node2D
 
 const TILE := 24
 const MOVE_TIME := 0.15
-const CAM_TOP_PAD := 40
+const CAM_TOP_PAD := 56   # Rion พิกเซลสูง ~74 ยื่นเหนือช่องราว 50 (เดิม 64px ยื่น 38 → 40)
 # ท่าเดิน: ก้าว 1 ครั้ง (2 เฟรม) ต่อ 1 ช่อง → รอบละ 2 ช่อง · เล่นต่อเนื่องข้ามช่อง หยุดเมื่อปล่อยปุ่ม
 const WALK_FPS := 2.0 / MOVE_TIME
 const ENEMY_STEP := 0.9
 const CHASE_RANGE := 4
 const MAP_PATH := "res://data/map_ashfield.txt"
-const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
+const SPRITE_DIR := "res://assets/sprites/rion_px"
 
-# ชื่อไฟล์เฟรมตัวเอกต่อทิศ — ถ้าทิศไหนดูผิด แก้ชื่อไฟล์ตรงนี้ได้เลย
-# Rion ตามต้นแบบ Last Light (ตัดจาก docs/art-bible/lastlight_01.png · หมวกน้ำเงิน) 64x64 · ร่าง รอ kwan อนุมัติ
-# เดิน 4 เฟรม/ทิศ (w0 = ยืน · w1 ก้าว · w2 ผ่าน · w3 ก้าวอีกข้าง) สร้างจาก tools/sprites/rion_anim.py · หมาใช้ชุดเดียวกัน
-const HERO_ANIMS := {
-	"down":  ["south_w0", "south_w1", "south_w2", "south_w3"],
-	"up":    ["north_w0", "north_w1", "north_w2", "north_w3"],
-	"left":  ["west_w0", "west_w1", "west_w2", "west_w3"],
-	"right": ["east_w0", "east_w1", "east_w2", "east_w3"],
-}
+# Rion พิกเซล 32-bit (kwan 16 ต.ค. 2026 เลือกเปลี่ยนแนวภาพเป็นพิกเซล ตัวสูง ~72) · tools/sprites/rion_px_game.py
+# ผืน 96x112 เท้าแถว ~108 · เดิน 8 เฟรม/ทิศ (2 ก้าว/รอบ · w0 = ภาพตอนหยุด) · โหลดตามไฟล์ที่มี (<ทิศ>_w0, _w1, ...)
+const HERO_ANIMS := {"down": "south_w", "up": "north_w", "left": "west_w", "right": "east_w"}
+const HERO_FEET_OFFSET := -40.0   # เท้า (แถว 108 ในผืน 112) ตรงขอบล่างช่อง
 
 # พาเลตต์องก์ 1 โทนจิบลิ (GDD 13) — องก์ถัดไปเปลี่ยนด้วย color grading ไม่ใช่วาดใหม่
 const TILE_COLORS := {
@@ -225,17 +220,17 @@ func _build_hero() -> void:
 	var found := 0
 	for anim in HERO_ANIMS.keys():
 		frames.add_animation(anim)
-		frames.set_animation_speed(anim, WALK_FPS)
 		frames.set_animation_loop(anim, true)
-		for fname in HERO_ANIMS[anim]:
-			var p := "%s/%s.png" % [SPRITE_DIR, fname]
-			if ResourceLoader.exists(p):
-				frames.add_frame(anim, load(p))
-				found += 1
+		var i := 0
+		while ResourceLoader.exists("%s/%s%d.png" % [SPRITE_DIR, HERO_ANIMS[anim], i]):
+			frames.add_frame(anim, load("%s/%s%d.png" % [SPRITE_DIR, HERO_ANIMS[anim], i]))
+			i += 1
+		found += i
+		frames.set_animation_speed(anim, WALK_FPS * i / 4.0)   # รอบเดินเท่าเดิม (2 ช่อง/รอบ) ไม่ว่ากี่เฟรม
 	if found > 0:
 		hero_sprite = AnimatedSprite2D.new()
 		hero_sprite.sprite_frames = frames
-		hero_sprite.offset = Vector2(0, -18)   # เท้า (y=62 ในเฟรม 64) ตรงขอบล่างช่อง
+		hero_sprite.offset = Vector2(0, HERO_FEET_OFFSET)
 		hero_sprite.animation = "down"
 		hero_node.add_child(hero_sprite)
 	else:
@@ -248,7 +243,7 @@ func _build_hero() -> void:
 	hero_node.position = _cell_center(ps.cell)
 	var cam := Camera2D.new()
 	cam.limit_left = 0
-	# ตัวเอกสูง 64px ยื่นเหนือช่องราว 38px → ยืนแถวบนแล้วหัวหลุดจอ · ให้กล้องเลื่อนเหนือแมพได้ แล้วระบายส่วนนั้นเป็นสีกำแพง
+	# ตัวเอกยื่นเหนือช่องสูง (ดู CAM_TOP_PAD) → ยืนแถวบนแล้วหัวหลุดจอ · ให้กล้องเลื่อนเหนือแมพได้ แล้วระบายส่วนนั้นเป็นสีกำแพง
 	cam.limit_top = -CAM_TOP_PAD
 	RenderingServer.set_default_clear_color(TILE_COLORS["#"])
 	cam.limit_right = map.w * TILE

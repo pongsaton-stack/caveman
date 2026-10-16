@@ -11,7 +11,10 @@ var step_delay := 0.55       # วินาทีต่อเทิร์นข�
 var end_delay := 1.2
 const QUEUE_SLOTS := 8          # GDD 3.1 — UI ต้องแสดงคิวล่วงหน้า 8 ช่อง
 const LOG_LINES := 2   # กฎ UX ข้อ 5 ของ kwan: กล่องข้อความละไม่เกิน 2 บรรทัด
-const SPRITE_DIR := "res://assets/sprites/rion_lastlight_draft"
+const SPRITE_DIR := "res://assets/sprites/rion_px"   # Rion พิกเซล 32-bit (kwan 16 ต.ค. 2026) · tools/sprites/rion_px_game.py
+const HERO_SIZE := Vector2(96, 112)       # ผืนภาพ Rion · เท้าแถว 109 · กลางตัวคอลัมน์ 48
+const HERO_PIVOT := Vector2(48, 81)       # จุดกลางตัวในผืน (เอฟเฟกต์/ตัวเลขยิงจากตรงนี้)
+const HERO_IDLE_SEC := 0.22               # ยืนศึกวน 6 เฟรม (ms แถว idle_battle ในหน้าเทส)
 const HELD_DIR := "res://assets/sprites/weapons_held"   # Rion ถืออาวุธ 30 ชิ้น (tools/sprites/weapons_held.py)
 
 # พาเลตต์เดียวกับแผนที่องก์ 1
@@ -45,10 +48,12 @@ var _info_label: Label
 var _menu: GridContainer
 var _hero_tex: TextureRect
 var _tex_idle: Texture2D
-var _tex_attack: Array[Texture2D] = []   # west_a0..a3: ง้าง → พุ่ง → ฟันเต็ม → ถอย
+var _tex_attack: Array[Texture2D] = []   # west_a0..: ยืน → วิ่งเข้า → ชูมีด → ฟันมีรอย → คืนท่า
 const ATTACK_FRAME_SEC := 0.11
-var _tex_hurt: Array[Texture2D] = []     # west_h0..h1: ผงะ + ประกาย → ตั้งหลัก
-var _tex_ko: Array[Texture2D] = []       # west_k0..k1: ทรุดเข่า → นอนราบ (ค้างไว้จนฟื้น)
+var _tex_hurt: Array[Texture2D] = []     # west_h0..: โดน → เซถอย → ตั้งหลัก
+var _tex_ko: Array[Texture2D] = []       # west_k0..: เซ → ล้มคว่ำ → นอนราบ (ค้างภาพสุดท้ายจนฟื้น)
+var _tex_idle_loop: Array[Texture2D] = []   # west_i0..: ยืนศึกหายใจ
+var _idle_t := 0.0
 var _hero_hp_seen := -1
 const HERO_X := 222                       # ตัวเอกยืนขวาของเวที ชิดแผงปาร์ตี้
 # ภาพคม (kwan 14 ต.ค. 2026 "เปลี่ยน art ของเกมเป็นแบบนี้เลย ไม่ใช้ pixel แล้ว" · ขั้น 1 Rion + ฉากต่อสู้) — ร่าง ปิดไว้จน kwan อนุมัติ
@@ -378,21 +383,20 @@ func _fill_side(box: VBoxContainer, list: Array, allies: bool) -> void:
 
 # ── สร้าง UI ─────────────────────────────────────────────────
 func _load_textures() -> void:
-	# ปาร์ตี้อยู่ขวา หันซ้ายเข้าหาศัตรู · ท่าโจมตี west_a0-3 (ร่าง รอ kwan อนุมัติ)
-	for i in 4:
-		var pa := "%s/west_a%d.png" % [SPRITE_DIR, i]
-		if ResourceLoader.exists(pa):
-			_tex_attack.append(load(pa))
-		for pair in [["h", _tex_hurt], ["k", _tex_ko]]:
-			var ph := "%s/west_%s%d.png" % [SPRITE_DIR, pair[0], i]
-			if ResourceLoader.exists(ph):
-				pair[1].append(load(ph))
+	# ปาร์ตี้อยู่ขวา หันซ้ายเข้าหาศัตรู · โหลดทุกเฟรมที่มีไฟล์ (west_a0, west_a1, ...)
+	for pair in [["a", _tex_attack], ["h", _tex_hurt], ["k", _tex_ko], ["i", _tex_idle_loop]]:
+		var i := 0
+		while ResourceLoader.exists("%s/west_%s%d.png" % [SPRITE_DIR, pair[0], i]):
+			pair[1].append(load("%s/west_%s%d.png" % [SPRITE_DIR, pair[0], i]))
+			i += 1
 	var p_idle := "%s/west.png" % SPRITE_DIR
 	if ResourceLoader.exists(p_idle):
 		_tex_idle = load(p_idle)
+	if not _tex_idle_loop.is_empty():
+		_tex_idle = _tex_idle_loop[0]   # ภาพยืน = เฟรมแรกของวงหายใจ (ให้ _idle_tick รู้ว่ากำลังยืน)
 	# ถืออาวุธจริงตามที่ติดตั้ง (kwan 7 ต.ค. 2026 "แก้ด่วน"): weapons_held/<id>_0 ยืนถือ · _1–4 ง้าง→ฟาด→ฟาดต่อ→ตามแรง
-	# ไม่มีภาพของอาวุธนั้น = ใช้ west/west_a เดิม (มีด)
-	if hero != null and hero.weapon_id != "":
+	# ภาพ weapons_held วาดบน Rion แบบเก่า (64px) → ใช้เฉพาะเมื่อไม่มี Rion พิกเซล (ชุดใหม่ถือมีดอย่างเดียว)
+	if hero != null and hero.weapon_id != "" and _tex_idle_loop.is_empty():
 		var held: Array[Texture2D] = []
 		for i in 5:
 			var ph := "%s/%s_%d.png" % [HELD_DIR, hero.weapon_id, i]
@@ -433,6 +437,13 @@ func _hires_tex(res_path: String) -> Texture2D:
 	var img := Image.load_from_file(f)
 	img.generate_mipmaps()
 	return ImageTexture.create_from_image(img)
+
+## ยืนศึกหายใจวน · เล่นเฉพาะตอนภาพบนจอเป็นท่ายืน (ฟัน/โดนตี/ล้ม ตั้งภาพเองแล้วคืน _tex_idle)
+func _idle_tick(delta: float) -> void:
+	if _tex_idle_loop.size() < 2 or _hero_tex == null or _hero_tex.texture not in _tex_idle_loop:
+		return
+	_idle_t += delta
+	_hero_tex.texture = _tex_idle_loop[int(_idle_t / HERO_IDLE_SEC) % _tex_idle_loop.size()]
 
 func _hires_tick(delta: float) -> void:
 	if _hires_idle.is_empty() or _hero_tex == null or _hero_tex.texture not in _hires_idle:
@@ -499,8 +510,9 @@ func _build() -> void:
 
 	_hero_tex = TextureRect.new()
 	_hero_tex.texture = _tex_idle
-	_hero_tex.position = Vector2(HERO_X, 34)
-	_hero_tex.size = Vector2(64, 64)
+	# กลางตัวตรงตำแหน่งเดิม (HERO_X + 32) · เท้าลงพื้นทราย STAGE_FEET_Y
+	_hero_tex.position = Vector2(HERO_X + 32 - HERO_PIVOT.x, STAGE_FEET_Y - 109.0)
+	_hero_tex.size = HERO_SIZE
 	_hero_tex.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	root.add_child(_hero_tex)
 
@@ -666,6 +678,7 @@ func _build_ally_sprites(root: Control) -> void:
 
 func _process(delta: float) -> void:
 	_hires_tick(delta)
+	_idle_tick(delta)
 	if _foe_rects.is_empty():
 		return
 	_foe_clock += delta
@@ -756,7 +769,7 @@ func _actor_point(a) -> Vector2:
 	if a == null:
 		return Vector2.INF
 	if a == hero and _hero_tex != null:
-		return _hero_tex.position + Vector2(32, 34)
+		return _hero_tex.position + HERO_PIVOT
 	if _foe_rects.has(a):
 		var r: TextureRect = _foe_rects[a]
 		return r.position + r.size * Vector2(0.5, 0.55)
