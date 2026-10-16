@@ -143,14 +143,14 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<button class="btn" role="tab" id="tabBosses" aria-pressed="false">บอส</button>
 			<button class="btn" role="tab" id="tabSkills" aria-pressed="false">สกิล</button>
 			<button class="btn" role="tab" id="tabSksheet" aria-pressed="false">สกิลจากชีต</button>
-			<button class="btn" role="tab" id="tabVxsheet" aria-pressed="false">VFX ตัวเอก</button>
+			<button class="btn" role="tab" hidden id="tabVxsheet" aria-pressed="false">VFX ตัวเอก</button>
 			<button class="btn" role="tab" id="tabArms" aria-pressed="false">อาวุธ</button>
-			<button class="btn" role="tab" id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
-			<button class="btn" role="tab" id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
+			<button class="btn" role="tab" hidden id="tabWeapons" aria-pressed="false">ติดตั้งอาวุธ</button>
+			<button class="btn" role="tab" hidden id="tabSpells" aria-pressed="false">เวทย์มนต์</button>
 			<button class="btn" role="tab" id="tabItems" aria-pressed="false">ไอเท็ม</button>
 			<button class="btn" role="tab" id="tabStructs" aria-pressed="false">อาคาร · สิ่งก่อสร้าง</button>
 			<button class="btn" role="tab" id="tabVehicles" aria-pressed="false">ยานพาหนะ</button>
-			<button class="btn" role="tab" id="tabNpcs" aria-pressed="false">NPC ชาวบ้าน</button>
+			<button class="btn" role="tab" hidden id="tabNpcs" aria-pressed="false">NPC ชาวบ้าน</button>
 		</div>
 
 		<section class="box" id="paneClips">
@@ -178,7 +178,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSksheet" hidden>
 			<p class="muted wnote">ตัดจากชีตสกิลของ kwan ทีละช่อง (มีจริง 172 ช่อง แม้หัวชีตเขียน 173) · ตัวเอกในชีตถูกลบออก ใช้ Rion ตัวจริงของเกมแทน · หันซ้ายแบบจอสู้ ·
 				ยืน → ง้าง → ปล่อย → กระทบ → คืนท่า · มุมซ้ายบน = ช่องต้นฉบับ · ร่าง ยังไม่เข้าเกม · ชื่อท่ายังไม่ได้ใส่ (ในชีตเป็นภาพตัวหนังสือ)</p>
-			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button><button class="btn pxBtn" aria-pressed="true">👦 Rion พิกเซล (ในเกม)</button></p>
+			<p class="seg"><button class="btn" id="btnSound" aria-pressed="false">🔇 เสียงประกอบ</button><button class="btn" id="btnMusic" aria-pressed="false">🎵 เพลงต่อสู้</button><button class="btn vxsBtn" id="btnVxs" aria-pressed="true">✨ แสงจากชีต VFX ตัวเอก</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></p>
 			<p class="seg" id="labSheet" role="group" aria-label="ซ้อนแล็บ VFX"></p>
 			<p class="seg" id="rollFoe" role="group" aria-label="มอนที่โดน (ท่ากระโดดม้วน)"></p>
 			<p class="seg" id="fbElem" role="group" aria-label="ธาตุของห่าลูกไฟ"></p>
@@ -258,7 +258,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 			<p class="lbl" style="margin-top:12px">แล็บ VFX (ไฟล์จาก night-forge-vfx-lab · ยังไม่ผูกกับท่า)</p>
 			<div class="row"><span class="seg" id="labPick"></span></div>
 			<p class="lbl" style="margin-top:12px">ไม้ตาย 6 สาย × แสงจากชีต VFX ตัวเอก (ร่าง)</p>
-			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button><button class="btn pxBtn" aria-pressed="true">👦 Rion พิกเซล (ในเกม)</button></div>
+			<div class="row"><span class="seg" id="ultPick"></span><button class="btn vxsBtn" aria-pressed="true">✨ แสงจากชีต</button><button class="btn rigBtn" aria-pressed="true">🦴 ริก Rion</button></div>
 			<p class="note" id="styleNote">ซินีมา = คัตอิน · มุมกล้อง · ร่างแยก (6 สาย) · SaGa = แนว Romancing SaGa 3: ฉากเต็มจอ · ทีมเรียงทแยง · วิ่งเข้าตี · กล่องชื่อท่ามุมขวาบน · ไม้ตายเปลี่ยนสีทั้งจอ (ตัวอย่าง: คม · ยิง)</p>
 			<p class="lbl" style="margin-top:12px">สาย (techs.csv)</p>
 			<div class="schools" id="schoolPick"></div>
@@ -286,6 +286,7 @@ const DIRS = [['south', 'ลง'], ['north', 'ขึ้น'], ['west', 'ซ้�
 const CLIPS = {};
 const GROUPS = [];
 function addClip(group, id, label, frames, sec, opt = {}) {
+	if (['clips', 'arms', 'vxsheet'].includes(opt.tab || 'clips') && [...frames, ...(opt.panels || []).flatMap(p => p.keys || [])].some(k => typeof k === 'string' && /^(rion\/|held\/|rig\/|pxw\/|cut\/|spl\/|p64\/rion_|npc\/)/.test(k))) return;   // kwan 16 ต.ค.: Rion แบบเก่าออกจากทุกหน้า
 	CLIPS[id] = Object.assign({ id, label, frames, sec, loop: true }, opt);
 	let g = GROUPS.find(x => x.name === group);
 	if (!g) GROUPS.push(g = { name: group, ids: [], tab: opt.tab || 'clips' });
@@ -295,7 +296,7 @@ function addClip(group, id, label, frames, sec, opt = {}) {
 // Rion พิกเซล 32-bit ที่อยู่ในเกมตอนนี้ (kwan 16 ต.ค. 2026 · assets/sprites/rion_px) — จังหวะเท่าในเกม: เดินรอบ 2 ช่อง · ยืนศึก HERO_IDLE_SEC · ฟัน/โดนตี/ล้ม ATTACK_FRAME_SEC
 {
 	const pxKeys = pre => { const k = []; for (let i = 0; DATA.sprites[`px/${pre}${i}`]; i++) k.push(`px/${pre}${i}`); return k; };
-	const G = 'Rion พิกเซล 32-bit · ในเกม (16 ต.ค.)', PXS = [112, 116];   // ผืน 96x112 + ขอบ
+	const G = 'Rion · แบบ Flow หมวกน้ำเงิน (แบบเดียวที่ใช้ · 16 ต.ค.)', PXS = [112, 116];   // ผืน 96x112 + ขอบ
 	for (const [pre, lab] of [['south_w', 'เดินลง (หน้า)'], ['north_w', 'เดินขึ้น (หลัง)'], ['west_w', 'เดินซ้าย'], ['east_w', 'เดินขวา']]) {
 		const k = pxKeys(pre); if (k.length) addClip(G, 'px_' + pre, `${lab} · ${k.length} เฟรม`, k, 2 * K.MOVE_TIME / k.length, { stage: PXS });
 	}
@@ -304,6 +305,10 @@ function addClip(group, id, label, frames, sec, opt = {}) {
 	if (atk.length) addClip(G, 'px_attack', `ฟันมีด · ${atk.length} เฟรม`, atk, K.ATTACK_FRAME_SEC, { stage: PXS });
 	if (hurt.length) addClip(G, 'px_hurt', `โดนตี · ${hurt.length} เฟรม`, hurt, K.ATTACK_FRAME_SEC, { stage: PXS });
 	if (ko.length) addClip(G, 'px_ko', `ล้ม (ค้างท่านอน) · ${ko.length} เฟรม`, ko, K.ATTACK_FRAME_SEC, { hold: true, stage: PXS });
+	// ท่าแบบ Flow 14-2 ที่เกมยังไม่ใช้ (หลบ · มองไกล · กระโดดม้วนฟัน · เต้นสามช่า) — จังหวะเท่าหน้าเทส Flow (ค่าภาพ)
+	for (const [k, lab, sec, hold] of [['dodge', 'หลบ', 0.09, true], ['watch', 'มองไกล (จับตา)', 0.16, false], ['roll', 'กระโดดม้วน → คุกเข่าฟัน', 0.08, true], ['victory', 'ชนะ · เต้นสามช่า', 0.12, false]]) {
+		const n = (DATA.px_extra || {})[k] || 0; if (n) addClip(G, 'px_' + k, `${lab} · ${n} เฟรม (ยังไม่อยู่ในเกม)`, Array.from({ length: n }, (_, i) => `px/${k}_${i}`), sec, { stage: PXS, hold });
+	}
 }
 // มอนภูมิภาค 1 พิกเซล (ชีตรอบ 10 จาก Google Flow · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — หันขวาแบบศัตรูในจอศึก · ผืนเท่ากันทุกภาพต่อตัว (ตำแหน่งกระโดด/บินอยู่ในภาพแล้ว)
 // คลิป 1 = หายใจวน (ภาพ idle) · คลิป 2 = โจมตี → โดนตี → ล้ม (ค้างท่าล้ม) · ความเร็ว FOE_IDLE_SEC / ATTACK_FRAME_SEC ตามในเกม
@@ -434,23 +439,27 @@ const rspr = (key, x, y, opt) => spr(key, x, y - (key && key.startsWith('p64/') 
 // ถูกแทนด้วยภาพ px/ ตามจังหวะท่า ณ จุดวาด (spr · tinted · ghost) · ปุ่ม "Rion พิกเซล" ปิดเพื่อเทียบของเดิม
 // ผืนเก่า 64x64 เท้าแถว 62 กลางคอลัมน์ 32 · ผืน px 96x112 เท้าแถว 109 กลาง 48 → เลื่อน (-16, -47) · p64 สูง 76 (rspr ลบ 12 ไว้แล้ว) → (-16, -35)
 // ไม่แทนในคลิปท่าขยับธรรมดา/คู่เทียบ/แท็บอาวุธ (ดูภาพเดิมได้ตรง ๆ) · ภาพที่ไม่มีคู่ (เต้นสามช่า อีโมต ท่าขดตัวกลางอากาศของริก) = ใช้ภาพเดิม
-let PX_ON = true, PX_NOW = true;
+const PX_ON = true, PX_NOW = true;   // kwan 16 ต.ค.: Rion แบบ Flow เท่านั้น ทุกฉาก (ไม่มีปุ่มเทียบของเดิมแล้ว)
 const PX_PAD = 24;
 const PX_ATK = [3, 3, 4, 5], PX_POSE5 = [0, 3, 4, 4, 5, 5];   // ฟันเก่า 4 ภาพ (ง้าง→พุ่ง→ฟัน→ถอย) · ท่าถือ 5–6 ช่อง (ยืน ง้าง ฟาด ตาม คืน)
 const PX_RIG = i => i <= 0 ? 0 : i <= 5 ? 3 : i <= 7 ? 4 : 5;    // ริก 12 เฟรม: 0 ยืน · 1–5 ง้าง · 6 ฟาด · 7 ตาม · 8–11 คืน
-const pxIdle = () => `px/west_i${Math.floor(performance.now() / 1000 / (K.HERO_IDLE_SEC || 0.22)) % 6}`;
+const pxN = pre => { let n = 0; while (DATA.sprites[`px/${pre}${n}`]) n++; return Math.max(1, n); };
+const pxIdle = () => `px/west_i${Math.floor(performance.now() / 1000 / (K.HERO_IDLE_SEC || 0.22)) % pxN('west_i')}`;
+const pxAt = (pre, u) => `px/${pre}${Math.min(pxN(pre) - 1, Math.max(0, Math.floor(u * pxN(pre))))}`;   // u 0–1 → เฟรม
 function pxMap(key) {
-	if (!PX_ON || !PX_NOW || !key || !DATA.sprites['px/west_i0']) return null;
+	if (!key || !DATA.sprites['px/west_i0'] || key.startsWith('px/')) return null;
 	let m;
 	if (key === 'rion/west') return pxIdle();
-	if ((m = key.match(/^rion\/west_([ahk])(\d)$/))) return m[1] === 'a' ? `px/west_a${PX_ATK[+m[2]] ?? 5}` : m[1] === 'h' ? `px/west_h${+m[2] ? 4 : 1}` : `px/west_k${+m[2] ? 4 : 1}`;
-	if ((m = key.match(/^rion\/(south|north|west|east)(?:_w(\d))?$/))) return `px/${m[1]}_w${2 * +(m[2] || 0)}`;
+	if ((m = key.match(/^rion\/west_([ahk])(\d)$/))) return m[1] === 'a' ? `px/west_a${PX_ATK[+m[2]] ?? 5}` : m[1] === 'h' ? pxAt('west_h', +m[2] ? .8 : .2) : pxAt('west_k', +m[2] ? 1 : 0);
+	if ((m = key.match(/^rion\/(south|north|west|east)(?:_w(\d))?$/))) return pxAt(`${m[1]}_w`, +(m[2] || 0) / 4);
 	if ((m = key.match(/^rion\/grips\/[a-z_]+?_(\d)$/)) || (m = key.match(/^held\/.+_(\d)$/))) return `px/west_a${PX_POSE5[+m[1]] ?? 5}`;
-	if ((m = key.match(/^rig\/(SL01T)_/))) return null;
+	if ((m = key.match(/^rig\/SL01T_(\d+)$/))) return `px/roll_${2 + (+m[1] % 2)}`;   // ท่าขดตัวกลางอากาศ = ม้วนตัวของชุด Flow
 	if ((m = key.match(/^rig\/.+_(\d+)$/))) return `px/west_a${PX_RIG(+m[1])}`;
-	if ((m = key.match(/^p64\/rion_(run|walk)_(west|east|south|north)_(\d+)$/))) return `px/${m[2]}_w${+m[3] % 8}`;
-	if ((m = key.match(/^p64\/rion_idle_west_(\d+)$/))) return `px/west_i${+m[1] % 6}`;
-	if ((m = key.match(/^p64\/rion_hurt_(\d+)$/))) return `px/west_h${Math.min(5, Math.floor(+m[1] / 11))}`;
+	if ((m = key.match(/^p64\/rion_(run|walk)_(west|east|south|north)_(\d+)$/))) return pxAt(`${m[2]}_w`, (+m[3] % 64) / 64);
+	if ((m = key.match(/^p64\/rion_idle_west_(\d+)$/))) return pxIdle();
+	if ((m = key.match(/^p64\/rion_hurt_(\d+)$/))) return pxAt('west_h', +m[1] / 64);
+	if ((m = key.match(/^p64\/rion_b_chacha_(\d+)$/))) return `px/victory_${Math.floor(performance.now() / 1000 / 0.12) % ((DATA.px_extra || {}).victory || 1)}`;
+	if (/^(rion\/|held\/|rig\/|p64\/rion_)/.test(key)) return pxIdle();   // ภาพ Rion เก่าที่ไม่มีคู่ → ยืนศึกแบบ Flow (ห้ามโชว์แบบเก่า)
 	return null;
 }
 const PX_FEET = 109;   // แถวเท้าของผืน px (rion_px_game.py)
@@ -1272,7 +1281,7 @@ function eyCrest(x, y, d, col) {   // ตราเวทย์หกเหลี
 	ctx.beginPath(); ctx.moveTo(0, -8); ctx.lineTo(0, 8); ctx.moveTo(-6, -3); ctx.lineTo(6, 3); ctx.moveTo(-6, 3); ctx.lineTo(6, -3); ctx.stroke(); ctx.restore();
 }
 function eyCutin(d, name, poseKey, col) {   // คัตอินแถบเฉียงพาดจอ: หน้า Rion ขยาย 3 เท่า (พิกเซลคม) + ชื่อท่า · เลื่อนเข้า-ค้าง-ออก (นอกกล้อง)
-	if (d < 0 || d >= EY.CUT) return; const im = IMG[poseKey]; const W0 = 240, cy = 54, h = 46;
+	if (d < 0 || d >= EY.CUT) return; const im = IMG['ref/face']; const W0 = 240, cy = 54, h = 46;
 	const slide = d < 3 ? (3 - d) / 3 : d > EY.CUT - 4 ? -(d - (EY.CUT - 4)) / 3 : 0, ox = slide * 260;
 	ctx.save(); ctx.translate(ox, 0);
 	ctx.beginPath(); ctx.moveTo(-10, cy - h / 2 + 10); ctx.lineTo(W0 + 10, cy - h / 2 - 10); ctx.lineTo(W0 + 10, cy + h / 2 - 10); ctx.lineTo(-10, cy + h / 2 + 10); ctx.closePath();
@@ -1280,7 +1289,7 @@ function eyCutin(d, name, poseKey, col) {   // คัตอินแถบเฉ
 	const g = ctx.createLinearGradient(0, 0, W0, 0); g.addColorStop(0, col + 'aa'); g.addColorStop(0.6, col + '22'); g.addColorStop(1, col + '00'); ctx.fillStyle = g; ctx.fillRect(-10, cy - 40, W0 + 20, 80);
 	const r = vRng(77 + d); ctx.globalCompositeOperation = 'lighter'; for (let i = 0; i < 12; i++) { ctx.globalAlpha = 0.25 + r() * 0.35; ctx.fillStyle = '#ffffff'; ctx.fillRect(((r() * W0 + d * 40) % (W0 + 40)) - 20, cy - h / 2 + r() * h, 20 + r() * 40, 1); }
 	ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
-	if (im) { ctx.imageSmoothingEnabled = false; ctx.drawImage(im, 8, 4, 44, 44, 146, cy - 48, 88, 88); }   // หน้า Rion ขยาย 2 เท่า: แถบตัดช่วงหน้าผากถึงคาง (y≈16–40 ในสไปรต์)
+	if (im) { ctx.imageSmoothingEnabled = false; ctx.drawImage(im, 0, 0, 44, 44, 146, cy - 48, 88, 88); }   // หน้า Rion แบบ Flow (ref/face จาก rion_flow_ref_cut.png) ·   // หน้า Rion ขยาย 2 เท่า: แถบตัดช่วงหน้าผากถึงคาง (y≈16–40 ในสไปรต์)
 	ctx.restore();
 	ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-10, cy - h / 2 + 10); ctx.lineTo(W0 + 10, cy - h / 2 - 10); ctx.moveTo(-10, cy + h / 2 + 10); ctx.lineTo(W0 + 10, cy + h / 2 - 10); ctx.stroke();
 	ctx.font = '900 15px Sarabun, "Noto Sans Thai", sans-serif'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#000000';
@@ -1727,7 +1736,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 // ── สถานะผู้ชม ──
 const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
-const S = { tab: 'clips', last: { clips: 'rion_walk_west' }, clip: 'rion_walk_west', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
+const S = { tab: 'clips', last: { clips: 'px_west_w' }, clip: 'px_west_w', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', rollFoe: 'M01', fbElem: 'fire', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, vxs: true, rigW: null, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
@@ -1778,7 +1787,6 @@ function clipView() {
 	if (c.panels) return panelView(c);
 	if (c.skill) return sheetSkillView(c);
 	if (c.lab) return labSpellView(c);
-	PX_NOW = false;   // คลิปท่าขยับธรรมดา = ดูภาพตามชื่อจริง ไม่แทนด้วย Rion พิกเซล
 	const [SW, SH] = c.stage || [96, 96], base = SH - 4;   // ผืนสูงกว่า 96 (Rion พิกเซล 112) → เวทีสูงตาม ไม่ตัดเท้า
 	cv.width = SW; cv.height = SH; ctx.imageSmoothingEnabled = false;
 	drawBg();
@@ -1792,7 +1800,6 @@ function clipView() {
 
 // คู่เทียบ: แต่ละช่องเล่นชุดของตัวเองพร้อมกัน เฟรมเท่ากัน รอบเท่ากัน (ซ้าย = ท่าเดิม)
 function panelView(c) {
-	PX_NOW = false;
 	const n = c.panels.length; cv.width = 96 * n; cv.height = 96; ctx.imageSmoothingEnabled = false; drawBg();
 	ctx.font = '7px system-ui, sans-serif';
 	c.panels.forEach((p, k) => {
@@ -2278,9 +2285,9 @@ function cutIn(name, col) {
 		for (let i = 0; i < 14; i++) { const ly = y0 + 3 + ((i * 37) % (h - 6)), lx = ((i * 71 + t * 900) % (W() + 80)) - 40, ln = 18 + (i % 4) * 10;
 			ctx.globalAlpha = 0.35 * a; ctx.fillStyle = '#fff'; ctx.fillRect(W() - lx, ly, ln, 1); }
 		ctx.globalCompositeOperation = 'source-over';
-		const im = IMG['rion/west'], sc = 1.35, slide = easeOut(Math.min(1, t / 0.22));
+		const im = IMG[pxIdle()], sc = 1.2, slide = easeOut(Math.min(1, t / 0.22));
 		ctx.save(); ctx.beginPath(); ctx.rect(0, y0, W(), h); ctx.clip(); ctx.globalAlpha = a;
-		ctx.imageSmoothingEnabled = false; ctx.drawImage(im, W() - 20 - im.width * sc * slide, y0 - 10, im.width * sc, im.height * sc); ctx.restore();
+		ctx.imageSmoothingEnabled = false; if (im) ctx.drawImage(im, W() - 20 - im.width * sc * slide, y0 - 40, im.width * sc, im.height * sc); ctx.restore();   // Rion แบบ Flow (ผืน 96x112)
 		const tx = -60 + 80 * easeOut(Math.min(1, t / 0.25));
 		ctx.globalAlpha = a; ctx.font = '700 15px Sarabun, sans-serif'; ctx.textAlign = 'left'; ctx.lineJoin = 'round';
 		ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.strokeText(name, tx, y0 + h / 2 + 8); ctx.fillStyle = '#ffe08a'; ctx.fillText(name, tx, y0 + h / 2 + 8);
@@ -2907,7 +2914,7 @@ function tick(now) {
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
 				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
-		PX_NOW = true; LOGICAL_H = 0; clipView();
+		LOGICAL_H = 0; clipView();
 	} else {
 		if (S.playing) {
 			if (S.seq) { S.seq.acc += dt; while (S.seq && S.seq.acc >= S.seq.sec) { S.seq.acc -= S.seq.sec; S.seq.i++;
@@ -2918,7 +2925,7 @@ function tick(now) {
 			if (S.shake > 0) S.shake = Math.max(0, S.shake - dt);
 			if (S.dimT !== undefined) { S.dimT += dt; const t = S.dimT, hold = (S.dimTotal || 0.85) - 0.03; S.dim = t < 0.12 ? 0.55 * t / 0.12 : t < hold ? 0.55 : t < hold + 0.35 ? 0.55 * (1 - (t - hold) / 0.35) : 0; if (t >= hold + 0.35) S.dimT = undefined; }
 		}
-		PX_NOW = true; LOGICAL_H = 0; skillView(S.playing ? dt : 0);
+		LOGICAL_H = 0; skillView(S.playing ? dt : 0);
 	}
 	requestAnimationFrame(tick);
 }
@@ -3199,7 +3206,6 @@ function boot() {
 	$('btnSound').onclick = () => { S.sound = !S.sound; if (S.sound) auInit(); const b = $('btnSound'); b.setAttribute('aria-pressed', String(S.sound));
 		b.textContent = S.sound ? (AU ? '🔊 เสียงประกอบ' : 'เบราว์เซอร์นี้เล่นเสียงไม่ได้') : '🔇 เสียงประกอบ'; };
 	$('btnMusic').onclick = () => { S.music = !S.music; const ok = bgmSet(S.music), b = $('btnMusic'); b.setAttribute('aria-pressed', String(S.music && ok)); b.textContent = !ok ? 'เบราว์เซอร์นี้เล่นเสียงไม่ได้' : S.music ? '🎵 เพลงต่อสู้ (กำลังเล่น)' : '🎵 เพลงต่อสู้'; };
-	for (const b of document.querySelectorAll('.pxBtn')) b.onclick = () => { PX_ON = !PX_ON; for (const x of document.querySelectorAll('.pxBtn')) x.setAttribute('aria-pressed', String(PX_ON)); };
 	for (const b of document.querySelectorAll('.rigBtn')) b.onclick = () => { RIG_ON = !RIG_ON; for (const x of document.querySelectorAll('.rigBtn')) x.setAttribute('aria-pressed', String(RIG_ON)); };
 	{ const box = $('fbElem'), lab = document.createElement('span'); lab.className = 'muted'; lab.textContent = 'ธาตุเวทย์ (ห่าลูกไฟ):'; box.append(lab);   // kwan 13 ต.ค. มอนร้อน/หนาวตามเวทย์
 		for (const [v, t] of [['fire', '🔥 ไฟ (ร้อน)'], ['ice', '❄ น้ำแข็ง (หนาว)']]) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = v; b.textContent = t; b.setAttribute('aria-pressed', String(v === S.fbElem));
@@ -3233,7 +3239,7 @@ function boot() {
 	$('tabClips').onclick = () => setTab('clips'); $('tabSkills').onclick = () => setTab('skills'); for (const [k, n] of Object.entries(TAB_IDS)) $('tab' + n).onclick = () => setTab(k);
 	$('prof').oninput = e => { S.prof = +e.target.value; $('profV').textContent = S.prof; renderStats(); renderTechs(); };
 	$('wpn').onchange = e => { S.wpn = +e.target.value; renderStats(); renderTechs(); };
-	buildSkillRef(); buildClips(); buildBosses(); buildWeapons(); buildSpells(); buildGalleries(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
+	buildSkillRef(); buildClips(); buildBosses(); /* แท็บติดตั้งอาวุธ/เวทย์มนต์ซ่อน (Rion แบบเก่า · kwan 16 ต.ค.) */ buildGalleries(); buildFoes(); renderStats(); renderTechs(); setTab(S.tab);
 	$('foot').innerHTML = `สร้างจากไฟล์เกม: สไปรต์ <code>assets/sprites/{rion_lastlight_draft, dog_lastlight_draft, monsters_ll, monsters_ll_draft, compendium_anim}</code> (${Object.keys(DATA.sprites).length} ไฟล์)
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ

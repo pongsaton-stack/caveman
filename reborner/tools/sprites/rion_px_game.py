@@ -14,8 +14,22 @@ W, H, FEET = 96, 112, 110   # ผืนกว้างพอท่าล้ม�
 _n = lambda row: range(sum(1 for f in os.listdir(SRC) if f.startswith(row + "_") and f[len(row) + 1:-4].isdigit()))
 MAP = [("south_w", "walk_front", _n("walk_front")), ("north_w", "walk_back", _n("walk_back")),
 	("west_w", "walk_left", _n("walk_left")), ("east_w", "walk_right", _n("walk_right")),
-	("west_i", "idle_battle", range(6)), ("west_a", "attack_knife", [0, 1, 2, 3, 4, 6]),
-	("west_h", "hurt", [1, 2, 3, 4, 5, 6]), ("west_k", "death", [0, 1, 2, 3, 5])]
+	# ท่าศึก (kwan 16 ต.ค. "หน้า rion ที่ไม่ตรงกับที่บอก ให้เอาออกจากทุกอาติแฟค"): ใช้ภาพแบบ Flow 14-2 เท่านั้นจนกว่าจะได้ชีต 14-1
+	# ยืนศึก = ย่อถือมีด (กระโดดม้วนเฟรม 0) + ภาพหายใจ (ช่วงบนยุบ 1 จุด) · ฟัน = กระโดดม้วนทั้งชุด · โดนตี = หลบ (ย่อ → กระโดดถอย → ลง) · ล้ม = หลบเฟรมลงพื้น → นอนหงาย (หมุน 90°)
+	("west_i", "jump_roll", [0, "breathe:jump_roll:0"]), ("west_a", "jump_roll", range(6)),
+	("west_h", "dodge", [1, 2, 3, 4, 5]), ("west_k", "dodge", [1, 4, "lie:dodge:3"])]
+
+
+def _frame(row, i):
+	"""i = เลขเฟรม หรือ "<ทำ>:<แถว>:<เฟรม>" (breathe = ช่วงบน 60% ยุบลง 1 จุด · lie = หมุนนอนหงาย หัวไปทางขวา ลงพื้น)"""
+	if isinstance(i, int): return Image.open(os.path.join(SRC, "%s_%d.png" % (row, i)))
+	op, r, n = i.split(":"); im = Image.open(os.path.join(SRC, "%s_%s.png" % (r, n))).convert("RGBA")
+	bb = im.getchannel("A").getbbox(); im = im.crop(bb)
+	if op == "breathe":
+		cut = int(im.height * .6); out = Image.new("RGBA", im.size)
+		out.paste(im.crop((0, 0, im.width, cut)), (0, 1)); out.paste(im.crop((0, cut, im.width, im.height)), (0, cut))
+		return out
+	return im.transpose(Image.ROTATE_270)
 
 
 def main():
@@ -27,7 +41,7 @@ def main():
 	clip, info = 0, {}
 	for name, row, idx in MAP:
 		for j, i in enumerate(idx):
-			im = Image.open(os.path.join(SRC, "%s_%d.png" % (row, i)))
+			im = _frame(row, i)
 			# เฟรมในชุดหลัก: กลางผืน = กลางตัว · ขอบล่างผืน = พื้น
 			x, y = W // 2 - im.width // 2, FEET - im.height
 			c = Image.new("RGBA", (W, H)); c.paste(im, (x, y), im)

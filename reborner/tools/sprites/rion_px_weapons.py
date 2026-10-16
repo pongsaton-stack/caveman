@@ -14,7 +14,9 @@ SHEET = os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v9.jpg")
 # รอบ 13 ระดับ 2 (kwan 16 ต.ค. · เจนด้วย Google Flow): Flow ลอกผังรอบ 9 (8x6) · แถวดินสอ/หนังสติ๊กยังเป็นของระดับ 1 → ไม่ใช้ · ใช้ มีดอีโต้ ไม้อลูมิเนียม แม็กยิงบอร์ด ถุงมือหนังน็อต
 SHEETS = {"v9": SHEET, "t2": os.path.join(ROOT, "docs/art-bible/rion_hires/flow_trial_v13_t2.jpg")}
 OUT = os.path.join(ROOT, "assets/sprites/rion_px_weapons_draft")
-GAME = os.path.join(ROOT, "assets/sprites/rion_px")   # เข้าเกม (kwan 16 ต.ค. "ใส่เข้าเกม"): west_<สาย>_<i>.png ผืนเดียวกับ rion_px · BattleScreen เลือกตามสายของอาวุธที่ติดตั้ง
+GAME = os.path.join(ROOT, "assets/sprites/rion_px")
+# 16 ต.ค. ปิดการเขียนเข้าเกม: ชีตรอบ 9/13 เป็น Rion หมวกครีม ไม่ตรงแบบที่ kwan ยึด (Flow หมวกน้ำเงินทั้งใบ) · เปิดคืนเมื่อเจนท่าถืออาวุธใหม่ด้วยแบบที่ถูกแล้ว
+TO_GAME = False   # เข้าเกม (kwan 16 ต.ค. "ใส่เข้าเกม"): west_<สาย>_<i>.png ผืนเดียวกับ rion_px · BattleScreen เลือกตามสายของอาวุธที่ติดตั้ง
 W, H, FEET, CX = 96, 112, 109, 48
 EDGE = np.array([42, 26, 20])
 # เลือกเฟรมด้วยตา (แถว, ช่อง) นับจาก 0 ตามที่ Flow วาด (หันขวา ก่อนพลิก)
@@ -125,7 +127,7 @@ def main():
 			canvas = Image.new("RGBA", (W, H))
 			canvas.paste(Image.fromarray(img, "RGBA"), (CX - hx, FEET - ys.max()), Image.fromarray(img, "RGBA"))
 			canvas.save(os.path.join(OUT, "%s_%d.png" % (fam, i)))
-			canvas.save(os.path.join(GAME, "west_%s_%d.png" % (fam, i)))
+			if TO_GAME: canvas.save(os.path.join(GAME, "west_%s_%d.png" % (fam, i)))
 		idx["clips"].append({"family": fam, "label": label, "sheet": sk, "n": len(picks), "hit": hit, "src": [list(p) for p in picks]})
 	json.dump(idx, open(os.path.join(OUT, "index.json"), "w"), ensure_ascii=False, indent=1)
 	open(os.path.join(OUT, ".gdignore"), "w").close()

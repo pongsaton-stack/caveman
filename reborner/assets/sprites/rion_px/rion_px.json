@@ -9,9 +9,9 @@
   "north_w": 6,
   "west_w": 6,
   "east_w": 6,
-  "west_i": 6,
+  "west_i": 2,
   "west_a": 6,
-  "west_h": 6,
-  "west_k": 5
+  "west_h": 5,
+  "west_k": 3
  }
 }

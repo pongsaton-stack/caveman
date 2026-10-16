@@ -472,9 +472,11 @@ def page(path):
 		("v8a", "attack_knife"): {5}, ("v8a", "hurt"): {0}, ("v8a", "death"): {4}}
 	omit = lambda sid, n: OMIT.get((sid, n)) or (OMIT.get((MAIN_FROM.get(n, "v5a"), n), ()) if sid in ("main", "main_px") else ())
 	sets = []
-	for sid, label, fn, _ry, rows in SETS[:1] + [("main_px", "◆ ชุดหลัก แบบพิกเซล 32-bit (ทดลอง)", SETS[0][2], None, MAIN_ROWS)] + SETS[1:]:
+	# kwan 16 ต.ค. "หน้า rion ที่ไม่ตรงกับที่บอก ให้เอาออกจากทุกอาติแฟค": หน้าเทสแสดงเฉพาะแบบ Flow 14-2 (ชุดอื่น = GPT/หมวกครีม/รอบก่อน ไม่แสดง)
+	v14 = next(x for x in SETS if x[0] == "v14")
+	for sid, label, fn, _ry, rows in [("main_px", "◆ แบบพิกเซลในเกม (Flow 14-2)", v14[2], None, V14_ROWS), v14]:
 		d = os.path.join(OUT, sid)
-		sets.append({"id": sid, "label": label, **({"px": PX_SHOW, "pxh": PX_H, "pxc": PX_COLORS, "pair": "main"} if sid == "main_px" else {}), "sheet": uri(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)),
+		sets.append({"id": sid, "label": label, **({"px": PX_SHOW, "pxh": PX_H, "pxc": PX_COLORS} if sid == "main_px" else {}), "sheet": uri(os.path.join(ROOT, "docs/art-bible/rion_hires", fn)),
 			"rows": [{"id": n, "label": lab, "ms": ms, "loop": lp, "want": want, "flipped": fl, "hit": hit, "skip0": skip0(sid, n),
 				"frames": [uri(os.path.join(d, "%s_%d.png" % (n, i))) for i in range(nframes(d, n, cells)) if i not in omit(sid, n)]}
 				for n, lab, cells, ms, lp, want, fl, hit in rows]})

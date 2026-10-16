@@ -170,6 +170,32 @@ def sprites():
 		f = os.path.join(td, n + '.png')
 		if os.path.exists(f):
 			out['tile/' + n] = png(f)
+	# kwan 16 ต.ค. "หน้า rion ที่ไม่ตรงกับที่บอก ให้เอาออกจากทุกอาติแฟค" — Rion ยึดแบบ Flow หมวกน้ำเงินทั้งใบเท่านั้น
+	# ไม่ฝังภาพ Rion แบบเก่า: Last Light (rion/ grips) · ถืออาวุธเก่า (held/) · ริก (rig/) · poses64 ของ Rion · ตัดชีตจำลอง (cut/) · ท่าร่าย (spl/) ·
+	# ถืออาวุธหมวกครีม (pxw/) · ช่องชีตสกิล (skc/ มีตัวเอกของชีต) · ชีต VFX ตัวเอก (vxs/) · NPC (ทาสีจาก Rion เก่า)
+	# ฉากที่ยังเรียกชื่อภาพเก่า → pxMap() ในเทมเพลตแทนด้วยภาพ px/ (Flow) ทุกจุด
+	for k in [k for k in out if OLD_RION.match(k)]: del out[k]
+	out.update(px_extra())
+	return out
+
+
+OLD_RION = re.compile(r'^(rion/|held/|rig/|pxw/|cut/|spl/|skc/|vxs/|npc/|p64/rion_)')
+PX_EXTRA = {'dodge': 'dodge', 'watch': 'watch', 'roll': 'jump_roll', 'victory': 'victory'}   # ท่าแบบ Flow 14-2 ที่เกมยังไม่ใช้ → ผืนเดียวกับ rion_px (96x112 เท้าแถว 110)
+
+
+def px_extra():
+	import importlib.util
+	spec = importlib.util.spec_from_file_location('rpg', os.path.join(ROOT, 'tools/sprites/rion_px_game.py')); g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+	out = {}
+	for name, row in PX_EXTRA.items():
+		i = 0
+		while os.path.exists(os.path.join(g.SRC, '%s_%d.png' % (row, i))):
+			im = g._frame(row, i); c = Image.new('RGBA', (g.W, g.H)); c.paste(im, (g.W // 2 - im.width // 2, g.FEET - im.height), im)
+			import io as _io; b = _io.BytesIO(); c.save(b, 'PNG'); out['px/%s_%d' % (name, i)] = 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
+			i += 1
+	# หน้าคัตอิน = ภาพอ้างอิง Flow (rion_flow_ref_cut.png 512) ครอปหน้าผากถึงคาง ย่อ 44 จุด
+	ref = Image.open(os.path.join(ROOT, 'docs/art-bible/rion_hires/rion_flow_ref_cut.png')).convert('RGBA').crop((150, 110, 370, 330)).resize((44, 44), Image.BOX)
+	import io as _io; b = _io.BytesIO(); ref.save(b, 'PNG'); out['ref/face'] = 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
 	return out
 
 def sheet_cut():
@@ -244,8 +270,9 @@ def main(out_path):
 		'npcs': json.load(open(os.path.join(ROOT, 'docs/art-bible/world/npcs.json'), encoding='utf-8')),
 		# Rion พิกเซล: แถวล่างสุดของตัวต่อภาพ (ฉาก VFX วางเท้าลงพื้นเสมอ · ภาพวิ่ง/ง้างในชีตลอยอยู่ 17–21 จุด)
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
+		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
 		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
-		'px_weapons': json.load(open(os.path.join(SPR, 'rion_px_weapons_draft/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_px_weapons_draft/index.json')) else [],
+		'px_weapons': [],   # ถืออาวุธรอบ 9/13 = Rion หมวกครีม (ไม่ตรงแบบที่ยึด) → ไม่แสดง
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
 		'sheet_cut': sheet_cut(),

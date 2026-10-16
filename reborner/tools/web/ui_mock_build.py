@@ -60,12 +60,28 @@ def main():
 	img.update({'B1i': 'monsters_ll/B1_idle1.png', 'C03i': 'monsters_ll/COMP-M03_idle1.png', 'C06i': 'monsters_ll/COMP-M06_idle1.png'})
 	for w in data['weapons']:
 		img['W' + w['weapon_id']] = 'weapons_draft/%s.png' % w['weapon_id']
-	data['img'] = {k: b64(v) for k, v in img.items()}
+	data['img'] = {k: (px64(v) if v.startswith('rion_lastlight_draft/') else b64(v)) for k, v in img.items()}
 	with open(os.path.join(ROOT, 'docs/art-bible/ui/map_b1_384.png'), 'rb') as f:
 		data['img']['map'] = 'data:image/png;base64,' + base64.b64encode(f.read()).decode()
 	html = open(TPL, encoding='utf-8').read().replace('/*DATA*/null', json.dumps(data, ensure_ascii=False))
 	open(out, 'w', encoding='utf-8').write(html)
 	print(out, len(html), 'bytes ·', len(img), 'รูป ·', len(data['techs']), 'ท่า')
+
+# kwan 16 ต.ค. "หน้า rion ที่ไม่ตรงกับที่บอก ให้เอาออกจากทุกอาติแฟค" → ทุกภาพ Rion ในหน้านี้ = แบบ Flow (assets/sprites/rion_px)
+# จับคู่ชื่อภาพเก่า (ผืน 64x64 เท้าแถว 62) → ภาพ px แล้วย่อลงผืนเดิม (สูง 62 · กลางคอลัมน์ 32) ให้ตำแหน่ง/ครอปในหน้าใช้ได้เหมือนเดิม
+PX_OF = {'south': 'south_w0', 'west': 'west_i0', 'east': 'east_w0', 'east_w0': 'east_w0', 'east_w1': 'east_w1', 'east_w2': 'east_w3', 'east_w3': 'east_w4',
+	'west_a0': 'west_a0', 'west_a1': 'west_a1', 'west_a2': 'west_a4', 'west_a3': 'west_a5', 'west_h0': 'west_h1', 'west_h1': 'west_h3', 'west_k0': 'west_k1', 'west_k1': 'west_k2'}
+
+
+def px64(rel):
+	from PIL import Image
+	import io
+	name = PX_OF[os.path.basename(rel)[:-4]]
+	im = Image.open(os.path.join(SPR, 'rion_px', name + '.png')).convert('RGBA'); im = im.crop(im.getchannel('A').getbbox())
+	k = min(62 / im.height, 60 / im.width); im = im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.BOX)
+	c = Image.new('RGBA', (64, 64)); c.paste(im, (32 - im.width // 2, 62 - im.height), im)
+	b = io.BytesIO(); c.save(b, 'PNG'); return 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
+
 
 if __name__ == '__main__':
 	main()
