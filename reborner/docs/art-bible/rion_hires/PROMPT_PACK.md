@@ -326,6 +326,22 @@ Row 3 – cheer an ally, holding the same small kitchen knife low in the FRONT h
 Keep his look identical to image 1 in all 17 frames. Output PNG only.
 ```
 
+## 17-4b · แบบสั้น แนบภาพเดียว
+<!-- note: ⚠ แนบแค่ rion_flow_ref.png ภาพเดียว (ไม่แนบชีต v14b_3) · 17-4 รอบแรก Flow วาดชีตเก่าซ้ำ (เดิน 4 ทิศ ม้วนฟัน) ไม่มีท่าที่สั่ง | cells: 17 -->
+```
+The attached image is Rion, the ONLY character reference. Copy him exactly: chibi, very big round head, big round eyes, bright blue baseball cap with brass goggles on top, brown spiky hair, white short-sleeve shirt, blue tie, brown backpack, blue shorts, blue watch on his LEFT wrist, white socks, brown boots. Thick dark outline, flat cel colors.
+
+Make a NEW sprite sheet with ONLY the 17 poses below. Do not draw walking, running, rolling, jumping or any other pose.
+
+Solid green background #01DA0D. 3 rows. Row 1 has 5 cells, rows 2 and 3 have 6 cells. One full-body Rion per cell, all facing RIGHT, same size, feet on one baseline. No grid lines, no text, no shadows.
+
+Row 1 (5 cells) – he holds a CEILING-FAN BLADE sword: one long white curved fan blade on a black handle, with a small round silver motor between blade and handle. It is in his front hand in all 5 cells. 1 stand ready. 2 step forward, blade raised. 3 blade pulled back over his shoulder. 4 big slash with a white arc. 5 stand ready.
+Row 2 (6 cells) – he holds a small kitchen knife in his front hand in all 6 cells. HURT: 1 hit, eyes shut, leaning back. 2 stagger back. 3 stagger. 4 catch balance. 5 straighten up. 6 stand ready.
+Row 3 (6 cells) – he holds the small kitchen knife low in his front hand in all 6 cells. CHEER: 1 stand. 2 raise his other fist. 3 pump that fist up. 4 shout with mouth open. 5 pump the fist again. 6 stand.
+
+One weapon per row. No umbrella. Only one knife. Output PNG only.
+```
+
 ## ผลตรวจรอบแรก (kwan ส่ง 7 ชีต 16 ต.ค. · Google Flow · JPG 1438x2576 ทุกชีต) — ยังไม่เข้าเกม/หน้าเทส
 ไฟล์ `flow_trial_v14_1.jpg` `v15_6` `v16_1`…`v16_5` · ตัดด้วย `tools/sprites/rion_pack_cut.py` · ภาพตรวจกรอบ+เลข `pack_check/<ชีต>.jpg` · หน้าตาตรงแบบ Flow ทุกชีต (หมวกน้ำเงินสด แว่นทอง chibi)
 - 14-1 ศึก 48/48 ✓ · พลาด: โดนตีช่อง 1–4 และล้มช่อง 1–2 มีดหายจากมือ · วิ่งช่อง 5 มือเปล่า
