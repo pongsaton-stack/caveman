@@ -62,6 +62,7 @@ var seized: Array[String] = []   # ตัวเอก: ชื่อท่าท�
 var reads: Dictionary = {}       # monster_id → {"name": ชื่อท่าเด่น, "p": แต้มที่อ่านได้, "need": แต้มที่ต้องครบ, "on": ติดตั้งอยู่ไหม}
 var read_slots: int = 0
 var counter_used: bool = false   # ประกายสวนกลับได้ครั้งเดียวต่อการตั้งรับหนึ่งครั้ง
+var counter_tech: Tech = null    # ตั้งท่าสวนอยู่ (ท่า effect=counter) · หมดเมื่อสวนแล้ว หรือถึงตาตัวเองครั้งถัดไป
 
 func reads_on() -> int:
 	var n := 0

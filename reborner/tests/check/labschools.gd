@@ -53,7 +53,10 @@ func _process(_d: float) -> bool:
 				var top: Tech = null
 				for t in bs.b.hero_options(h):
 					if top == null or t.req_prof > top.req_prof: top = t
-				ok(h.school == schools[si] and h.learned.size() == 7, "สาย %s รู้ %d ท่า · ตัวเลือกตอนนี้ %d" % [schools[si], h.learned.size(), bs.b.hero_options(h).size()])
+				var n_school := 0
+				for t in ow.techs.all:
+					if t.school == schools[si]: n_school += 1
+				ok(h.school == schools[si] and h.learned.size() == n_school, "สาย %s รู้ %d/%d ท่า · ตัวเลือกตอนนี้ %d" % [schools[si], h.learned.size(), n_school, bs.b.hero_options(h).size()])
 				var foe: Actor
 				for a in bs.b.actors:
 					if a.side == "foe" and not a.down: foe = a; break
