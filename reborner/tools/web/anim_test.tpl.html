@@ -330,6 +330,12 @@ for (const m of (DATA.monsters_px || [])) {
 			{ tab: 'arms', panels: [{ label: 'เดิม', keys: ['wpn/' + id] }, { label: 'ใหม่ 32', keys: [key] }, { label: 'ใหม่ 48', keys: [key + '_48'] }] });
 	}
 }
+// Rion ชุดท่าครบจาก prompt pack (ชีต Flow 14-1…17-4b → พิกเซล 72 · 40 สี · kwan 16 ต.ค. "ครบแล้วค่อยลงหน้าเทสทีเดียว") · ร่าง ยังไม่เข้าเกม
+// ผืนสูง 112 เท้าแถว 108 เท่าภาพในเกม · จังหวะต่อเฟรมเป็นค่าภาพ (index.json ms) ไม่ใช่ค่าเกม · คลิปไม่วนค้างเฟรมสุดท้าย
+for (const c of (DATA.rion_pack || [])) {
+	addClip(c.group, 'rpk_' + c.id, `${c.label} · ${c.frames.length} เฟรม`, c.frames.map(f => 'rpk/' + f), c.ms / 1000,
+		Object.assign({ stage: [c.w ? c.w + 16 : 96, c.w ? 116 : 80] }, c.loop ? {} : { hold: true }));
+}
 // Rion พิกเซลถืออาวุธ 6 สาย (ชีต 15-1 จาก Google Flow แบบหมวกน้ำเงิน · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — ยืนถือ 3 จังหวะ แล้วเล่นท่าโจมตีครบชุด · ความเร็ว ATTACK_FRAME_SEC เท่าท่าฟันในเกม
 for (const w of (DATA.px_weapons || [])) {
 	const k = Array.from({ length: w.n }, (_, i) => `pxw/${w.family}_${i}`);
@@ -2938,7 +2944,7 @@ function setRead(t) {
 		const c = CLIPS[S.clip];
 		$('rdClip').textContent = c.label; $('rdFrame').textContent = `${String(S.frame + 1).padStart(String(c.frames.length).length, '\u2007')}/${c.frames.length}`;   // เลขกว้างคงที่ ข้อความไม่ขยับ
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
-		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', env: 'env_sheet_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll', px: 'rion_px', pxw: 'rion_px_weapons_draft', mpx: 'monsters_px_draft', wic: 'weapons_icons_draft' }[k.split('/')[0]];
+		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', env: 'env_sheet_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll', px: 'rion_px', pxw: 'rion_px_weapons_draft', mpx: 'monsters_px_draft', wic: 'weapons_icons_draft', rpk: 'rion_pack_px' }[k.split('/')[0]];
 		$('rdFile').textContent = c.vx ? `${VXS.sheet} · ${c.pieces ? 'กรอบ ' + c.pieces[S.frame].box.join(',') : 'แถว ' + c.label + ' · แสง ' + fold + '/' + c.vx.atlas + '.png'}`
 			: fold === undefined ? k : `assets/sprites/${fold}/${k.split('/')[1]}.png`;
 	} else {

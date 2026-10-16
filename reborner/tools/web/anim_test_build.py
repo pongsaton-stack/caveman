@@ -49,6 +49,12 @@ def sprites():
 		for f in sorted(os.listdir(wd)):
 			if f.endswith('.png'):
 				out['pxw/' + f[:-4]] = png(os.path.join(wd, f))
+	# Rion ชุดท่าครบจาก prompt pack (tools/sprites/rion_pack_px.py · ชีต Flow 14-1…17-4b · ร่าง · kwan 16 ต.ค. เลือก "1")
+	rp = os.path.join(SPR, 'rion_pack_px')
+	if os.path.isdir(rp):
+		for f in sorted(os.listdir(rp)):
+			if f.endswith('.png'):
+				out['rpk/' + f[:-4]] = png(os.path.join(rp, f))
 	# มอนภูมิภาค 1 พิกเซล (tools/sprites/monsters_px.py · ชีตรอบ 10 · ร่าง)
 	md = os.path.join(SPR, 'monsters_px_draft')
 	if os.path.isdir(md):
@@ -272,6 +278,7 @@ def main(out_path):
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
 		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
+		'rion_pack': json.load(open(os.path.join(SPR, 'rion_pack_px/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_pack_px/index.json')) else [],   # ชุดท่าครบ (prompt pack)
 		'px_weapons': json.load(open(os.path.join(SPR, 'rion_px_weapons_draft/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_px_weapons_draft/index.json')) else [],   # ชีต 15-1 (แบบ Flow)
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
