@@ -148,7 +148,7 @@ function finish(c, st, t) {
 
 // ── วาด ──
 const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
-let IMG = {}, WHITE = {}, BG;
+let IMG = {}, SEQI = {}, WHITE = {}, BG;
 function whiteOf(name) {
   if (WHITE[name]) return WHITE[name];
   const im = IMG[name], o = document.createElement('canvas'); o.width = im.width; o.height = im.height;
@@ -256,18 +256,23 @@ const PUR = ['#12052a', '#3b1688', '#7a3cff', '#c9a6ff', '#ffffff'];
 const hsh = n => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const TINT = {};
-function tintOf(name, col) {   // เงาสีทั้งตัว (ออร่าทอง/วาบ)
+function tintOf(name, col, src) {   // เงาสีทั้งตัว (ออร่าทอง/วาบ)
   const key = name + col; if (TINT[key]) return TINT[key];
-  const im = IMG[name], o = document.createElement('canvas'); o.width = im.width; o.height = im.height;
+  const im = src || IMG[name], o = document.createElement('canvas'); o.width = im.width; o.height = im.height;
   const x = o.getContext('2d'); x.drawImage(im, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = col; x.fillRect(0, 0, o.width, o.height);
   return TINT[key] = o;
 }
 // วาด Rion หมุนรอบจุดกลางตัว (cy = ความสูงจุดหมุนจากเท้า) · tint = [สี, ความทึบ]
+// o.seq = ท่าขยับจากชุดหลัก (D.seq · หลายเฟรม) แทนภาพนิ่ง o.pose · o.i = เลขเฟรม · วางจุดต่ำสุดของตัวบนพื้น (ตัด lift ของเฟรมทิ้ง ให้ y คุมความสูงเอง)
 function drawRion(o) {
-  const im = IMG[o.pose], s = 512 * SC, cy = o.cy || 0;
+  const cy = o.cy || 0; let im, dx, dy, dw, dh, key;
+  if (o.seq) {
+    const S_ = D.seq[o.seq], n = S_.frames.length, i = ((o.i % n) + n) % n, k = S_.k * SC; im = SEQI[o.seq][i]; key = o.seq + i;
+    dw = im.width * k; dh = im.height * k; dx = -dw / 2; dy = -(im.height - 6 - S_.lift[i]) * k + cy;
+  } else { im = IMG[o.pose]; key = o.pose; dw = dh = 512 * SC; dx = -256 * SC; dy = -504 * SC + cy; }
   ctx.save(); ctx.globalAlpha = o.a ?? 1; ctx.translate(o.x, FY + (o.y || 0) - cy); ctx.rotate((o.r || 0) * Math.PI / 180); ctx.scale(o.sx || 1, o.sy || 1);
-  ctx.drawImage(im, -256 * SC, -504 * SC + cy, s, s);
-  if (o.tint) { ctx.globalAlpha = (o.a ?? 1) * o.tint[1]; ctx.drawImage(tintOf(o.pose, o.tint[0]), -256 * SC, -504 * SC + cy, s, s); }
+  ctx.drawImage(im, dx, dy, dw, dh);
+  if (o.tint) { ctx.globalAlpha = (o.a ?? 1) * o.tint[1]; ctx.drawImage(tintOf(key, o.tint[0], im), dx, dy, dw, dh); }
   ctx.restore();
 }
 function bgLayer(dark) {
@@ -379,11 +384,12 @@ function epicVfx(tr) {   // SL01 · VFX + ฟันวิญญาณ (ยืน
   dummyAt(F, HT);
   for (const [i, b] of [30, 32, 34, 36, 38, 40].entries()) if (F >= b && F < b + 2) bolt(TX + [-40, 30, -10, 45, -30, 10][i], b, F === b ? 1 : .55);
   // Rion: ยืน → ง้างรวมพลัง (สั่นจากเฟรม 28) → ฟาดปล่อย → คืนท่า
-  let pose = 'left', x = px0, sy = 1, sx = 1, tint = null;
-  if (F >= 14 && F < 36) { pose = 'left_windup'; if (F >= 28) x += Math.sin(f * 9) * 1.5; tint = ['#c9a6ff', .12 + .1 * Math.sin(f * 1.7)]; }
-  else if (F >= 36 && F < 58) { pose = 'left_strike'; x -= 10 * ease.out(clamp01((f - 36) / 3)); }
-  else { const b = .5 - .5 * Math.cos(2 * Math.PI * tr / 2400); sy = 1 - .016 * b; sx = 1 + .007 * b; if (F >= 58) x -= 10 * (1 - clamp01((f - 58) / 6)); }
-  shadow(x, { y: 0, a: 1 }); drawRion({ pose, x, sy, sx, tint });
+  // ชุดหลัก: ยืนในศึก (วน 6 เฟรม) → ชูมีดรวมพลัง (ฟันเฟรม 4) → ฟาด (เฟรม 5 มีรอยมีด) → คืนท่า (เฟรม 6)
+  let seq = 'idle', i = Math.floor(f / 4), x = px0, sy = 1, sx = 1, tint = null;
+  if (F >= 14 && F < 36) { seq = 'atk'; i = 3; if (F >= 28) x += Math.sin(f * 9) * 1.5; tint = ['#c9a6ff', .12 + .1 * Math.sin(f * 1.7)]; }
+  else if (F >= 36 && F < 58) { seq = 'atk'; i = F < 48 ? 4 : 5; x -= 10 * ease.out(clamp01((f - 36) / 3)); }
+  else { const b = .5 - .5 * Math.cos(2 * Math.PI * tr / 2400); sy = 1 - .012 * b; if (F >= 58) x -= 10 * (1 - clamp01((f - 58) / 6)); }
+  shadow(x, { y: 0, a: 1 }); drawRion({ seq, i, x, sy, sx, tint });
   if (F >= 10 && F < 36) motes(px0, FY - 20, f, 12, PUR[3], 150, 220);
   if (F >= 36 && F < 42) { const k = (f - 36) / 6; ctx.save(); ctx.translate(lerp(px0 - 110, tgt[0] + 30, ease.in(k)), tgt[1] - 10); spiritWave(0, 0, .55, .55, false); ctx.restore(); }   // ฟันวิญญาณพุ่งเข้าเป้า
   HT.forEach((h, i) => spiritWave(tgt[0], tgt[1], (f - h) / 10, EP.WAVE[i], i === 1));
@@ -404,17 +410,20 @@ function epicRoll(tr) {   // SL01 · กระโดดม้วน ชันเ
   bgLayer(dark);
   dummyAt(F, HT, HT[2]);
   // ตำแหน่ง/ท่า Rion
-  let o = { pose: 'left', x: HX, y: 0, r: 0, sx: 1, sy: 1, cy: 0 }, ghosts = [];
-  const jumpAt = g => { const t = clamp01((g - 14) / 18); return { x: HX + LAND * t, y: -150 * Math.sin(Math.PI * t), r: g < 29 ? -1080 * ease.io(clamp01((g - 14) / 15)) : 0 }; };
-  if (F < 3) { const b = .5 - .5 * Math.cos(2 * Math.PI * tr / 2400); o.sy = 1 - .016 * b; }
-  else if (F < 14) { o.sy = .88 + .02 * Math.sin(f * 3); o.sx = 1.05; o.x += Math.sin(f * 11) * 1.2; }   // ย่อเบ่งพลัง
-  else if (F < 32) { const j = jumpAt(f); Object.assign(o, j, F < 29 ? { pose: 'left_windup', sx: .84, sy: .84, cy: CY } : { pose: 'left_windup' });
-    if (F < 29) for (let g = 1; g <= 3; g++) { const jg = jumpAt(f - g * .9); ghosts.push({ pose: 'left_windup', ...jg, sx: .84, sy: .84, cy: CY, a: .3 - g * .08, tint: ['#ffd34a', .5] }); } }
-  else if (F < 50) {
+  // ชุดหลัก (ม้วนฟันรอบ 8-2): 0 ย่อ · 1 กระโดด · 2–3 ม้วนกลางอากาศ · 4 ชูมีดสองมือ · 5 ฟันลงมีรอยมีด · 6 คุกเข่าค้าง
+  let o = { seq: 'idle', i: Math.floor(f / 4), x: HX, y: 0, r: 0, sx: 1, sy: 1, cy: 0 }, ghosts = [];
+  const rollFrame = g => g < 17 ? 1 : g < 27 ? 2 + (Math.floor(g / 2) % 2) : 4;   // ง้างสองมือกลางอากาศ 27–31 (หลักโมเมนตัม)
+  const jumpAt = g => { const t = clamp01((g - 14) / 18); return { x: HX + LAND * t, y: -85 * Math.sin(Math.PI * t), r: g >= 17 && g < 27 ? -360 * ease.io(clamp01((g - 17) / 10)) : 0 }; };
+  if (F < 3) { const b = .5 - .5 * Math.cos(2 * Math.PI * tr / 2400); o.sy = 1 - .012 * b; }
+  else if (F < 14) { o.seq = 'roll'; o.i = 0; o.sy = .97 + .015 * Math.sin(f * 3); o.x += Math.sin(f * 11) * 1.2; }   // ย่อเบ่งพลัง
+  else if (F < 32) { const j = jumpAt(f); Object.assign(o, j, { seq: 'roll', i: rollFrame(F), cy: F >= 17 && F < 27 ? CY : 0 });
+    if (F >= 15 && F < 29) for (let g = 1; g <= 3; g++) { const jg = jumpAt(f - g * .9); ghosts.push({ seq: 'roll', i: rollFrame(Math.floor(f - g * .9)), ...jg, cy: o.cy, a: .3 - g * .08, tint: ['#ffd34a', .5] }); } }
+  else if (F < 50) {   // ฟัน 3 ครั้ง = ฟันวิญญาณ 3 ระลอก (32 · 40 · 46): ฟันลง → ชูสองมือ → ฟันลง …
     const skid = SKID * ease.out(clamp01((f - 32) / 4)), lunge = (F >= 40 ? -6 : 0) + (F >= 46 ? -6 : 0);
-    o.x = HX + LAND + skid + lunge; o.pose = (F >= 40 && F < 46) ? 'left_windup' : 'left_strike';
-    const land = f - 32; if (land < 2) { o.sy = .92; o.sx = 1.05; }
-  } else if (F < 62) { const t = clamp01((f - 50) / 11); o.x = HX + BACK0 * (1 - ease.io(t)); o.y = -110 * Math.sin(Math.PI * t); o.r = 360 * ease.io(t); o.cy = CY; o.sx = o.sy = .9; }
+    o.x = HX + LAND + skid + lunge; o.seq = 'roll';
+    o.i = F < 36 ? 5 : F < 40 ? 4 : F < 44 ? 5 : F < 46 ? 4 : F < 49 ? 5 : 6;
+    const land = f - 32; if (land < 2) { o.sy = .93; o.sx = 1.04; }
+  } else if (F < 62) { const t = clamp01((f - 50) / 11); o.seq = 'roll'; o.i = 1; o.x = HX + BACK0 * (1 - ease.io(t)); o.y = -75 * Math.sin(Math.PI * t); o.r = 360 * ease.io(t); o.cy = CY; }
   // ออร่าทอง (เบ่งพลังที่เฟรม 3 · ตามตัวตอนกระโดดแล้วจาง)
   const aura = F < 3 ? 0 : F < 6 ? .4 + .8 * (f - 3) / 3 : F < 14 ? 1.2 : F < 20 ? 1.2 * (1 - (f - 14) / 6) : 0;
   shadow(o.x, { y: o.y, a: 1 });
@@ -435,8 +444,8 @@ function epicRoll(tr) {   // SL01 · กระโดดม้วน ชันเ
   balloon('ตายซะ!!', HX + LAND + SKID + 10, FY - 290, (f - 36) / 16);
 }
 CLIPS.push(
-  { id: 'epic_vfx', name: 'SL01 · VFX + ฟันวิญญาณ (70 เฟรม · 45 ms)', dur: EP.N * EP.SEC, custom: epicVfx, keys: [{ t: 0, pose: 'left' }] },
-  { id: 'epic_roll', name: 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน ชันเข่าฟัน (70 เฟรม · 45 ms)', dur: EP.N * EP.SEC, custom: epicRoll, keys: [{ t: 0, pose: 'left' }] });
+  { id: 'epic_vfx', name: 'SL01 · VFX + ฟันวิญญาณ · ท่าชุดหลัก (70 เฟรม · 45 ms)', dur: EP.N * EP.SEC, custom: epicVfx, keys: [{ t: 0, pose: 'left' }] },
+  { id: 'epic_roll', name: 'SL01 · VFX + ฟันวิญญาณ · กระโดดม้วน ชันเข่าฟันสองมือ · ท่าชุดหลัก (70 เฟรม · 45 ms)', dur: EP.N * EP.SEC, custom: epicRoll, keys: [{ t: 0, pose: 'left' }] });
 
 // ── วนเวลา ──
 let last = performance.now();
@@ -452,6 +461,7 @@ function pick(c) { clip = c; T = 0; hist = []; document.getElementById('clipName
   const names = Object.keys(SRC);
   const ims = await Promise.all(names.map(n => load(SRC[n]))); names.forEach((n, i) => IMG[n] = ims[i]);
   BG = await load(D.bg);
+  for (const [n, q] of Object.entries(D.seq)) SEQI[n] = await Promise.all(q.frames.map(load));
   const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
   const box = document.getElementById('clips');
   CLIPS.forEach(c => { const b = document.createElement('button'); b.textContent = c.name.split(' (')[0].split(':')[0]; b.dataset.id = c.id; b.addEventListener('click', () => pick(c)); box.append(b); });

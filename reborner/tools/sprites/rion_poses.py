@@ -146,10 +146,33 @@ def main():
 		data = {"front": uri(os.path.join(OUT, "stand_south.png")),
 			"poses": [{"id": n, "label": labels[n], "src": uri(os.path.join(OUT, n + ".png"))} for n in cuts],
 			"sheet": uri(SHEET), "k": round(k, 3),
-			"bg": uri(os.path.join(ROOT, "assets/sprites/battle_bg_hires_draft/act1.png")), "bg_ground": 0.734}   # เส้นพื้นของฉาก (battle_bg_hires.GROUND)
+			"bg": uri(os.path.join(ROOT, "assets/sprites/battle_bg_hires_draft/act1.png")), "bg_ground": 0.734,   # เส้นพื้นของฉาก (battle_bg_hires.GROUND)
+			"seq": seqs(uri)}
 		tpl = open(os.path.join(ROOT, "tools/web/rion_poses_test.tpl.html"), encoding="utf-8").read()
 		open(args.page, "w", encoding="utf-8").write(tpl.replace("__DATA__", json.dumps(data)))
 		print("หน้าเทส →", args.page, os.path.getsize(args.page), "bytes")
+
+
+# ท่าขยับจากชุดหลัก (rion_flow_cut.py · ชีต GPT รอบ 8 ขนาดเต็ม ตัวสูง ~360) ใช้ในคลิป SL01 · หันซ้ายแล้ว
+# ช่อง = กรอบรวมทั้งแถว: ล่างช่อง − 5 = พื้น (เฟรมลอยคงความสูงเดิม) · กลางช่อง = กลางตัว
+# k = ขยายเข้าผืน 512 แบบเดียวกับท่าอื่น: อัตราที่ชุดหลักย่อ (เทียบเดินชีต A) × BODY_H ÷ ความสูงเดินชีต A
+SEQ = {"idle": ("v8a", "idle_battle", ()), "atk": ("v8a", "attack_knife", (5,)), "roll": ("v8b", "jump_roll", ()),
+	"kneel": ("v8b", "kneel", ())}
+
+
+def seqs(uri):
+	d = os.path.join(ROOT, "assets/sprites/rion_flow_draft")
+	sc = json.load(open(os.path.join(d, "main", "scale.json")))
+	out = {}
+	for name, (src, row, omit) in SEQ.items():
+		fs, lift, i = [], [], 0
+		while os.path.exists(os.path.join(d, src, "%s_%d.png" % (row, i))):
+			if i not in omit:
+				p = os.path.join(d, src, "%s_%d.png" % (row, i)); a = np.array(Image.open(p))[..., 3] > 128
+				fs.append(uri(p)); lift.append(int(a.shape[0] - 5 - 1 - np.nonzero(a.any(1))[0].max()))   # ระยะเท้าลอยจากพื้นช่อง (หน้าเทสวางเท้าบนพื้นเอง)
+			i += 1
+		out[name] = {"k": round(sc["k"][src] * R.BODY_H / sc["ref_h"], 4), "frames": fs, "lift": lift}
+	return out
 
 
 if __name__ == "__main__":

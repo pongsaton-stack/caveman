@@ -405,6 +405,8 @@ def build_main():
 			im = Image.open(os.path.join(OUT, src, "%s_%d.png" % (n, i)))
 			if k != 1: im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
 			im.save(os.path.join(d, "%s_%d.png" % (n, i)))
+	ref_h = float(np.median([_hcap(ld("v5a", "walk_left", i))[0] for i in range(cnt("v5a", "walk_left"))]))
+	json.dump({"k": {k_: float(v) for k_, v in ks.items()}, "ref_h": ref_h}, open(os.path.join(d, "scale.json"), "w"))   # rion_poses.py ใช้ขยายภาพเต็มขนาดเข้าหน้าเทสภาพคม
 	print("ชุดหลัก: ย่อ", " · ".join("%s ×%.3f" % kv for kv in ks.items()))
 
 
