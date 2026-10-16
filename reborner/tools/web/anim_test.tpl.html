@@ -292,6 +292,19 @@ function addClip(group, id, label, frames, sec, opt = {}) {
 	CLIPS[id].tab = g.tab;
 	g.ids.push(id);
 }
+// Rion พิกเซล 32-bit ที่อยู่ในเกมตอนนี้ (kwan 16 ต.ค. 2026 · assets/sprites/rion_px) — จังหวะเท่าในเกม: เดินรอบ 2 ช่อง · ยืนศึก HERO_IDLE_SEC · ฟัน/โดนตี/ล้ม ATTACK_FRAME_SEC
+{
+	const pxKeys = pre => { const k = []; for (let i = 0; DATA.sprites[`px/${pre}${i}`]; i++) k.push(`px/${pre}${i}`); return k; };
+	const G = 'Rion พิกเซล 32-bit · ในเกม (16 ต.ค.)', PXS = [112, 116];   // ผืน 96x112 + ขอบ
+	for (const [pre, lab] of [['south_w', 'เดินลง (หน้า)'], ['north_w', 'เดินขึ้น (หลัง)'], ['west_w', 'เดินซ้าย'], ['east_w', 'เดินขวา']]) {
+		const k = pxKeys(pre); if (k.length) addClip(G, 'px_' + pre, `${lab} · ${k.length} เฟรม`, k, 2 * K.MOVE_TIME / k.length, { stage: PXS });
+	}
+	const idle = pxKeys('west_i'), atk = pxKeys('west_a'), hurt = pxKeys('west_h'), ko = pxKeys('west_k');
+	if (idle.length) addClip(G, 'px_idle', `ยืนในศึก หายใจ · ${idle.length} เฟรม`, idle, K.HERO_IDLE_SEC, { stage: PXS });
+	if (atk.length) addClip(G, 'px_attack', `ฟันมีด · ${atk.length} เฟรม`, atk, K.ATTACK_FRAME_SEC, { stage: PXS });
+	if (hurt.length) addClip(G, 'px_hurt', `โดนตี · ${hurt.length} เฟรม`, hurt, K.ATTACK_FRAME_SEC, { stage: PXS });
+	if (ko.length) addClip(G, 'px_ko', `ล้ม (ค้างท่านอน) · ${ko.length} เฟรม`, ko, K.ATTACK_FRAME_SEC, { hold: true, stage: PXS });
+}
 // ทุกคลิปในแท็บนี้ = 64 เฟรม (tools/sprites/poses64.py · kwan สั่ง 5 ต.ค.) · เฟรมที่ปัดพิกเซลแล้วซ้ำกันใช้ไฟล์เดียว
 // รอบ: เดิน = 2 ช่อง (2 × MOVE_TIME) · หายใจในศึก = 2 × FOE_IDLE_SEC · ฟัน 4 / โดนตี 2 / ล้ม 3 × ATTACK_FRAME_SEC (เท่ากับชุด 4 เฟรมเดิม) · ท่าร่าง = ยาวเท่ารอบเดิม
 const CYCLE = { walk: 2 * K.MOVE_TIME, idle: 2 * K.FOE_IDLE_SEC, attack: 4 * K.ATTACK_FRAME_SEC, hurt: 2 * K.ATTACK_FRAME_SEC, ko: 3 * K.ATTACK_FRAME_SEC };
@@ -1709,13 +1722,14 @@ function clipView() {
 	if (c.panels) return panelView(c);
 	if (c.skill) return sheetSkillView(c);
 	if (c.lab) return labSpellView(c);
-	cv.width = 96; cv.height = 96; ctx.imageSmoothingEnabled = false;
+	const [SW, SH] = c.stage || [96, 96], base = SH - 4;   // ผืนสูงกว่า 96 (Rion พิกเซล 112) → เวทีสูงตาม ไม่ตัดเท้า
+	cv.width = SW; cv.height = SH; ctx.imageSmoothingEnabled = false;
 	drawBg();
 	if (S.onion && c.frames.length > 1) {
 		const pk = c.frames[(S.frame - 1 + c.frames.length) % c.frames.length], pim = IMG[pk];
-		if (pim) spr(pk, (96 - pim.width) / 2, 92 - pim.height, { alpha: 0.32 });
+		if (pim) spr(pk, (SW - pim.width) / 2, base - pim.height, { alpha: 0.32 });
 	}
-	if (im) spr(key, (96 - im.width) / 2, Math.max(0, 92 - im.height));
+	if (im) spr(key, (SW - im.width) / 2, Math.max(0, base - im.height));
 	if (S.grid) drawGrid();
 }
 

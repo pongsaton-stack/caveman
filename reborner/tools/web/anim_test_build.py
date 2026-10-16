@@ -37,6 +37,11 @@ def sprites():
 		for f in sorted(os.listdir(d)):
 			if f.endswith('.png'):
 				out['%s/%s' % (key, f[:-4])] = png(os.path.join(d, f))
+	# Rion พิกเซล 32-bit ที่เกมใช้ (tools/sprites/rion_px_game.py · kwan 16 ต.ค. 2026)
+	xd = os.path.join(SPR, 'rion_px')
+	for f in sorted(os.listdir(xd)):
+		if f.endswith('.png'):
+			out['px/' + f[:-4]] = png(os.path.join(xd, f))
 	# ร่างศัตรูจากชีต Last Light (tools/sprites/ll_enemies.py) — แสดงในหน้านี้อย่างเดียว ยังไม่เข้าเกม
 	dd = os.path.join(SPR, 'monsters_ll_draft')
 	if os.path.isdir(dd):
@@ -244,6 +249,7 @@ def main(out_path):
 			'BODY_GOOD': const('core/Formulas.gd', 'BODY_GOOD'),
 			'BODY_BAD': const('core/Formulas.gd', 'BODY_BAD'),
 			'ATTACK_FRAME_SEC': const('world/BattleScreen.gd', 'ATTACK_FRAME_SEC'),
+			'HERO_IDLE_SEC': const('world/BattleScreen.gd', 'HERO_IDLE_SEC'),
 			'FOE_IDLE_SEC': const('world/BattleScreen.gd', 'FOE_IDLE_SEC'),
 			'MOVE_TIME': const('world/Overworld.gd', 'MOVE_TIME'),
 			'FX_SEC': const('world/BattleScreen.gd', 'FX_SEC'),
