@@ -308,3 +308,24 @@ Keep each monster's design and colors identical across its 8 frames. Output PNG 
 แก้ด้วยโค้ด: ตัดพื้นแบบเดิมลบสไลม์ทิ้งทั้งตัว (สไลม์เขียว) → ตัดด้วยระยะสีจากพื้นจริง (พื้น ≤ 4 · สไลม์ ≥ 89) · ขอบเขียวจาก JPG ล้างตามตัว (สไลม์ไม่ล้าง · หนอนเฉพาะขอบ เพราะมอสเขียว) ·
   หยดสไลม์กระเด็นไปชนตัวข้าง ๆ → รวมก้อนเฉพาะที่ซ้อนเกิน 40%
 ขัดกับแบบที่อนุมัติ: บอสไม่มีเกราะหินถ่านเป็นแผ่น ตามี 2 ดวงใหญ่ (สั่ง 10 ดวงเล็ก) · ค้างคาวหน้าค้างคาวธรรมดา ไม่ใช่หน้าหมา · หนอนไม่มีหินบนหลังเท่าเดิม (เหลือก้อนมอส)
+
+## รอบ 11 — เจนใหม่เฉพาะตัวที่ไม่ตรงแบบ (kwan 16 ต.ค. เลือกข้อ 3)
+หมาป่า (ขาดท่ากัด) · ค้างคาว (ต้องหน้าหมา) · บอส (ต้องมีเกราะหินถ่านเป็นแผ่น + ตาเล็ก 10 ดวง) · สไลม์/หนอนใช้รอบ 10 ต่อ
+แนบ ภาพ 1 `monster_trial_v10.jpg` (ให้ลายเส้น/ขนาดตรงกับตัวที่ผ่านแล้ว) + ภาพ 2 `monster_ref_region1.png` (แบบที่อนุมัติ)
+ผัง 4 แถว: หมาป่า 8 · ค้างคาว 8 · บอส 4+4 (บอสตัวใหญ่ GPT วางแถวละ 4 เองในรอบ 10 → สั่งตามนั้น ตัดง่าย)
+
+```
+Image 1 is our current monster sprite sheet; copy its exact art style, outline thickness, flat cel colors and monster sizes. Image 2 shows the approved monster designs. Redraw ONLY these three monsters so they match image 2 more closely, in the style of image 1.
+
+Layout: 4 rows. Rows 1 and 2 have 8 columns, rows 3 and 4 have 4 columns. One pose per cell, evenly spaced, each monster fully inside its cell, all on the same ground baseline per row. Solid green background #01DA0D. No grid lines, no text, no labels, no numbers, no ground shadows, only one monster per cell.
+
+Every frame faces RIGHT (looks and attacks toward the right edge of the image).
+
+Row 1 – Wolf: ONE grey-brown wolf on four legs, same size and look as the wolf in image 1, scruffy fur, lighter muzzle and chest, bushy tail. Exactly 8 frames: 1–3 idle growl loop (breathing, head low). 4 crouch to pounce. 5 leap forward, jaws open. 6 BITE: jaws clamped shut forward with a small white bite mark in front of the mouth. 7 hurt: yelping, recoiling back. 8 defeated: lying on its side.
+
+Row 2 – Shadow Bat: same size as the bat in image 1. Its FACE MUST LOOK LIKE A PUPPY DOG, as in image 2: round dark grey head with a short dog snout and dog nose, two upright pointed dog ears, round orange eyes, two tiny fangs. Wide leathery brown bat wings, flying above the ground. 1–3 idle flap loop (wings up, middle, down). 4 pull wings back and dive. 5 swoop bite toward the right with fangs. 6 fly back up. 7 hurt: tumbling in the air, wings bent. 8 defeated: fallen on the ground, wings spread flat.
+
+Rows 3–4 – Ash Worm King (boss, same size as the boss in image 1): huge segmented worm with a dark ash-brown slimy body. ALONG ITS BACK there must be a row of four large round charcoal-black STONE ARMOR PLATES (like boulders sitting on the back). On the head a crown of five black thorns. Its face has TEN SMALL GLOWING ORANGE EYES arranged in two rows of five (no big eyes). Two long curved white fangs hanging from the mouth. Row 3: 1–3 idle loop (rising and swaying, eyes glowing), 4 rear up tall. Row 4: 5 slam down forward with the fangs, 6 ground cracks and dust burst in front, 7 hurt: recoiling with one stone armor plate cracking, 8 defeated: collapsed flat, eyes dark, crown tilted.
+
+Keep each monster's design and colors identical across all its frames. Output PNG only.
+```
