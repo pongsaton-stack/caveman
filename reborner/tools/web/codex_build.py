@@ -80,13 +80,55 @@ def world(name, key):
 	d = json.load(open(P('docs/art-bible/world/%s.json' % name), encoding='utf-8'))
 	return {'status': d['status'], 'items': d[key]}
 
+def statuses():
+	src = open(P('core/Status.gd'), encoding='utf-8').read()
+	names = dict(re.findall(r'const (\w+)\s*:= "([^"]+)"', src))
+	k = gd_consts('core/Status.gd')
+	out = []
+	for const, note in re.findall(r'(\w+):\s*\{[^}]*"note": "([^"]+)"', src):
+		nm = names.get(const)
+		if not nm: continue
+		techs = [r['name_th'] + ' (' + r['school'] + ' ' + str(round(float(r['status_chance']) * 100)) + '%)' for r in rows('data/techs.csv') if r['status'] == nm]
+		mons = [r['name_th'] + ' (' + str(round(float(r['status_chance'] or 0) * 100)) + '%)' for r in rows('data/monsters.csv') if r['status'] == nm]
+		out.append({'name': nm, 'note': note, 'techs': techs, 'mons': mons})
+	return {'duration': int(k['DURATION']['v']), 'resist_k': k['RESIST_K']['v'], 'list': out}
+
+def elements():
+	f = gd_consts('core/Formulas.gd')
+	ms = rows('data/monsters.csv')
+	split = lambda v: [x for x in re.split(r'[|/,]', v or '') if x.strip()]
+	names = []
+	for r in rows('data/techs.csv'):
+		if r['element'] and r['element'] not in names: names.append(r['element'])
+	for r in ms:
+		for col in ('weak', 'resist'):
+			for x in split(r[col]):
+				if x not in names: names.append(x)
+	special = [{'monster': r['name_th'], 'rule': x} for r in ms for x in split(r['immune']) if x not in names]
+	out = []
+	for e in names:
+		out.append({'name': e, 'techs': [t['name_th'] for t in rows('data/techs.csv') if t['element'] == e],
+			'weak': [m['name_th'] for m in ms if e in split(m['weak'])], 'resist': [m['name_th'] for m in ms if e in split(m['resist'])],
+			'immune': [m['name_th'] for m in ms if e in split(m['immune'])]})
+	return {'weak': f['WEAK_MULT']['v'], 'resist': f['RESIST_MULT']['v'], 'push': f['PUSH_MULT']['v'], 'list': out, 'special': special}
+
+def bodies():
+	f = gd_consts('core/Formulas.gd')
+	body = rows('data/monster_body.csv')
+	names = [n for n in dict.fromkeys(r['body'] for r in body)]
+	aff = {(r['school'], r['body']): {'sign': int(r['sign']), 'why': r['why']} for r in rows('data/body_affinity.csv')}
+	mon = {r['monster_id']: r['name_th'] for r in rows('data/monsters.csv')}
+	return {'good': f['BODY_GOOD']['v'], 'bad': f['BODY_BAD']['v'], 'bodies': names,
+		'mons': {b: [mon.get(r['monster_id'], r['monster_id']) for r in body if r['body'] == b] for b in names},
+		'aff': [{'school': s, 'body': b, **v} for (s, b), v in aff.items()]}
+
 def main(out):
 	sk, ult = skills()
 	veh = world('vehicles', 'items')
 	for v in veh['items']:
 		v['img'] = img('assets/sprites/vehicles_draft/%s_0.png' % v['id'])
 	data = {'built': date.today().isoformat(), 'ult': ult, 'skills': sk, 'spells': spells(), 'glimmer': glimmer(), 'weapons': weapons(),
-		'monsters': monsters(), 'items': items(), 'npcs': world('npcs', 'npcs'), 'vehicles': veh}
+		'monsters': monsters(), 'items': items(), 'statuses': statuses(), 'elements': elements(), 'bodies': bodies(), 'npcs': world('npcs', 'npcs'), 'vehicles': veh}
 	tpl = open(P('tools/web/codex.tpl.html'), encoding='utf-8').read()
 	html = tpl.replace('/*DATA*/null', json.dumps(data, ensure_ascii=False))
 	open(out, 'w', encoding='utf-8').write(html)

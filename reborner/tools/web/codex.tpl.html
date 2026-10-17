@@ -255,10 +255,42 @@ function vVehicles() {
 			<div class="chips">${chip(x.kind, 'prop')}</div><p class="note" style="margin:0">${esc(x.use)}</p></article>`).join('') || '<p class="empty">ไม่พบที่ตรงกับคำค้น</p>'}</div>`;
 }
 
+// ── สถานะ / ธาตุ / ร่างกาย ──
+const names = l => l.length ? l.map(esc).join(' · ') : '<span class="sub">ไม่มี</span>';
+function vStatuses() {
+	const s = D.statuses, l = s.list.filter(x => match(x.name, x.note, ...x.techs, ...x.mons));
+	return `<div class="prose"><h2>สถานะผิดปกติ ${s.list.length} แบบ</h2>
+		<p class="lead">ติดนาน ${s.duration} เทิร์นของตัวที่ติด · โอกาสติดจริง = โอกาสฐาน × (1 − DEF ÷ (DEF + ${s.resist_k})) ยิ่ง DEF สูงยิ่งต้านได้ · ตั้งรับสลัดสถานะออกได้ 1 เทิร์น · ตัวเอกติดสถานะได้ Insight</p></div>
+		<div class="grid">${l.map(x => `<article class="card"><div class="name">${esc(x.name)}</div><p style="margin:0">${esc(x.note)}</p>
+			<dl class="kv"><dt>ท่าที่ลง</dt><dd>${names(x.techs)}</dd><dt>มอนที่ลง</dt><dd>${names(x.mons)}</dd></dl></article>`).join('') || '<p class="empty">ไม่พบสถานะที่ตรงกับคำค้น</p>'}</div>`;
+}
+function vElements() {
+	const e = D.elements, l = e.list.filter(x => match(x.name, ...x.techs, ...x.weak, ...x.resist, ...x.immune));
+	return `<div class="prose"><h2>ธาตุและจุดอ่อน</h2>
+		<p class="lead">ตีโดนธาตุที่แพ้ ดาเมจ ×${e.weak} และดันคิวผู้ตีให้ได้ตาถัดไปเร็วขึ้น (AV ×${e.push}) · ธาตุที่ต้านทาน ×${e.resist} · ภูมิคุ้มกัน = 0 · ธาตุที่ยังไม่มีท่าใช้ = รอสายเวทย์</p></div>
+		<div class="tbl"><table><thead><tr><th>ธาตุ</th><th>ท่าที่ใช้ธาตุนี้</th><th>มอนที่แพ้</th><th>ต้านทาน / ภูมิคุ้มกัน</th></tr></thead><tbody>
+		${l.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${x.techs.length ? x.techs.length + ' ท่า' : '<span class="sub">ยังไม่มีท่า</span>'}</td>
+			<td>${names(x.weak)}</td><td>${names([...x.resist, ...x.immune.map(m => m + ' (ภูมิคุ้มกัน)')])}</td></tr>`).join('')}</tbody></table></div>
+		${e.special.length ? `<p class="sub">ภูมิคุ้มกันแบบพิเศษ: ${e.special.map(x => esc(x.monster) + ' = ' + esc(x.rule)).join(' · ')}</p>` : ''}`;
+}
+function vBodies() {
+	const b = D.bodies, cell = (s, body) => b.aff.find(a => a.school === s && a.body === body);
+	const mark = a => !a ? `<td class="num sub">ปกติ</td>` : `<td class="num" title="${esc(a.why)}">${a.sign > 0 ? `<span class="chip good">×${b.good}</span>` : `<span class="chip bad">×${b.bad}</span>`}</td>`;
+	const why = b.aff.filter(a => match(a.school, a.body, a.why));
+	return `<div class="prose"><h2>ร่างกาย × สายอาวุธ</h2>
+		<p class="lead">มอนแต่ละตัวมีร่างกาย 1 แบบ · สายที่เข้ากับร่างนั้นดาเมจ ×${b.good} สายที่เข้าน้อย ×${b.bad} · เป็นชั้นแยกจากธาตุ คูณดาเมจอย่างเดียว ไม่ดันคิว · จอศึกขึ้นคำ "อ่อนแอ!" / "ต้านทาน"</p></div>
+		<div class="tbl"><table><thead><tr><th>ร่างกาย</th>${SCHOOLS.map(s => `<th style="text-align:right">${esc(s)}</th>`).join('')}<th>มอน</th></tr></thead><tbody>
+		${b.bodies.map(body => `<tr><td><b>${esc(body)}</b></td>${SCHOOLS.map(s => mark(cell(s, body))).join('')}<td class="sub">${b.mons[body].length} ตัว</td></tr>`).join('')}</tbody></table></div>
+		<div class="grid">${why.map(a => `<article class="card"><div class="chips">${chip(a.school)}${chip('ร่าง' + a.body)}${chip(a.sign > 0 ? 'เข้าดี ×' + b.good : 'เข้าน้อย ×' + b.bad, a.sign > 0 ? 'good' : 'bad')}</div>
+			<p style="margin:0">${esc(a.why)}</p></article>`).join('')}</div>`;
+}
+
 const TABS = [
 	['skills', 'สกิล', () => D.skills.length, vSkills], ['spells', 'เวทย์', () => D.spells.schools.reduce((a, s) => a + s.spells.length, 0), vSpells],
 	['glimmer', 'ประกาย', () => '', vGlimmer], ['weapons', 'อาวุธ', () => D.weapons.families.reduce((a, f) => a + f.weapons.length, 0), vWeapons],
 	['monsters', 'มอน', () => D.monsters.filter(m => !m.boss).length, () => vMon(false)], ['bosses', 'บอส', () => D.monsters.filter(m => m.boss).length, () => vMon(true)],
+	['statuses', 'สถานะ', () => D.statuses.list.length, vStatuses], ['elements', 'ธาตุ', () => D.elements.list.length, vElements],
+	['bodies', 'ร่างกาย', () => D.bodies.bodies.length, vBodies],
 	['items', 'ไอเท็ม', () => D.items.length, vItems], ['npcs', 'NPC', () => D.npcs.items.length, vNpcs], ['vehicles', 'ยานพาหนะ', () => D.vehicles.items.length, vVehicles]];
 if (!TABS.some(t => t[0] === S.tab)) S.tab = 'skills';
 
