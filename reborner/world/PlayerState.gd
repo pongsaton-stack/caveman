@@ -8,7 +8,7 @@ const SAVE_VERSION := 2   # 2 = มีปาร์ตี้มอน · ไอ�
 var prof := 8               # ความชำนาญ — เริ่มจากแทบไม่มีอะไร
 var weapon_base := 14       # มีดทำครัว (weapons_workbook W11)
 var weapon_name := "มีดทำครัว"
-var gold := 600
+var gold: int = Economy.start_gold()   # data/economy.csv START_GOLD
 var hp := 0
 var sp := 0
 var learned: Array[String] = []
@@ -31,7 +31,9 @@ var met_species: Array[String] = []   # สายพันธุ์ที่เ�
 var rest_count := 0                   # จุดพักที่นับแล้วตั้งแต่ LP ฟื้นครั้งล่าสุด
 var fought_since_rest := false        # พักซ้ำโดยไม่สู้เลยไม่นับ (กันเดินวนจุดพักฟื้น LP)
 var items: Dictionary = {}            # item_id -> จำนวน
-var shop_stock: Dictionary = {}       # item_id -> ที่เหลือในร้าน (ภูมิภาคนี้)
+var shop_stock: Dictionary = {}       # "<shop_id>/<ref_id>" -> ที่เหลือ · ไม่มีคีย์ = เต็มตาม data/shops.csv
+var stock_ec := 0                      # EC ตอนร้านเติมสต๊อกครั้งล่าสุด (Economy.restock_if_due)
+var tomes: Array[String] = []          # ตำราที่ซื้อ (spell_id ใน data/tomes.csv) — ยังอ่านไม่ได้จนกว่าสายเวทย์เข้าเกม
 var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: สู้อัตโนมัติเปิดตั้งแต่เริ่ม สลับได้
 var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
 var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
@@ -419,6 +421,7 @@ func to_dict() -> Dictionary:
 		"party": party.duplicate(true), "party_seeded": party_seeded, "lost": lost.duplicate(),
 		"met_species": met_species.duplicate(), "rest_count": rest_count,
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
+		"stock_ec": stock_ec, "tomes": tomes.duplicate(),
 		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true),
 		"seized": seized.duplicate(true), "reads": reads.duplicate(true), "insight": insight,
 		"falls": falls, "demo_end_seen": demo_end_seen,
@@ -502,3 +505,7 @@ func from_dict(d: Dictionary) -> void:
 	var st: Dictionary = d.get("shop_stock", {})
 	for k in st.keys():
 		shop_stock[str(k)] = int(st[k])
+	stock_ec = int(d.get("stock_ec", ec))   # เซฟเก่า: ถือว่าเติมแล้วที่ EC ปัจจุบัน ไม่เติมฟรีตอนโหลด
+	tomes.clear()
+	for t in d.get("tomes", []):
+		tomes.append(str(t))

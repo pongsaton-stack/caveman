@@ -14,6 +14,7 @@ const WALK_FPS := 2.0 / MOVE_TIME
 const ENEMY_STEP := 0.9
 const CHASE_RANGE := 4
 const MAP_PATH := "res://data/map_ashfield.txt"
+const REGION := "ที่ราบเถ้า"   # ภูมิภาคของแผนที่นี้ (คอลัมน์ region ใน monsters.csv / shops.csv)
 const SPRITE_DIR := "res://assets/sprites/rion_px"
 
 # Rion พิกเซล 32-bit (kwan 16 ต.ค. 2026 เลือกเปลี่ยนแนวภาพเป็นพิกเซล ตัวสูง ~72) · tools/sprites/rion_px_game.py
@@ -92,11 +93,9 @@ func _ready() -> void:
 	if not loaded:
 		ps.init_new(techs, map.start)
 	ps.sync_weapon(techs)   # สายท่า/กิ่งชี้ทางตามอาวุธที่ถือ (แก้เซฟเก่าที่ถือไม้เบสบอลแต่สายยังเป็น คม)
-	# เซฟเก่า (v1) ไม่มีปาร์ตี้/ร้าน — ตั้งให้ครั้งเดียว
+	# เซฟเก่า (v1) ไม่มีปาร์ตี้ — ตั้งให้ครั้งเดียว · สต๊อกร้านแบบเก่า (คีย์ item_id) ย้ายเป็นคีย์ร้าน
 	ps.seed_party(companion_rows)
-	if ps.shop_stock.is_empty():
-		for r in item_rows:
-			ps.shop_stock[str(r["item_id"])] = int(r["stock"])
+	Economy.migrate_stock(ps)
 	# เซฟเก่าอาจชี้ไปช่องที่แผนที่เปลี่ยนไปแล้ว
 	if not map.walkable(ps.cell):
 		ps.cell = map.start
@@ -511,8 +510,9 @@ func _open_chest(key: String) -> void:
 			msg += "\nสายท่าเปลี่ยนเป็น %s · ท่าสาย%sยังอยู่ สลับกลับได้ที่เมนู > อาวุธ" % [ps.school, old_school]
 		_show(msg, 2.6)
 	else:
-		ps.gold += 50
-		_show("🎁 %s — อาวุธที่มีดีกว่าแล้ว ขายได้ +50 เงิน" % label, 1.6)
+		var g := Economy.dup_weapon_gold()
+		ps.gold += g
+		_show("🎁 %s — อาวุธที่มีดีกว่าแล้ว ขายได้ +%d เงิน" % [label, g], 1.6)
 	SaveGame.save(ps)
 
 func _enemy_at(c: Vector2i) -> WorldEnemy:
@@ -648,7 +648,7 @@ func _start_practice(school: String) -> void:
 func _open_shop() -> void:
 	busy = true
 	var s := ShopScreen.new()
-	s.setup(ps, item_rows)
+	s.setup(ps, REGION)
 	s.closed.connect(_on_screen_closed)
 	add_child(s)
 
@@ -735,7 +735,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		if not Formulas.map_swat(int(r["tier"]), ps.prof):
 			all_swat = false
 	if all_swat:
-		var coins := 2 * rows.size()
+		var coins := Economy.swat_gold(rows.size())
 		ps.gold += coins
 		_remove_enemy(e)
 		_show("✋ ตบทิ้ง %s — ไม่เข้าฉากต่อสู้ (+%d เงิน)" % [e.label_text, coins], 1.2)
@@ -770,7 +770,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	if res["won"]:
 		ps.absorb(hero, max_tier)
 		ps.prof += Formulas.prof_gain(max_tier, ps.prof)
-		var loot := max_tier * rows.size()
+		var loot := Economy.win_gold(max_tier, rows.size())
 		ps.gold += loot
 		ps.sp = mini(ps.max_sp(), ps.sp + int(ps.max_sp() * Formulas.SP_RESTORE))
 		if e.is_boss:
@@ -788,7 +788,7 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 			lines.append("คอมโบ %d · ขัดจังหวะ %d" % [res["combos"], res["interrupts"]])
 	else:
 		# ตัวเอกล้ม = แพ้ทันที เสียเงินครึ่งหนึ่ง กลับจุดพักล่าสุด (GDD 3.6)
-		var lost := int(ps.gold / 2.0)
+		var lost := Economy.death_loss(ps.gold)
 		ps.gold -= lost
 		ps.cell = ps.rest_cell
 		ps.rest()
