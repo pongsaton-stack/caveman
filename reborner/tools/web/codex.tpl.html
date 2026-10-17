@@ -304,8 +304,8 @@ function vRegions() {
 	const regs = r.list.map(reg => {
 		const subs = reg.subs.map(sb => ({ ...sb, mons: sb.mons.filter(x => match(x.name, x.id, reg.name, sb.name)) })).filter(sb => sb.mons.length);
 		if (!subs.length) return '';
-		return `<section class="school"><div class="top"><h3>${esc(reg.name)}</h3><span class="sub">${reg.subs.length} สถานที่ย่อย</span></div>
-			<div class="branches">${subs.map(sb => `<div class="branch"><h4>${esc(sb.name)}</h4>${sb.mons.map(x =>
+		return `<section class="school"><div class="top"><h3>${esc(reg.name)}</h3><span class="sub">${reg.name === 'บอส' ? 'monsters.csv ยังไม่ระบุว่าบอสอยู่ภูมิภาคไหน (แผนที่ภูมิภาค 1 มี B1)' : reg.subs.length + ' สถานที่ย่อย'}</span></div>
+			<div class="branches">${subs.map(sb => `<div class="branch">${sb.name && sb.name !== '-' ? `<h4>${esc(sb.name)}</h4>` : ''}${sb.mons.map(x =>
 				`<div class="tech${x.boss ? ' ult' : ''}"><div class="t1"><span class="req">tier ${esc(x.tier)}</span><span class="tn">${esc(x.name)}</span>${x.boss ? chip('บอส', 'gold') : ''}</div>
 				<div class="nums">${esc(x.id)} · เจอเมื่อ EC ${esc(x.ec)}</div></div>`).join('')}</div>`).join('')}</div></section>`;
 	}).join('');
