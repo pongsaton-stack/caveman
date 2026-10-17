@@ -78,7 +78,7 @@ th, td { text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--lin
 tr:last-child td { border-bottom: 0 } td.num { text-align: right }
 .bar { height: 6px; background: var(--gold); border-radius: 3px; min-width: 2px }
 .cols { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)) }
-.prose { max-width: 70ch; display: grid; gap: 8px } .prose p, .prose ol { margin: 0 }
+.prose { max-width: 70ch; display: grid; gap: 8px; align-content: start } .prose p, .prose ol { margin: 0 }
 .empty { color: var(--muted); padding: 20px 0 }
 footer { color: var(--muted); font-size: 12px; padding-block: 0 32px }
 @media (prefers-reduced-motion: no-preference) { nav button { transition: color .15s, border-color .15s } }
@@ -285,18 +285,66 @@ function vBodies() {
 			<p style="margin:0">${esc(a.why)}</p></article>`).join('')}</div>`;
 }
 
+// ── ภูมิภาค / ทีมมอน ──
+const TILE = { '#': '#5b5146', '~': '#4f7ea6', '.': '#b8a888', ',': '#7f9a52' };
+function drawMap(cv) {
+	const m = D.regions.map, g = m.grid, w = Math.max(...g.map(r => r.length)), h = g.length, k = 12;
+	cv.width = w * k; cv.height = h * k; const c = cv.getContext('2d');
+	g.forEach((row, y) => [...row].forEach((ch, x) => {
+		c.fillStyle = TILE[ch] || TILE['.']; c.fillRect(x * k, y * k, k, k);
+		const mark = ch === 'R' ? ['#f2e6b0', 'พ'] : ch === 'H' ? ['#ffffff', '★'] : ch === 'S' ? ['#e0b84a', 'ร'] : ch === 'B' ? ['#c0392b', 'B']
+			: m.enc[ch] ? ['#2a1a14', ch] : m.chests[ch] ? ['#c9a24a', '▣'] : null;
+		if (!mark) return;
+		c.fillStyle = mark[0] === '#2a1a14' ? '#f4ead2' : mark[0]; c.fillRect(x * k + 1, y * k + 1, k - 2, k - 2);
+		c.fillStyle = '#2a1a14'; c.font = '700 9px Sarabun, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(mark[1], x * k + k / 2, y * k + k / 2 + 1);
+	}));
+}
+function vRegions() {
+	const r = D.regions, m = r.map;
+	const regs = r.list.map(reg => {
+		const subs = reg.subs.map(sb => ({ ...sb, mons: sb.mons.filter(x => match(x.name, x.id, reg.name, sb.name)) })).filter(sb => sb.mons.length);
+		if (!subs.length) return '';
+		return `<section class="school"><div class="top"><h3>${esc(reg.name)}</h3><span class="sub">${reg.subs.length} สถานที่ย่อย</span></div>
+			<div class="branches">${subs.map(sb => `<div class="branch"><h4>${esc(sb.name)}</h4>${sb.mons.map(x =>
+				`<div class="tech${x.boss ? ' ult' : ''}"><div class="t1"><span class="req">tier ${esc(x.tier)}</span><span class="tn">${esc(x.name)}</span>${x.boss ? chip('บอส', 'gold') : ''}</div>
+				<div class="nums">${esc(x.id)} · เจอเมื่อ EC ${esc(x.ec)}</div></div>`).join('')}</div>`).join('')}</div></section>`;
+	}).join('');
+	return `<div class="prose"><h2>ภูมิภาค</h2><p class="lead">มอนแต่ละตัวอยู่ภูมิภาคและสถานที่ย่อยไหน และเจอได้ช่วง EC เท่าไหร่ (EC เพิ่มเมื่อเนื้อเรื่องเดินหน้า โลกเปลี่ยนตาม) · GDD วางไว้ 3 ภูมิภาค × 3 สถานที่ย่อย</p></div>
+		<div class="cols"><div class="prose"><h3>แผนที่ที่เล่นได้ตอนนี้ · ${esc(m.title)}</h3>
+			<div class="tbl" style="padding:8px"><canvas id="map" style="image-rendering:pixelated;max-width:100%;display:block" aria-label="แผนที่ภูมิภาค 1"></canvas></div>
+			<div class="chips">${chip('★ จุดเริ่ม')}${chip('พ จุดพัก')}${chip('ร ร้านค้า')}${chip('B บอส', 'bad')}${chip('▣ หีบ')}</div>
+			<dl class="kv">${Object.entries(m.enc).map(([s, e]) => `<dt>${esc(s)}</dt><dd>${esc(e.label)}${e.boss ? ' ' + chip('บอส', 'gold') : ''}</dd>`).join('')}
+				${Object.values(m.chests).map(c => `<dt>▣</dt><dd>หีบ: ${esc(c.label)}${c.base ? ' (ค่าอาวุธ ' + esc(c.base) + ')' : ''}</dd>`).join('')}</dl></div>
+			<div class="tree">${regs || '<p class="empty">ไม่พบที่ตรงกับคำค้น</p>'}</div></div>`;
+}
+function vTeam() {
+	const t = D.team, card = (x, extra) => `<article class="card"><div class="head">${pic(x.img, x.name)}<div><div class="name">${esc(x.name)}</div><div class="sub">${esc(x.monster_id)}${x.region ? ' · ' + esc(x.region) : ''}</div></div></div>${extra}</article>`;
+	return `<div class="prose"><h2>มอนร่วมทีม</h2><p class="lead">ชนะมอนแล้วความเข้าใจท่าเด่นครบ เลือกได้ทางเดียว: ยึดท่า (ได้ 1 ท่า กินช่องความจำ) หรือรับเข้าทีม (ได้ทั้งตัว กินช่องทีม) · LP ล้มเสีย 1 หมดแล้วหายถาวร · ความเชื่อใจโตจากการสู้ด้วยกัน</p></div>
+		<h3>เริ่มเกมพร้อม ${t.start.length} ตัว</h3><div class="grid">${t.start.filter(x => match(x.name, x.note)).map(x => card(x,
+			`<div class="chips">${chip('LP ' + x.lp)}${chip('ความเชื่อใจ ' + x.loyalty)}${x.sig ? chip('ท่าเด่น ' + x.sig) : ''}</div><p class="note" style="margin:0">${esc(x.note)}</p>`)).join('')}</div>
+		<h3>รับเข้าทีมได้</h3><div class="grid">${t.recruits.filter(x => match(x.name, x.note, x.region)).map(x => card(x,
+			`<div class="chips">${chip('กิน ' + x.slots + ' ช่อง', +x.slots > 1 ? 'gold' : '')}${chip('ต้องเข้าใจ ' + x.need)}${x.sig ? chip('ท่าเด่น ' + x.sig) : ''}</div><p class="note" style="margin:0">${esc(x.note)}</p>`)).join('')}</div>
+		<h3>ท่าที่ยึดได้</h3><div class="grid">${t.seize.filter(x => match(x.name_th, x.monster, x.note)).map(x => card({ ...x, name: x.name_th },
+			`<div class="chips">${chip('จาก ' + x.monster)}${+x.power ? chip('พลัง ' + x.power) : ''}${chip('SP ' + x.sp)}${chip('กิน ' + x.slots + ' ช่องความจำ')}${x.status === 'ยืนยัน' ? chip('ยืนยันแล้ว', 'good') : ''}</div>
+			<p class="note" style="margin:0">${esc(x.note)}</p>`)).join('')}</div>
+		<h3>ช่องทีมตาม EC</h3><div class="tbl"><table><thead><tr><th>EC ตั้งแต่</th><th style="text-align:right">ช่องมอน</th><th>หมายเหตุ</th></tr></thead><tbody>
+			${t.slots.map(s => `<tr><td>${esc(s.ec)}</td><td class="num">${esc(s.monster_slots)}</td><td>${esc(s.note)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
 const TABS = [
 	['skills', 'สกิล', () => D.skills.length, vSkills], ['spells', 'เวทย์', () => D.spells.schools.reduce((a, s) => a + s.spells.length, 0), vSpells],
 	['glimmer', 'ประกาย', () => '', vGlimmer], ['weapons', 'อาวุธ', () => D.weapons.families.reduce((a, f) => a + f.weapons.length, 0), vWeapons],
 	['monsters', 'มอน', () => D.monsters.filter(m => !m.boss).length, () => vMon(false)], ['bosses', 'บอส', () => D.monsters.filter(m => m.boss).length, () => vMon(true)],
 	['statuses', 'สถานะ', () => D.statuses.list.length, vStatuses], ['elements', 'ธาตุ', () => D.elements.list.length, vElements],
-	['bodies', 'ร่างกาย', () => D.bodies.bodies.length, vBodies],
+	['bodies', 'ร่างกาย', () => D.bodies.bodies.length, vBodies], ['regions', 'ภูมิภาค', () => D.regions.list.length, vRegions],
+	['team', 'ทีมมอน', () => D.team.start.length + D.team.recruits.length, vTeam],
 	['items', 'ไอเท็ม', () => D.items.length, vItems], ['npcs', 'NPC', () => D.npcs.items.length, vNpcs], ['vehicles', 'ยานพาหนะ', () => D.vehicles.items.length, vVehicles]];
 if (!TABS.some(t => t[0] === S.tab)) S.tab = 'skills';
 
 function render() {
 	$('tabs').innerHTML = TABS.map(([id, label, n]) => `<button type="button" role="tab" id="t-${id}" aria-selected="${S.tab === id}" data-tab="${id}">${label}<span class="n">${n()}</span></button>`).join('');
 	$('view').innerHTML = TABS.find(t => t[0] === S.tab)[3]();
+	if ($('map')) drawMap($('map'));
 }
 $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return;
 	S.tab = b.dataset.tab; try { history.replaceState(null, '', '#' + S.tab); } catch (x) {} render(); window.scrollTo(0, 0); });

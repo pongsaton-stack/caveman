@@ -122,13 +122,37 @@ def bodies():
 		'mons': {b: [mon.get(r['monster_id'], r['monster_id']) for r in body if r['body'] == b] for b in names},
 		'aff': [{'school': s, 'body': b, **v} for (s, b), v in aff.items()]}
 
+def regions():
+	ms = rows('data/monsters.csv')
+	order = list(dict.fromkeys(r['region'] for r in ms))
+	out = []
+	for reg in order:
+		subs = list(dict.fromkeys(r['sublocation'] for r in ms if r['region'] == reg))
+		out.append({'name': reg, 'subs': [{'name': sb, 'mons': [{'id': r['monster_id'], 'name': r['name_th'], 'tier': r['tier'], 'boss': r['is_boss'] == '1',
+			'ec': r['ec_min'] + '–' + r['ec_max']} for r in ms if r['region'] == reg and r['sublocation'] == sb]} for sb in subs]})
+	lines = open(P('data/map_ashfield.txt'), encoding='utf-8').read().splitlines()
+	legend = [l[1:].strip() for l in lines if l.startswith(';')]
+	grid = [l for l in lines if l and not l.startswith(';')]
+	enc = {r['symbol']: {'label': r['label'], 'boss': r['boss'] == '1'} for r in rows('data/encounters.csv')}
+	chests = {r['symbol']: {'label': r['label'], 'base': r['weapon_base']} for r in rows('data/chests.csv')}
+	return {'list': out, 'map': {'title': legend[0] if legend else '', 'grid': grid, 'enc': enc, 'chests': chests}}
+
+def team():
+	mon = {r['monster_id']: r for r in rows('data/monsters.csv')}
+	pic = lambda mid: img('assets/sprites/monsters_px/%s_idle0.png' % mid) or img('assets/sprites/monsters_ll/%s.png' % mid)
+	start = [dict(r, img=pic(r['monster_id']), sig=mon.get(r['monster_id'], {}).get('signature_tech', '')) for r in rows('data/companions.csv')]
+	rec = [dict(r, img=pic(r['monster_id']), sig=mon.get(r['monster_id'], {}).get('signature_tech', ''), region=mon.get(r['monster_id'], {}).get('region', ''),
+		need=mon.get(r['monster_id'], {}).get('comprehension', '')) for r in rows('data/recruits.csv')]
+	seize = [dict(r, monster=mon.get(r['monster_id'], {}).get('name_th', ''), img=pic(r['monster_id'])) for r in rows('data/seize_techs.csv')]
+	return {'start': start, 'recruits': rec, 'seize': seize, 'slots': rows('data/party_slots.csv')}
+
 def main(out):
 	sk, ult = skills()
 	veh = world('vehicles', 'items')
 	for v in veh['items']:
 		v['img'] = img('assets/sprites/vehicles_draft/%s_0.png' % v['id'])
 	data = {'built': date.today().isoformat(), 'ult': ult, 'skills': sk, 'spells': spells(), 'glimmer': glimmer(), 'weapons': weapons(),
-		'monsters': monsters(), 'items': items(), 'statuses': statuses(), 'elements': elements(), 'bodies': bodies(), 'npcs': world('npcs', 'npcs'), 'vehicles': veh}
+		'monsters': monsters(), 'items': items(), 'statuses': statuses(), 'elements': elements(), 'bodies': bodies(), 'regions': regions(), 'team': team(), 'npcs': world('npcs', 'npcs'), 'vehicles': veh}
 	tpl = open(P('tools/web/codex.tpl.html'), encoding='utf-8').read()
 	html = tpl.replace('/*DATA*/null', json.dumps(data, ensure_ascii=False))
 	open(out, 'w', encoding='utf-8').write(html)

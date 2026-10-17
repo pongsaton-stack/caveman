@@ -783,8 +783,9 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 
 ## หน้า "สมุดรวม REBORNER" (kwan 17 ต.ค. 2026 "หน้าเว็บรวบรวมสกิล เวทย์ ประกาย อาวุธ มอน บอส ไอเท็ม npc ยานพาหนะ สำหรับเปิดดูหรือแชร์")
 - ลิงก์: https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 (ส่วนตัว · แชร์ผ่านเมนู Share ของหน้า) · สร้าง `python3 tools/web/codex_build.py <out.html>` (เทมเพลต `tools/web/codex.tpl.html`) แล้วเผยแพร่ทับ
-- 12 แท็บ: สกิล (ต้นไม้ตามสาย/กิ่ง · ป้าย ไม้ตาย / ตัวเลขเสนอ) · เวทย์ · ประกาย (สูตร + ตาราง Insight) · อาวุธ · มอน · บอส · สถานะ · ธาตุ · ร่างกาย · ไอเท็ม · NPC · ยานพาหนะ
-- Version 2 (kwan เลือก "2"): สถานะ 6 แบบ (คำอธิบายจาก INFO ใน core/Status.gd · DURATION · RESIST_K · ท่า/มอนที่ลง) · ธาตุ (WEAK/RESIST/PUSH_MULT · ท่าที่ใช้ · มอนที่แพ้/ต้านทาน · ภูมิคุ้มกันพิเศษ เช่น โกลเลมสลัก = ธาตุล่าสุด) · ร่างกาย (ตาราง 9 ร่าง × 6 สายจาก body_affinity.csv + เหตุผลรายช่อง) · ช่องค้นหา · ลิงก์ตรงแท็บ `#monsters` ฯลฯ
+- 14 แท็บ: สกิล (ต้นไม้ตามสาย/กิ่ง · ป้าย ไม้ตาย / ตัวเลขเสนอ) · เวทย์ · ประกาย (สูตร + ตาราง Insight) · อาวุธ · มอน · บอส · สถานะ · ธาตุ · ร่างกาย · ภูมิภาค · ทีมมอน · ไอเท็ม · NPC · ยานพาหนะ
+- Version 2 (kwan เลือก "2"): สถานะ 6 แบบ (คำอธิบายจาก INFO ใน core/Status.gd · DURATION · RESIST_K · ท่า/มอนที่ลง) · ธาตุ (WEAK/RESIST/PUSH_MULT · ท่าที่ใช้ · มอนที่แพ้/ต้านทาน · ภูมิคุ้มกันพิเศษ เช่น โกลเลมสลัก = ธาตุล่าสุด) · ร่างกาย (ตาราง 9 ร่าง × 6 สายจาก body_affinity.csv + เหตุผลรายช่อง)
+- Version 3 (kwan เลือก "2"): ภูมิภาค (มอนตามภูมิภาค/สถานที่ย่อย + ช่วง EC จาก monsters.csv · แผนที่ภูมิภาค 1 วาดจาก map_ashfield.txt + encounters.csv + chests.csv) · ทีมมอน (companions.csv · recruits.csv + ความเข้าใจที่ต้องใช้ · seize_techs.csv · party_slots.csv) · ช่องค้นหา · ลิงก์ตรงแท็บ `#monsters` ฯลฯ
 - **ไม่มีตัวเลขพิมพ์เอง**: techs.csv · monsters.csv · monster_body.csv · weapons.csv + weapons_full.json · spells_full.json · items_draft/index.json · npcs.json · vehicles.json · ค่าประกายอ่านจาก `const` ใน core/Insight.gd + Formulas.gd · ULT_PROF จาก BattleScreen.gd → **แก้ข้อมูลเกมแล้วสร้างหน้าใหม่**
 - ภาพ: มอน = monsters_px (5 ตัว) ไม่มีค่อย monsters_ll · อาวุธ = weapon_icons · ไอเท็ม = items_draft · ยานพาหนะ = vehicles_draft · **NPC ไม่แสดงภาพ** (npcs_draft ทาสีจาก Rion แบบเก่า — kwan สั่งถอด 16 ต.ค.)
 - ตรวจ 17 ต.ค.: 9 แท็บ 1200px สว่าง / 400px มืด ไม่มี error ไม่เลื่อนข้าง · ค้นหา "หมาป่" ได้ 3 ตัว · หน้า 265 KB
