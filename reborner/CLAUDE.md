@@ -781,6 +781,13 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
     ฟิสิกส์ตามธาตุ: ความร้อน → ถ่าน/ควันลอยขึ้น · ลมเย็นหนัก → เลียดพื้น ไอเย็นจมลง หิมะร่วงช้า · แสงเร็วสุด → ถึงเป้าเกือบทันที · มืดทะลุคอลัมน์ เป้าหลังโดนช้ากว่าตามระยะ · เกราะแตกไปทาง +x ตามโมเมนตัมเข็ม
     ลิงก์ v2: BK-1 `7qy7eq5cr5` · BK-2 `9nfitsrwv8` · BK-3 `vatif8fd9t` · BK-4 `tdvbggzwpp` · BK-5 `uvjb5bq333` · BK-6 `cswxqvib3n` · ยังไม่มีใครเปิดดู · **สมมติฐาน**: กระสุนออกจากผู้ร่ายทันทีที่ชั้นเริ่ม ความเร็วคงที่ (ถ้าแล็บเร่ง/หน่วง เวลาโดนจะคลาด) · ท่าพนมมือยังไม่มีสไปรต์ในเกม (มีแค่ cast_fwd/cast_up)
 
+## หน้า "สมุดรวม REBORNER" (kwan 17 ต.ค. 2026 "หน้าเว็บรวบรวมสกิล เวทย์ ประกาย อาวุธ มอน บอส ไอเท็ม npc ยานพาหนะ สำหรับเปิดดูหรือแชร์")
+- ลิงก์: https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 (ส่วนตัว · แชร์ผ่านเมนู Share ของหน้า) · สร้าง `python3 tools/web/codex_build.py <out.html>` (เทมเพลต `tools/web/codex.tpl.html`) แล้วเผยแพร่ทับ
+- 9 แท็บ: สกิล (ต้นไม้ตามสาย/กิ่ง · ป้าย ไม้ตาย / ตัวเลขเสนอ) · เวทย์ · ประกาย (สูตร + ตาราง Insight) · อาวุธ · มอน · บอส · ไอเท็ม · NPC · ยานพาหนะ · ช่องค้นหา · ลิงก์ตรงแท็บ `#monsters` ฯลฯ
+- **ไม่มีตัวเลขพิมพ์เอง**: techs.csv · monsters.csv · monster_body.csv · weapons.csv + weapons_full.json · spells_full.json · items_draft/index.json · npcs.json · vehicles.json · ค่าประกายอ่านจาก `const` ใน core/Insight.gd + Formulas.gd · ULT_PROF จาก BattleScreen.gd → **แก้ข้อมูลเกมแล้วสร้างหน้าใหม่**
+- ภาพ: มอน = monsters_px (5 ตัว) ไม่มีค่อย monsters_ll · อาวุธ = weapon_icons · ไอเท็ม = items_draft · ยานพาหนะ = vehicles_draft · **NPC ไม่แสดงภาพ** (npcs_draft ทาสีจาก Rion แบบเก่า — kwan สั่งถอด 16 ต.ค.)
+- ตรวจ 17 ต.ค.: 9 แท็บ 1200px สว่าง / 400px มืด ไม่มี error ไม่เลื่อนข้าง · ค้นหา "หมาป่" ได้ 3 ตัว · หน้า 265 KB
+
 ## หน้า UI Kit (แยกจากหน้า animation test · kwan 6 ต.ค. 2026 "แยกอาติเฟคใหม่สำหรับ ui hud และ menu")
 - ลิงก์: https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz · สร้าง `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` (แม่แบบ `tools/web/ui_mock.tpl.html` · ค่าจริงจาก `tools/web/ui_mock_dump.gd`) แล้วเผยแพร่ทับลิงก์เดิม
 - ทุกจอวาดที่ 384×216 จริงแล้วขยาย · สองหน้าตา: ทอง (โทน UiKit ในเกม + โครง RS3) / น้ำเงิน (ตามชีต UI ของ kwan) · ค่าบนจอมาจากเกม (Rion ความชำนาญ 20 ถือไม้เบสบอล vs B1)
