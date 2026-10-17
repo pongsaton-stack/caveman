@@ -5,6 +5,7 @@
 # JSON คือแหล่งเดียว (ใช้ร่วมกับ tools/sprites/weapons*.py) · แก้ชื่อ/สาย/กิ่งที่ JSON แล้วรันใหม่ · ห้ามแก้ CSV ตรงๆ
 # คอลัมน์: weapon_id · existing_id (รหัสเดิมใน workbook เช่น W11) · name · school (= สายท่าใน techs.csv) · tier (1–5 ของไฟล์)
 #          weapon_base (ว่าง = kwan ยังไม่กำหนด) · steer (กิ่งที่ชี้ทาง ×2 ตอนประกาย · ว่าง = ไม่ชี้ทาง · GDD 6.3)
+#          price · price_status (ราคาร้านก่อนเงินเฟ้อ · เสนอโดย tools/data/econ_csv.py · ร้านขายเฉพาะชิ้นที่มี weapon_base)
 import csv, json, os, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,11 +30,12 @@ def main():
 					sys.exit('กิ่ง %s/%s มีอาวุธประจำกิ่ง 2 ชิ้น (%s, %s) — GDD 6.3 ให้ 1 ชิ้นต่อกิ่ง' % (fam['school'], steer, seen[(fam['school'], steer)], w['id']))
 				seen[(fam['school'], steer)] = w['id']
 			base = w.get('weapon_base')
-			rows.append([w['id'], w.get('existing_id', ''), w['name'], fam['school'], w['tier'], '' if base is None else base, steer])
+			rows.append([w['id'], w.get('existing_id', ''), w['name'], fam['school'], w['tier'], '' if base is None else base, steer,
+				w.get('price', ''), w.get('price_status', '')])
 	missing = [(s, b) for s in branches for b in branches[s] if (s, b) not in seen]
 	with open(OUT, 'w', encoding='utf-8', newline='') as f:
 		wr = csv.writer(f, lineterminator='\n')
-		wr.writerow(['weapon_id', 'existing_id', 'name', 'school', 'tier', 'weapon_base', 'steer'])
+		wr.writerow(['weapon_id', 'existing_id', 'name', 'school', 'tier', 'weapon_base', 'steer', 'price', 'price_status'])
 		wr.writerows(rows)
 	print('ok', len(rows), 'ชิ้น · ชี้ทาง', len(seen), 'กิ่ง', ('· กิ่งที่ยังไม่มีอาวุธประจำ: %s' % missing) if missing else '· ครบทุกกิ่ง')
 
