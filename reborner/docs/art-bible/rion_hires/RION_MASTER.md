@@ -27,6 +27,17 @@ Solid flat pure green chroma-key background, no shadow, no ground line, no text,
 front view, full body, standing still with arms relaxed at his sides, feet planted at the bottom edge, centered, single character.
 ```
 
+### การจัดชีต (SHEET LAYOUT) — ใส่ทุกชีตท่าขยับ ลดงานตัดภาพ (บทเรียนชีตเดินแรก 18 ต.ค.: ตัวชิดกันจนเศษเท้า/หมวกติดเฟรมข้าง)
+```
+Exactly 6 frames in ONE horizontal row. Wide empty green gaps between frames: at least half a character width of pure green between any two characters, no body part, shadow or effect may cross into the gap. Same character size and same head-to-body proportions in every frame, feet on one shared baseline, the character fills most of the image height.
+```
+
+### ทิศ (DIRECTION) — Flow ชอบวาดหันขวาเสมอ ต้องบอกด้วยส่วนของร่างกาย ไม่ใช่แค่คำว่า left/right
+```
+LEFT:  Side view facing LEFT: nose, cap brim and toes point to the LEFT edge of the image; the backpack is on the RIGHT side of the body. The left arm with the blue watch is the near arm, fully visible.
+RIGHT: Side view facing RIGHT: nose, cap brim and toes point to the RIGHT edge of the image; the backpack is on the LEFT side of the body. The left arm with the blue watch is the far arm, mostly hidden behind the body; never draw the watch on the near arm.
+```
+
 ## กฎสำหรับ prompt ใหม่ทุกชิ้น
 1. แนบ `rion_master_v1.jpg` เป็นภาพอ้างอิงตัวละคร (ภาพ 1)
 2. ใช้บล็อก CHARACTER + STYLE ข้างบนตามตัวอักษร · เปลี่ยนเฉพาะส่วนท่า/มุม/จำนวนช่อง
