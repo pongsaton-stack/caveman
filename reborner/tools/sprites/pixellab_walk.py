@@ -308,7 +308,7 @@ def fetch():
 # State = ตัวละครเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ (/create-character-state) · ใช้เป็นภาพเริ่มของท่าถัดไป (keep_first_frame) แทนภาพยืนมือเปล่า
 # ซึ่งเป็นต้นเหตุที่มีดหาย/ตัวหันเข้ากล้องในท่ายาว · ผลเป็น character_id ใหม่ (กลุ่มเดียวกับตัวเดิม) เก็บใน state.json["states"][ชื่อ]
 STATES = {
-	"fight_knife": {"seed": 27, "frame": [112, 112], "edit": (
+	"fight_knife": {"seed": 27, "frame": None, "edit": (   # ผืน 112 = อย่างน้อย 15 gen (402 · 18 ต.ค.) → ผืนเดิม 96
 		"Same character, same design, same proportions and same colors; only the pose changes. "
 		"Battle-ready fighting stance: knees slightly bent, feet apart, body weight forward, both feet flat on the ground. "
 		"The FRONT hand holds ONE small kitchen knife: short dark wooden handle in the fist, short silver blade about as long as the hand, "

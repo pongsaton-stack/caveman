@@ -47,5 +47,5 @@
 ## State (/create-character-state · kwan 18 ต.ค. คลิป "PixelLab Character States" → เลือก "2")
 - หลักการ: สร้าง State = ตัวเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ → ใช้เป็นภาพเริ่มของท่า (`keep_first_frame` · `custom_start_frame`) แทนภาพยืนมือเปล่า · ท่ายาว = ต่อหลายช่วงด้วย `end_frame` (interpolation)
 - คำสั่ง: `python3 tools/sprites/pixellab_walk.py state fight_knife` (`STATES` ใน pixellab_walk.py · edit_description ≤ 1000 ตัวอักษร · palette จากตัวเดิม) · `fetch_state` ดึงภาพ
-- ลองแล้ว 18 ต.ค.: ผืน 112x112 → **HTTP 402 "This edit costs at least 15 generations"** (มี 7) · ไม่เสียเครดิต · ราคาที่ผืน 96 (ขนาดเดิม) ยังไม่รู้ — ระบบไม่มีทางถามราคาก่อน ถ้าพอจะหักทันที
+- ลองแล้ว 18 ต.ค.: ผืน 112x112 → **HTTP 402 "This edit costs at least 15 generations"** (มี 7) · ไม่เสียเครดิต · ผืน 96 (ขนาดเดิม · kwan เลือก "2") → **HTTP 402 "at least 10 generations"** ไม่เสียเครดิต · State ตัว 4 ทิศ = ≥10 gen (ผืน 96) / ≥15 gen (ผืน 112)
 
