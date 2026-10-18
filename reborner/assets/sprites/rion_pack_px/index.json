@@ -14,6 +14,7 @@
   "17-3b": 0.2176,
   "M-walkA": 0.1239,
   "M-walkB": 0.1071,
+  "M2-walkB": 0.2081,
   "MU-walkL/0": 0.23,
   "MU-walkL/1": 0.2466,
   "MU-walkL/2": 0.2748,
@@ -485,6 +486,62 @@
     "M-walkB/0_3",
     "M-walkB/0_4",
     "M-walkB/0_5"
+   ]
+  },
+  {
+   "group": "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
+   "id": "walk_right_m2",
+   "label": "เดินขวา · master ไม่มีนาฬิกา (prompt รอบ 2 · 8 ภาพ)",
+   "frames": [
+    "walk_right_m2_0",
+    "walk_right_m2_1",
+    "walk_right_m2_2",
+    "walk_right_m2_3",
+    "walk_right_m2_4",
+    "walk_right_m2_5",
+    "walk_right_m2_6",
+    "walk_right_m2_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 66,
+   "src": [
+    "M2-walkB/0_0",
+    "M2-walkB/0_1",
+    "M2-walkB/0_2",
+    "M2-walkB/0_3",
+    "M2-walkB/1_0",
+    "M2-walkB/1_1",
+    "M2-walkB/1_2",
+    "M2-walkB/1_3"
+   ]
+  },
+  {
+   "group": "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
+   "id": "walk_left_m2",
+   "label": "เดินซ้าย · master ไม่มีนาฬิกา (พลิกจากเดินขวา)",
+   "frames": [
+    "walk_left_m2_0",
+    "walk_left_m2_1",
+    "walk_left_m2_2",
+    "walk_left_m2_3",
+    "walk_left_m2_4",
+    "walk_left_m2_5",
+    "walk_left_m2_6",
+    "walk_left_m2_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 66,
+   "src": [
+    "M2-walkB/0_0",
+    "M2-walkB/0_1",
+    "M2-walkB/0_2",
+    "M2-walkB/0_3",
+    "M2-walkB/1_0",
+    "M2-walkB/1_1",
+    "M2-walkB/1_2",
+    "M2-walkB/1_3"
    ]
   },
   {

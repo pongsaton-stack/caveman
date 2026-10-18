@@ -23,7 +23,7 @@ CANVAS_H, FEET = 112, 108
 # ตัวยืนตรงของแต่ละชีต (เฟรม, สัดส่วนของความสูงยืน) · ชีตที่ไม่มีท่ายืน ใช้ท่าวิ่งหารสัดส่วนที่วัดจาก 17-3 (วิ่ง 290 / ยืนหน้า 17-3 แถว 6)
 REF = {"14-1": ("0_0", 1), "15-6": ("0_0", 1), "15-2": ("0_0", 1), "15-3": ("0_0", 1), "15-4": ("0_0", 1), "15-5": ("0_0", 1),
 	"16-1": ("0_0", 1), "16-1b": ("2_0", 1), "16-2": ("0_0", 1), "16-3": ("0_0", 1), "16-4": ("0_0", 1),
-	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "MU-walkL": ("0_0", 1), "MU-walkR": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
+	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "MU-walkL": ("0_0", 1), "MU-walkR": ("0_0", 1), "M2-walkA": ("0_0", 1), "M2-walkB": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
 # 16-1b วาดแถววิ่งหลังเล็กกว่าแถวกระโดด (ตัวยืนหน้า 2_0) → แถว 0 ใช้อัตราของตัวเอง: วิ่งหลัง ÷ สัดส่วนวิ่ง/ยืนแบบ 17-3b
 ROW_REF = {("16-1b", "0"): "0_0",
 	**{("MU-walkL", str(r)): f"{r}_0" for r in range(4)}, **{("MU-walkR", str(r)): f"{r}_0" for r in range(3)}}   # ชีต Muse แต่ละแถวขนาดตัวไม่เท่ากัน → ย่อทีละแถว
@@ -77,6 +77,8 @@ CLIPS = [
 	(G_FIELD, "run_right", "วิ่ง · ขวา (17-3b)", R("17-3b", 0, range(6)), RUN, True, False),
 	(G_FIELD, "walk_left_m", "เดินซ้าย · แบบ master (พลิกจากภาพที่ Flow วาดหันขวา)", R("M-walkA", 0, range(6)), RUN, True, True),
 	(G_FIELD, "walk_right_m", "เดินขวา · แบบ master", R("M-walkB", 0, range(6)), RUN, True, False),
+	(G_FIELD, "walk_right_m2", "เดินขวา · master ไม่มีนาฬิกา (prompt รอบ 2 · 8 ภาพ)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_m2", "เดินซ้าย · master ไม่มีนาฬิกา (พลิกจากเดินขวา)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, True),
 	(G_FIELD, "walk_left_mu", "เดินซ้าย · prompt Muse (แถว 1–2 = 8 ภาพ)", R("MU-walkL", 0, range(4)) + R("MU-walkL", 1, range(4)), RUN, True, False),
 	(G_FIELD, "walk_left_mu_all", "เดินซ้าย · prompt Muse ทั้ง 16 ภาพ (แถว 3 หัวโตกว่าแถวอื่น)", [("MU-walkL", f"{r}_{c}") for r in range(4) for c in range(4)], RUN, True, False),
 	(G_FIELD, "walk_right_mu", "เดินขวา · prompt Muse (3+3+4 = 10 ภาพ · นาฬิกาสลับข้าง)", R("MU-walkR", 0, range(3)) + R("MU-walkR", 1, range(3)) + R("MU-walkR", 2, range(4)), RUN, True, False),
@@ -150,6 +152,31 @@ def boxes(sheet):
 	return {f"{e['row']}_{e['col']}": e["box"] for e in json.load(open(p))["frames"]}
 
 
+# ชีตที่ Flow วาดนาฬิกาสลับแขน → ลบนาฬิกา (kwan 18 ต.ค. เลือก Rion ไม่มีนาฬิกา)
+NOWATCH = {"M2-walkA", "M2-walkB"}
+
+
+def no_watch(a):
+	"""นาฬิกา = ก้อนสีน้ำเงินเล็ก (ไม่ใช่หมวก/กางเกง/เนคไท/เลนส์) ที่แตะผิว ระดับข้อมือ → ทาสีผิวทับ รวมหน้าปัดสีเขียวอ่อน"""
+	r, g, b, al = (a[..., i] for i in range(4))
+	solid = al > 127
+	skin = solid & (r > 180) & (g > 120) & (r > b + 30) & (r >= g)
+	blue = solid & (b > r + 40) & (b >= g)
+	face = solid & (g > r + 30) & (g > b)
+	lab, n = ndimage.label(blue | face)
+	h, w = a.shape[:2]
+	tone = np.median(a[skin][:, :3], 0) if skin.any() else np.array([250, 205, 170])
+	out = a.copy()
+	for i, sl in enumerate(ndimage.find_objects(lab)):
+		comp = lab == i + 1
+		cy = (sl[0].start + sl[0].stop) / 2 / h
+		touch = (ndimage.binary_dilation(comp, iterations=4) & skin).sum()
+		# ข้อมือแกว่งไปหน้าเลยเนคไท (เนคไทอยู่กลางตัว x < 0.62 ของกรอบ ชีตหันขวา)
+		if comp.sum() < 300 and .45 < cy < .72 and sl[1].start > .62 * w and touch >= 8:
+			out[ndimage.binary_dilation(comp, iterations=2) & solid & ~skin, :3] = tone
+	return out
+
+
 def shrink(a, k):
 	al = a[..., 3:] / 255
 	pre = a.copy()
@@ -185,6 +212,8 @@ def build():
 			if key not in ks:
 				ks[key] = scale_of(key)
 			a = load(sheet, f)
+			if sheet in NOWATCH:
+				a = no_watch(a)
 			for x0, y0, x1, y1 in ERASE.get((sheet, f), []):
 				a[y0:y1, x0:x1, 3] = 0
 			if flip:
