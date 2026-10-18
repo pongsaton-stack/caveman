@@ -34,8 +34,12 @@ front view, full body, standing still with arms relaxed at his sides, feet plant
 8 frames arranged in a grid of 2 rows x 4 columns, read left to right, top row first. Each character is about one third of the image height, centered in its own cell. Wide empty green space around every character: no body part, shadow or effect touches or crosses into another cell. Same character size and same head-to-body proportions in every frame, feet on the same baseline within each row.
 ```
 
-### ทิศ (DIRECTION) — ท่าด้านข้างสั่งหันขวาอย่างเดียว · หันซ้าย = Claude พลิกภาพด้วยโค้ด (ไม่มีนาฬิกาแล้ว พลิกได้อิสระ · Flow วาดหันขวาเสมอแม้สั่งซ้าย)
+### ทิศ (DIRECTION)
+แก้ 18 ต.ค. รอบ 3: เคยสรุปว่า "Flow วาดหันขวาเสมอ" = **ผิด** · ชีตเวทย์ของ Muse 4 ชีต + เดินซ้ายของ Muse หันซ้ายถูกทุกภาพ
+ที่ต่าง: ชีตของ Muse มี "สิ่งที่ตัวละครหันไปหา" อยู่ทางซ้าย (เวทย์พุ่งไปทางซ้าย) และเป็นภาพแนวตั้ง · prompt ท่าเดินของ Claude ไม่มีเป้าหมายในภาพ → Flow ใช้ทิศตั้งต้น (หันขวา)
+ในศึก Rion หันซ้ายเข้าหามอน → **ท่าในศึกสั่งหันซ้ายตรง ๆ** · ท่าเดินบนแผนที่ สั่งทิศเดียวแล้วพลิกได้ (ไม่มีนาฬิกา)
 ```
+LEFT:  Side view facing LEFT, toward an enemy off-screen on the left: nose, cap brim and toes point to the LEFT edge of the image; the backpack is on the RIGHT side of the body.
 RIGHT: Side view facing RIGHT: nose, cap brim and toes point to the RIGHT edge of the image; the backpack is on the LEFT side of the body.
 ```
 
@@ -43,5 +47,5 @@ RIGHT: Side view facing RIGHT: nose, cap brim and toes point to the RIGHT edge o
 1. แนบ `rion_master_v2.png` เป็นภาพอ้างอิงตัวละคร (ภาพ 1)
 2. ใช้บล็อก CHARACTER + STYLE ข้างบนตามตัวอักษร · เปลี่ยนเฉพาะส่วนท่า/มุม/จำนวนช่อง
 3. พื้นหลังเขียว chroma-key ตามบล็อก BACKGROUND (ตัวตัดพื้น `rion_pack_cut.py` ใช้คีย์เขียวอยู่แล้ว)
-4. ท่าด้านข้างสั่งหันขวาเท่านั้น · ไม่ต้องเจนหันซ้าย
+4. ท่าในศึกสั่งหันซ้าย (บอกว่าหันไปหาศัตรูทางซ้าย) · ท่าเดินแผนที่เจนทิศเดียวแล้วพลิก
 5. มอน/NPC/เอฟเฟกต์ใช้บล็อก STYLE เดียวกัน (พิกเซล 32-bit ขอบแข็ง ไม่ไล่สี) ให้เข้ากับ Rion
