@@ -39,10 +39,10 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
         ต่างจาก master: หัวเล็กกว่า (ไม่ chibi เท่า) · แว่นบนหมวกเห็นน้อย · กางเกงยาวกว่า · ภาพเทียบ `pixellab_draft/compare_walk_east.png/.gif` (บน PixelLab · ล่าง ชีต B)
         `page` → `pixellab_draft/px/` ผืน 112 เท้าแถว 108 (เท่า rion_pack_px) · anim_test_build.py `rion_pack_clips()` แทรก 2 คลิปท้ายกลุ่มเดินหลัก (ความเร็วดู 90 ms · ในเกม 37.5 ms · พื้นเลื่อน 48)
         ตรวจในเบราว์เซอร์: คลิปเล่นได้ เท้าลงเส้นพื้น ไม่มี error · 1200/400px ไม่เลื่อนข้าง · แถบไฟล์ขึ้น rion_pack_px/ (ป้ายผิดโฟลเดอร์ ภาพถูก)
-        **ยังไม่ได้เผยแพร่หน้า animation test** — ระบบอนุญาตบล็อกเพราะหน้าแชร์แบบใครมีลิงก์ก็ดูได้ → kwan ต้องอนุญาตก่อน แล้วรัน anim_test_build.py + publish ทับ MoNVTd…
+        หน้า animation test **Version 114** (kwan อนุญาตเผยแพร่ 18 ต.ค.) · กลุ่ม "★ Rion master v2 · เดินหลัก" มีคลิป PixelLab ต่อจากชีต B · **kwan เลือก "ดูก่อน" ยังไม่ทำทิศอื่น**
   แบบก่อนหน้า (Flow หมวกน้ำเงิน 16 ต.ค. · `rion_flow_ref.png`) = แบบเดียวกันแนวภาพคม → ใช้ประกอบได้ · ภาพ master ใหม่เป็นภาพอ้างอิงหลัก
 **งานค้างล่าสุด (อ่านก่อนเมื่อเริ่ม session ใหม่ · อัปเดต 18 ต.ค. 2026)**: ท่าเดิน Rion master v2 ชีต B แก้สมจริงแล้ว (หน้า animation test Version 113 · ยังไม่เข้าเกม) →
-  PixelLab เดินขวา **ทำแล้ว 18 ต.ค.** (เหลือ 23 gen) · ขั้นต่อไป: เผยแพร่หน้า animation test (รอ kwan อนุญาต) → kwan เทียบกับชีต B แล้วตัดสินว่าใช้ PixelLab ต่อไหม (ทิศอื่น `walk west north south` · 2 gen/ทิศ) · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
+  PixelLab เดินขวา **ทำแล้ว 18 ต.ค.** (เหลือ 23 gen · หน้า animation test Version 114) · ขั้นต่อไป: kwan เทียบกับชีต B แล้วตัดสินว่าใช้ PixelLab ต่อไหม (ทิศอื่น `walk west north south` · 2 gen/ทิศ) · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
 **ท่า/เอฟเฟกต์/อนิเมชั่นใหม่ ต้องทำให้ลองได้ในหน้า animation test ก่อนทุกครั้ง** (กฎ 3 ต.ค. 2026) แล้วค่อยเข้าเกมเมื่อ kwan ดูแล้ว — หน้า: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
 
 ## ลิงก์ที่ปักไว้
