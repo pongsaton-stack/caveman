@@ -11,6 +11,7 @@
   python3 tools/sprites/pixellab_walk.py slash/slash2 [ทิศ]  คำสั่งแบบเก่าที่ใช้ไปแล้ว (เก็บไว้รันซ้ำตามบันทึก)
   python3 tools/sprites/pixellab_walk.py fetch        ดึง ZIP ของตัวละคร แตกภาพลง OUT
   python3 tools/sprites/pixellab_walk.py vfx <ชื่อ>    เอฟเฟกต์จาก VFX_SPECS (/vfx · lite ~1 gen · พิมพ์คำสั่งเต็ม + ราคาที่ PixelLab เสนอ) → OUT/vfx/<ชื่อ>/
+  python3 tools/sprites/pixellab_walk.py state [ชื่อ]     สร้าง State จาก STATES (/create-character-state · ตัวเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ) · fetch_state [ชื่อ] ดึงภาพ
   python3 tools/sprites/pixellab_walk.py page         ท่าเดินจาก ZIP → px/ (ผืนเดียวกับ rion_pack_px) ให้หน้า animation test
 ผลทั้งหมดอยู่ใน assets/sprites/pixellab_draft/ (.gdignore · ร่าง ยังไม่เข้าเกม) · state.json เก็บ character_id / job id
 """
@@ -303,6 +304,63 @@ def fetch():
 		print(" ", n, Image.open(os.path.join(dst, n)).size)
 
 
+# ---- State (kwan 18 ต.ค. คลิป "PixelLab Character States" → เลือก "2" สร้าง State อย่างเดียวก่อน) ----
+# State = ตัวละครเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ (/create-character-state) · ใช้เป็นภาพเริ่มของท่าถัดไป (keep_first_frame) แทนภาพยืนมือเปล่า
+# ซึ่งเป็นต้นเหตุที่มีดหาย/ตัวหันเข้ากล้องในท่ายาว · ผลเป็น character_id ใหม่ (กลุ่มเดียวกับตัวเดิม) เก็บใน state.json["states"][ชื่อ]
+STATES = {
+	"fight_knife": {"seed": 27, "frame": [112, 112], "edit": (
+		"Same character, same design, same proportions and same colors; only the pose changes. "
+		"Battle-ready fighting stance: knees slightly bent, feet apart, body weight forward, both feet flat on the ground. "
+		"The FRONT hand holds ONE small kitchen knife: short dark wooden handle in the fist, short silver blade about as long as the hand, "
+		"blade pointing forward and slightly up, held at chest height in front of the body. The back hand is a loose fist near the chest. "
+		"Keep the blue cap with brass goggles, messy brown hair, white short-sleeve shirt, blue necktie, brown belt, brown backpack with two side pockets "
+		"on the back, blue shorts, white socks and brown boots exactly as in the source. "
+		"In side views the character stays in a true side view facing the same direction as the source rotation, never turned toward the camera. "
+		"No second knife, no sword, no glow, no slash trail, no motion lines, no shadow, no ground, no background, no text.")},
+}
+
+
+def make_state(name):
+	s = state()
+	if "character_id" not in s:
+		sys.exit("ยังไม่มีตัวละคร: รัน character ก่อน")
+	st = STATES[name]
+	print(f"— edit_description ({len(st['edit'])} ตัวอักษร) —\n{st['edit']}\n")
+	balance()
+	body = {"character_id": s["character_id"], "edit_description": st["edit"], "state_name": name, "seed": st["seed"],
+		"no_background": True, "use_color_palette_from_reference": True}
+	if st.get("frame"):
+		body["override_frame_size"] = {"width": st["frame"][0], "height": st["frame"][1]}
+	r = call("POST", "/create-character-state", body)
+	s.setdefault("states", {})[name] = {"response": r}
+	save_state(s)
+	print(json.dumps(r, ensure_ascii=False)[:800])
+	jid = r.get("background_job_id") or (r.get("background_job_ids") or [None])[0]
+	if jid:
+		j = wait(jid, f"state {name}")
+		s["states"][name]["status"] = j.get("status")
+		save_state(s)
+	balance()
+
+
+def fetch_state(name):
+	"""ZIP ของ State → OUT/states/<ชื่อ>/ (ภาพหมุนทุกทิศ)"""
+	s = state()
+	r = s["states"][name]["response"]
+	cid = r.get("character_id") or r.get("state_character_id") or r.get("id")
+	if not cid:
+		sys.exit("ไม่เจอ character_id ของ State ใน state.json: " + json.dumps(r, ensure_ascii=False)[:400])
+	data = call("GET", f"/characters/{cid}/zip", raw=True)
+	dst = os.path.join(OUT, "states", name)
+	os.makedirs(dst, exist_ok=True)
+	zipfile.ZipFile(io.BytesIO(data)).extractall(dst)
+	for root, _, fs in os.walk(dst):
+		for f in sorted(fs):
+			if f.endswith(".png"):
+				im = Image.open(os.path.join(root, f))
+				print(" ", os.path.relpath(os.path.join(root, f), dst), im.size, im.getbbox())
+
+
 # ---- เอฟเฟกต์ (/vfx · kwan 18 ต.ค. "vfx ก็ทำใน pixellab ได้หรือเปล่า" → ลอง lite 1 ท่า) ----
 # คำสั่งละเอียดแบบเดียวกับท่า: อะไร · สี · ขยับยังไง · จังหวะเทียบเฟรมของสไปรต์ · สิ่งที่ห้าม · สไปรต์ = เฟรมท่าที่ PixelLab เจนแล้ว (เรียงแนวนอน)
 VFX_SPECS = {
@@ -458,4 +516,6 @@ if __name__ == "__main__":
 	 "prompt": lambda: show_prompt(sys.argv[2], (sys.argv[3:] or [None])[0]),
 	 "anim": lambda: anim(sys.argv[2], sys.argv[3:] or None),
 	 "vfx_frames": lambda: vfx_frames(sys.argv[2] if len(sys.argv) > 2 else "slash2_trail"),
+	 "state": lambda: make_state(sys.argv[2] if len(sys.argv) > 2 else "fight_knife"),
+	 "fetch_state": lambda: fetch_state(sys.argv[2] if len(sys.argv) > 2 else "fight_knife"),
 	 "vfx": lambda: vfx(sys.argv[2] if len(sys.argv) > 2 else "slash2_trail")}[cmd]()

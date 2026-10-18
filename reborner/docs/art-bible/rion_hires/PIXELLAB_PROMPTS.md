@@ -43,3 +43,9 @@
 - คำสั่งละเอียดแบบเดียวกับท่า: เอฟเฟกต์อะไร · สี hex · ขยับยังไง · เกิดเฟรมไหนเทียบเฟรมท่า · ขนาด/ความหนา · สิ่งที่ห้าม (ห้ามวาดตัวละครใหม่ · ห้ามพื้น/ตัวหนังสือ)
 - ส่งเฟรมท่าที่ PixelLab เจนแล้วเป็นสไปรต์ (แถบแนวนอน) → เอฟเฟกต์ตรงจังหวะท่า · lite ≈ 1 gen ไม่มีสไปรต์ / 2 gen สไปรต์เคลื่อนไหว · pro 6–8
 - ผล: `assets/sprites/pixellab_draft/vfx/<ชื่อ>/` (gif · ชีต png+json · game pack zip) → `vfx_frames <ชื่อ>` แยก with_sprite/ + fx/ (ชั้นเอฟเฟกต์ล้วน ซ้อนบนเฟรมท่าตรงทุกพิกเซล)
+
+## State (/create-character-state · kwan 18 ต.ค. คลิป "PixelLab Character States" → เลือก "2")
+- หลักการ: สร้าง State = ตัวเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ → ใช้เป็นภาพเริ่มของท่า (`keep_first_frame` · `custom_start_frame`) แทนภาพยืนมือเปล่า · ท่ายาว = ต่อหลายช่วงด้วย `end_frame` (interpolation)
+- คำสั่ง: `python3 tools/sprites/pixellab_walk.py state fight_knife` (`STATES` ใน pixellab_walk.py · edit_description ≤ 1000 ตัวอักษร · palette จากตัวเดิม) · `fetch_state` ดึงภาพ
+- ลองแล้ว 18 ต.ค.: ผืน 112x112 → **HTTP 402 "This edit costs at least 15 generations"** (มี 7) · ไม่เสียเครดิต · ราคาที่ผืน 96 (ขนาดเดิม) ยังไม่รู้ — ระบบไม่มีทางถามราคาก่อน ถ้าพอจะหักทันที
+
