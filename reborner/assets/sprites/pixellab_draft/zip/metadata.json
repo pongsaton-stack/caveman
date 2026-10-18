@@ -35,11 +35,23 @@
               "Idle/animations/walk/east/frame_006.png",
               "Idle/animations/walk/east/frame_007.png"
             ]
+          },
+          "slash": {
+            "west": [
+              "Idle/animations/slash/west/frame_000.png",
+              "Idle/animations/slash/west/frame_001.png",
+              "Idle/animations/slash/west/frame_002.png",
+              "Idle/animations/slash/west/frame_003.png",
+              "Idle/animations/slash/west/frame_004.png",
+              "Idle/animations/slash/west/frame_005.png",
+              "Idle/animations/slash/west/frame_006.png",
+              "Idle/animations/slash/west/frame_007.png"
+            ]
           }
         }
       }
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-18T10:14:03.604814"
+  "export_date": "2026-10-18T11:33:49.648954"
 }

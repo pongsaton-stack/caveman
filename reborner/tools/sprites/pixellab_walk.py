@@ -6,6 +6,7 @@
   python3 tools/sprites/pixellab_walk.py balance      ดูยอดคงเหลือ
   python3 tools/sprites/pixellab_walk.py character    สร้างตัวละครจากภาพอ้างอิง 4 ทิศ (/create-character-v3 · ~ceil(w*h*4/65536) gen)
   python3 tools/sprites/pixellab_walk.py walk [ทิศ…]  ท่าเดินของตัวละครที่สร้างแล้ว (ค่าเริ่ม east · /characters/animations)
+  python3 tools/sprites/pixellab_walk.py slash [ทิศ…] ฟันมีด (ค่าเริ่ม west · ท่าในศึกหันซ้าย)
   python3 tools/sprites/pixellab_walk.py fetch        ดึง ZIP ของตัวละคร แตกภาพลง OUT
   python3 tools/sprites/pixellab_walk.py page         ท่าเดินจาก ZIP → px/ (ผืนเดียวกับ rion_pack_px) ให้หน้า animation test
 ผลทั้งหมดอยู่ใน assets/sprites/pixellab_draft/ (.gdignore · ร่าง ยังไม่เข้าเกม) · state.json เก็บ character_id / job id
@@ -32,6 +33,10 @@ REF_H, CANVAS = 72, 96   # ตัวสูงเท่า Rion ในเกม (
 DESC = ("chibi boy hero, blue cap with brass goggles, messy brown hair, white short-sleeve collared shirt, blue necktie, "
 	"blue knee-length shorts, brown backpack, white socks, brown boots, no wristwatch, 32-bit pixel art")
 WALK_ACTION = "walking at a steady pace, arms swinging opposite to the legs, legs pass each other mid-step, body bobs slightly"
+# ท่าในศึกหันซ้าย (RION_MASTER) · มีดทำครัวในมือหน้าทุกเฟรม (Flow ทำมีดหายกลางท่า 3 รอบติด → จุดที่ต้องทดสอบ)
+ACTIONS = {"walk": WALK_ACTION,
+	"slash": "slashing with a small kitchen knife held in the front hand in every frame: raise the knife behind the shoulder, "
+		"step forward and swing it down fast in an arc toward an enemy on the left, follow through, then recover to a ready stance"}
 
 
 def key_green(rgb):
@@ -139,19 +144,19 @@ def character():
 	balance()
 
 
-def walk(dirs):
+def walk(dirs, name="walk"):
 	s = state()
 	if "character_id" not in s:
 		sys.exit("ยังไม่มีตัวละคร: รัน character ก่อน")
 	balance()
-	r = call("POST", "/characters/animations", {"character_id": s["character_id"], "animation_name": "walk",
-		"mode": "v3", "action_description": WALK_ACTION, "frame_count": 8, "keep_first_frame": False, "directions": dirs, "seed": 18})
-	s.setdefault("walk", []).append(r)
+	r = call("POST", "/characters/animations", {"character_id": s["character_id"], "animation_name": name,
+		"mode": "v3", "action_description": ACTIONS[name], "frame_count": 8, "keep_first_frame": False, "directions": dirs, "seed": 18})
+	s.setdefault(name, []).append(r)
 	save_state(s)
 	print(json.dumps(r, ensure_ascii=False)[:800])
 	for jid in r.get("background_job_ids") or ([r["background_job_id"]] if r.get("background_job_id") else []):
-		j = wait(jid, "ท่าเดิน")
-		s.setdefault("walk_jobs", {})[jid] = j.get("status")
+		j = wait(jid, name)
+		s.setdefault(name + "_jobs", {})[jid] = j.get("status")
 		save_state(s)
 	balance()
 
@@ -203,4 +208,5 @@ def page():
 if __name__ == "__main__":
 	cmd = sys.argv[1] if len(sys.argv) > 1 else "ref"
 	{"ref": make_ref, "balance": balance, "character": character, "fetch": fetch, "page": page,
-	 "walk": lambda: walk(sys.argv[2:] or ["east"])}[cmd]()
+	 "walk": lambda: walk(sys.argv[2:] or ["east"]),
+	 "slash": lambda: walk(sys.argv[2:] or ["west"], "slash")}[cmd]()

@@ -19,5 +19,22 @@
  ],
  "walk_jobs": {
   "1e14aa3f-c3bb-42d9-b6bf-0c6f15cf3707": "completed"
+ },
+ "slash": [
+  {
+   "background_job_ids": [
+    "4d0ab50d-9387-40d0-8983-9f9a7eb1ec6a"
+   ],
+   "directions": [
+    "west"
+   ],
+   "animation_group_id": "e6f0fcad-ff1c-4238-add6-439e01ad21e7",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  }
+ ],
+ "slash_jobs": {
+  "4d0ab50d-9387-40d0-8983-9f9a7eb1ec6a": "completed"
  }
 }
