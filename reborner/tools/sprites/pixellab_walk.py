@@ -6,7 +6,9 @@
   python3 tools/sprites/pixellab_walk.py balance      ดูยอดคงเหลือ
   python3 tools/sprites/pixellab_walk.py character    สร้างตัวละครจากภาพอ้างอิง 4 ทิศ (/create-character-v3 · ~ceil(w*h*4/65536) gen)
   python3 tools/sprites/pixellab_walk.py walk [ทิศ…]  ท่าเดินของตัวละครที่สร้างแล้ว (ค่าเริ่ม east · /characters/animations)
-  python3 tools/sprites/pixellab_walk.py slash [ทิศ…] ฟันมีด (ค่าเริ่ม west · ท่าในศึกหันซ้าย)
+  python3 tools/sprites/pixellab_walk.py prompt <ท่า> [ทิศ]  พิมพ์คำสั่งเต็มก่อนเสียเครดิต (ท่าใน MOVES)
+  python3 tools/sprites/pixellab_walk.py anim <ท่า> [ทิศ…]   **ท่าใหม่ใช้คำสั่งนี้เท่านั้น** (คำสั่งละเอียด 8 ส่วน · docs/art-bible/rion_hires/PIXELLAB_PROMPTS.md)
+  python3 tools/sprites/pixellab_walk.py slash/slash2 [ทิศ]  คำสั่งแบบเก่าที่ใช้ไปแล้ว (เก็บไว้รันซ้ำตามบันทึก)
   python3 tools/sprites/pixellab_walk.py fetch        ดึง ZIP ของตัวละคร แตกภาพลง OUT
   python3 tools/sprites/pixellab_walk.py page         ท่าเดินจาก ZIP → px/ (ผืนเดียวกับ rion_pack_px) ให้หน้า animation test
 ผลทั้งหมดอยู่ใน assets/sprites/pixellab_draft/ (.gdignore · ร่าง ยังไม่เข้าเกม) · state.json เก็บ character_id / job id
@@ -33,8 +35,9 @@ API = "https://api.pixellab.ai/v2"
 REF_H, CANVAS = 72, 96   # ตัวสูงเท่า Rion ในเกม (rion_pack_px PX_H) · ผืนจัตุรัส เท้าชิดล่างเว้น 4
 DESC = ("chibi boy hero, blue cap with brass goggles, messy brown hair, white short-sleeve collared shirt, blue necktie, "
 	"blue knee-length shorts, brown backpack, white socks, brown boots, no wristwatch, 32-bit pixel art")
+# ---- คำสั่งที่ใช้ไปแล้ว (เก็บไว้ให้รันซ้ำได้ตรงตามบันทึก · ห้ามใช้แบบนี้กับท่าใหม่) ----
+# kwan 18 ต.ค.: "คุณต้องใส่คำสั่งให้ละเอียดที่สุด" → ท่าใหม่ใช้ MOVES + build_action() (กฎใน docs/art-bible/rion_hires/PIXELLAB_PROMPTS.md)
 WALK_ACTION = "walking at a steady pace, arms swinging opposite to the legs, legs pass each other mid-step, body bobs slightly"
-# ท่าในศึกหันซ้าย (RION_MASTER) · มีดทำครัวในมือหน้าทุกเฟรม (Flow ทำมีดหายกลางท่า 3 รอบติด → จุดที่ต้องทดสอบ)
 SEEDS = {"slash2": 27}
 ACTIONS = {"walk": WALK_ACTION,
 	"slash": "slashing with a small kitchen knife held in the front hand in every frame: raise the knife behind the shoulder, "
@@ -44,6 +47,93 @@ ACTIONS = {"walk": WALK_ACTION,
 		"backpack on the right. A short small kitchen knife (blade about the length of the hand) stays in the front hand in every frame. "
 		"Raise the knife up behind the shoulder, step forward with the front foot and slash it down in a curved arc in front of the body "
 		"toward an enemy on the left, follow through low, then return to a ready stance still facing left"}
+
+# ---- คำสั่งละเอียด 8 ส่วน (PIXELLAB_PROMPTS.md) ----
+MASTER_MD = os.path.join(ROOT, "docs/art-bible/rion_hires/RION_MASTER.md")
+DIR_BLOCK = {"west": "LEFT", "east": "RIGHT", "north": "BACK"}   # south = หน้าตรง (บล็อก "ภาพหน้าตรง" ไม่ใช้ เพราะบอกให้ยืนนิ่ง)
+# ส่วนที่ต้องคงที่ทุกเฟรม (ข้อ 5) และสิ่งที่ห้ามทุกท่า (ข้อ 6) · ท่าเพิ่มของตัวเองได้ใน MOVES[ท่า]["not"]
+KEEP = ("Keep identical in every frame: the whole cap is blue with the brass-gold goggles resting on its front, the brown backpack stays on the back, "
+	"the blue necktie, the same head size and body height, the same proportions as the reference. Bare wrists, no wristwatch.")
+NOT_ALWAYS = ["turning the body toward the camera unless this move says so", "a wristwatch", "extra characters", "ground, shadow, text or background",
+	"large glowing effects, energy trails or speed lines (effects are added later in code)"]
+MOMENTUM = ("Follow momentum: wind up while still moving, land the hit at the moment the weight comes down, "
+	"let the follow-through carry forward, then settle. Never freeze in a held wind-up pose.")
+# ท่า: dir = ทิศตั้งต้น · held = ของในมือ (None = มือว่าง) · beats = จังหวะ (≈ จำนวนเฟรม) · attack = ใส่หลักโมเมนตัม · not = ห้ามเพิ่ม · frames · seed
+MOVES = {
+	"walk": {"dir": "east", "held": None, "attack": False, "frames": 8, "seed": 18,
+		"beats": [
+			"contact: front heel touches the ground, back leg straight behind, arms swing opposite to the legs",
+			"down: weight drops onto the front leg, knee bends slightly, body lowest",
+			"passing: back leg swings forward past the standing leg, body rises, arms near the sides",
+			"up: pushing off the toes of the standing leg, body highest",
+			"contact with the other foot forward, arms swapped",
+			"down on the other leg",
+			"passing with the other leg",
+			"up, ready to loop back to the first frame"],
+		"not": ["both feet off the ground", "sliding feet"]},
+	"slash": {"dir": "west", "attack": True, "frames": 8, "seed": 27,
+		"held": "a short small kitchen knife, blade about the length of the hand, held by the handle in the front hand (the hand nearest the viewer)",
+		"beats": [
+			"ready stance facing left, knees slightly bent, knife held low in front",
+			"step forward with the front foot while raising the knife back over the shoulder, blade pointing up and back",
+			"wind-up at its peak behind the shoulder, body twisting back, weight on the back foot",
+			"swing begins: arm comes forward over the head toward the left",
+			"the knife slashes down in a curved arc in front of the body, front foot lands, weight shifts forward",
+			"follow-through: knife low near the front knee, body leaning forward",
+			"recover: pull the knife back up toward the chest",
+			"back to the ready stance facing left, same as the first frame"],
+		"not": ["the knife disappearing in any frame", "a second knife", "a long sword or dagger", "the knife sticking straight up above the cap"]},
+}
+
+
+def master_blocks():
+	"""อ่านบล็อกจาก RION_MASTER.md ตามตัวอักษร: CHARACTER · STYLE · LEFT/RIGHT/BACK"""
+	t = open(MASTER_MD, encoding="utf-8").read()
+	def code_after(head):
+		i = t.index(head)
+		a = t.index("```", i) + 3
+		return " ".join(t[a:t.index("```", a)].split())
+	out = {"CHARACTER": code_after("### ตัวละคร (CHARACTER)"), "STYLE": code_after("### สไตล์ (STYLE)")}
+	for line in t.splitlines():
+		for k in ("LEFT", "RIGHT", "BACK"):
+			if line.startswith(k + ":"):
+				out[k] = line[len(k) + 1:].strip()
+	return out
+
+
+def build_action(move, d):
+	"""ประกอบ action_description 8 ส่วน · ส่วน 7–8 (CHARACTER + STYLE) ส่งเป็น description แยก (ดู build_description)"""
+	m, mb = MOVES[move], master_blocks()
+	parts = []
+	if d in DIR_BLOCK:
+		parts.append(mb[DIR_BLOCK[d]] + " The body keeps this exact facing in every frame and never turns toward the camera.")
+	else:
+		parts.append("Front view facing the viewer in every frame.")
+	if m["held"]:
+		parts.append("Held item: " + m["held"] + ". It stays in that same hand in every frame, never disappears, and there is never a second one.")
+	else:
+		parts.append("Both hands are empty in every frame.")
+	parts.append(f"The animation is {m['frames']} frames, one beat per frame: "
+		+ " ".join(f"{i + 1}) {b}." for i, b in enumerate(m["beats"])))
+	if m["attack"]:
+		parts.append(MOMENTUM)
+	parts.append(KEEP)
+	parts.append("Do NOT draw: " + "; ".join(NOT_ALWAYS + m.get("not", [])) + ".")
+	return " ".join(parts)
+
+
+def build_description():
+	mb = master_blocks()
+	return mb["CHARACTER"] + " " + mb["STYLE"]
+
+
+def show_prompt(move, d=None):
+	d = d or MOVES[move]["dir"]
+	a, desc = build_action(move, d), build_description()
+	print(f"ท่า {move} · ทิศ {d} · seed {MOVES[move]['seed']} · เฟรม {MOVES[move]['frames']}")
+	print(f"\n[description {len(desc)} ตัวอักษร]\n{desc}\n\n[action_description {len(a)} ตัวอักษร]\n{a}")
+	if len(desc) > 2000:
+		sys.exit("description เกิน 2000 ตัวอักษร (ขีดจำกัด API)")
 
 
 def key_green(rgb):
@@ -168,6 +258,29 @@ def walk(dirs, name="walk"):
 	balance()
 
 
+def anim(move, dirs=None):
+	"""ท่าใหม่ทุกท่าใช้ทางนี้: คำสั่ง 8 ส่วนจาก MOVES · description = CHARACTER + STYLE ของ RION_MASTER ตามตัวอักษร"""
+	s = state()
+	if "character_id" not in s:
+		sys.exit("ยังไม่มีตัวละคร: รัน character ก่อน")
+	m = MOVES[move]
+	dirs = dirs or [m["dir"]]
+	balance()
+	for d in dirs:
+		show_prompt(move, d)
+		body = {"character_id": s["character_id"], "animation_name": f"{move}_v", "mode": "v3",
+			"description": build_description(), "action_description": build_action(move, d),
+			"frame_count": m["frames"], "keep_first_frame": False, "directions": [d], "seed": m["seed"]}
+		r = call("POST", "/characters/animations", body)
+		s.setdefault("anim", []).append({"move": move, "dir": d, "seed": m["seed"], "response": r})
+		save_state(s)
+		for jid in r.get("background_job_ids") or ([r["background_job_id"]] if r.get("background_job_id") else []):
+			j = wait(jid, f"{move} {d}")
+			s.setdefault("anim_jobs", {})[jid] = j.get("status")
+			save_state(s)
+	balance()
+
+
 def fetch():
 	s = state()
 	data = call("GET", f"/characters/{s['character_id']}/zip", raw=True)
@@ -233,4 +346,6 @@ if __name__ == "__main__":
 	{"ref": make_ref, "balance": balance, "character": character, "fetch": fetch, "page": page,
 	 "walk": lambda: walk(sys.argv[2:] or ["east"]),
 	 "slash": lambda: walk(sys.argv[2:] or ["west"], "slash"),
-	 "slash2": lambda: walk(sys.argv[2:] or ["west"], "slash2")}[cmd]()
+	 "slash2": lambda: walk(sys.argv[2:] or ["west"], "slash2"),
+	 "prompt": lambda: show_prompt(sys.argv[2], (sys.argv[3:] or [None])[0]),
+	 "anim": lambda: anim(sys.argv[2], sys.argv[3:] or None)}[cmd]()
