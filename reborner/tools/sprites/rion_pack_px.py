@@ -23,9 +23,10 @@ CANVAS_H, FEET = 112, 108
 # ตัวยืนตรงของแต่ละชีต (เฟรม, สัดส่วนของความสูงยืน) · ชีตที่ไม่มีท่ายืน ใช้ท่าวิ่งหารสัดส่วนที่วัดจาก 17-3 (วิ่ง 290 / ยืนหน้า 17-3 แถว 6)
 REF = {"14-1": ("0_0", 1), "15-6": ("0_0", 1), "15-2": ("0_0", 1), "15-3": ("0_0", 1), "15-4": ("0_0", 1), "15-5": ("0_0", 1),
 	"16-1": ("0_0", 1), "16-1b": ("2_0", 1), "16-2": ("0_0", 1), "16-3": ("0_0", 1), "16-4": ("0_0", 1),
-	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
+	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "MU-walkL": ("0_0", 1), "MU-walkR": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
 # 16-1b วาดแถววิ่งหลังเล็กกว่าแถวกระโดด (ตัวยืนหน้า 2_0) → แถว 0 ใช้อัตราของตัวเอง: วิ่งหลัง ÷ สัดส่วนวิ่ง/ยืนแบบ 17-3b
-ROW_REF = {("16-1b", "0"): "0_0"}
+ROW_REF = {("16-1b", "0"): "0_0",
+	**{("MU-walkL", str(r)): f"{r}_0" for r in range(4)}, **{("MU-walkR", str(r)): f"{r}_0" for r in range(3)}}   # ชีต Muse แต่ละแถวขนาดตัวไม่เท่ากัน → ย่อทีละแถว
 # ไฟล์ fix/ ใช้อัตราย่อของชีตที่เป็นฐาน
 # เศษของเฟรมข้างเคียงที่ติดมาในกรอบ (ตัวในชีตชิดกัน) · (x0, y0, x1, y1) พิกัดภาพที่ตัดแล้วใน rion_pack_draft · วัดจากภาพตาราง 50 จุด
 ERASE = {("M-walkB", "0_0"): [(238, 330, 252, 420)], ("M-walkB", "0_1"): [(0, 550, 28, 620)], ("M-walkB", "0_3"): [(0, 50, 30, 140)],
@@ -76,6 +77,9 @@ CLIPS = [
 	(G_FIELD, "run_right", "วิ่ง · ขวา (17-3b)", R("17-3b", 0, range(6)), RUN, True, False),
 	(G_FIELD, "walk_left_m", "เดินซ้าย · แบบ master (พลิกจากภาพที่ Flow วาดหันขวา)", R("M-walkA", 0, range(6)), RUN, True, True),
 	(G_FIELD, "walk_right_m", "เดินขวา · แบบ master", R("M-walkB", 0, range(6)), RUN, True, False),
+	(G_FIELD, "walk_left_mu", "เดินซ้าย · prompt Muse (แถว 1–2 = 8 ภาพ)", R("MU-walkL", 0, range(4)) + R("MU-walkL", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_mu_all", "เดินซ้าย · prompt Muse ทั้ง 16 ภาพ (แถว 3 หัวโตกว่าแถวอื่น)", [("MU-walkL", f"{r}_{c}") for r in range(4) for c in range(4)], RUN, True, False),
+	(G_FIELD, "walk_right_mu", "เดินขวา · prompt Muse (3+3+4 = 10 ภาพ · นาฬิกาสลับข้าง)", R("MU-walkR", 0, range(3)) + R("MU-walkR", 1, range(3)) + R("MU-walkR", 2, range(4)), RUN, True, False),
 	(G_FIELD, "jump", "กระโดด (16-1b)", R("16-1b", 2, range(4)) + R("16-1b", 3, range(2)), RUN, False, False),
 	(G_GESTURE, "wave", "โบกมือ", R("16-2", 0, range(5)), EMO, False, False),
 	(G_GESTURE, "nod", "พยักหน้า", R("16-2", 1, range(6)), EMO, False, False),
@@ -128,6 +132,9 @@ def run_frac():   # วิ่ง/ยืน วัดจาก 17-3 (มีทั
 def scale_of(sheet):
 	if "/" in sheet:   # sheet/row จาก ROW_REF
 		s, r = sheet.split("/")
+		if s.startswith("MU-"):   # ชีต Muse: ภาพที่สูงสุดของแถว (ท่ายืดตัวตอนเท้าผ่านกัน) = สูงเท่าตัวยืน
+			hs = [height(load(s, f[:-4])) for f in os.listdir(os.path.join(SRC, s)) if f.startswith(r + "_") and f.endswith(".png")]
+			return PX_H / max(hs)
 		return PX_H * run_frac() / height(load(s, ROW_REF[(s, r)]))
 	sheet = FIX_BASE.get(sheet, sheet)
 	if sheet == "17-3b":   # ไม่มีท่ายืน
