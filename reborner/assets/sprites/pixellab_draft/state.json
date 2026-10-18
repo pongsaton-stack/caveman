@@ -105,5 +105,45 @@
    },
    "conversation": "2NzsOyFsaXJ2a5VXik333g.72dd58a53f451dfc102b80b49b8350778d936a3684c4b9442fcb05847962ff80"
   }
- ]
+ ],
+ "anim": [
+  {
+   "move": "bl15",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "fbdfa0a7-4f8c-4977-8f84-14b5d0910761"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5842b53d-5ba8-4ebc-a67b-e8de4d844ce0",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bt5",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "1d8cc9bc-ab18-42dd-858d-4127402b7cf2"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "8e192c62-2f72-49cf-b459-af3afabb93ed",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  }
+ ],
+ "anim_jobs": {
+  "fbdfa0a7-4f8c-4977-8f84-14b5d0910761": "completed",
+  "1d8cc9bc-ab18-42dd-858d-4127402b7cf2": "completed"
+ }
 }

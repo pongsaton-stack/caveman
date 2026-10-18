@@ -24,6 +24,30 @@
           "north": "Idle/rotations/north.png"
         },
         "animations": {
+          "bl15_v": {
+            "west": [
+              "Idle/animations/bl15_v/west/frame_000.png",
+              "Idle/animations/bl15_v/west/frame_001.png",
+              "Idle/animations/bl15_v/west/frame_002.png",
+              "Idle/animations/bl15_v/west/frame_003.png",
+              "Idle/animations/bl15_v/west/frame_004.png",
+              "Idle/animations/bl15_v/west/frame_005.png",
+              "Idle/animations/bl15_v/west/frame_006.png",
+              "Idle/animations/bl15_v/west/frame_007.png"
+            ]
+          },
+          "bt5_v": {
+            "west": [
+              "Idle/animations/bt5_v/west/frame_000.png",
+              "Idle/animations/bt5_v/west/frame_001.png",
+              "Idle/animations/bt5_v/west/frame_002.png",
+              "Idle/animations/bt5_v/west/frame_003.png",
+              "Idle/animations/bt5_v/west/frame_004.png",
+              "Idle/animations/bt5_v/west/frame_005.png",
+              "Idle/animations/bt5_v/west/frame_006.png",
+              "Idle/animations/bt5_v/west/frame_007.png"
+            ]
+          },
           "slash2": {
             "west": [
               "Idle/animations/slash2/west/frame_000.png",
@@ -65,5 +89,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-18T11:39:58.992303"
+  "export_date": "2026-10-18T14:21:54.586538"
 }
