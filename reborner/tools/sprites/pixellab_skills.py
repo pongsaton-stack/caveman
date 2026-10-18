@@ -49,7 +49,7 @@ BEATS = {
 	"bl13": B("ready stance facing left; drop very low, knees deeply bent; cross-step forward low, legs crossing; second low step, body close to the ground; short quick slash forward; step back low; rise up slightly; ready stance"),
 	"bl14": B("ready stance facing left; quick step diagonally forward and slightly up-screen; step around, body still facing left; slash forward at a far target; step back diagonally; return to the original spot; settle; ready stance"),
 	"bl6": B("ready stance facing left, knife in the front hand, back hand open as a guard; raise the knife up to the right; slash diagonally down to the left; raise the knife up to the left; slash diagonally down to the right, crossing the first cut; follow-through low; pull back; ready stance"),
-	"bl15": B("guard stance facing left, knife held across the body, knees bent, waiting; still waiting, eyes sharp; flinch as if an attack comes from the left, knife meeting it; deflect the blow to the side with the knife; immediately cut back to the left; follow-through; step back; guard stance again"),
+	"bl15": B("side view facing left, knees bent low, box cutter held close in front of the chest, blade pointing left, waiting; same side view, waiting, eyes on the left; same side view, the box cutter flicks up to the left to knock an incoming hit aside; same side view, cutter arm pushed up and out to the left after the parry; same side view, step forward with the front foot and slash down to the left; same side view, follow-through low near the front knee; same side view, pull the cutter back to the chest; side view facing left, knees bent, cutter in front of the chest, same as the first frame"),
 	"bl16": B("ready stance facing left; crouch, gathering strength; dash forward, body blurring low; first slash to the left high; turn and slash back low; leap up and slash downward; land and slash horizontally; spin and slash diagonally; fifth slash, the strongest, straight down; skid to a stop with the knife low; stand up slowly; flick the knife; bring the knife to the chest; hold still; lower the knife; ready stance"),
 	# ---------------- ทุบ ----------------
 	"bt0": B("ready stance facing left, hammer held low; raise the hammer above the head; peak of the raise, body leaning back slightly; swing straight down to the left; hammer hits at waist height in front, front knee bent; recoil bounce; lift back; ready stance"),
@@ -67,7 +67,7 @@ BEATS = {
 	"bt13": B("ready stance facing left, pan held out; push the pan forward as if catching an enemy weapon; twist the pan to lock it; hold the lock, leaning in; jab forward with the pan handle end; push away; step back; ready stance"),
 	"bt14": B("ready stance facing left, pan held close along the forearm; step deep forward, body low, slipping past the front; drive the elbow and pan forward at a far target; impact; withdraw; step back; settle; ready stance"),
 	"bt6": B("ready stance facing left; raise the pan high; smash it down hard at foot level in front; impact on the ground, body bent; press down; lift the pan; step back; ready stance"),
-	"bt15": B("guard stance facing left, pan held diagonally in front of the body, waiting; still waiting; react as an attack comes, pan blocking it; deflect it upward with the pan; swing the pan back down hard to the left; impact; recover; guard stance again"),
+	"bt15": B("side view facing left, knees bent low, frying pan held up in front of the chest like a small shield, waiting; same side view, waiting, eyes on the left; same side view, the pan flicks up to the left to knock an incoming hit aside; same side view, pan pushed up and out to the left after the parry; same side view, step forward and swing the pan down to the left; same side view, pan low after the hit; same side view, pull the pan back to the chest; side view facing left, pan in front of the chest, same as the first frame"),
 	"bt16": B("ready stance facing left, hammer raised; smash to the left side; lift; smash to the right side; lift high with both hands; jump slightly; smash straight down with full force; ground impact, knees bent deep; press the hammer down; hold; lift; step back; settle; ready stance; small breath; ready stance"),
 	# ---------------- แทง ----------------
 	"pt0": B("ready stance facing left, screwdriver held like a dagger at the waist; step forward; stab straight forward at chest height; arm fully extended; pull back; step back; ready stance; small breath"),
@@ -85,7 +85,7 @@ BEATS = {
 	"pt13": B("ready stance facing left; fake a high stab, fork raised; stop halfway; drop and stab low instead; fork extended low; pull back; rise; ready stance"),
 	"pt14": B("ready stance facing left; step in a curve diagonally forward; circle around, still facing left; stab forward at a far target; pull back; step back along the curve; settle; ready stance"),
 	"pt6": B("ready stance facing left; stab; pull; stab; pull; stab; pull; stab hardest; recover; small step back; ready stance; small breath; ready stance"),
-	"pt15": B("guard stance facing left, fork pointed at the enemy, waiting; still waiting; small parry flick to the side as an attack comes; parry completes; immediately stab straight forward; arm fully extended; pull back; guard stance"),
+	"pt15": B("side view facing left, knees bent low, fork held forward at chest height pointing left, waiting; same side view, waiting, eyes on the left; same side view, small flick of the fork to the left side to push an incoming hit aside; same side view, fork pushed out to the side after the parry; same side view, lunge forward and stab straight to the left; same side view, arm fully extended; same side view, pull the fork back; side view facing left, fork forward at chest height, same as the first frame"),
 	"pt16": B("ready stance facing left, spear held with both hands; crouch; dash forward and stab; pass through; turn and dash back stabbing; dash forward again stabbing; turn and dash back once more; final huge thrust forward; hold the thrust; pull back; skid to a stop; settle; spear upright; lower the spear; small breath; ready stance"),
 	# ---------------- ยิง ----------------
 	"rg0": B("ready stance facing left, bow held low; raise the bow, nock an arrow; draw quickly; release, the string snaps forward; small recoil; lower the bow; ready stance; small breath"),
@@ -103,7 +103,7 @@ BEATS = {
 	"rg13": B("ready stance facing left; quick flick from the hip, firing the water pistol without raising it; recoil small; snap back; ready stance; tiny bounce; ready stance; breath"),
 	"rg14": B("ready stance facing left; swing the arm from low to high, lobbing the shot upward in an arc; arm high after the throw; watch the arc; lower the arm; settle; ready stance; breath"),
 	"rg6": B("ready stance facing left; raise the water pistol with both hands; aim perfectly still; hold; fire one precise shot; recoil; lower; ready stance"),
-	"rg15": B("guard stance facing left, water pistol held low and ready; waiting; react as an enemy moves; snap the pistol up and fire instantly; recoil; aim held; lower; guard stance"),
+	"rg15": B("side view facing left, knees bent low, water pistol held low in front pointing at the ground on the left, waiting; same side view, waiting, eyes on the left; same side view, snap the pistol up to point left at chest height; same side view, fire, small recoil; same side view, fire again; same side view, hold the aim to the left; same side view, lower the pistol; side view facing left, pistol held low, same as the first frame"),
 	"rg16": B("ready stance facing left, bow ready; nock and shoot; turn slightly and shoot; turn back and shoot; jump and shoot in the air; land and shoot; draw the last arrow fully; hold; release the final shot; recoil; lower the bow; turn; settle; small breath; ready stance; ready stance"),
 	# ---------------- กล (อุปกรณ์/กระสุนทำด้วยโค้ด) ----------------
 	"dv0": B("ready stance facing left, remote held in the front hand; raise the remote and point it at the enemy; press the button firmly; hold the pose pointing; lower the remote; ready stance; small breath; ready stance"),
@@ -121,7 +121,7 @@ BEATS = {
 	"dv13": B("ready stance facing left; crouch and lay something on the ground; step back; yank the hand back hard as if pulling a rope; hold the pull; release; ready stance; breath"),
 	"dv14": B("ready stance facing left; swing a hook on a rope over the head; throw it forward high over the front; pull the rope back hard with both hands; lean back pulling; release; ready stance; breath"),
 	"dv6": B("ready stance facing left; point the pliers at the enemy; hold pointing; nod; lower; ready stance; breath; ready stance"),
-	"dv15": B("crouch facing left pressing something into the ground; stand up, guard stance waiting; waiting; react as the enemy comes; thrust the pliers forward; hold; pull back; guard stance"),
+	"dv15": B("side view facing left, crouching, pressing the pliers down onto the ground in front; same side view, stand up with knees bent, pliers held in front of the chest, waiting; same side view, waiting, eyes on the left; same side view, jerk the pliers upward to the left as if springing a trap; same side view, thrust the pliers forward to the left; same side view, arm extended; same side view, pull the pliers back; side view facing left, knees bent, pliers in front of the chest"),
 	"dv16": B("ready stance facing left, remote ready; crouch and assemble something in front; stand and press the remote; point high; press again; point high again; watch; nod; lower; step back; settle; breath; ready stance; ready stance; ready stance; ready stance"),
 	# ---------------- มือเปล่า ----------------
 	"fs0": B("boxing stance facing left, gloves up; quick jab forward with the front hand; arm extended; snap back; guard; tiny bounce; boxing stance; breath"),
@@ -139,9 +139,14 @@ BEATS = {
 	"fs13": B("boxing stance facing left; slip the head to the side dodging; come back and jab; arm extended; snap back; guard; bounce; boxing stance"),
 	"fs14": B("stance facing left; grab forward with both hands at wrist height; twist the grabbed arm; hold the lock, leaning; push down; release; step back; stance"),
 	"fs6": B("stance facing left; tiny lean forward; extremely fast punch; fist extended; snap back; stance; bounce; stance"),
-	"fs15": B("relaxed stance facing left, hands open in front, waiting; waiting; take the incoming push, turning the body with it; guide it around in a circle; throw it back to the left with both hands; arms extended; return; relaxed stance"),
+	"fs15": B("side view facing left, knees bent, both open hands raised in front at chest height, waiting; same side view, waiting, eyes on the left; same side view, both hands catch an incoming push and sweep it down and back to the right; same side view, body turns slightly with the motion but still faces left; same side view, both hands push forward hard to the left; same side view, arms fully extended to the left; same side view, pull the hands back; side view facing left, hands raised in front, same as the first frame"),
 	"fs16": B("muay thai stance facing left; jab; cross; front knee strike; elbow strike; roundhouse kick; high knee jump strike; land; elbow down; push kick; guard; bounce; stance; breath; stance; stance"),
 }
+
+
+# ท่าสวน: bl15 รอบแรก (18 ต.ค.) ท่ายืนรอทำให้ตัวหันเข้ากล้อง 3 เฟรม + วาดวงแสงใหญ่ → ทุกจังหวะขึ้นต้น "same side view" · ห้ามแบบระบุของ
+COUNTER_NOT = ["a front-facing guard pose", "the chest or face turned toward the viewer", "a glowing ring, circle or shield around the body",
+	"speed lines, wind lines or energy streaks", "a defensive stance with both arms crossed in front of the face"]
 
 
 def frames_for(n):
@@ -161,6 +166,7 @@ def skill_moves(rows):
 			beats = beats + [beats[-1]]
 		out[r["tech_id"]] = {"dir": "west", "attack": True, "frames": len(beats), "seed": 27,
 			"held": REP[(r["school"], br)], "beats": beats,
-			"not": ["the held item disappearing in any frame", "a second copy of the held item", "a sword"],
+			"not": ["the held item disappearing in any frame", "a second copy of the held item", "a sword"]
+				+ (COUNTER_NOT if r.get("effect") == "counter" else []),
 			"name": r["name_th"]}
 	return out

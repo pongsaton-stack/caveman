@@ -277,7 +277,7 @@ def anim(move, dirs=None):
 	balance()
 	for d in dirs:
 		show_prompt(move, d)
-		body = {"character_id": s["character_id"], "animation_name": f"{move}_v", "mode": "v3",
+		body = {"character_id": s["character_id"], "animation_name": f"{move}_v" + os.environ.get("PL_SUFFIX", ""), "mode": "v3",
 			"description": build_description(), "action_description": build_action(move, d),
 			"frame_count": m["frames"], "keep_first_frame": False, "directions": [d], "seed": m["seed"]}
 		r = call("POST", "/characters/animations", body)
