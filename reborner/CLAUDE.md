@@ -53,12 +53,16 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 **คำสั่ง PixelLab ต้องละเอียดที่สุด (kwan 18 ต.ค. 2026 "คุณต้องใส่คำสั่งให้ละเอียดที่สุด บันทึกไว้ด้วย")**: Claude เขียนคำสั่ง PixelLab เอง (ต่างจาก Flow ที่ Muse เขียน) · ห้ามส่งคำสั่งสั้นประโยคเดียว ·
   ทุกท่าต้องมีครบ 8 ส่วน: ทิศล็อกตลอดท่า · ของในมือ (ขนาด/มือไหน/ทุกเฟรม) · ลำดับท่าทีละจังหวะ ≈ จำนวนเฟรม · หลักโมเมนตัม (ท่าโจมตี) · ส่วนที่คงที่ทุกเฟรม · สิ่งที่ห้าม · CHARACTER + STYLE ของ RION_MASTER ตามตัวอักษร ·
   ทำผ่าน `MOVES` + `python3 tools/sprites/pixellab_walk.py prompt <ท่า>` (ดูคำสั่งเต็มก่อนเสียเครดิต) แล้ว `anim <ท่า> [ทิศ]` · กฎ ขั้นตอน และตารางผลที่ลองแล้วอยู่ใน `docs/art-bible/rion_hires/PIXELLAB_PROMPTS.md` (เพิ่มแถวทุกครั้งที่ลอง)
+**หน้า "pixellab animation test" = มาสเตอร์อนิเมชันของเกม (kwan 18 ต.ค. 2026 "แยกเวปเทสใหม่ ที่มีแต่ที่เจนจาก pixellab … เวปนี้ต่อไปจะเป็นมาสเตอร์ของอะนิเมชั่นทั้งหมดของเกม")**: https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y
+  ใส่**เฉพาะภาพที่ PixelLab เจน** (ห้าม Flow/GPT/วาดด้วยโค้ด) · แหล่งความจริง `docs/art-bible/pixellab_test/catalog.json` (หมวด ตัวเอก/คู่หู/มอน/บอส/NPC/เอฟเฟกต์/ของในฉาก → ตัวละคร → ท่า → ทิศ · status ผ่าน/ไม่ผ่าน/ร่าง/ในเกม · seed · gen · ms ดู/ในเกม · mirror = ทิศที่พลิกด้วยโค้ด)
+  สร้าง `python3 tools/web/pixellab_test_build.py <out.html>` (เทมเพลต `tools/web/pixellab_test.tpl.html` · prompt อ่านจาก pixellab_walk.py) แล้วเผยแพร่ทับลิงก์ · ฉากหลังเลือกได้ 2 ฉาก `docs/art-bible/pixellab_test/bg_{ash_village,flooded_ruins}.jpg` (เส้นพื้นปรับได้ · จำในเบราว์เซอร์)
+  Version 1: Rion ยืน 4 ทิศ (ร่าง) · เดิน ขวา+ซ้ายพลิก (ผ่าน) · ฟันมีดรอบ 2 ซ้าย+ขวาพลิก (ผ่าน) · ฟันมีดรอบ 1 (ไม่ผ่าน เก็บเป็นบันทึก) · **ท่า PixelLab ใหม่ทุกท่า: fetch แล้วเพิ่มแถวใน catalog.json + สร้างหน้าใหม่**
 **ท่า/เอฟเฟกต์/อนิเมชั่นใหม่ ต้องทำให้ลองได้ในหน้า animation test ก่อนทุกครั้ง** (กฎ 3 ต.ค. 2026) แล้วค่อยเข้าเกมเมื่อ kwan ดูแล้ว — หน้า: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
 
 ## ลิงก์ที่ปักไว้
 - อัปภาพ Monster Compendium (kwan อัปเอง): https://github.com/pongsaton-stack/caveman/upload/claude/zealous-goldberg-50frc1/reborner/docs/art-bible/compendium
   เลือก "Commit directly to the claude/zealous-goldberg-50frc1 branch" · ไฟล์ละ ≤25MB · ครั้งละ ≤100 ไฟล์
-- เล่นเกมบนเว็บ: https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan · หน้า animation test: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
+- เล่นเกมบนเว็บ: https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan · หน้า animation test: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw · **pixellab animation test (มาสเตอร์)**: https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) และ **บทเรียน 30 ข้อ (หมวด 11) อ่านก่อนแก้อะไรก็ตาม**
