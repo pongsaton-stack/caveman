@@ -187,7 +187,15 @@ static func why_not_sell_weapon(ps: PlayerState, id: String) -> String:
 		return "ชิ้นสุดท้าย"
 	if str(PlayerState.weapon_row(id).get("price", "")) == "":
 		return "ร้านไม่รับ"
-	return ""
+	# อาวุธที่แรงสุดที่มีอยู่ขายไม่ได้ — หีบไม่เกิดใหม่ ขายไม้เบสบอลทิ้งในภูมิภาค 1 = ประตูบอสปิดถาวร (GDD 11.29)
+	var base := _base_of(id)
+	for other in ps.weapons_owned:
+		if other != id and _base_of(other) >= base:
+			return ""
+	return "ดีที่สุดที่มี"
+
+static func _base_of(id: String) -> int:
+	return int(str(PlayerState.weapon_row(id).get("weapon_base", "0")).to_int())
 
 static func weapon_resale(id: String, ec: int) -> int:
 	return resale_price(float(PlayerState.weapon_row(id).get("price", 0)), ec)

@@ -331,6 +331,37 @@ function vTeam() {
 			${t.slots.map(s => `<tr><td>${esc(s.ec)}</td><td class="num">${esc(s.monster_slots)}</td><td>${esc(s.note)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
+// ── เศรษฐกิจ ──
+const econKey = k => +((D.economy.keys.find(r => r.key === k) || {}).value || 1);
+const ecMult = ec => D.economy.inflation.reduce((m, r) => ec >= +r.ec ? +r.price_mult : m, 1);
+function vEconomy() {
+	const e = D.economy, ec = +(S.f.ec ?? 0), pm = S.f.pm != null ? +S.f.pm : econKey('PRICE_MULT'), mult = pm * ecMult(ec), sr = econKey('SELL_RATIO');
+	const stat = s => s === 'เสนอ' ? chip('ตัวเลขเสนอ', 'prop') : s === 'ยืนยัน' ? chip('ยืนยันแล้ว', 'good') : chip(s || '', 'draft');
+	const maxM = Math.max(...e.inflation.map(r => +r.price_mult));
+	const shops = [...new Set(e.shops.map(r => r.shop_id))].map(id => e.shops.filter(r => r.shop_id === id));
+	return `<div class="prose"><h2>เศรษฐกิจ</h2>
+		<p class="lead">ราคาจริง = ราคาฐาน × ตัวคูณช่วงเวลา (ขึ้นตาม EC) × ตัวคูณรวม (PRICE_MULT) · ขายอาวุธคืนได้ ${Math.round(sr * 100)}% ของราคาซื้อช่วงนั้น · ตายเสียเงินครึ่งหนึ่ง · ลองปรับค่าด้านล่างเพื่อดูราคา (ในหน้านี้เท่านั้น ไม่แตะเกม)</p></div>
+		<div class="card" style="gap:10px"><h3>ลองปรับเงินเฟ้อ</h3>
+			<div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center">
+				<label for="ecIn">EC <input id="ecIn" type="range" min="0" max="20" step="1" value="${ec}" data-k="ec" style="vertical-align:middle"> <b>${ec}</b></label>
+				<label for="pmIn">ตัวคูณรวม <input id="pmIn" type="range" min="0.5" max="3" step="0.05" value="${pm}" data-k="pm" style="vertical-align:middle"> <b>×${pm.toFixed(2)}</b></label>
+				<span>ราคาช่วงนี้ <b style="color:var(--gold)">×${mult.toFixed(2)}</b></span></div></div>
+		<div class="cols"><div class="prose"><h3>เงินเฟ้อตามช่วงเรื่อง</h3>
+			<div class="tbl"><table><thead><tr><th>EC ตั้งแต่</th><th style="text-align:right">ตัวคูณ</th><th style="width:40%"></th><th></th></tr></thead><tbody>
+			${e.inflation.map(r => `<tr><td>${esc(r.ec)}</td><td class="num">×${(+r.price_mult).toFixed(2)}</td><td><div class="bar" style="width:${(r.price_mult / maxM * 100).toFixed(0)}%"></div></td><td class="sub">${esc(r.note)} ${stat(r.status)}</td></tr>`).join('')}</tbody></table></div></div>
+			<div class="prose"><h3>ค่าตั้ง (data/economy.csv)</h3>
+			<div class="tbl"><table><tbody>${e.keys.map(r => `<tr><td><b>${esc(r.key)}</b></td><td class="num">${esc(r.value)}</td><td class="sub">${esc(r.note)} ${stat(r.status)}</td></tr>`).join('')}</tbody></table></div></div></div>
+		<h3>ร้านค้าแต่ละภูมิภาค · ราคาที่ EC ${ec}</h3>
+		<div class="grid">${shops.map(l => `<article class="card"><div class="name">${esc(l[0].region)}</div><div class="sub">ร้าน ${esc(l[0].shop_id)} · เปิดตั้งแต่ EC ${esc(Math.min(...l.map(r => +r.ec_min)))}</div>
+			<dl class="kv">${l.filter(r => match(r.name, r.region, r.kind)).map(r => `<dt>${esc(r.name)}</dt><dd>${r.price ? Math.round(r.price * mult) + 'g' : '<span class="sub">ยังไม่มีราคา</span>'} · สต๊อก ${esc(r.stock)}${+r.ec_min > ec ? ' ' + chip('EC ' + r.ec_min, 'draft') : ''}</dd>`).join('')}</dl></article>`).join('')}</div>
+		<div class="cols"><div class="prose"><h3>ราคาอาวุธ (ซื้อ / ขายคืน)</h3><div class="tbl"><table><thead><tr><th>อาวุธ</th><th style="text-align:right">ซื้อ</th><th style="text-align:right">ขายคืน</th></tr></thead><tbody>
+			${e.weapons.filter(w => match(w.name, w.school)).map(w => `<tr><td>${esc(w.name)} <span class="sub">${esc(w.weapon_id)}${w.weapon_base ? '' : ' · ยังใช้ไม่ได้'}</span></td><td class="num">${Math.round(w.price * mult)}</td><td class="num">${Math.round(w.price * sr * mult)}</td></tr>`).join('')}</tbody></table></div></div>
+			<div class="prose"><h3>ราคารับซื้อวัตถุดิบ</h3><div class="tbl"><table><thead><tr><th>วัตถุดิบ</th><th>จาก</th><th style="text-align:right">ขายได้</th></tr></thead><tbody>
+			${e.materials.filter(m => match(m.name, m.monster_id)).map(m => `<tr><td>${esc(m.name)}</td><td class="sub">${esc((D.monsters.find(x => x.id === m.monster_id) || {}).name || m.monster_id)}</td><td class="num">${Math.round(m.sell_base * mult)}</td></tr>`).join('')}</tbody></table></div></div></div>
+		<h3>ตำราเวทย์</h3><div class="tbl"><table><thead><tr><th>ตำรา</th><th>สาย</th><th style="text-align:right">ราคา</th><th>หมายเหตุ</th></tr></thead><tbody>
+			${e.tomes.filter(t => match(t.name, t.school)).map(t => `<tr><td>${esc(t.name)}</td><td>${esc(t.school)}</td><td class="num">${Math.round(t.price * mult)}</td><td class="sub">${esc(t.note)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
 const TABS = [
 	['skills', 'สกิล', () => D.skills.length, vSkills], ['spells', 'เวทย์', () => D.spells.schools.reduce((a, s) => a + s.spells.length, 0), vSpells],
 	['glimmer', 'ประกาย', () => '', vGlimmer], ['weapons', 'อาวุธ', () => D.weapons.families.reduce((a, f) => a + f.weapons.length, 0), vWeapons],
@@ -338,7 +369,7 @@ const TABS = [
 	['statuses', 'สถานะ', () => D.statuses.list.length, vStatuses], ['elements', 'ธาตุ', () => D.elements.list.length, vElements],
 	['bodies', 'ร่างกาย', () => D.bodies.bodies.length, vBodies], ['regions', 'ภูมิภาค', () => D.regions.list.length, vRegions],
 	['team', 'ทีมมอน', () => D.team.start.length + D.team.recruits.length, vTeam],
-	['items', 'ไอเท็ม', () => D.items.length, vItems], ['npcs', 'NPC', () => D.npcs.items.length, vNpcs], ['vehicles', 'ยานพาหนะ', () => D.vehicles.items.length, vVehicles]];
+	['economy', 'เศรษฐกิจ', () => '', vEconomy], ['items', 'ไอเท็ม', () => D.items.length, vItems], ['npcs', 'NPC', () => D.npcs.items.length, vNpcs], ['vehicles', 'ยานพาหนะ', () => D.vehicles.items.length, vVehicles]];
 if (!TABS.some(t => t[0] === S.tab)) S.tab = 'skills';
 
 function render() {
@@ -350,6 +381,7 @@ $('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab
 	S.tab = b.dataset.tab; try { history.replaceState(null, '', '#' + S.tab); } catch (x) {} render(); window.scrollTo(0, 0); });
 $('view').addEventListener('click', e => { const b = e.target.closest('.filters button'); if (!b) return;
 	S.f[b.parentElement.dataset.key] = b.dataset.v; render(); });
+$('view').addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; S.f[k] = e.target.value; render(); const el = document.querySelector(`[data-k="${k}"]`); if (el) el.focus(); });
 $('q').addEventListener('input', e => { S.q = e.target.value.trim().toLowerCase(); render(); });
 $('built').textContent = 'ข้อมูล ณ ' + D.built;
 $('foot').textContent = 'สร้างจากไฟล์ข้อมูลเกมโดยตรง (techs.csv · monsters.csv · items · weapons · spells · Insight.gd) · ป้าย "ตัวเลขเสนอ" = รอผู้ออกแบบยืนยัน · ป้ายร่าง = ยังไม่อยู่ในเกม';

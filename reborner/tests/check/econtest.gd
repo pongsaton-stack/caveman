@@ -115,6 +115,12 @@ func _initialize() -> void:
 	var ps_last := PlayerState.new()
 	ps_last.weapons_owned.clear(); ps_last.weapons_owned.append("CR-2"); ps_last.weapon_id = "SL-1"
 	check(Economy.why_not_sell_weapon(ps_last, "CR-2") == "ชิ้นสุดท้าย", "อาวุธชิ้นสุดท้ายขายไม่ได้แม้ไม่ได้ถือ")
+	var ps_best := PlayerState.new()
+	ps_best.weapons_owned.clear()
+	ps_best.weapons_owned.append("SL-1")
+	ps_best.weapons_owned.append("CR-2")
+	ps_best.weapon_id = "SL-1"
+	check(Economy.why_not_sell_weapon(ps_best, "CR-2") == "ดีที่สุดที่มี" and Economy.sell_weapon(ps_best, "CR-2") == 0, "ถือมีดอยู่ก็ขายไม้เบสบอล (อาวุธแรงสุด) ไม่ได้ — กันประตูบอสปิดถาวร")
 
 	# ── เซฟ ──
 	ps.gold = 777

@@ -146,13 +146,26 @@ def team():
 	seize = [dict(r, monster=mon.get(r['monster_id'], {}).get('name_th', ''), img=pic(r['monster_id'])) for r in rows('data/seize_techs.csv')]
 	return {'start': start, 'recruits': rec, 'seize': seize, 'slots': rows('data/party_slots.csv')}
 
+def economy():
+	name = {}
+	for r in rows('data/items.csv'): name[r['item_id']] = r['name']
+	for r in rows('data/weapons.csv'): name[r['weapon_id']] = r['name']
+	for r in rows('data/tomes.csv'): name[r['spell_id']] = 'ตำรา' + r['name']
+	price = {r['item_id']: r['price'] for r in rows('data/items.csv')}
+	price.update({r['weapon_id']: r['price'] for r in rows('data/weapons.csv')})
+	price.update({r['spell_id']: r['price'] for r in rows('data/tomes.csv')})
+	shops = [dict(r, name=name.get(r['ref_id'], r['ref_id']), price=price.get(r['ref_id'], '')) for r in rows('data/shops.csv')]
+	return {'keys': rows('data/economy.csv'), 'inflation': rows('data/inflation.csv'), 'shops': shops,
+		'materials': rows('data/materials.csv'), 'tomes': rows('data/tomes.csv'),
+		'weapons': [r for r in rows('data/weapons.csv') if r.get('price')]}
+
 def main(out):
 	sk, ult = skills()
 	veh = world('vehicles', 'items')
 	for v in veh['items']:
 		v['img'] = img('assets/sprites/vehicles_draft/%s_0.png' % v['id'])
 	data = {'built': date.today().isoformat(), 'ult': ult, 'skills': sk, 'spells': spells(), 'glimmer': glimmer(), 'weapons': weapons(),
-		'monsters': monsters(), 'items': items(), 'statuses': statuses(), 'elements': elements(), 'bodies': bodies(), 'regions': regions(), 'team': team(), 'npcs': world('npcs', 'npcs'), 'vehicles': veh}
+		'monsters': monsters(), 'items': items(), 'statuses': statuses(), 'elements': elements(), 'bodies': bodies(), 'regions': regions(), 'team': team(), 'economy': economy(), 'npcs': world('npcs', 'npcs'), 'vehicles': veh}
 	tpl = open(P('tools/web/codex.tpl.html'), encoding='utf-8').read()
 	html = tpl.replace('/*DATA*/null', json.dumps(data, ensure_ascii=False))
 	open(out, 'w', encoding='utf-8').write(html)
