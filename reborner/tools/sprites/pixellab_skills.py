@@ -50,7 +50,7 @@ BEATS = {
 	"bl14": B("ready stance facing left; quick step diagonally forward and slightly up-screen; step around, body still facing left; slash forward at a far target; step back diagonally; return to the original spot; settle; ready stance"),
 	"bl6": B("ready stance facing left, knife in the front hand, back hand open as a guard; raise the knife up to the right; slash diagonally down to the left; raise the knife up to the left; slash diagonally down to the right, crossing the first cut; follow-through low; pull back; ready stance"),
 	"bl15": B("side view facing left, knees bent low, box cutter held close in front of the chest, blade pointing left, waiting; same side view, waiting, eyes on the left; same side view, the box cutter flicks up to the left to knock an incoming hit aside; same side view, cutter arm pushed up and out to the left after the parry; same side view, step forward with the front foot and slash down to the left; same side view, follow-through low near the front knee; same side view, pull the cutter back to the chest; side view facing left, knees bent, cutter in front of the chest, same as the first frame"),
-	"bl16": B("ready stance facing left; crouch, gathering strength; dash forward, body blurring low; first slash to the left high; turn and slash back low; leap up and slash downward; land and slash horizontally; spin and slash diagonally; fifth slash, the strongest, straight down; skid to a stop with the knife low; stand up slowly; flick the knife; bring the knife to the chest; hold still; lower the knife; ready stance"),
+	"bl16": B("same side view facing left, standing on one spot, knife held low in front, knees bent; same side view on the same spot, crouch lower gathering strength, knife pulled back to the hip; same side view on the same spot, slash 1: knife cuts high from upper right to the left at head height; same side view on the same spot, slash 2: knife cuts low across the knees toward the left; same side view on the same spot, raise the knife high above the head with the front hand; same side view on the same spot, slash 3: knife cuts straight down in front of the face; same side view on the same spot, slash 4: knife cuts horizontally at chest height toward the left, front foot steps forward; same side view on the same spot, pull the knife far back over the shoulder for the last cut, body coiled; same side view on the same spot, slash 5, the strongest: full diagonal cut down to the left, body leaning forward, front knee deeply bent; same side view on the same spot, hold the finish, knife low near the front foot; same side view on the same spot, slowly straighten up, knife lowered; same side view facing left on the same spot, ready stance, knife held low in front, same as the first frame"),
 	# ---------------- ทุบ ----------------
 	"bt0": B("ready stance facing left, hammer held low; raise the hammer above the head; peak of the raise, body leaning back slightly; swing straight down to the left; hammer hits at waist height in front, front knee bent; recoil bounce; lift back; ready stance"),
 	"bt1": B("ready stance facing left; swing the hammer far back behind the body, full arm; twist the hips back, weight on the back foot; swing diagonally forward with the whole body; hammer impacts at chest height in front; follow-through across the body; recover; ready stance"),
@@ -149,6 +149,13 @@ COUNTER_NOT = ["a front-facing guard pose", "the chest or face turned toward the
 	"speed lines, wind lines or energy streaks", "a defensive stance with both arms crossed in front of the face"]
 
 
+# ไม้ตายแบบแยกงาน (kwan 18 ต.ค. "ทำเลย"): PixelLab เจนท่าฟันอยู่กับที่ หันซ้ายตลอด · การพุ่ง/พลิกทิศ/ร่างติดตา/รอยฟัน ทำด้วยโค้ด
+IN_PLACE = {"bl16"}
+IN_PLACE_NOT = ["turning around or facing right", "spinning the body", "jumping off the ground", "moving away from the starting spot",
+	"the knife turning into a white streak of light (it stays a solid steel kitchen knife with a dark handle)", "afterimages or duplicate bodies",
+	"a glowing ring, circle or arc of light"]
+
+
 def frames_for(n):
 	return n if n % 2 == 0 else n + 1
 
@@ -167,6 +174,7 @@ def skill_moves(rows):
 		out[r["tech_id"]] = {"dir": "west", "attack": True, "frames": len(beats), "seed": 27,
 			"held": REP[(r["school"], br)], "beats": beats,
 			"not": ["the held item disappearing in any frame", "a second copy of the held item", "a sword"]
-				+ (COUNTER_NOT if r.get("effect") == "counter" else []),
+				+ (COUNTER_NOT if r.get("effect") == "counter" else [])
+				+ (IN_PLACE_NOT if r["tech_id"] in IN_PLACE else []),
 			"name": r["name_th"]}
 	return out

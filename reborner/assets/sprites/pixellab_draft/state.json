@@ -157,11 +157,29 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "bl16",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "0f7e54ef-fd1b-46c3-8545-903eafbfeb16"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "d1dbbe49-67c5-4747-8308-3b138b7bee09",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
   "fbdfa0a7-4f8c-4977-8f84-14b5d0910761": "completed",
   "1d8cc9bc-ab18-42dd-858d-4127402b7cf2": "completed",
-  "99e2334d-5506-4e1d-98cc-f4c117c851b5": "completed"
+  "99e2334d-5506-4e1d-98cc-f4c117c851b5": "completed",
+  "0f7e54ef-fd1b-46c3-8545-903eafbfeb16": "completed"
  }
 }

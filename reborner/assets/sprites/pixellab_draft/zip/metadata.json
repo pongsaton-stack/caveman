@@ -60,6 +60,22 @@
               "Idle/animations/slash2/west/frame_007.png"
             ]
           },
+          "bl16_v": {
+            "west": [
+              "Idle/animations/bl16_v/west/frame_000.png",
+              "Idle/animations/bl16_v/west/frame_001.png",
+              "Idle/animations/bl16_v/west/frame_002.png",
+              "Idle/animations/bl16_v/west/frame_003.png",
+              "Idle/animations/bl16_v/west/frame_004.png",
+              "Idle/animations/bl16_v/west/frame_005.png",
+              "Idle/animations/bl16_v/west/frame_006.png",
+              "Idle/animations/bl16_v/west/frame_007.png",
+              "Idle/animations/bl16_v/west/frame_008.png",
+              "Idle/animations/bl16_v/west/frame_009.png",
+              "Idle/animations/bl16_v/west/frame_010.png",
+              "Idle/animations/bl16_v/west/frame_011.png"
+            ]
+          },
           "walk": {
             "east": [
               "Idle/animations/walk/east/frame_000.png",
@@ -101,5 +117,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-18T14:32:29.707952"
+  "export_date": "2026-10-18T14:56:55.173771"
 }
