@@ -58,6 +58,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
   สร้าง `python3 tools/web/pixellab_test_build.py <out.html>` (เทมเพลต `tools/web/pixellab_test.tpl.html` · prompt อ่านจาก pixellab_walk.py) แล้วเผยแพร่ทับลิงก์ · ฉากหลังเลือกได้ 2 ฉาก `docs/art-bible/pixellab_test/bg_{ash_village,flooded_ruins}.jpg` (เส้นพื้นปรับได้ · จำในเบราว์เซอร์)
   **VFX ทำใน PixelLab ได้ (kwan 18 ต.ค. "vfx ก็ทำใน pixellab ได้หรือเปล่า" → ลอง lite 1 ท่า)**: `/vfx` · `pixellab_walk.py vfx <ชื่อ>` (`VFX_SPECS`) + `vfx_frames` · รอยมีดบนฟันมีดรอบ 2 = 2 gen (เสนอ 2 เพราะสไปรต์เคลื่อนไหว) → **เหลือ 17** · 44 วิ
     ได้: ตรงจังหวะเฟรม 5 · ไม่แตะตัวละคร · game pack (ชั้นหลัง/หน้า + manifest จุดยึดเท้า) · ไม่ได้: เส้นบางกว่าสั่ง · ประกายเฟรม 4 ไม่มี · เฟรม 6 แทบหาย → ร่าง · หน้า pixellab animation test Version 2 หมวดเอฟเฟกต์
+    ✅ **kwan ตัดสิน 18 ต.ค. (ตอบข้อ 3): PixelLab ใช้ทำตัวละคร/ท่าเท่านั้น · VFX ใหญ่ทำด้วยโค้ดแบบหน้า animation test (ไม่เสียเครดิต)** · ไม่เจน /vfx เพิ่มเว้นแต่ kwan สั่ง · รอยมีด VFX ที่เจนแล้วเก็บไว้ในหน้ามาสเตอร์เป็นบันทึก (ร่าง)
   Version 1: Rion ยืน 4 ทิศ (ร่าง) · เดิน ขวา+ซ้ายพลิก (ผ่าน) · ฟันมีดรอบ 2 ซ้าย+ขวาพลิก (ผ่าน) · ฟันมีดรอบ 1 (ไม่ผ่าน เก็บเป็นบันทึก) · **ท่า PixelLab ใหม่ทุกท่า: fetch แล้วเพิ่มแถวใน catalog.json + สร้างหน้าใหม่**
 **ท่า/เอฟเฟกต์/อนิเมชั่นใหม่ ต้องทำให้ลองได้ในหน้า animation test ก่อนทุกครั้ง** (กฎ 3 ต.ค. 2026) แล้วค่อยเข้าเกมเมื่อ kwan ดูแล้ว — หน้า: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
 
