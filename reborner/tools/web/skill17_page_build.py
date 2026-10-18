@@ -2,7 +2,7 @@
 """หน้า "ต้นไม้ท่า 6 สาย" — ชื่อ ท่าทาง ศาสตร์อ้างอิง อาวุธที่เหมาะ + ท่าประจำอาวุธ (ร่าง ยังไม่เข้าเกม)
 ใช้: python3 tools/data/skill17_proposal.py && python3 tools/data/skill17_content.py && python3 tools/web/skill17_page_build.py <out.html>
 """
-import csv, html, json, os, sys
+import base64, csv, html, json, os, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 P = lambda *a: os.path.join(ROOT, *a)
@@ -14,6 +14,8 @@ SCOPE = {"single": "เดี่ยว", "row": "ทั้งแถว", "column
 UNUSABLE = {"rg5", "dv5", "dv6", "fs3"}
 PAPER = {"dv1": "ช่องคิวของอุปกรณ์", "dv2": "ช่องคิวของอุปกรณ์", "fs4": "แรงขึ้นตามดาเมจที่รับ", "rg6": "ต้องเล็งนิ่งก่อน"}
 e = html.escape
+sys.path.insert(0, P("tools/sprites"))
+import pixellab_walk as plw  # noqa: E402  (โหลดคำสั่ง 102 ท่าจาก pixellab_skills.py)
 
 
 def card(r, c, school, wide=False):
@@ -46,6 +48,7 @@ def card(r, c, school, wide=False):
 <p class="stats"><span>ปลดที่ {r['req_prof']}</span><span>{pw}</span><span>{SCOPE.get(r['scope'], r['scope'])}</span><span>น้ำหนัก {r['weight']}</span><span>SP {r['sp']}</span></p>
 {'<p class="fx">' + ''.join(f'<span>{e(x)}</span>' for x in fx) + '</p>' if fx else ''}
 <dl><dt>ท่าทาง</dt><dd>{e(c['motion'][tid])}</dd><dt>ศาสตร์</dt><dd>{e(r['art'])}</dd><dt>เหมาะกับ</dt><dd>{e(wtxt)}</dd></dl>
+<details><summary>คำสั่ง PixelLab ({plw.MOVES[tid]['frames']} เฟรม · หันซ้าย)</summary><pre class="pr">{e(plw.build_action(tid, 'west'))}</pre></details>
 </article>'''
 
 
@@ -72,6 +75,22 @@ def main():
 	tabs.append('<button role="tab" data-t="weapon">ท่าประจำอาวุธ</button>')
 	panels.append(f'''<div class="panel" id="p-weapon" hidden><p class="lede">อาวุธแต่ละชนิดมีท่าพิเศษ 1 ท่า ได้จากการใช้อาวุธชนิดนั้นจนชำนาญ · 60 ท่า (สายละ 10)</p>
 <ol class="rules">{''.join(f'<li>{x}</li>' for x in c['special_rules'])}</ol><div class="spgrid">{sp}</div><p class="note">{e(c['weapon_note'])}</p></div>''')
+	w300 = json.load(open(P("docs/art-bible/weapons/weapons300.json"), encoding="utf-8"))
+	ic = lambda wid: "data:image/png;base64," + base64.b64encode(open(P("assets/sprites/weapons300_draft", wid + "_48.png"), "rb").read()).decode()
+	wt = ""
+	for name, key, *_ in SCHOOLS:
+		rowsw = [w for w in w300["weapons"] if w["school"] == name]
+		trs = ""
+		for t in sorted({w["type_no"] for w in rowsw}):
+			ws = [w for w in rowsw if w["type_no"] == t]
+			w0 = ws[0]
+			flag = ' <span class="tag bad">รอตัดสิน</span>' if w0["needs_decision"] else ""
+			trs += f'<tr><th>{e(w0["type"])}{flag}<br><small>กิ่ง {w0["branch"]} · {e(w0["grip"])}</small></th>' + "".join(
+				f'<td><img src="{ic(w["id"])}" width="48" height="48" alt="{e(w["name_th"])}" title="{e(w["id"] + " " + w["name_th"])}"></td>' for w in ws) + "</tr>"
+		wt += f'<section class="wt" style="--sc:var(--{key})"><h4>{name}</h4><div class="tw"><table><thead><tr><th>ชนิด</th>' + "".join(f"<th>ระดับ {i}</th>" for i in range(1, 6)) + f"</tr></thead><tbody>{trs}</tbody></table></div></section>"
+	tabs.append('<button role="tab" data-t="arms">อาวุธ 300</button>')
+	panels.append(f'''<div class="panel" id="p-arms" hidden><p class="lede">ตัดจากชีต 6 แผ่นที่ kwan ส่ง (ไอคอนพิกเซล 48) · ชื่อเป็นร่าง (ชนิด + ชั้นดี/ดัดแปลง/ไฮเทค/ตำนาน) · ยังไม่มีค่าพลัง/ราคา · "แบบการจับ" ที่วงเล็บว่ายังไม่มีท่า = ต้องทำท่าถือใหม่</p>
+<p class="note">ข้อจำกัด: ระดับ 4–5 ราว 11 ชิ้น (ค้อนปอนด์/อิฐ/ท่อ/หนังสือระดับ 5 · ถุงมือสายมือเปล่าระดับ 4–5) แสงเรืองในชีตทับช่องข้าง ติดเศษมาเล็กน้อย</p>{wt}</div>''')
 	budget = open(P("docs/design/skill_trees_17_budget.txt"), encoding="utf-8").read()
 	tabs.append('<button role="tab" data-t="balance">หลักสมดุล</button>')
 	panels.append(f'''<div class="panel" id="p-balance" hidden>
@@ -124,6 +143,9 @@ dt{color:var(--muted)} dd{margin:0}
 .sp h4{font:500 1.1rem var(--fd);margin:0 0 6px;color:var(--sc)} .sp ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}
 .sp small{color:var(--muted)} .sn{font-family:var(--fd)}
 .note{color:var(--muted);font-size:.85rem}
+details summary{cursor:pointer;color:var(--muted);font-size:.82rem;margin-top:6px} .pr{white-space:pre-wrap;font-size:.75rem;background:var(--bg);border-radius:6px;padding:8px;margin:6px 0 0}
+.wt{margin-bottom:18px} .wt h4{font:500 1.1rem var(--fd);color:var(--sc);margin:0 0 6px} .tw{overflow-x:auto} .wt table{border-collapse:collapse;background:var(--panel)}
+.wt th,.wt td{border:1px solid var(--line);padding:4px 8px;text-align:left;font-weight:400;font-size:.85rem} .wt td img{image-rendering:pixelated;display:block}
 .pre{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px} .pre pre{margin:0;padding:12px;font-size:.78rem}
 </style>
 <div class="wrap">

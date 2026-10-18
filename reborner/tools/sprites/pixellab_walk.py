@@ -86,6 +86,14 @@ MOVES = {
 		"not": ["the knife disappearing in any frame", "a second knife", "a long sword or dagger", "the knife sticking straight up above the cap"]},
 }
 
+# ท่าต้นไม้ 17 ท่า × 6 สาย (102 ท่า · tools/sprites/pixellab_skills.py) — ใช้คำสั่งเดียวกัน: prompt <รหัสท่า> · anim <รหัสท่า>
+try:
+	import csv as _csv
+	import pixellab_skills as _sk
+	MOVES.update(_sk.skill_moves(list(_csv.DictReader(open(os.path.join(ROOT, "docs/design/skill_trees_17.csv"), encoding="utf-8")))))
+except (ImportError, FileNotFoundError):
+	pass
+
 
 def master_blocks():
 	"""อ่านบล็อกจาก RION_MASTER.md ตามตัวอักษร: CHARACTER · STYLE · LEFT/RIGHT/BACK"""
