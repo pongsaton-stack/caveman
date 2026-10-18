@@ -5,43 +5,199 @@
     "เพิ่มท่าใหม่: เพิ่มแถวใน entities[].anims — dirs = {ทิศ: โฟลเดอร์เฟรม frame_*.png} · mirror = {ทิศที่พลิกด้วยโค้ด: ทิศต้นทาง}",
     "prompt: {type: 'legacy', key} = ACTIONS ใน pixellab_walk.py · {type: 'moves', key} = MOVES + build_action() (คำสั่ง 8 ส่วน)",
     "status: pass ผ่าน · fail ไม่ผ่าน (เก็บไว้เป็นบันทึก) · draft ร่างรอ kwan ดู · game เข้าเกมแล้ว",
-    "ms = ความเร็วดูต่อเฟรม · game_ms = ความเร็วในเกม (null = ยังไม่กำหนด) · travel = ระยะที่ตัวเคลื่อนต่อรอบ (จุดของสไปรต์) ใช้กับปุ่มเดินข้ามฉาก"
+    "ms = ความเร็วดูต่อเฟรม · game_ms = ความเร็วในเกม (null = ยังไม่กำหนด) · travel = ระยะที่ตัวเคลื่อนต่อรอบ (จุดของสไปรต์) ใช้กับปุ่มเดินข้ามฉาก",
+    "prompt {type: 'vfx', key} = VFX_SPECS ใน pixellab_walk.py (/vfx · เอฟเฟกต์) · เฟรมแยกด้วย pixellab_walk.py vfx_frames <ชื่อ>"
   ],
   "categories": [
-    {"id": "hero", "name": "ตัวเอก"},
-    {"id": "companion", "name": "คู่หู"},
-    {"id": "monster", "name": "มอนสเตอร์"},
-    {"id": "boss", "name": "บอส"},
-    {"id": "npc", "name": "NPC"},
-    {"id": "vfx", "name": "เอฟเฟกต์"},
-    {"id": "prop", "name": "ของในฉาก"}
+    {
+      "id": "hero",
+      "name": "ตัวเอก"
+    },
+    {
+      "id": "companion",
+      "name": "คู่หู"
+    },
+    {
+      "id": "monster",
+      "name": "มอนสเตอร์"
+    },
+    {
+      "id": "boss",
+      "name": "บอส"
+    },
+    {
+      "id": "npc",
+      "name": "NPC"
+    },
+    {
+      "id": "vfx",
+      "name": "เอฟเฟกต์"
+    },
+    {
+      "id": "prop",
+      "name": "ของในฉาก"
+    }
   ],
   "backgrounds": [
-    {"id": "ash_village", "name": "หมู่บ้านเถ้า · ถ้ำหนอน", "file": "docs/art-bible/pixellab_test/bg_ash_village.jpg", "ground": 0.69, "scale": 3},
-    {"id": "flooded_ruins", "name": "ซากเมืองน้ำท่วม · หอนาฬิกา", "file": "docs/art-bible/pixellab_test/bg_flooded_ruins.jpg", "ground": 0.80, "scale": 3}
+    {
+      "id": "ash_village",
+      "name": "หมู่บ้านเถ้า · ถ้ำหนอน",
+      "file": "docs/art-bible/pixellab_test/bg_ash_village.jpg",
+      "ground": 0.69,
+      "scale": 3
+    },
+    {
+      "id": "flooded_ruins",
+      "name": "ซากเมืองน้ำท่วม · หอนาฬิกา",
+      "file": "docs/art-bible/pixellab_test/bg_flooded_ruins.jpg",
+      "ground": 0.8,
+      "scale": 3
+    }
   ],
   "entities": [
     {
-      "id": "rion", "cat": "hero", "name": "Rion", "state": "assets/sprites/pixellab_draft/state.json",
+      "id": "rion",
+      "cat": "hero",
+      "name": "Rion",
+      "state": "assets/sprites/pixellab_draft/state.json",
       "master": "docs/art-bible/rion_hires/RION_MASTER.md",
       "anims": [
-        {"id": "idle", "name": "ยืน (ภาพหมุน 4 ทิศ)", "kind": "still", "status": "draft", "date": "2026-10-18", "gens": 2, "seed": 18,
-         "dirs": {"south": "assets/sprites/pixellab_draft/zip/Idle/rotations/south.png", "east": "assets/sprites/pixellab_draft/zip/Idle/rotations/east.png",
-                  "north": "assets/sprites/pixellab_draft/zip/Idle/rotations/north.png", "west": "assets/sprites/pixellab_draft/zip/Idle/rotations/west.png"},
-         "prompt": {"type": "description"}, "ms": 500, "game_ms": null,
-         "notes": "/create-character-v3 จากภาพอ้างอิงหันหน้า (ref_south.png) · ภาพนิ่งทิศละ 1 ภาพ ผืน 96"},
-        {"id": "walk", "name": "เดิน", "kind": "loop", "status": "pass", "date": "2026-10-18", "gens": 2, "seed": 18,
-         "dirs": {"east": "assets/sprites/pixellab_draft/zip/Idle/animations/walk/east"}, "mirror": {"west": "east"},
-         "prompt": {"type": "legacy", "key": "walk"}, "ms": 90, "game_ms": 37.5, "travel": 48,
-         "notes": "หันข้างจริง ขาผ่านกันจริง · หัวเล็กกว่า master · แว่นบนหมวกเห็นน้อย · game_ms = 2 × MOVE_TIME ÷ 8 · ทิศซ้าย = พลิกด้วยโค้ด"},
-        {"id": "slash2", "name": "ฟันมีด (รอบ 2)", "kind": "attack", "status": "pass", "date": "2026-10-18", "gens": 2, "seed": 27,
-         "dirs": {"west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash2/west"}, "mirror": {"east": "west"},
-         "prompt": {"type": "legacy", "key": "slash2"}, "ms": 110, "game_ms": null,
-         "notes": "หันซ้ายครบ 8 เฟรม · มีดในมือทุกเฟรม · ฟันเป็นวง · ใบมีดยังยาวกว่ามีดทำครัว · เฟรม 1 มีดตั้งเหนือหมวก · ท่าในศึกหันซ้าย (ขวา = พลิก)"},
-        {"id": "slash", "name": "ฟันมีด (รอบ 1)", "kind": "attack", "status": "fail", "date": "2026-10-18", "gens": 2, "seed": 18,
-         "dirs": {"west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash/west"},
-         "prompt": {"type": "legacy", "key": "slash"}, "ms": 110, "game_ms": null,
-         "notes": "เก็บเป็นบันทึก · คำสั่งสั้นประโยคเดียว → เฟรม 5–7 หมุนหันเข้ากล้อง · แทงตรงแทนฟันเป็นวง · ใบมีดยาว"}
+        {
+          "id": "idle",
+          "name": "ยืน (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 18,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/zip/Idle/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/zip/Idle/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/zip/Idle/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/zip/Idle/rotations/west.png"
+          },
+          "prompt": {
+            "type": "description"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "/create-character-v3 จากภาพอ้างอิงหันหน้า (ref_south.png) · ภาพนิ่งทิศละ 1 ภาพ ผืน 96"
+        },
+        {
+          "id": "walk",
+          "name": "เดิน",
+          "kind": "loop",
+          "status": "pass",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 18,
+          "dirs": {
+            "east": "assets/sprites/pixellab_draft/zip/Idle/animations/walk/east"
+          },
+          "mirror": {
+            "west": "east"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "walk"
+          },
+          "ms": 90,
+          "game_ms": 37.5,
+          "travel": 48,
+          "notes": "หันข้างจริง ขาผ่านกันจริง · หัวเล็กกว่า master · แว่นบนหมวกเห็นน้อย · game_ms = 2 × MOVE_TIME ÷ 8 · ทิศซ้าย = พลิกด้วยโค้ด"
+        },
+        {
+          "id": "slash2",
+          "name": "ฟันมีด (รอบ 2)",
+          "kind": "attack",
+          "status": "pass",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash2/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "slash2"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "หันซ้ายครบ 8 เฟรม · มีดในมือทุกเฟรม · ฟันเป็นวง · ใบมีดยังยาวกว่ามีดทำครัว · เฟรม 1 มีดตั้งเหนือหมวก · ท่าในศึกหันซ้าย (ขวา = พลิก)"
+        },
+        {
+          "id": "slash",
+          "name": "ฟันมีด (รอบ 1)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 18,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash/west"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "slash"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "เก็บเป็นบันทึก · คำสั่งสั้นประโยคเดียว → เฟรม 5–7 หมุนหันเข้ากล้อง · แทงตรงแทนฟันเป็นวง · ใบมีดยาว"
+        }
+      ]
+    },
+    {
+      "id": "vfx_slash2",
+      "cat": "vfx",
+      "name": "รอยมีด (ฟันมีดรอบ 2)",
+      "anims": [
+        {
+          "id": "with_sprite",
+          "name": "รอยมีด + Rion (ตามที่ PixelLab ทำ)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/vfx/slash2_trail/with_sprite"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "vfx",
+            "key": "slash2_trail"
+          },
+          "ms": 111,
+          "game_ms": null,
+          "notes": "/vfx lite · ราคาเสนอ 2 gen (สไปรต์เคลื่อนไหว) · จ่ายจริง 2 (19 → 17) · 44 วิ · ทำงานแบบชั้น 'หลังตัว' · ได้: เส้นโค้งฟ้าบาง 1–2 จุดที่เฟรม 5 · ประกาย 3–4 จุดเฟรม 6–7 · ไม่ได้: ประกายบนใบมีดเฟรม 4 · เส้นหนา 3 จุด · เฟรม 6 เส้นหายแทบหมด (15 จุด) · รอยเทาใหญ่เฟรม 6 เป็นของภาพท่าเดิม ไม่ใช่ของ VFX"
+        },
+        {
+          "id": "fx",
+          "name": "รอยมีดล้วน (ชั้นเอฟเฟกต์)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/vfx/slash2_trail/fx"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "vfx",
+            "key": "slash2_trail"
+          },
+          "ms": 111,
+          "game_ms": null,
+          "notes": "ชั้น 'whole' จาก game pack วางตาม anchor + offset ลงผืน 124 · ซ้อนบนเฟรมท่าแล้วตรงกับภาพ with_sprite ทุกพิกเซล (ตรวจ 8/8) · gen = 0 (ไฟล์เดียวกับแถวบน)"
+        }
       ]
     }
   ]

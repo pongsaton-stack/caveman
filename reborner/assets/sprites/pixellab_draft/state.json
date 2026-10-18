@@ -53,5 +53,57 @@
  ],
  "slash2_jobs": {
   "fedc4e9e-2c81-42e6-9028-bef99fdd85a8": "completed"
- }
+ },
+ "vfx": [
+  {
+   "name": "slash2_trail",
+   "response": {
+    "usage": null,
+    "background_job_id": "4bf73f19-ff07-489a-b480-b7b33662f5fb",
+    "status": "processing",
+    "quoted_generations": 2
+   },
+   "status": "completed",
+   "result": {
+    "fps": 9,
+    "kind": "new",
+    "loop": false,
+    "name": "Rion slash2_trail",
+    "files": {
+     "rion-slash2-trail.gif": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail.gif",
+     "rion-slash2-trail.png": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail.png",
+     "rion-slash2-trail.json": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail.json",
+     "rion-slash2-trail-game.zip": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail-game.zip"
+    },
+    "parts": [],
+    "anchor": {
+     "x": 62,
+     "y": 106,
+     "kind": "feet"
+    },
+    "artist": "lite",
+    "canvas": {
+     "h": 124,
+     "w": 124
+    },
+    "frames": 8,
+    "message": "The knife slash is a one-shot on the sprite, which is left unchanged: a 1-pixel glint on the blade at frame 4, a 3-pixel navy-to-white crescent arc from above the cap down to knee height on frames 5-6, small sparks flying left at frame 6, then fragments drifting left and down on frame 7, with frame 8 empty for looping. Try the timing or the fragment count if you want a different feel.",
+    "edit_url": "https://pixellab.ai/create-vfx?effect=cf10706e-e148-47a9-aac0-dd378f040f3c",
+    "effect_id": "cf10706e-e148-47a9-aac0-dd378f040f3c",
+    "gif_exact": true,
+    "result_id": "70ce23be-e368-4ab4-93b2-ac019cc7d4a7",
+    "billing_usage": {
+     "usd": 0.0,
+     "type": "generations",
+     "generations": 2.0
+    },
+    "generation_id": "bd72d688-e4af-474e-b17b-0d920978ba51",
+    "billing_charged": true,
+    "generation_mode": "vfx",
+    "pixel_tools_image": true,
+    "quoted_generations": 2
+   },
+   "conversation": "2NzsOyFsaXJ2a5VXik333g.72dd58a53f451dfc102b80b49b8350778d936a3684c4b9442fcb05847962ff80"
+  }
+ ]
 }

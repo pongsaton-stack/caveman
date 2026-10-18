@@ -10,6 +10,7 @@
   python3 tools/sprites/pixellab_walk.py anim <ท่า> [ทิศ…]   **ท่าใหม่ใช้คำสั่งนี้เท่านั้น** (คำสั่งละเอียด 8 ส่วน · docs/art-bible/rion_hires/PIXELLAB_PROMPTS.md)
   python3 tools/sprites/pixellab_walk.py slash/slash2 [ทิศ]  คำสั่งแบบเก่าที่ใช้ไปแล้ว (เก็บไว้รันซ้ำตามบันทึก)
   python3 tools/sprites/pixellab_walk.py fetch        ดึง ZIP ของตัวละคร แตกภาพลง OUT
+  python3 tools/sprites/pixellab_walk.py vfx <ชื่อ>    เอฟเฟกต์จาก VFX_SPECS (/vfx · lite ~1 gen · พิมพ์คำสั่งเต็ม + ราคาที่ PixelLab เสนอ) → OUT/vfx/<ชื่อ>/
   python3 tools/sprites/pixellab_walk.py page         ท่าเดินจาก ZIP → px/ (ผืนเดียวกับ rion_pack_px) ให้หน้า animation test
 ผลทั้งหมดอยู่ใน assets/sprites/pixellab_draft/ (.gdignore · ร่าง ยังไม่เข้าเกม) · state.json เก็บ character_id / job id
 """
@@ -294,6 +295,105 @@ def fetch():
 		print(" ", n, Image.open(os.path.join(dst, n)).size)
 
 
+# ---- เอฟเฟกต์ (/vfx · kwan 18 ต.ค. "vfx ก็ทำใน pixellab ได้หรือเปล่า" → ลอง lite 1 ท่า) ----
+# คำสั่งละเอียดแบบเดียวกับท่า: อะไร · สี · ขยับยังไง · จังหวะเทียบเฟรมของสไปรต์ · สิ่งที่ห้าม · สไปรต์ = เฟรมท่าที่ PixelLab เจนแล้ว (เรียงแนวนอน)
+VFX_SPECS = {
+	"slash2_trail": {"sprite": "zip/Idle/animations/slash2/west", "artist": "lite", "fps": 9,
+		"description": (
+			"A knife slash trail for a small kitchen knife, in 32-bit pixel art that matches the sprite: hard pixel edges, no anti-aliasing, "
+			"no blur, no soft glow gradients, a small palette. The sprite is an 8-frame attack: a chibi boy seen from the side, facing LEFT "
+			"in every frame, raises a short kitchen knife behind his shoulder (frames 1-4), slashes it down in a curved arc in front of his body "
+			"toward an enemy on the LEFT (frames 5-6), follows through low and recovers (frames 7-8). "
+			"Make the effect follow the knife tip exactly: nothing during the wind-up except a 1-2 pixel glint on the blade at frame 4; "
+			"at frames 5-6 a thick crescent arc trail swept from above the cap down to knee height on the LEFT side of the body, "
+			"3 pixels thick at its middle and tapering to 1 pixel at both ends, colours from the edge inward: dark navy #21508A outline, "
+			"blue #4184C9, pale sky blue, and a white core line along the leading edge; 4-6 small white and pale-blue spark pixels fly "
+			"off the arc to the left at frame 6; at frames 7-8 the arc breaks into pixel fragments that fade out and drift slightly left and down. "
+			"The effect is about as wide as the character and never covers his face. "
+			"Do NOT redraw, recolour, move or resize the character; do NOT add a second knife, a big explosion, smoke, a ground, a shadow, "
+			"a background, text or numbers. Keep the same timing as the sprite and end with an empty frame so the attack can loop.")},
+}
+
+
+def vfx(name):
+	spec = VFX_SPECS[name]
+	src = os.path.join(OUT, spec["sprite"])
+	files = sorted(f for f in os.listdir(src) if f.startswith("frame_"))
+	ims = [Image.open(os.path.join(src, f)).convert("RGBA") for f in files]
+	strip = Image.new("RGBA", (ims[0].width * len(ims), ims[0].height), (0, 0, 0, 0))
+	for i, im in enumerate(ims):
+		strip.paste(im, (i * im.width, 0))
+	buf = io.BytesIO()
+	strip.save(buf, "PNG")
+	print(f"เอฟเฟกต์ {name} · {spec['artist']} · สไปรต์ {len(ims)} เฟรม {ims[0].size} · คำสั่ง {len(spec['description'])} ตัวอักษร")
+	print(spec["description"])
+	balance()
+	r = call("POST", "/vfx", {"description": spec["description"], "artist": spec["artist"], "name": f"Rion {name}",
+		"sprite": {"type": "base64", "base64": base64.b64encode(buf.getvalue()).decode(), "format": "png"},
+		"sprite_frames": len(ims), "sprite_fps": spec["fps"], "game_pack": True})
+	print("ตอบรับ", json.dumps(r, ensure_ascii=False)[:600])
+	s = state()
+	s.setdefault("vfx", []).append({"name": name, "response": r})
+	save_state(s)
+	jid = r.get("background_job_id")
+	if not jid:
+		sys.exit("ไม่มี background_job_id")
+	j = wait(jid, "vfx " + name)
+	last = j.get("last_response") or {}
+	s["vfx"][-1].update(status=j.get("status"), result={k: v for k, v in last.items() if k != "conversation"}, conversation=last.get("conversation"))
+	save_state(s)
+	dst = os.path.join(OUT, "vfx", name)
+	os.makedirs(dst, exist_ok=True)
+	fl = last.get("files") or {}
+	for fname, url in (fl.items() if isinstance(fl, dict) else [(f.get("name") or os.path.basename(f.get("url", "")), f.get("url")) for f in fl]):
+		for i in range(4):
+			try:
+				data = urllib.request.urlopen(url, timeout=120).read()
+				break
+			except urllib.error.URLError as e:
+				print(f"  โหลด {fname} หลุด ({e.reason}) ลองใหม่", flush=True)
+				time.sleep(2 ** (i + 1))
+		else:
+			continue
+		open(os.path.join(dst, os.path.basename(fname)), "wb").write(data)
+		print("  ได้", fname, len(data), "ไบต์")
+	print("ข้อความศิลปิน:", last.get("message"))
+	vfx_frames(name)
+	balance()
+
+
+def vfx_frames(name):
+	"""ผล /vfx → เฟรมแยกให้หน้า pixellab animation test: with_sprite/ (ตามที่ PixelLab ทำ) · fx/ (เอฟเฟกต์ล้วน ผืน/จังหวะเท่าสไปรต์ จาก game pack)"""
+	dst = os.path.join(OUT, "vfx", name)
+	base = [f for f in os.listdir(dst) if f.endswith(".json") and not f.endswith("manifest.json")][0][:-5]
+	meta = json.load(open(os.path.join(dst, base + ".json")))
+	sheet = Image.open(os.path.join(dst, base + ".png")).convert("RGBA")
+	for sub in ("with_sprite", "fx"):
+		shutil.rmtree(os.path.join(dst, sub), ignore_errors=True)
+		os.makedirs(os.path.join(dst, sub))
+	for i, fr in enumerate(meta["frames"]):
+		r = fr["frame"]
+		sheet.crop((r["x"], r["y"], r["x"] + r["w"], r["y"] + r["h"])).save(os.path.join(dst, "with_sprite", f"frame_{i:03d}.png"))
+	z = zipfile.ZipFile(os.path.join(dst, base + "-game.zip"))
+	man = json.loads(z.read("manifest.json"))
+	clip = next(c for c in man["clips"] if c["name"] == "whole")
+	w, h = man["canvas"]["w"], man["canvas"]["h"]
+	ox, oy = man["anchor"]["x"] + clip["offset"]["x"], man["anchor"]["y"] + clip["offset"]["y"]
+	cells = {}
+	for sh in clip["sheets"]:
+		im = Image.open(io.BytesIO(z.read(sh["file"]))).convert("RGBA")
+		for k in range(sh["frames"]):
+			cx, cy = (k % sh["columns"]) * clip["frame"]["w"], (k // sh["columns"]) * clip["frame"]["h"]
+			cells[sh["first_frame"] + k] = im.crop((cx, cy, cx + clip["frame"]["w"], cy + clip["frame"]["h"]))
+	for i in range(man["frames"]):
+		out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+		k = i - clip["start_frame"]
+		if k in cells:
+			out.alpha_composite(cells[k], (ox, oy))
+		out.save(os.path.join(dst, "fx", f"frame_{i:03d}.png"))
+	print("  เฟรมแยก", len(meta["frames"]), "→", dst, "(with_sprite/ fx/)")
+
+
 PAGE_H, PAGE_FEET = 112, 108   # ผืน/แถวเท้าเดียวกับ rion_pack_px (CANVAS_H · FEET) → เทียบกับชีต B ได้ตรง
 G_WALK = "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)"
 
@@ -348,4 +448,6 @@ if __name__ == "__main__":
 	 "slash": lambda: walk(sys.argv[2:] or ["west"], "slash"),
 	 "slash2": lambda: walk(sys.argv[2:] or ["west"], "slash2"),
 	 "prompt": lambda: show_prompt(sys.argv[2], (sys.argv[3:] or [None])[0]),
-	 "anim": lambda: anim(sys.argv[2], sys.argv[3:] or None)}[cmd]()
+	 "anim": lambda: anim(sys.argv[2], sys.argv[3:] or None),
+	 "vfx_frames": lambda: vfx_frames(sys.argv[2] if len(sys.argv) > 2 else "slash2_trail"),
+	 "vfx": lambda: vfx(sys.argv[2] if len(sys.argv) > 2 else "slash2_trail")}[cmd]()

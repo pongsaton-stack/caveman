@@ -51,6 +51,9 @@ def prompt_of(p):
 	if p['type'] == 'moves':
 		d = p.get('dir') or plw.MOVES[p['key']]['dir']
 		return {'label': f"MOVES['{p['key']}'] · {d} (คำสั่ง 8 ส่วน)", 'text': plw.build_action(p['key'], d) + '\n\n— description —\n' + plw.build_description()}
+	if p['type'] == 'vfx':
+		v = plw.VFX_SPECS[p['key']]
+		return {'label': f"VFX_SPECS['{p['key']}'] · /vfx {v['artist']}", 'text': v['description']}
 	raise SystemExit(f'prompt type ไม่รู้จัก: {p}')
 
 
