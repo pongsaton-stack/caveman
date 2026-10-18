@@ -412,6 +412,8 @@ function pkTip(key) {   // ปลายมือ/อาวุธของภา�
 	return [bx, by];
 }
 function pkTimeline(a, die) {
+	if (a.kf) { const pk = (DATA.rion_pack || []).find(c => c.id === a.clip), HIT = a.hits[0], last = a.hits[a.hits.length - 1], end = a.keys[a.keys.length - 1].f, D0 = a.d0 || last + 10;
+		return { pk, pre: HIT - 6, S0: HIT, HIT, D0, N: Math.max(end + 8, die ? D0 + 48 : last + 22), pose: F => pk17Eval(a.keys, F, { home: 0, near: 0, back: 0, mid: 0, rw: 0, G: 0, star: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0]] }).p }; }
 	const pk = (DATA.rion_pack || []).find(c => c.id === a.clip), n = pk ? pk.frames.length : 1, pre = a.charge ? 14 : a.ult ? 26 : a.blade ? 10 : 8, step = a.charge ? 5 : 4;
 	const S0 = pre + step * a.strike, HIT = S0 + (a.proj ? a.fly : 0);
 	let pose = F => F < pre ? 0 : F < S0 ? Math.min(a.strike, Math.floor((F - pre) / step) + 1) : F < S0 + 6 ? a.strike : Math.min(n - 1, a.strike + 1 + Math.floor((F - S0 - 6) / 4));
@@ -437,19 +439,80 @@ for (const die of [false, true]) for (const a of PKV.SPELLS) {
 	addClip(`เวทย์${a.school}${die ? ' · โดนแล้วตาย' : a.self ? ' · ใส่ตัวเอง' : a.status ? ' · ใส่สถานะ' : ' · โดน'}`, `pks_${a.id}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} (${a.el})${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
 		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'magic' });
 }
-// เทียบ (kwan 18 ต.ค. "ขอดูเทียบทั้ง 1 และ 2"): ตัว Rion จาก PixelLab ฟันมีดรอบ 2 (8 เฟรม · ฟาดเฟรม 4) ใส่ในโค้ดสายคมชุดเดิม (กล้อง แสง กายกรรม ท่าตาย เหมือนกันทุกอย่าง)
-// + ไม้ตาย bl16 พันคมดับเถ้า (techs.csv: 5 ครั้ง + เลือดไหล) ทั้งตัว Flow (sl_bl6 เงาสองคม) และตัว PixelLab · ฟันซ้ำทุกครั้งง้างใหม่ (rehit)
-const PK_BL16 = { id: 'bl16', move: 'flip2', name: '★ พันคมดับเถ้า', strike: 2, extra: [5, 10, 15, 20], hit: 'SLASH', death: 'SL', bleed: true, ult: true, rehit: true, sfx: 'ฉัวะ ฉัวะ ฉัวะ!!!', blade: true,
-	arcs: [[{ a0: -60, a1: 150, R: 0.6 }], [{ a0: 150, a1: -60, R: 0.66 }], [{ a0: -185, a1: 5, R: 0.95, sy: 0.3, th: 6 }], [{ a0: -110, a1: 30, R: 0.7, th: 5 }],
-		[{ a0: -80, a1: 200, R: 1.1, th: 7 }, { a0: 100, a1: 380, R: 1.3, sy: 0.5, th: 4, delay: 2 }]] };
-const PK_PL = a => ({ ...a, clip: 'pl_slash2', strike: 4, rehit: true, blade: true });
-for (const [grp, list] of [['ไม้ตาย bl16 พันคมดับเถ้า · เทียบ ตัว Flow / ตัว PixelLab', [['flow', { ...PK_BL16, clip: 'sl_bl6' }, 'ตัว Flow'], ['pl', PK_PL(PK_BL16), 'ตัว PixelLab']]],
-	['สายคม · ตัว PixelLab (ฟันมีดรอบ 2) ใส่โค้ดเดิม', PKV.BLADE.map(a => ['pl', PK_PL(a), 'ตัว PixelLab'])]])
-	for (const die of [false, true]) for (const [tag, a, who] of list) {
-		const tl = pkTimeline(a, die); if (!tl.pk) continue;
-		addClip(`${grp} · ${die ? 'โดนแล้วตาย' : 'โดน'}`, `pkb_${a.id}_${tag}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} · ${who}${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
-			Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'skillnew' });
-	}
+// สายคม 17 ท่าตามต้นไม้ท่า (kwan 18 ต.ค. "ใช้โค้ดปรับชื่อและท่าทางให้ตรงกับรายละเอียดในต้นไม้ท่า") · ตัว Rion = PixelLab ฟันมีดรอบ 2 (ภาพ 0 ยืน · 1–3 ง้าง · 4 ฟาด · 5–7 ตามแรง)
+// ชื่อ · จำนวนครั้ง · เลือดไหล · ไม้ตาย อ่านจาก DATA.tree17 (docs/design/skill_trees_17.csv) · คำบรรยายท่าทางจาก DATA.motion17 · ตารางนี้มีแค่ "ท่าทาง" ที่แปลงจากคำบรรยายเป็นการเคลื่อนไหว
+// คีย์เฟรม K17(เฟรม, จุด, ภาพ, ค่า): จุด = home ที่ยืน · near หน้ามอน · back หลังมอน · mid กลางมอน · {s:i} มุมดาว i · ค่า dx เลื่อน · lift ยก · arc โค้งช่วงถัดไป · rot หมุน · turn บิดตัว (หันกลับ = π)
+// face 1 หันซ้าย / -1 หันขวา / 'auto' ตามทางวิ่ง · sq ยุบ (ติดลบ = ยืด) · lean เอน · shake สั่น · ทุกค่าเป็นค่าภาพของหน้าเทส ไม่ใช่ค่าเกม · ขอบเขตแถว/ทั้งหมด/แนว ยังโดนเป้าเดียว
+const K17 = (f, x, p, o = {}) => ({ f, x, p, ...o });
+const RET17 = (f, x, dx = 0) => [K17(f, x, 6, { dx, sq: 0.4 }), K17(f + 2, x, 7, { dx, sq: 0.8 }), K17(f + 3, x, 0, { dx, arc: 32 }), K17(f + 15, 'home', 0, { rot: 2 * Math.PI, sq: 0.6 }), K17(f + 18, 'home', 0, { rot: 2 * Math.PI })];   // ตีลังกาหลังกลับที่
+const RUN17 = (f, to, dx = 0, p = 0) => [K17(0, 'home', 0), K17(f, 'home', 0, { sq: 0.3 }), K17(f + 1, 'home', p, { lean: -0.1 }), K17(f + 10, to, p, { dx, lean: -0.1 })];   // วิ่งเข้า
+const PK17_MOVE = {
+	bl0: { hits: [26], arcs: [[{ a0: -70, a1: 160, R: 0.62 }]], sfx: 'ฉัวะ!',   // ง้างเหนือไหล่ ก้าวหน้าหนึ่งก้าว ฟันเฉียงบนลงล่าง
+		keys: [...RUN17(4, 'near', 20), K17(17, 'near', 2, { dx: 20 }), K17(21, 'near', 3, { dx: 20, sq: 0.3 }), K17(23, 'near', 3, { dx: 16 }), K17(26, 'near', 4, { sq: 0.5 }), K17(28, 'near', 5), K17(31, 'near', 6), ...RET17(34, 'near')] },
+	bl1: { hits: [18], push: 14, arcs: [[{ a0: 150, a1: -80, R: 0.7, th: 5 }]], sfx: 'ฉึบ!!',   // ย่อตัว แล้วพุ่งทั้งตัวยาว ฟันระหว่างพุ่ง ตัวเอนหน้า
+		keys: [K17(0, 'home', 0), K17(4, 'home', 1, { sq: 0.6 }), K17(8, 'home', 2, { sq: 0.8 }), K17(9, 'home', 3, { sq: -0.15, lean: -0.24 }), K17(18, 'near', 4, { dx: -6, sq: -0.1, lean: -0.24 }), K17(22, 'near', 5, { dx: -16, lean: -0.1 }), K17(25, 'near', 6, { dx: -16 }), ...RET17(27, 'near', -16)] },
+	bl2: { hits: [30, 34, 38], arcs: [[{ a0: -60, a1: 150, R: 0.6 }], [{ a0: 150, a1: -60, R: 0.66 }], [{ a0: -185, a1: 5, R: 0.95, sy: 0.3, th: 6 }]], sfx: 'ฉัวะ ฉัวะ ฉัวะ!!',   // ข้อมือเลขแปด ฟันสลับ ซ้าย-ขวา-ลง
+		keys: [K17(0, 'home', 0), K17(18, 'home', 0), K17(20, 'home', 1, { sq: 0.5 }), K17(21, 'home', 3, { lean: -0.15 }), K17(28, 'near', 3, { lean: -0.15 }), K17(30, 'near', 4), K17(32, 'near', 2, { dx: -2, lift: 4 }), K17(34, 'near', 4, { dx: -4 }), K17(36, 'near', 2, { dx: -6, lift: 4 }), K17(38, 'near', 4, { dx: -8, sq: 0.5 }), K17(41, 'near', 5, { dx: -8 }), K17(44, 'near', 6, { dx: -8 }), ...RET17(46, 'near', -8)] },
+	bl3: { hits: [26], arcs: [[{ a0: 200, a1: -20, R: 1.25, sy: 0.24, th: 5 }]], sfx: 'วืดด!',   // บิดเอว กวาดแนวนอนระดับเอว
+		keys: [...RUN17(4, 'near', 6), K17(18, 'near', 3, { dx: 6, turn: 0.9 }), K17(23, 'near', 3, { dx: 6, turn: 1.3, sq: 0.3 }), K17(26, 'near', 4, { dx: 4, turn: 0 }), K17(28, 'near', 5, { dx: 4, turn: -0.6 }), K17(31, 'near', 6, { dx: 4 }), ...RET17(34, 'near', 4)] },
+	bl4: { hits: [32], arcs: [[{ a0: 0, a1: 720, R: 0.8, sy: 0.5, th: 4 }, { a0: 180, a1: 900, R: 1.05, sy: 0.42, th: 3, delay: 2 }]], sfx: 'ฟิ้ววว!!',   // หมุนตัวครบรอบ แขนกาง ใบมีดกวาดทุกตัว
+		keys: [K17(0, 'home', 0), K17(20, 'home', 0, { sq: 0.3 }), K17(21, 'home', 0, { lean: -0.1 }), K17(28, 'near', 3, { dx: 10 }), K17(29, 'near', 3, { dx: 10, sq: 0.3 }), K17(32, 'near', 4, { dx: 8, turn: Math.PI }), K17(35, 'near', 4, { dx: 6, turn: 2 * Math.PI }), K17(38, 'near', 5, { dx: 6 }), K17(41, 'near', 6, { dx: 6 }), ...RET17(43, 'near', 6)] },
+	bl5: { hits: [24], arcs: [[{ a0: 190, a1: -10, R: 0.62, sy: 0.3, oy: 0.1, th: 5 }]], sfx: 'ฉึบ!', txt: [[29, 'แก๊ก']],   // มือวางที่ด้าม ชักออกฟันจังหวะเดียว (ทะลุผ่าน รอยฟันขึ้นทีหลัง) แล้วเก็บ
+		keys: [K17(0, 'home', 0), K17(8, 'home', 1, { sq: 0.35 }), K17(17, 'home', 1, { sq: 0.4, shake: 1 }), K17(18, 'home', 3, { sq: 0.5 }), K17(20, 'back', 4, { dx: -24, lean: -0.2 }), K17(23, 'back', 5, { dx: -24 }), K17(27, 'back', 6, { dx: -24 }), K17(29, 'back', 0, { dx: -24 }),
+			K17(35, 'back', 0, { dx: -24, face: -1 }), K17(36, 'back', 0, { dx: -24, face: -1, sq: 0.5 }), K17(37, 'back', 0, { dx: -24, face: -1, arc: 34 }), K17(49, 'home', 0, { face: -1, sq: 0.5 }), K17(52, 'home', 0)] },
+	bl6: { hits: [30, 34], arcs: [[{ a0: -70, a1: 150, R: 0.66, th: 5 }], [{ a0: -110, a1: 30, R: 0.66, th: 5 }]], sfx: 'ฉัวะ ฉัวะ!!',   // มือหน้าฟัน มือหลังดัน ฟันไขว้กากบาท 2 ครั้ง
+		keys: [K17(0, 'home', 0), K17(18, 'home', 0), K17(20, 'home', 1, { sq: 0.4 }), K17(21, 'home', 2, { lean: -0.12 }), K17(28, 'near', 2, { dx: 4, lean: -0.12 }), K17(30, 'near', 4, { dx: 2 }), K17(32, 'near', 2, { dx: 2, sq: 0.3 }), K17(34, 'near', 4, { dx: -2, sq: 0.5, lean: -0.1 }), K17(37, 'near', 5, { dx: -2 }), K17(40, 'near', 6, { dx: -2 }), ...RET17(42, 'near', -2)] },
+	bl7: { hits: [18], push: 4, arcs: [[{ a0: 200, a1: -20, R: 0.55, sy: 0.3, oy: 0.32, th: 4 }]], sfx: 'ฉึบ!',   // ก้าวสั้นเข้า ฟันต่ำที่ข้อเท้า แล้วกระโดดถอยทันที
+		keys: [K17(0, 'home', 0), K17(3, 'home', 1, { sq: 0.6 }), K17(4, 'home', 3, { sq: 0.6, lean: -0.15 }), K17(14, 'near', 3, { dx: -2, sq: 0.7, lean: -0.15 }), K17(18, 'near', 4, { dx: -4, sq: 0.8 }), K17(20, 'near', 5, { dx: -4, sq: 0.6 }), K17(21, 'near', 6, { dx: -4, arc: 26 }), K17(31, 'home', 0, { sq: 0.6 }), K17(34, 'home', 0)] },
+	bl8: { hits: [26], push: 3, crush: true, arcs: [[{ ln: 90, L: 1.4, th: 6 }]], sfx: 'ผ่าาา!!',   // จับสองมือยกเหนือหัว กระโดดสั้น ฟันดิ่งลงกลางหัว
+		keys: [...RUN17(4, 'near', 12, 2), K17(15, 'near', 2, { dx: 12, sq: 0.7 }), K17(16, 'near', 2, { dx: 12, sq: -0.1, arc: 30 }), K17(23, 'near', 3, { dx: 4 }), K17(26, 'near', 4, { sq: 0.7 }), K17(29, 'near', 5, { sq: 0.2 }), K17(32, 'near', 6), ...RET17(35, 'near')] },
+	bl9: { hits: [44], push: 22, arcs: [[{ a0: -120, a1: 200, R: 1.25, th: 8 }, { a0: -110, a1: 190, R: 1.55, sy: 0.7, th: 3, delay: 1 }]], sfx: 'ฉัวะะะ!!!', txt: [[36, 'ฮ้า!!!']],   // ค้างนิ่งเกร็งทั้งตัว แล้วระเบิดฟันเดียวสุดแรงพร้อมตะโกน
+		keys: [K17(0, 'home', 0), K17(16, 'home', 0, { sq: 0.3 }), K17(17, 'home', 0, { lean: -0.1 }), K17(24, 'near', 3, { dx: 14 }), K17(26, 'near', 3, { dx: 14, sq: 0.3, shake: 1 }), K17(41, 'near', 3, { dx: 14, sq: 0.45, shake: 2 }), K17(42, 'near', 3, { dx: 14, sq: 0.55 }), K17(44, 'near', 4, { dx: -6, sq: -0.15, lean: -0.22 }), K17(48, 'near', 5, { dx: -12, lean: -0.1 }), K17(54, 'near', 6, { dx: -12 }), ...RET17(56, 'near', -12)] },
+	bl10: { hits: [22], push: 10, arcs: [[{ a0: 180, a1: -10, R: 1.0, sy: 0.18, th: 5 }]], sfx: 'ฉับ!!',   // วิ่งฝ่าแนว ฟันขณะวิ่งทะลุ ไปหยุดหลังแถว
+		keys: [K17(0, 'home', 0), K17(4, 'home', 1, { sq: 0.5 }), K17(6, 'home', 3, { lean: -0.22 }), K17(20, 'mid', 3, { dx: 16, lean: -0.22 }), K17(22, 'mid', 4, { lean: -0.22 }), K17(28, 'back', 5, { dx: -34, lean: -0.08 }), K17(32, 'back', 6, { dx: -34, sq: 0.4 }), K17(36, 'back', 0, { dx: -34 }),
+			K17(38, 'back', 0, { dx: -34, face: -1, sq: 0.5 }), K17(39, 'back', 0, { dx: -34, face: -1, arc: 34 }), K17(51, 'home', 0, { face: -1, sq: 0.5 }), K17(54, 'home', 0)] },
+	bl11: { hits: [25, 32], boom: [21, 25, 28, 32, 37], arcs: [[{ a0: 0, a1: 360, R: 0.42, sy: 0.8, th: 3 }], [{ a0: 180, a1: 540, R: 0.48, sy: 0.8, th: 3 }]], sfx: 'วิ้ววว!',   // ขว้างมีดหมุนผ่านแถว แล้ววกกลับมารับที่มือ
+		keys: [K17(0, 'home', 0), K17(12, 'home', 1, { sq: 0.2 }), K17(16, 'home', 2, { sq: 0.3, lean: 0.12 }), K17(20, 'home', 3, { lean: 0.15 }), K17(21, 'home', 4, { lean: -0.18 }), K17(24, 'home', 5, { lean: -0.08 }), K17(28, 'home', 6), K17(36, 'home', 6), K17(37, 'home', 0, { sq: 0.4 }), K17(41, 'home', 0)] },
+	bl12: { hits: [38, 44], ash: [30, 66], arcs: [[{ a0: 0, a1: 540, R: 0.9, sy: 0.5, th: 4 }], [{ a0: 180, a1: 720, R: 1.2, sy: 0.4, th: 3 }]], sfx: 'วืด วืดดด!!',   // กระโดดหมุนตัวต่อเนื่อง 2 รอบ ใบมีดเป็นพายุ เถ้าปลิวตาม
+		keys: [K17(0, 'home', 0), K17(20, 'home', 0, { sq: 0.3 }), K17(21, 'home', 0, { lean: -0.1 }), K17(28, 'near', 2, { dx: 16 }), K17(30, 'near', 2, { dx: 16, sq: 0.7 }), K17(31, 'near', 4, { dx: 16, sq: -0.1, arc: 48 }), K17(47, 'near', 4, { dx: -4, rot: -4 * Math.PI, sq: 0.6 }), K17(50, 'near', 5, { dx: -4, rot: -4 * Math.PI }), K17(53, 'near', 6, { dx: -4, rot: -4 * Math.PI }),
+			...RET17(55, 'near', -4).map(k => ({ ...k, rot: (k.rot || 0) - 4 * Math.PI }))] },
+	bl13: { hits: [24], push: 4, arcs: [[{ a0: -10, a1: 130, R: 0.45, sy: 0.6, oy: 0.15, th: 3 }]], sfx: 'ฉึบ',   // ย่อต่ำ ก้าวไขว้เลื้อยเข้าใกล้ ปาดสั้นแล้วถอย
+		keys: [K17(0, 'home', 0), K17(4, 'home', 1, { sq: 0.8 }), K17(7, 'home', 1, { dx: -26, sq: 0.8 }), K17(9, 'home', 1, { dx: -28, sq: 0.75 }), K17(12, 'home', 1, { dx: -56, sq: 0.8 }), K17(14, 'home', 1, { dx: -58, sq: 0.75 }), K17(20, 'near', 3, { dx: 4, sq: 0.8 }), K17(22, 'near', 3, { sq: 0.8 }),
+			K17(24, 'near', 4, { sq: 0.7, dx: -2 }), K17(26, 'near', 5, { sq: 0.6, dx: -2 }), K17(28, 'near', 5, { sq: 0.7, dx: 2 }), K17(36, 'home', 0, { sq: 0.5 }), K17(39, 'home', 0)] },
+	bl14: { hits: [34], push: -6, arcs: [[{ a0: 250, a1: 20, R: 0.62, th: 4 }]], sfx: 'ฉัวะ!',   // ก้าวสามเหลี่ยมอ้อมแนวหน้า ปาดแถวหลัง แล้วกลับที่
+		keys: [...RUN17(4, 'near', 14, 2), K17(15, 'near', 2, { dx: 14, sq: 0.6 }), K17(16, 'near', 2, { dx: 14, sq: -0.1, arc: 42 }), K17(27, 'back', 2, { dx: -18, sq: 0.5 }), K17(29, 'back', 3, { dx: -18, face: -1 }), K17(31, 'back', 3, { dx: -14, face: -1, sq: 0.3 }), K17(34, 'back', 4, { dx: -6, face: -1 }),
+			K17(37, 'back', 5, { dx: -6, face: -1 }), K17(40, 'back', 6, { dx: -6, face: -1 }), K17(42, 'back', 0, { dx: -6, face: -1, sq: 0.6 }), K17(43, 'back', 0, { dx: -6, face: -1, arc: 42 }), K17(55, 'home', 0, { face: -1, sq: 0.6 }), K17(58, 'home', 0)] },
+	bl15: { hits: [34], counter: [8, 22, 27], arcs: [[{ a0: -80, a1: 170, R: 0.7, th: 5 }]], sfx: 'สวน!!', txt: [[27, 'ปัด!']],   // ตั้งมีดขวางลำตัวรอ โดนตีเมื่อไหร่ปัดแล้วฟันกลับทันที
+		keys: [K17(0, 'home', 0), K17(6, 'home', 1, { sq: 0.3 }), K17(26, 'home', 1, { sq: 0.35 }), K17(27, 'home', 2, { dx: 6, sq: 0.1 }), K17(31, 'home', 3, { dx: 4 }), K17(34, 'home', 4, { dx: -12, lean: -0.15 }), K17(37, 'home', 5, { dx: -14 }), K17(42, 'home', 6, { dx: -14 }), K17(48, 'home', 0)] },
+	bl16: { hits: [34, 40, 46, 52, 58], d0: 72, star: 70, sfx: 'ฉัวะ!!', txt: [[70, 'แก๊ก']], arcs: [[{ seg: [0, 2] }], [{ seg: [2, 4] }], [{ seg: [4, 1] }], [{ seg: [1, 3] }], [{ seg: [3, 0] }]],   // พุ่งไป-มารอบเป้า 5 ครั้ง ทิ้งรอยฟันรูปดาว แล้วกลับมาเก็บมีด
+		keys: [K17(0, 'home', 0), K17(20, 'home', 0), K17(24, 'home', 1, { sq: 0.6 }), K17(25, 'home', 3, { sq: -0.1, face: 'auto' }), K17(30, { s: 0 }, 3, { face: 'auto' }), K17(31, { s: 0 }, 4, { face: 'auto' }), K17(36, { s: 2 }, 3, { face: 'auto' }), K17(37, { s: 2 }, 4, { face: 'auto' }),
+			K17(42, { s: 4 }, 3, { face: 'auto' }), K17(43, { s: 4 }, 4, { face: 'auto' }), K17(48, { s: 1 }, 3, { face: 'auto' }), K17(49, { s: 1 }, 4, { face: 'auto' }), K17(54, { s: 3 }, 3, { face: 'auto' }), K17(55, { s: 3 }, 4, { face: 'auto' }),
+			K17(60, { s: 0 }, 5, { face: 'auto' }), K17(65, 'near', 5, { dx: 12, sq: 0.6 }), K17(67, 'near', 6, { dx: 12 }), K17(70, 'near', 0, { dx: 12 }), ...RET17(74, 'near', 12)] } };
+function pkStarPts(mcx, mcy, mw, mh) { const R = Math.max(mw, mh) * 0.5 + 30; return [0, 1, 2, 3, 4].map(k => { const an = (-90 + 72 * k) * Math.PI / 180; return [mcx + Math.cos(an) * R, mcy - 6 + Math.sin(an) * R * 0.75]; }); }
+// คีย์เฟรม → ตำแหน่ง/ร่างกายต่อเฟรม (f ทศนิยมได้ สำหรับร่างติดตา) · A = จุดอ้างอิงของฉาก
+function pk17Eval(keys, f, A) {
+	const pos = k => { if (k.x && k.x.s !== undefined) { const [px, py] = A.star[k.x.s]; return [px - A.rw / 2, Math.max(0, A.G - 36 - py)]; } return [A[k.x] + (k.dx || 0), k.lift || 0]; };
+	let i = 0; while (i < keys.length - 1 && keys[i + 1].f <= f) i++;
+	const k0 = keys[i], k1 = keys[Math.min(i + 1, keys.length - 1)], u = k1.f > k0.f ? Math.max(0, Math.min(1, (f - k0.f) / (k1.f - k0.f))) : 0, L = (a, b) => a + (b - a) * u;
+	const [x0, l0] = pos(k0), [x1, l1] = pos(k1), v = (key) => L(k0[key] ?? 0, k1[key] ?? 0);
+	const face = k0.face === 'auto' ? (x1 < x0 - 0.5 ? 1 : x1 > x0 + 0.5 ? -1 : 1) : (k0.face ?? 1);
+	const b = { x: L(x0, x1), lift: L(l0, l1) + 4 * (k0.arc || 0) * u * (1 - u), rot: v('rot'), lean: v('lean'), sx: 1, sy: 1, face, p: k0.p };
+	const sq = v('sq'); b.sy *= 1 - 0.2 * sq; b.sx *= 1 + 0.14 * sq;
+	const tw = v('turn'), c = Math.cos(tw); if (tw) b.sx *= Math.sign(c || 1) * Math.max(0.2, Math.abs(c));
+	const sh = A.rw ? k0.shake || 0 : 0; if (sh) b.x += Math.round((fbHash(Math.floor(f), 5, 1) - 0.5) * 2 * sh);
+	return b;
+}
+for (const die of [false, true]) for (const r of (DATA.tree17 || []).filter(r => r.school === 'คม')) {
+	const m = PK17_MOVE[r.tech_id]; if (!m) continue;
+	const ult = +r.req_prof >= K.ULT_PROF && r.effect !== 'counter', a = { ...m, id: r.tech_id, name: (ult ? '★ ' : '') + r.name_th, clip: 'pl_slash2', strike: 4, blade: true, kf: true, ult,
+		hit: 'SLASH', death: 'SL', bleed: r.status === 'เลือดไหล', extra: m.hits.slice(1).map(h => h - m.hits[0]), W: 360, MX: 140 };
+	if (m.hits.length !== +r.hits) console.warn('จำนวนครั้งไม่ตรงต้นไม้ท่า', r.tech_id, m.hits.length, r.hits);
+	const tl = pkTimeline(a, die); if (!tl.pk) continue;
+	const scope = { row: 'แถว', all: 'ทั้งหมด', column: 'แนวหน้า-หลัง' }[r.scope];
+	addClip(`สายคม 17 ท่า (ต้นไม้ท่า) · ตัว PixelLab · ${die ? 'โดนแล้วตาย' : 'โดน'}`, `pk17_${r.tech_id}_${die ? 'die' : 'hit'}`,
+		`${r.tech_id} ${a.name} · ${r.hits} ครั้ง${a.bleed ? ' + เลือดไหล' : ''}${scope ? ' · ' + scope + ' (หน้าเทสโดนตัวเดียว)' : ''}${r.free_row === '1' ? ' · ตีแถวหลังได้' : ''}${die ? ' → ตาย' : ''} — ${(DATA.motion17 || {})[r.tech_id] || ''}`,
+		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [a.W, PKV.H], tab: 'skillnew' });
+}
 function pkTint(key, col, a) {   // ภาพ + ย้อมสีทับเฉพาะส่วนที่มีภาพ
 	const im = IMG[key], oc = document.createElement('canvas'); oc.width = im.width; oc.height = im.height; const o = oc.getContext('2d'); o.drawImage(im, 0, 0);
 	if (a > 0) { o.globalCompositeOperation = 'source-atop'; o.globalAlpha = a; o.fillStyle = col; o.fillRect(0, 0, oc.width, oc.height); } return oc;
@@ -475,7 +538,7 @@ function pkGuardian(x, ground, k, F, slam) {
 	if (k >= 1) for (const s of [-1, 1]) { const ax = x + s * 30, ay = top + 30 + (slam ? 40 : 0); pkLine(x + s * 18, top + 30, ax, ay, P[2], 6); fbPx(ax - 6, ay - 6, P[1], 12, 12); fbPx(ax - 3, ay - 3, P[0], 6, 6); }
 }
 function pkvView(c) {
-	const F = S.frame, a = c.atk, tl = pkTimeline(a, c.die), m = pkMon(), { W, H, G, MX } = PKV;
+	const F = S.frame, a = c.atk, tl = pkTimeline(a, c.die), m = pkMon(), { H, G } = PKV, W = a.W || PKV.W, MX = a.MX || PKV.MX;
 	const rion = c.frames[F], rim = IMG[rion] || { width: 68, height: 112 }, d = F - tl.HIT;
 	const idle = pkRole(m, 'idle', Math.floor(F / 4) % 3), hurt = pkRole(m, 'hurt'), mim = IMG[idle];
 	if (!mim) return;
@@ -489,16 +552,18 @@ function pkvView(c) {
 	const AIR = MOVE.air || 0, T0 = tl.S0 - AIR, SLIDE = MOVE.slide || 5, B0 = lastHit + 8, BAIR = 12;
 	const clamp01 = v => Math.max(0, Math.min(1, v)), ease = v => v * v * (3 - 2 * v);
 	const slideX = f => SLIDE * (1 - (1 - clamp01((f - tl.S0) / 6)) ** 2), nearF = near - SLIDE;
-	const pkRx = f => !a.blade ? (a.proj || a.self ? home : near) :
+	const pkRx = f => a.kf ? pk17Eval(a.keys, f, A17).x : !a.blade ? (a.proj || a.self ? home : near) :
 		f < tl.S0 ? (AIR ? (f < T0 ? home : home + (near - home) * (f - T0) / AIR) : f < tl.pre ? home : home + (near - home) * ((f - tl.pre) / (tl.S0 - tl.pre)) ** 2) :
 		f < B0 ? near - slideX(f) : f < B0 + BAIR ? nearF + (home - nearF) * (f - B0) / BAIR : home;
+	// สายคม 17 ท่า: ทางเดิน/ร่างกายจากคีย์เฟรม (pk17Eval) แทนสูตรด้านบน
+	const A17 = a.kf ? { home, near, back: mx0 + 22 - rim.width, mid: mx0 + mw / 2 - rim.width / 2, rw: rim.width, G, star: pkStarPts(mx0 + mw / 2, my0 + mh * 0.55, mw, mh) } : null;
 	const rx = Math.round(pkRx(F)), ry = G - 108;
 	const squash = (k, b) => { b.sy *= 1 - 0.2 * k; b.sx *= 1 + 0.14 * k; };   // ยุบ k 0..1 · ปริมาตรคงที่โดยประมาณ
 	const airBody = (u, h, turns, tuck, dir, b) => {   // u 0..1 ช่วงลอย
 		b.lift = 4 * h * u * (1 - u);
 		const st = clamp01(1 - u / 0.25) * 0.12 + clamp01((u - 0.82) / 0.18) * 0.06; b.sy *= 1 + st; b.sx *= 1 - st * 0.7;   // ยืดตอนดีด/ก่อนแตะพื้น
 		if (turns) { const p = ease(clamp01((u - 0.06) / 0.76)); b.rot = dir * 2 * Math.PI * turns * p; if (tuck) { const k = Math.sin(Math.PI * p) * 0.14; b.sy *= 1 - k; b.sx *= 1 - k * 0.3; } } };
-	const pkBody = f => { const b = { lift: 0, rot: 0, lean: 0, sx: 1, sy: 1 }; if (!a.blade) return b;
+	const pkBody = f => { if (a.kf) return pk17Eval(a.keys, f, A17); const b = { lift: 0, rot: 0, lean: 0, sx: 1, sy: 1 }; if (!a.blade) return b;
 		if (f < tl.S0) {
 			if (AIR) { if (f >= T0 - 3 && f < T0) squash([0.45, 0.85, 1][Math.floor(f - T0 + 3)], b); else if (f >= T0) airBody((f - T0) / AIR, MOVE.h, MOVE.turns, MOVE.tuck, -1, b); }
 			else if (f >= tl.pre) { const u = (f - tl.pre) / (tl.S0 - tl.pre); b.lean = MOVE.lean * ease(clamp01(u * 1.6));
@@ -516,7 +581,7 @@ function pkvView(c) {
 		return b; };
 	const pkDrawRion = (key, x, f, alpha = 1) => { const im = IMG[key]; if (!im) return; const b = pkBody(f);   // เอนรอบเท้า · หมุนรอบกลางตัว (y72) · ยืด/ยุบรอบเท้า
 		ctx.save(); ctx.globalAlpha = alpha; ctx.translate(Math.round(x + im.width / 2), Math.round(ry + 108 - b.lift)); ctx.rotate(b.lean);
-		ctx.translate(0, -36); ctx.rotate(b.rot); ctx.translate(0, 36); ctx.scale(-b.sx, b.sy); ctx.drawImage(im, -Math.round(im.width / 2), -108); ctx.restore(); };
+		ctx.translate(0, -36); ctx.rotate(b.rot); ctx.translate(0, 36); ctx.scale(-b.sx * (b.face || 1), b.sy); ctx.drawImage(im, -Math.round(im.width / 2), -108); ctx.restore(); };
 	const cp = PK_COL[a.charge === 'rune' ? 'fire' : a.charge] || FB_PAL.fire, big = a.hit === 'BOOM';
 	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false; drawBg(); ctx.save();
 	const shk = d >= 0 && d < (big ? 8 : 4) ? (a.hit === 'CR' || big ? 4 : 2) * (1 - d / (big ? 8 : 4)) : 0, rs = vRng(F * 31 + 7);
@@ -536,10 +601,15 @@ function pkvView(c) {
 	// อัญเชิญ: ยักษ์ไฟลุกหลังมอน (วาดก่อนมอน)
 	if (a.proj === 'summon' && F >= tl.S0) { const u = F - tl.S0, k = Math.min(1, u / 8), fade = d > 6 ? Math.max(0, 1 - (d - 6) / 8) : 1; if (fade > 0) { ctx.save(); ctx.globalAlpha = fade; pkGuardian(MX, G, k, F, d >= 0 && d < 6); ctx.restore(); } }
 	// ── มอน ──
-	const dl = d - Math.max(0, ...(a.extra || [0]).filter(o => d >= o)), kb = d >= 0 && !a.status && !a.self ? Math.round(-(a.push || 5) * Math.max(0, 1 - dl / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0, mx = mx0 + kb;
+	const dl = d - Math.max(0, ...(a.extra || [0]).filter(o => d >= o)), kb = d >= 0 && !a.status && !a.self ? Math.round(-(a.push || 5) * Math.max(0, 1 - dl / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0;
+	// คมสวน: มอนวิ่งเข้ามาตี Rion (counter = [เริ่มวิ่ง, ถึงตัว, ตี]) แล้วโดนฟันสวนกระเด็นกลับที่เดิม
+	let mOff = 0, mRole = null; if (a.counter) { const [c0, c1, c2] = a.counter, C = Math.round(home + 30 - (mx0 + mw)), e = v => v * v * (3 - 2 * v);
+		mOff = F < c0 ? 0 : F < c1 ? C * e((F - c0) / (c1 - c0)) : F < tl.HIT ? C : Math.round(C * (1 - e(Math.min(1, (F - tl.HIT) / 12))));
+		mRole = F >= c1 && F < c2 ? 'wind' : F >= c2 && F < tl.HIT ? 'atk' : null; }
+	const mx = mx0 + kb + Math.round(mOff);
 	const mcx = mx + mw / 2, mcy = my0 + mh * 0.55;
 	if (!dying) {
-		let key = d >= 0 && (d < 9 || c.die) && !a.self ? hurt : idle;
+		let key = d >= 0 && (d < 9 || c.die) && !a.self ? hurt : mRole ? pkRole(m, mRole) : idle;
 		if (a.self === 'SHIELD' && d >= 6 && d < 16) key = pkRole(m, d < 11 ? 'wind' : 'atk');   // มอนโจมตีใส่โล่
 		let tint = ['#000', 0]; const lasting = d >= 0 ? Math.max(0, 1 - d / 22) : 0;
 		if ((dl === 0 || dl === 1) && d >= 0 && !a.status && !a.self) tint = ['#fff', 1];   // วาบขาวทุกครั้งที่ฟันโดน
@@ -550,7 +620,7 @@ function pkvView(c) {
 		else if (a.hit === 'DARK' && d >= 0) tint = ['#3a1a70', (F % 3 ? 0.55 : 0.3) * Math.max(0.3, lasting)];
 		else if (a.hit === 'TAPE' && d >= 0) tint = ['#8a8a8a', 0.25];
 		const oc = pkTint(key, tint[0], tint[1]), im = IMG[key];
-		let sy = 1; if (a.hit === 'CR' && d >= 0 && d < 4) sy = [0.78, 0.86, 0.94, 1][d];
+		let sy = 1; if ((a.hit === 'CR' || a.crush) && d >= 0 && d < 4) sy = [0.78, 0.86, 0.94, 1][d];
 		const shiv = (a.hit === 'ICE' || a.hit === 'NEEDLE') && d >= 0 && d < 16 ? (F % 2 ? 1 : -1) : 0;
 		ctx.drawImage(oc, mx + shiv, Math.round(G - im.height * sy), im.width, Math.round(im.height * sy));
 	} else pkDeath(a.death, hurt, mx, G, t);
@@ -594,6 +664,23 @@ function pkvView(c) {
 	if (a.proj && a.proj !== 'summon' && F >= tl.S0 && F < tl.S0 + 2) fbPixHit(hx, hy, F - tl.S0, false, cp, 11);
 	// ── เอฟเฟกต์ตอนโดน ตามชนิด ──
 	if (a.blade && d >= -1) pkBladeFx(a, d, F, { mx, my0, mw, mh, mcx, mcy, G, W, H, dying });
+	if (a.kf) {   // สายคม 17 ท่า: ของเฉพาะท่า
+		const bb = pkBody(F), hx0 = rx + rim.width / 2 - 22 * (bb.face || 1), hy0 = G - bb.lift - 60;
+		if (a.star && F >= a.star && F < a.star + 20) { const P = pkStarPts(mcx, mcy, mw, mh), q = F - a.star, al = Math.max(0, 1 - q / 20);   // เก็บมีด = ดาวทั้งดวงสว่างวาบ
+			if (q === 0) { ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fillRect(-8, -8, W + 16, H + 16); }
+			for (const [i, j] of [[0, 2], [2, 4], [4, 1], [1, 3], [3, 0]]) pkSlashLine(...P[i], ...P[j], 7, 1, al);
+			if (q < 8) pkStar(mcx, mcy, 10 + q * 4, '#ffffff', '#9ae6ff');
+			if (q < 14) pkText('ดับเถ้า!!', mcx - 30, Math.max(18, my0 - 10), '#ffffff'); }
+		if (a.boom) { const [t0, t1, t2, t3, t4] = a.boom, far = mx - 26, e = v => v * v * (3 - 2 * v);   // มีดบินหมุน ไป → เลยแถว → วกกลับ → รับที่มือ
+			if (F >= t0 && F < t4) { const x = F < t1 ? hx0 + (mcx - hx0) * (F - t0) / (t1 - t0) : F < t2 ? mcx + (far - mcx) * e((F - t1) / (t2 - t1)) : F < t3 ? far + (mcx - far) * e((F - t2) / (t3 - t2)) : mcx + (hx0 - mcx) * (F - t3) / (t4 - t3);
+				const y = F < t2 ? hy0 + (mcy - hy0) * Math.min(1, (F - t0) / (t1 - t0)) : mcy + (hy0 - mcy) * Math.max(0, (F - t3) / (t4 - t3)) - 8 * Math.sin(Math.min(1, (F - t2) / (t4 - t2)) * Math.PI), an = F * 1.4;
+				for (let g = 3; g >= 0; g--) { const gx = x + (F < t2 ? 1 : -1) * g * 5; ctx.save(); ctx.globalAlpha = g ? 0.25 : 1; for (let k = -5; k <= 5; k++) fbPx(gx + Math.cos(an) * k, y + Math.sin(an) * k, k > 1 ? '#e8eef4' : k > -2 ? '#9aa4b0' : '#6a4a30', 2, 2); ctx.restore(); } } }
+		if (a.ash && F >= a.ash[0] && F < a.ash[1]) for (let i = 0; i < 26; i++) {   // เถ้าปลิววนรอบตัว
+			const q = (F - a.ash[0]) + i * 3, an = i * 0.9 + q * 0.35, r = 14 + (i % 5) * 7 + q * 0.4, x = rx + rim.width / 2 + Math.cos(an) * r, y = G - bb.lift - 40 + Math.sin(an) * r * 0.6 - q * 0.3;
+			if (fbHash(i, F, 4) < 0.15 || y > G - 1) continue; fbPx(x, y, i % 3 ? '#8a8078' : '#c8c0b4', 2, i % 2 ? 1 : 2); }
+		if (a.counter && F >= a.counter[2] && F < a.counter[2] + 4) pkStar(home + 34, G - 52, 6 + (F - a.counter[2]) * 4, '#ffffff', '#ffd24a');   // ปัด
+		for (const [tf, txt] of (a.txt || [])) if (F >= tf && F < tf + 12) pkText(txt, hx0 - 10, Math.max(14, G - bb.lift - 104 - Math.min(4, F - tf)), '#ffffff');
+	}
 	if (d >= 0 && !dying && !a.self && !a.blade) { const o = { mx, my0, mw, mh, mcx, mcy, G, cp }; pkHit(a, d, F, o);
 		(a.extra || []).forEach((off, i) => { if (d >= off) pkHit({ ...a, sfx: '', mirror: i % 2 === 0 }, d - off, F, o); });   // ฟันซ้ำ: ครั้งที่ 2 กลับทิศ
 		if (a.bleed && d >= 6) for (let i = 0; i < 5; i++) { const q = (d + i * 4) % 14, x = mcx - 10 + i * 5, y = mcy - 6 + q * 2; if (y < G - 2) fbPx(x, y, q < 6 ? '#e8401a' : '#8a1a10', 2, q < 4 ? 3 : 2); }   // เลือดไหล
@@ -612,11 +699,20 @@ function pkCrescent(cx, cy, R, sy, a0, a1, th, prog, alpha) {
 		if (w < 1) continue; const x = cx + Math.cos(an) * R, y = cy + Math.sin(an) * R * sy; fbPx(x - w / 2, y - w / 2, col, Math.ceil(w), Math.ceil(w)); }
 	ctx.restore();
 }
+// รอยฟันเส้นตรงพิกเซล 3 ชั้นแบบเดียวกับเสี้ยว · ยาวออกจากต้นตามเวลา
+function pkSlashLine(x0, y0, x1, y1, th, prog, alpha) {
+	if (alpha <= 0) return; ctx.save(); ctx.globalAlpha = alpha; const n = Math.max(8, Math.round(Math.hypot(x1 - x0, y1 - y0) / 2)), m = Math.round(n * prog);
+	for (const [col, add] of [['#1a3a9a', 2], ['#9ae6ff', 0], ['#ffffff', -2]]) for (let i = 0; i <= m; i++) { const t = i / n, w = Math.max(0, th * Math.pow(Math.sin(Math.PI * t), 0.6) + add); if (w < 1) continue;
+		fbPx(x0 + (x1 - x0) * t - w / 2, y0 + (y1 - y0) * t - w / 2, col, Math.ceil(w), Math.ceil(w)); }
+	ctx.restore();
+}
 function pkBladeFx(a, d, F, o) {
 	const { mx, my0, mw, mh, mcx, mcy, G, W, H, dying } = o, S0 = Math.max(mw, mh), hitsAt = [0, ...(a.extra || [])];
 	hitsAt.forEach((off, k) => { const q = d - off; if (q < -1 || q > 9) return;
 		for (const s of (a.arcs[k] || a.arcs[0])) { const r = q - (s.delay || 0); if (r < -1) continue;
-			const prog = Math.min(1, (r + 2) / 3), al = r < 3 ? 1 : Math.max(0, 1 - (r - 3) / 5), R = S0 * s.R * (1 + Math.max(0, r) * 0.04);
+			const prog = Math.min(1, (r + 2) / 3), al = r < 3 ? 1 : Math.max(0, 1 - (r - 3) / 5), R = S0 * (s.R || 1) * (1 + Math.max(0, r) * 0.04);
+			if (s.ln !== undefined) { const an = s.ln * Math.PI / 180, h = S0 * s.L / 2; pkSlashLine(mcx - Math.cos(an) * h, mcy - Math.sin(an) * h, mcx + Math.cos(an) * h, mcy + Math.sin(an) * h, (s.th || 4) * (a.ult ? 1.3 : 1), prog, al); continue; }
+			if (s.seg) { const P = pkStarPts(mcx, mcy, mw, mh); pkSlashLine(...P[s.seg[0]], ...P[s.seg[1]], 5, prog, Math.max(al, a.star ? 0.35 : 0)); continue; }
 			pkCrescent(mcx, mcy + (s.oy || 0) * mh, R, s.sy || 0.85, s.a0, s.a1, (s.th || 4) * (a.ult ? 1.3 : 1), prog, al); }
 		if (q < 0) return;
 		if (q === 0) { ctx.fillStyle = `rgba(255,255,255,${a.ult ? 0.5 : 0.3})`; ctx.fillRect(-8, -8, W + 16, H + 16); }   // จอวาบ

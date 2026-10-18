@@ -302,6 +302,9 @@ def main(out_path):
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
 		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
 		'rion_pack': rion_pack_clips(),   # ชุดท่าครบ (prompt pack) + PixelLab
+		# ต้นไม้ท่า 17 ท่า (ร่าง · tools/data/skill17_proposal.py + skill17_content.py) → ชื่อ/จำนวนครั้ง/เลือดไหล/ท่าทาง ของคลิปสายคม 17 ท่า (kwan 18 ต.ค. "ปรับชื่อและท่าทางให้ตรงกับรายละเอียดในต้นไม้ท่า")
+		'tree17': list(csv.DictReader(open(os.path.join(ROOT, 'docs/design/skill_trees_17.csv'), encoding='utf-8'))),
+		'motion17': json.load(open(os.path.join(ROOT, 'docs/design/skill_trees_17_content.json'), encoding='utf-8'))['motion'],
 		'px_weapons': json.load(open(os.path.join(SPR, 'rion_px_weapons_draft/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_px_weapons_draft/index.json')) else [],   # ชีต 15-1 (แบบ Flow)
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),
