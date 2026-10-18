@@ -37,7 +37,8 @@ front view, full body, standing still with arms relaxed at his sides, feet plant
 ### ทิศ (DIRECTION)
 แก้ 18 ต.ค. รอบ 3: เคยสรุปว่า "Flow วาดหันขวาเสมอ" = **ผิด** · ชีตเวทย์ของ Muse 4 ชีต + เดินซ้ายของ Muse หันซ้ายถูกทุกภาพ
 ที่ต่าง: ชีตของ Muse มี "สิ่งที่ตัวละครหันไปหา" อยู่ทางซ้าย (เวทย์พุ่งไปทางซ้าย) และเป็นภาพแนวตั้ง · prompt ท่าเดินของ Claude ไม่มีเป้าหมายในภาพ → Flow ใช้ทิศตั้งต้น (หันขวา)
-ในศึก Rion หันซ้ายเข้าหามอน → **ท่าในศึกสั่งหันซ้ายตรง ๆ** · ท่าเดินบนแผนที่ สั่งทิศเดียวแล้วพลิกได้ (ไม่มีนาฬิกา)
+ในศึก Rion หันซ้ายเข้าหามอน → **ท่าในศึกสั่งหันซ้ายตรง ๆ** (ถ้า Flow ยังวาดขวามา โค้ดพลิกให้ · มือถือมีดสลับข้างตามภาพพลิก)
+**ท่าเดินบนแผนที่ ไม่ต้องสั่งทิศ (kwan 18 ต.ค.)** — Flow วาดทิศไหนมาก็ใช้ได้ · โค้ดพลิกภาพให้ได้อีกทิศ (คำสั่ง `flip` ในตัวตัด ไม่เสียเครดิตเจน ไม่เสียโทเคน) · ไม่ต้องเจนซ้ำเพื่อแก้ทิศ
 ```
 LEFT:  Side view facing LEFT, toward an enemy off-screen on the left: nose, cap brim and toes point to the LEFT edge of the image; the backpack is on the RIGHT side of the body.
 RIGHT: Side view facing RIGHT: nose, cap brim and toes point to the RIGHT edge of the image; the backpack is on the LEFT side of the body.
@@ -47,5 +48,5 @@ RIGHT: Side view facing RIGHT: nose, cap brim and toes point to the RIGHT edge o
 1. แนบ `rion_master_v2.png` เป็นภาพอ้างอิงตัวละคร (ภาพ 1)
 2. ใช้บล็อก CHARACTER + STYLE ข้างบนตามตัวอักษร · เปลี่ยนเฉพาะส่วนท่า/มุม/จำนวนช่อง
 3. พื้นหลังเขียว chroma-key ตามบล็อก BACKGROUND (ตัวตัดพื้น `rion_pack_cut.py` ใช้คีย์เขียวอยู่แล้ว)
-4. ท่าในศึกสั่งหันซ้าย (บอกว่าหันไปหาศัตรูทางซ้าย) · ท่าเดินแผนที่เจนทิศเดียวแล้วพลิก
+4. ท่าในศึกสั่งหันซ้าย (บอกว่าหันไปหาศัตรูทางซ้าย) · ท่าเดินแผนที่ไม่ใส่บล็อก DIRECTION (ทิศไหนก็ได้ โค้ดพลิกให้อีกทิศ)
 5. มอน/NPC/เอฟเฟกต์ใช้บล็อก STYLE เดียวกัน (พิกเซล 32-bit ขอบแข็ง ไม่ไล่สี) ให้เข้ากับ Rion
