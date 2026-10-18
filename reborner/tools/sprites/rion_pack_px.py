@@ -35,6 +35,17 @@ FIX_BASE = {"fan": "15-4", "hurt": "17-2", "cheer": "17-2", "18-1": "18-1"}
 
 ATK, RUN, IDLE, EMO = 110, 90, 220, 160   # ms ต่อเฟรม (ค่าภาพของหน้าเทส ไม่ใช่ค่าเกม)
 
+# ท่าเดินชีต B แก้สมจริงด้วยโค้ด (kwan 18 ต.ค. "แก้ด้วยโค้ด ให้เดินซ้ายขวาสมจริง")
+# · ใช้แถวบน 4 ภาพ วน 2 รอบ: แถวล่างหัวเล็กกว่าแถวบน ~6% (พื้นที่หมวก 5,130 vs 5,830) แต่ตัวสูงเท่ากัน → สลับแถวแล้วหัวกระพริบทุกครึ่งรอบ · ขาสองแถววาดข้างเดียวกันอยู่แล้ว
+# · ตัวยุบ/ยืด: ชีตวาดตัวขึ้นลง 7 จุด (ที่ 72) = เด้งเหมือนกระโดด · คนเดินจริงขึ้นลงราว 3% ของความสูง → ยืด/หดเฉพาะช่วงขา (ใต้ขอบกางเกง) ให้สูงตาม LEG_FIT
+#   แตะพื้น 0.985 · ยุบรับน้ำหนัก 0.970 · ขาผ่านกัน 1.000 · เขย่งส่งตัว 1.010 (เทียบตัวยืน REF) → ขึ้นลงรวม ~3 จุด
+# · ความเร็วในเกม: เดิน 1 รอบ = 2 ช่อง (Overworld WALK_FPS) = 2 × MOVE_TIME 0.15 วิ → 8 ภาพ = 37.5 ms/ภาพ · พื้นเลื่อน 48 จุด/รอบ (TILE 24 × 2)
+#   ก้าวในภาพวัดได้ ~111 จุดชีต × 0.202 = 22 จุด/ก้าว ≈ 45 จุด/รอบ → เท้าไถลบนพื้นไม่ถึง 1 จุดต่อภาพ
+WALK_B = [("M3-walkB", f"0_{c}") for c in range(4)] * 2
+LEG_FIT = {("M3-walkB", "0_0"): .985, ("M3-walkB", "0_1"): .970, ("M3-walkB", "0_2"): 1.0, ("M3-walkB", "0_3"): 1.01}
+WALK_GAME_MS = 37.5
+TRAVEL = {"walk_right_m3b": 48, "walk_left_m3b": -48, "walk_right_m3b_game": 48, "walk_left_m3b_game": -48}   # จุดที่พื้นเลื่อนต่อรอบ (บวก = เดินไปขวา)
+
 
 def R(sheet, row, cols):
 	return [(sheet, f"{row}_{c}") for c in cols]
@@ -59,8 +70,11 @@ WEAPON = {
 
 # (กลุ่ม, id, ชื่อ, เฟรม, ms, วน, พลิก)
 CLIPS = [
-	(G_WALK, "walk_right_m3b", "เดินขวา · master v2 ชีต B (8 ภาพ)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, False),
-	(G_WALK, "walk_left_m3b", "เดินซ้าย · master v2 ชีต B (พลิก)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, True),
+	(G_WALK, "walk_right_m3b", "เดินขวา · ชีต B แก้สมจริง · ความเร็วดู", WALK_B, RUN, True, False),
+	(G_WALK, "walk_left_m3b", "เดินซ้าย · ชีต B แก้สมจริง (พลิก) · ความเร็วดู", WALK_B, RUN, True, True),
+	(G_WALK, "walk_right_m3b_game", "เดินขวา · ชีต B แก้สมจริง · ความเร็วในเกม", WALK_B, WALK_GAME_MS, True, False),
+	(G_WALK, "walk_left_m3b_game", "เดินซ้าย · ชีต B แก้สมจริง (พลิก) · ความเร็วในเกม", WALK_B, WALK_GAME_MS, True, True),
+	(G_WALK, "walk_right_m3b_raw", "เดินขวา · ชีต B ดิบ (ก่อนแก้ · เทียบ)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, False),
 	(G_BATTLE, "idle", "ยืนศึกถือมีด", R("14-1", 0, range(6)), IDLE, True, False),
 	(G_BATTLE, "attack", "ฟันมีด (วิ่งเข้า → ฟาด)", R("14-1", 1, range(6)), ATK, False, False),
 	(G_BATTLE, "hurt", "โดนตี (มีดแปะด้วยโค้ดช่อง 2–5)", F("hurt", 6), ATK, False, False),
@@ -182,6 +196,23 @@ def no_watch(a):
 	return out
 
 
+def leg_fit(a, ratio, ref_h):
+	"""ยืด/หดเฉพาะช่วงขา (ใต้ขอบบนกางเกง) ให้ตัวทั้งตัวสูง ratio × ref_h · หัวและลำตัวไม่เปลี่ยน · เท้ายังอยู่แถวล่าง"""
+	al = a[..., 3] > 127
+	r, g, b = a[..., 0], a[..., 1], a[..., 2]
+	blue = al & (b > r + 50) & (b > g + 20)
+	h = a.shape[0]
+	hip = h // 2 + int(np.nonzero(blue[h // 2:].any(1))[0].min())
+	ys = np.nonzero(al.any(1))[0]
+	top, bot = ys.min(), ys.max() + 1
+	legs = a[hip:bot]
+	new_leg = int(round(ratio * ref_h)) - (hip - top)
+	if new_leg <= 0 or new_leg == legs.shape[0]:
+		return a
+	rs = np.array(Image.fromarray(legs.astype(np.uint8), "RGBA").resize((legs.shape[1], new_leg), Image.NEAREST)).astype(float)
+	return np.concatenate([a[:hip], rs], 0)
+
+
 def shrink(a, k):
 	al = a[..., 3:] / 255
 	pre = a.copy()
@@ -221,6 +252,8 @@ def build():
 				a = no_watch(a)
 			for x0, y0, x1, y1 in ERASE.get((sheet, f), []):
 				a[y0:y1, x0:x1, 3] = 0
+			if (sheet, f) in LEG_FIT and not cid.endswith("_raw"):
+				a = leg_fit(a, LEG_FIT[(sheet, f)], height(load(sheet, REF[sheet][0])))
 			if flip:
 				a = a[:, ::-1]
 			rgb, m = shrink(a, ks[key])
@@ -244,7 +277,7 @@ def build():
 			n = f"{cid}_{i}"
 			items.append((n, rgb, m, ox, oy, W))
 			names.append(n)
-		clips.append({"group": group, "id": cid, "label": label, "frames": names, "ms": ms, "loop": loop, "w": W,
+		clips.append({"group": group, "id": cid, "label": label, "frames": names, "ms": ms, "loop": loop, "w": W, "travel": TRAVEL.get(cid, 0),
 			"src": ["%s/%s" % x for x in frames]})
 	# ภาพหน้า 16-5 (ครึ่งตัว) สูง PORTRAIT_H
 	por = []

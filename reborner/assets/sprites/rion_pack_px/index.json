@@ -41,7 +41,7 @@
   {
    "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
    "id": "walk_right_m3b",
-   "label": "เดินขวา · master v2 ชีต B (8 ภาพ)",
+   "label": "เดินขวา · ชีต B แก้สมจริง · ความเร็วดู",
    "frames": [
     "walk_right_m3b_0",
     "walk_right_m3b_1",
@@ -54,22 +54,23 @@
    ],
    "ms": 90,
    "loop": true,
-   "w": 65,
+   "w": 64,
+   "travel": 48,
    "src": [
     "M3-walkB/0_0",
     "M3-walkB/0_1",
     "M3-walkB/0_2",
     "M3-walkB/0_3",
-    "M3-walkB/1_0",
-    "M3-walkB/1_1",
-    "M3-walkB/1_2",
-    "M3-walkB/1_3"
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3"
    ]
   },
   {
    "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
    "id": "walk_left_m3b",
-   "label": "เดินซ้าย · master v2 ชีต B (พลิก)",
+   "label": "เดินซ้าย · ชีต B แก้สมจริง (พลิก) · ความเร็วดู",
    "frames": [
     "walk_left_m3b_0",
     "walk_left_m3b_1",
@@ -82,7 +83,95 @@
    ],
    "ms": 90,
    "loop": true,
+   "w": 64,
+   "travel": -48,
+   "src": [
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3",
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3"
+   ]
+  },
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "walk_right_m3b_game",
+   "label": "เดินขวา · ชีต B แก้สมจริง · ความเร็วในเกม",
+   "frames": [
+    "walk_right_m3b_game_0",
+    "walk_right_m3b_game_1",
+    "walk_right_m3b_game_2",
+    "walk_right_m3b_game_3",
+    "walk_right_m3b_game_4",
+    "walk_right_m3b_game_5",
+    "walk_right_m3b_game_6",
+    "walk_right_m3b_game_7"
+   ],
+   "ms": 37.5,
+   "loop": true,
+   "w": 64,
+   "travel": 48,
+   "src": [
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3",
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3"
+   ]
+  },
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "walk_left_m3b_game",
+   "label": "เดินซ้าย · ชีต B แก้สมจริง (พลิก) · ความเร็วในเกม",
+   "frames": [
+    "walk_left_m3b_game_0",
+    "walk_left_m3b_game_1",
+    "walk_left_m3b_game_2",
+    "walk_left_m3b_game_3",
+    "walk_left_m3b_game_4",
+    "walk_left_m3b_game_5",
+    "walk_left_m3b_game_6",
+    "walk_left_m3b_game_7"
+   ],
+   "ms": 37.5,
+   "loop": true,
+   "w": 64,
+   "travel": -48,
+   "src": [
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3",
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3"
+   ]
+  },
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "walk_right_m3b_raw",
+   "label": "เดินขวา · ชีต B ดิบ (ก่อนแก้ · เทียบ)",
+   "frames": [
+    "walk_right_m3b_raw_0",
+    "walk_right_m3b_raw_1",
+    "walk_right_m3b_raw_2",
+    "walk_right_m3b_raw_3",
+    "walk_right_m3b_raw_4",
+    "walk_right_m3b_raw_5",
+    "walk_right_m3b_raw_6",
+    "walk_right_m3b_raw_7"
+   ],
+   "ms": 90,
+   "loop": true,
    "w": 65,
+   "travel": 0,
    "src": [
     "M3-walkB/0_0",
     "M3-walkB/0_1",
@@ -109,6 +198,7 @@
    "ms": 220,
    "loop": true,
    "w": 67,
+   "travel": 0,
    "src": [
     "14-1/0_0",
     "14-1/0_1",
@@ -133,6 +223,7 @@
    "ms": 110,
    "loop": false,
    "w": 79,
+   "travel": 0,
    "src": [
     "14-1/1_0",
     "14-1/1_1",
@@ -157,6 +248,7 @@
    "ms": 110,
    "loop": false,
    "w": 64,
+   "travel": 0,
    "src": [
     "fix/hurt_0",
     "fix/hurt_1",
@@ -180,6 +272,7 @@
    "ms": 110,
    "loop": false,
    "w": 83,
+   "travel": 0,
    "src": [
     "17-2/1_0",
     "17-2/1_1",
@@ -202,6 +295,7 @@
    "ms": 90,
    "loop": true,
    "w": 69,
+   "travel": 0,
    "src": [
     "14-1/4_0",
     "14-1/4_1",
@@ -225,6 +319,7 @@
    "ms": 110,
    "loop": false,
    "w": 76,
+   "travel": 0,
    "src": [
     "14-1/5_0",
     "14-1/5_1",
@@ -249,6 +344,7 @@
    "ms": 110,
    "loop": false,
    "w": 69,
+   "travel": 0,
    "src": [
     "14-1/6_0",
     "14-1/6_1",
@@ -273,6 +369,7 @@
    "ms": 110,
    "loop": false,
    "w": 60,
+   "travel": 0,
    "src": [
     "14-1/7_0",
     "14-1/7_1",
@@ -295,6 +392,7 @@
    "ms": 110,
    "loop": false,
    "w": 72,
+   "travel": 0,
    "src": [
     "15-6/0_0",
     "15-6/0_1",
@@ -319,6 +417,7 @@
    "ms": 110,
    "loop": false,
    "w": 68,
+   "travel": 0,
    "src": [
     "15-6/1_0",
     "15-6/1_1",
@@ -343,6 +442,7 @@
    "ms": 110,
    "loop": false,
    "w": 66,
+   "travel": 0,
    "src": [
     "15-6/3_0",
     "15-6/3_1",
@@ -367,6 +467,7 @@
    "ms": 110,
    "loop": false,
    "w": 62,
+   "travel": 0,
    "src": [
     "15-6/4_0",
     "15-6/4_1",
@@ -393,6 +494,7 @@
    "ms": 220,
    "loop": true,
    "w": 58,
+   "travel": 0,
    "src": [
     "16-1/0_0",
     "16-1/0_1",
@@ -417,6 +519,7 @@
    "ms": 220,
    "loop": true,
    "w": 56,
+   "travel": 0,
    "src": [
     "16-1/1_0",
     "16-1/1_1",
@@ -441,6 +544,7 @@
    "ms": 90,
    "loop": true,
    "w": 58,
+   "travel": 0,
    "src": [
     "16-1/2_0",
     "16-1/2_1",
@@ -465,6 +569,7 @@
    "ms": 90,
    "loop": true,
    "w": 56,
+   "travel": 0,
    "src": [
     "16-1b/0_0",
     "16-1b/0_1",
@@ -489,6 +594,7 @@
    "ms": 90,
    "loop": true,
    "w": 70,
+   "travel": 0,
    "src": [
     "17-3b/0_0",
     "17-3b/0_1",
@@ -513,6 +619,7 @@
    "ms": 90,
    "loop": true,
    "w": 57,
+   "travel": 0,
    "src": [
     "M-walkA/0_0",
     "M-walkA/0_1",
@@ -537,6 +644,7 @@
    "ms": 90,
    "loop": true,
    "w": 51,
+   "travel": 0,
    "src": [
     "M-walkB/0_0",
     "M-walkB/0_1",
@@ -563,6 +671,7 @@
    "ms": 90,
    "loop": true,
    "w": 66,
+   "travel": 0,
    "src": [
     "M2-walkB/0_0",
     "M2-walkB/0_1",
@@ -591,6 +700,7 @@
    "ms": 90,
    "loop": true,
    "w": 66,
+   "travel": 0,
    "src": [
     "M2-walkB/0_0",
     "M2-walkB/0_1",
@@ -619,6 +729,7 @@
    "ms": 90,
    "loop": true,
    "w": 68,
+   "travel": 0,
    "src": [
     "M3-walkA/0_0",
     "M3-walkA/0_1",
@@ -647,6 +758,7 @@
    "ms": 90,
    "loop": true,
    "w": 68,
+   "travel": 0,
    "src": [
     "M3-walkA/0_0",
     "M3-walkA/0_1",
@@ -675,6 +787,7 @@
    "ms": 90,
    "loop": true,
    "w": 66,
+   "travel": 0,
    "src": [
     "MU-walkL/0_0",
     "MU-walkL/0_1",
@@ -711,6 +824,7 @@
    "ms": 90,
    "loop": true,
    "w": 70,
+   "travel": 0,
    "src": [
     "MU-walkL/0_0",
     "MU-walkL/0_1",
@@ -749,6 +863,7 @@
    "ms": 90,
    "loop": true,
    "w": 64,
+   "travel": 0,
    "src": [
     "MU-walkR/0_0",
     "MU-walkR/0_1",
@@ -777,6 +892,7 @@
    "ms": 90,
    "loop": false,
    "w": 60,
+   "travel": 0,
    "src": [
     "16-1b/2_0",
     "16-1b/2_1",
@@ -800,6 +916,7 @@
    "ms": 160,
    "loop": false,
    "w": 67,
+   "travel": 0,
    "src": [
     "16-2/0_0",
     "16-2/0_1",
@@ -823,6 +940,7 @@
    "ms": 160,
    "loop": false,
    "w": 58,
+   "travel": 0,
    "src": [
     "16-2/1_0",
     "16-2/1_1",
@@ -847,6 +965,7 @@
    "ms": 160,
    "loop": false,
    "w": 58,
+   "travel": 0,
    "src": [
     "16-2/2_0",
     "16-2/2_1",
@@ -871,6 +990,7 @@
    "ms": 160,
    "loop": false,
    "w": 58,
+   "travel": 0,
    "src": [
     "16-2/3_0",
     "16-2/3_1",
@@ -895,6 +1015,7 @@
    "ms": 160,
    "loop": false,
    "w": 65,
+   "travel": 0,
    "src": [
     "16-2/4_0",
     "16-2/4_1",
@@ -919,6 +1040,7 @@
    "ms": 160,
    "loop": true,
    "w": 76,
+   "travel": 0,
    "src": [
     "17-3b/1_0",
     "17-3b/1_1",
@@ -942,6 +1064,7 @@
    "ms": 160,
    "loop": false,
    "w": 66,
+   "travel": 0,
    "src": [
     "16-3/0_0",
     "16-3/0_1",
@@ -964,6 +1087,7 @@
    "ms": 220,
    "loop": false,
    "w": 76,
+   "travel": 0,
    "src": [
     "16-3/1_0",
     "16-3/1_1",
@@ -986,6 +1110,7 @@
    "ms": 160,
    "loop": false,
    "w": 65,
+   "travel": 0,
    "src": [
     "16-3/2_0",
     "16-3/2_1",
@@ -1008,6 +1133,7 @@
    "ms": 160,
    "loop": false,
    "w": 62,
+   "travel": 0,
    "src": [
     "16-3/3_0",
     "16-3/3_1",
@@ -1030,6 +1156,7 @@
    "ms": 160,
    "loop": false,
    "w": 56,
+   "travel": 0,
    "src": [
     "16-3/4_0",
     "16-3/4_1",
@@ -1052,6 +1179,7 @@
    "ms": 160,
    "loop": false,
    "w": 59,
+   "travel": 0,
    "src": [
     "16-3/5_0",
     "16-3/5_1",
@@ -1074,6 +1202,7 @@
    "ms": 160,
    "loop": false,
    "w": 60,
+   "travel": 0,
    "src": [
     "16-4/0_0",
     "16-4/0_1",
@@ -1097,6 +1226,7 @@
    "ms": 220,
    "loop": true,
    "w": 61,
+   "travel": 0,
    "src": [
     "16-4/1_0",
     "16-4/1_1",
@@ -1121,6 +1251,7 @@
    "ms": 160,
    "loop": false,
    "w": 73,
+   "travel": 0,
    "src": [
     "16-4/2_0",
     "16-4/2_1",
@@ -1144,6 +1275,7 @@
    "ms": 160,
    "loop": false,
    "w": 70,
+   "travel": 0,
    "src": [
     "fix/cheer_0",
     "fix/cheer_1",
@@ -1167,6 +1299,7 @@
    "ms": 160,
    "loop": false,
    "w": 56,
+   "travel": 0,
    "src": [
     "16-4/4_0",
     "16-4/4_1",
@@ -1191,6 +1324,7 @@
    "ms": 110,
    "loop": false,
    "w": 78,
+   "travel": 0,
    "src": [
     "18-1/0_0",
     "fix/18-1_0_1",
@@ -1215,6 +1349,7 @@
    "ms": 110,
    "loop": false,
    "w": 80,
+   "travel": 0,
    "src": [
     "18-1/1_0",
     "fix/18-1_1_1",
@@ -1239,6 +1374,7 @@
    "ms": 110,
    "loop": false,
    "w": 80,
+   "travel": 0,
    "src": [
     "18-1/2_0",
     "18-1/2_1",
@@ -1263,6 +1399,7 @@
    "ms": 110,
    "loop": false,
    "w": 81,
+   "travel": 0,
    "src": [
     "18-1/3_0",
     "18-1/3_1",
@@ -1287,6 +1424,7 @@
    "ms": 110,
    "loop": false,
    "w": 74,
+   "travel": 0,
    "src": [
     "18-1/4_0",
     "18-1/4_1",
@@ -1311,6 +1449,7 @@
    "ms": 110,
    "loop": false,
    "w": 75,
+   "travel": 0,
    "src": [
     "18-1/5_0",
     "18-1/5_1",
@@ -1335,6 +1474,7 @@
    "ms": 110,
    "loop": false,
    "w": 73,
+   "travel": 0,
    "src": [
     "18-1/6_0",
     "fix/18-1_6_1",
@@ -1358,6 +1498,7 @@
    "ms": 110,
    "loop": false,
    "w": 86,
+   "travel": 0,
    "src": [
     "15-2/0_0",
     "15-2/0_1",
@@ -1380,6 +1521,7 @@
    "ms": 110,
    "loop": false,
    "w": 86,
+   "travel": 0,
    "src": [
     "15-2/1_0",
     "15-2/1_1",
@@ -1402,6 +1544,7 @@
    "ms": 110,
    "loop": false,
    "w": 120,
+   "travel": 0,
    "src": [
     "17-1b/0_0",
     "17-1b/0_1",
@@ -1424,6 +1567,7 @@
    "ms": 110,
    "loop": false,
    "w": 70,
+   "travel": 0,
    "src": [
     "15-2/3_0",
     "15-2/3_1",
@@ -1446,6 +1590,7 @@
    "ms": 110,
    "loop": false,
    "w": 83,
+   "travel": 0,
    "src": [
     "15-2/4_0",
     "15-2/4_1",
@@ -1468,6 +1613,7 @@
    "ms": 110,
    "loop": false,
    "w": 79,
+   "travel": 0,
    "src": [
     "15-2/5_0",
     "15-2/5_1",
@@ -1490,6 +1636,7 @@
    "ms": 110,
    "loop": false,
    "w": 82,
+   "travel": 0,
    "src": [
     "15-3/0_0",
     "15-3/0_1",
@@ -1512,6 +1659,7 @@
    "ms": 110,
    "loop": false,
    "w": 93,
+   "travel": 0,
    "src": [
     "15-3/1_0",
     "15-3/1_1",
@@ -1534,6 +1682,7 @@
    "ms": 110,
    "loop": false,
    "w": 89,
+   "travel": 0,
    "src": [
     "15-3/2_0",
     "15-3/2_1",
@@ -1556,6 +1705,7 @@
    "ms": 110,
    "loop": false,
    "w": 115,
+   "travel": 0,
    "src": [
     "17-1b/1_0",
     "17-1b/1_1",
@@ -1578,6 +1728,7 @@
    "ms": 110,
    "loop": false,
    "w": 79,
+   "travel": 0,
    "src": [
     "15-3/4_0",
     "15-3/4_1",
@@ -1600,6 +1751,7 @@
    "ms": 110,
    "loop": false,
    "w": 102,
+   "travel": 0,
    "src": [
     "17-1b/2_0",
     "17-1b/2_1",
@@ -1622,6 +1774,7 @@
    "ms": 110,
    "loop": false,
    "w": 83,
+   "travel": 0,
    "src": [
     "fix/fan_0",
     "fix/fan_1",
@@ -1644,6 +1797,7 @@
    "ms": 110,
    "loop": false,
    "w": 84,
+   "travel": 0,
    "src": [
     "15-4/1_0",
     "15-4/1_1",
@@ -1666,6 +1820,7 @@
    "ms": 110,
    "loop": false,
    "w": 88,
+   "travel": 0,
    "src": [
     "15-4/2_0",
     "15-4/2_1",
@@ -1688,6 +1843,7 @@
    "ms": 110,
    "loop": false,
    "w": 115,
+   "travel": 0,
    "src": [
     "17-1b/4_0",
     "17-1b/4_1",
@@ -1710,6 +1866,7 @@
    "ms": 110,
    "loop": false,
    "w": 110,
+   "travel": 0,
    "src": [
     "17-1b/5_0",
     "17-1b/5_1",
@@ -1732,6 +1889,7 @@
    "ms": 110,
    "loop": false,
    "w": 95,
+   "travel": 0,
    "src": [
     "17-1b/6_0",
     "17-1b/6_1",
@@ -1754,6 +1912,7 @@
    "ms": 110,
    "loop": false,
    "w": 81,
+   "travel": 0,
    "src": [
     "15-5/0_0",
     "15-5/0_1",
@@ -1776,6 +1935,7 @@
    "ms": 110,
    "loop": false,
    "w": 86,
+   "travel": 0,
    "src": [
     "15-5/1_0",
     "15-5/1_1",
@@ -1798,6 +1958,7 @@
    "ms": 110,
    "loop": false,
    "w": 90,
+   "travel": 0,
    "src": [
     "15-5/2_0",
     "15-5/2_1",
@@ -1820,6 +1981,7 @@
    "ms": 110,
    "loop": false,
    "w": 86,
+   "travel": 0,
    "src": [
     "15-5/3_0",
     "15-5/3_1",
@@ -1842,6 +2004,7 @@
    "ms": 110,
    "loop": false,
    "w": 78,
+   "travel": 0,
    "src": [
     "15-5/4_0",
     "15-5/4_1",
@@ -1864,6 +2027,7 @@
    "ms": 110,
    "loop": false,
    "w": 77,
+   "travel": 0,
    "src": [
     "15-5/5_0",
     "15-5/5_1",
