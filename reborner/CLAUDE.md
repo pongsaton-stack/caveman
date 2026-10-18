@@ -35,6 +35,8 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
       ขั้น: `ref` (master → ตัดเขียว → ตัวสูง 72 ผืน 96 · ไม่ต่อเน็ต) → `balance` → `character` (/create-character-v3 4 ทิศ · ภาพอ้างอิงหันหน้า) → `walk east` (/characters/animations mode v3 8 เฟรม) → `fetch` (ZIP → `assets/sprites/pixellab_draft/zip/`)
       ภาพอ้างอิง `assets/sprites/pixellab_draft/ref_south.png` ทำแล้ว · **คีย์ยังไม่เข้า session ที่ kwan ใส่ (ต้องเปิด session ใหม่)** · ยังไม่ได้เรียก API จริง · ขนาดภาพ API 32–256 จุด
   แบบก่อนหน้า (Flow หมวกน้ำเงิน 16 ต.ค. · `rion_flow_ref.png`) = แบบเดียวกันแนวภาพคม → ใช้ประกอบได้ · ภาพ master ใหม่เป็นภาพอ้างอิงหลัก
+**งานค้างล่าสุด (อ่านก่อนเมื่อเริ่ม session ใหม่ · อัปเดต 18 ต.ค. 2026)**: ท่าเดิน Rion master v2 ชีต B แก้สมจริงแล้ว (หน้า animation test Version 113 · ยังไม่เข้าเกม) →
+  กำลังทดลอง PixelLab: kwan ใส่ `PIXELLAB_API_KEY` แล้ว แต่ session เดิมมองไม่เห็น (ค่า environment เข้าเฉพาะ session ใหม่) · ขั้นต่อไป: `python3 tools/sprites/pixellab_walk.py balance` → `character` → `walk east` → `fetch` → ลงหน้าเทสเทียบกับชีต B · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
 **ท่า/เอฟเฟกต์/อนิเมชั่นใหม่ ต้องทำให้ลองได้ในหน้า animation test ก่อนทุกครั้ง** (กฎ 3 ต.ค. 2026) แล้วค่อยเข้าเกมเมื่อ kwan ดูแล้ว — หน้า: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
 
 ## ลิงก์ที่ปักไว้
