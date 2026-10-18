@@ -23,7 +23,7 @@ CANVAS_H, FEET = 112, 108
 # ตัวยืนตรงของแต่ละชีต (เฟรม, สัดส่วนของความสูงยืน) · ชีตที่ไม่มีท่ายืน ใช้ท่าวิ่งหารสัดส่วนที่วัดจาก 17-3 (วิ่ง 290 / ยืนหน้า 17-3 แถว 6)
 REF = {"14-1": ("0_0", 1), "15-6": ("0_0", 1), "15-2": ("0_0", 1), "15-3": ("0_0", 1), "15-4": ("0_0", 1), "15-5": ("0_0", 1),
 	"16-1": ("0_0", 1), "16-1b": ("2_0", 1), "16-2": ("0_0", 1), "16-3": ("0_0", 1), "16-4": ("0_0", 1),
-	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "MU-walkL": ("0_0", 1), "MU-walkR": ("0_0", 1), "M2-walkA": ("0_0", 1), "M2-walkB": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
+	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "MU-walkL": ("0_0", 1), "MU-walkR": ("0_0", 1), "M2-walkA": ("0_0", 1), "M2-walkB": ("0_0", 1), "M3-walkA": ("0_0", 1), "M3-walkB": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
 # 16-1b วาดแถววิ่งหลังเล็กกว่าแถวกระโดด (ตัวยืนหน้า 2_0) → แถว 0 ใช้อัตราของตัวเอง: วิ่งหลัง ÷ สัดส่วนวิ่ง/ยืนแบบ 17-3b
 ROW_REF = {("16-1b", "0"): "0_0",
 	**{("MU-walkL", str(r)): f"{r}_0" for r in range(4)}, **{("MU-walkR", str(r)): f"{r}_0" for r in range(3)}}   # ชีต Muse แต่ละแถวขนาดตัวไม่เท่ากัน → ย่อทีละแถว
@@ -79,6 +79,10 @@ CLIPS = [
 	(G_FIELD, "walk_right_m", "เดินขวา · แบบ master", R("M-walkB", 0, range(6)), RUN, True, False),
 	(G_FIELD, "walk_right_m2", "เดินขวา · master ไม่มีนาฬิกา (prompt รอบ 2 · 8 ภาพ)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, False),
 	(G_FIELD, "walk_left_m2", "เดินซ้าย · master ไม่มีนาฬิกา (พลิกจากเดินขวา)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, True),
+	(G_FIELD, "walk_right_m3a", "เดินขวา · master v2 ชีต A (8 ภาพ)", R("M3-walkA", 0, range(4)) + R("M3-walkA", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_m3a", "เดินซ้าย · master v2 ชีต A (พลิก)", R("M3-walkA", 0, range(4)) + R("M3-walkA", 1, range(4)), RUN, True, True),
+	(G_FIELD, "walk_right_m3b", "เดินขวา · master v2 ชีต B (8 ภาพ)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_m3b", "เดินซ้าย · master v2 ชีต B (พลิก)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, True),
 	(G_FIELD, "walk_left_mu", "เดินซ้าย · prompt Muse (แถว 1–2 = 8 ภาพ)", R("MU-walkL", 0, range(4)) + R("MU-walkL", 1, range(4)), RUN, True, False),
 	(G_FIELD, "walk_left_mu_all", "เดินซ้าย · prompt Muse ทั้ง 16 ภาพ (แถว 3 หัวโตกว่าแถวอื่น)", [("MU-walkL", f"{r}_{c}") for r in range(4) for c in range(4)], RUN, True, False),
 	(G_FIELD, "walk_right_mu", "เดินขวา · prompt Muse (3+3+4 = 10 ภาพ · นาฬิกาสลับข้าง)", R("MU-walkR", 0, range(3)) + R("MU-walkR", 1, range(3)) + R("MU-walkR", 2, range(4)), RUN, True, False),
