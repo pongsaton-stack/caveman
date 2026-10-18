@@ -26,7 +26,9 @@ def rion_pack_clips():
 	rp = clips(os.path.join(SPR, 'rion_pack_px/index.json'))
 	pl = clips(os.path.join(SPR, 'pixellab_draft/px/index.json'))
 	n = max((i + 1 for i, c in enumerate(rp) if pl and c['group'] == pl[0]['group']), default=len(rp))
-	return rp[:n] + pl + rp[n:]
+	# PixelLab ฟันมีดรอบ 2 พลิกหันขวา (ภาพสร้างใน sprites()) → ตัว Rion ในแท็บสกิล ชุดใหม่ แบบ PixelLab · ไม่ลงแท็บท่าขยับ (hidden)
+	extra = [{'group': '', 'id': 'pl_slash2', 'label': 'PixelLab ฟันมีดรอบ 2 (พลิกหันขวา)', 'frames': ['pl_slash2_%d' % i for i in range(8)], 'ms': 110, 'loop': False, 'w': 104, 'travel': 0, 'hidden': True}] if pl else []
+	return rp[:n] + pl + rp[n:] + extra
 
 
 def png(path):
@@ -71,6 +73,11 @@ def sprites():
 		for f in sorted(os.listdir(pl)):
 			if f.endswith('.png'):
 				out['rpk/' + f[:-4]] = png(os.path.join(pl, f))
+				if f.startswith('pixellab_slash2_west_'):   # พลิกหันขวาแบบชุดครบ (หน้าเทสพลิกกลับหันซ้ายเอง) · ใช้ในแท็บสกิล ชุดใหม่ (kwan 18 ต.ค. "ขอดูเทียบ")
+					import io
+					from PIL import Image, ImageOps
+					b = io.BytesIO(); ImageOps.mirror(Image.open(os.path.join(pl, f))).save(b, 'PNG')
+					out['rpk/pl_slash2_' + f.rsplit('_', 1)[1][:-4]] = 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
 	# มอนภูมิภาค 1 พิกเซล (tools/sprites/monsters_px.py · ชีตรอบ 10 · ร่าง)
 	md = os.path.join(SPR, 'monsters_px_draft')
 	if os.path.isdir(md):

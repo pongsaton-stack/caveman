@@ -348,6 +348,7 @@ for (const m of (DATA.monsters_px || [])) {
 // Rion ชุดท่าครบจาก prompt pack (ชีต Flow 14-1…17-4b → พิกเซล 72 · 40 สี · kwan 16 ต.ค. "ครบแล้วค่อยลงหน้าเทสทีเดียว") · ร่าง ยังไม่เข้าเกม
 // ผืนสูง 112 เท้าแถว 108 เท่าภาพในเกม · จังหวะต่อเฟรมเป็นค่าภาพ (index.json ms) ไม่ใช่ค่าเกม · คลิปไม่วนค้างเฟรมสุดท้าย
 for (const c of (DATA.rion_pack || [])) {
+	if (c.hidden) continue;   // ภาพที่ใช้เฉพาะในฉาก (เช่น PixelLab พลิกหันขวา) ไม่ลงเป็นคลิป
 	addClip(c.group, 'rpk_' + c.id, `${c.label} · ${c.frames.length} เฟรม`, c.frames.map(f => 'rpk/' + f), c.ms / 1000,
 		Object.assign({ stage: [c.travel ? 192 : c.w ? c.w + 16 : 96, c.travel ? 136 : c.w ? 116 : 80] }, c.loop ? {} : { hold: true }, c.travel ? { travel: c.travel } : {}));
 }
@@ -413,8 +414,10 @@ function pkTip(key) {   // ปลายมือ/อาวุธของภา�
 function pkTimeline(a, die) {
 	const pk = (DATA.rion_pack || []).find(c => c.id === a.clip), n = pk ? pk.frames.length : 1, pre = a.charge ? 14 : a.ult ? 26 : a.blade ? 10 : 8, step = a.charge ? 5 : 4;
 	const S0 = pre + step * a.strike, HIT = S0 + (a.proj ? a.fly : 0);
-	const pose = F => F < pre ? 0 : F < S0 ? Math.min(a.strike, Math.floor((F - pre) / step) + 1) : F < S0 + 6 ? a.strike : Math.min(n - 1, a.strike + 1 + Math.floor((F - S0 - 6) / 4));
+	let pose = F => F < pre ? 0 : F < S0 ? Math.min(a.strike, Math.floor((F - pre) / step) + 1) : F < S0 + 6 ? a.strike : Math.min(n - 1, a.strike + 1 + Math.floor((F - S0 - 6) / 4));
 	const last = HIT + Math.max(0, ...(a.extra || [0]));
+	if (a.rehit) { const base = pose, offs = (a.extra || []).slice().sort((x, y) => y - x);   // ฟันซ้ำ: ง้างใหม่ 2 เฟรม → ฟาด → ตามแรง ทุกครั้ง (ไม่ค้างท่าตามแรงครั้งแรก)
+		pose = F => { for (const o of offs) { const q = F - (HIT + o); if (q >= -3 && q < 7) return q < -1 ? Math.max(1, a.strike - 2) : q < 0 ? a.strike - 1 : q < 3 ? a.strike : Math.min(n - 1, a.strike + 1 + Math.floor((q - 3) / 2)); } return base(F); }; }
 	return { pk, pre, S0, HIT, D0: last + (a.proj === 'flame' || a.proj === 'wind' ? 12 : a.blade ? 10 : 8), N: (a.blade ? last + 14 : HIT) + (die ? 50 : a.self === 'SHIELD' ? 40 : a.status ? 34 : 28), pose };
 }
 for (const die of [false, true]) for (const a of PKV.ATK) {
@@ -434,6 +437,19 @@ for (const die of [false, true]) for (const a of PKV.SPELLS) {
 	addClip(`เวทย์${a.school}${die ? ' · โดนแล้วตาย' : a.self ? ' · ใส่ตัวเอง' : a.status ? ' · ใส่สถานะ' : ' · โดน'}`, `pks_${a.id}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} (${a.el})${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
 		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'magic' });
 }
+// เทียบ (kwan 18 ต.ค. "ขอดูเทียบทั้ง 1 และ 2"): ตัว Rion จาก PixelLab ฟันมีดรอบ 2 (8 เฟรม · ฟาดเฟรม 4) ใส่ในโค้ดสายคมชุดเดิม (กล้อง แสง กายกรรม ท่าตาย เหมือนกันทุกอย่าง)
+// + ไม้ตาย bl16 พันคมดับเถ้า (techs.csv: 5 ครั้ง + เลือดไหล) ทั้งตัว Flow (sl_bl6 เงาสองคม) และตัว PixelLab · ฟันซ้ำทุกครั้งง้างใหม่ (rehit)
+const PK_BL16 = { id: 'bl16', move: 'flip2', name: '★ พันคมดับเถ้า', strike: 2, extra: [5, 10, 15, 20], hit: 'SLASH', death: 'SL', bleed: true, ult: true, rehit: true, sfx: 'ฉัวะ ฉัวะ ฉัวะ!!!', blade: true,
+	arcs: [[{ a0: -60, a1: 150, R: 0.6 }], [{ a0: 150, a1: -60, R: 0.66 }], [{ a0: -185, a1: 5, R: 0.95, sy: 0.3, th: 6 }], [{ a0: -110, a1: 30, R: 0.7, th: 5 }],
+		[{ a0: -80, a1: 200, R: 1.1, th: 7 }, { a0: 100, a1: 380, R: 1.3, sy: 0.5, th: 4, delay: 2 }]] };
+const PK_PL = a => ({ ...a, clip: 'pl_slash2', strike: 4, rehit: true, blade: true });
+for (const [grp, list] of [['ไม้ตาย bl16 พันคมดับเถ้า · เทียบ ตัว Flow / ตัว PixelLab', [['flow', { ...PK_BL16, clip: 'sl_bl6' }, 'ตัว Flow'], ['pl', PK_PL(PK_BL16), 'ตัว PixelLab']]],
+	['สายคม · ตัว PixelLab (ฟันมีดรอบ 2) ใส่โค้ดเดิม', PKV.BLADE.map(a => ['pl', PK_PL(a), 'ตัว PixelLab'])]])
+	for (const die of [false, true]) for (const [tag, a, who] of list) {
+		const tl = pkTimeline(a, die); if (!tl.pk) continue;
+		addClip(`${grp} · ${die ? 'โดนแล้วตาย' : 'โดน'}`, `pkb_${a.id}_${tag}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} · ${who}${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
+			Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'skillnew' });
+	}
 function pkTint(key, col, a) {   // ภาพ + ย้อมสีทับเฉพาะส่วนที่มีภาพ
 	const im = IMG[key], oc = document.createElement('canvas'); oc.width = im.width; oc.height = im.height; const o = oc.getContext('2d'); o.drawImage(im, 0, 0);
 	if (a > 0) { o.globalCompositeOperation = 'source-atop'; o.globalAlpha = a; o.fillStyle = col; o.fillRect(0, 0, oc.width, oc.height); } return oc;
