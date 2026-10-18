@@ -5,6 +5,7 @@
  "canvas_h": 112,
  "feet": 108,
  "scale": {
+  "M3-walkB": 0.2017,
   "14-1": 0.2368,
   "hurt": 0.1575,
   "17-2": 0.1575,
@@ -16,7 +17,6 @@
   "M-walkB": 0.1071,
   "M2-walkB": 0.2081,
   "M3-walkA": 0.2075,
-  "M3-walkB": 0.2017,
   "MU-walkL/0": 0.23,
   "MU-walkL/1": 0.2466,
   "MU-walkL/2": 0.2748,
@@ -38,6 +38,62 @@
   "15-5": 0.1951
  },
  "clips": [
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "walk_right_m3b",
+   "label": "เดินขวา · master v2 ชีต B (8 ภาพ)",
+   "frames": [
+    "walk_right_m3b_0",
+    "walk_right_m3b_1",
+    "walk_right_m3b_2",
+    "walk_right_m3b_3",
+    "walk_right_m3b_4",
+    "walk_right_m3b_5",
+    "walk_right_m3b_6",
+    "walk_right_m3b_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 65,
+   "src": [
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3",
+    "M3-walkB/1_0",
+    "M3-walkB/1_1",
+    "M3-walkB/1_2",
+    "M3-walkB/1_3"
+   ]
+  },
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "walk_left_m3b",
+   "label": "เดินซ้าย · master v2 ชีต B (พลิก)",
+   "frames": [
+    "walk_left_m3b_0",
+    "walk_left_m3b_1",
+    "walk_left_m3b_2",
+    "walk_left_m3b_3",
+    "walk_left_m3b_4",
+    "walk_left_m3b_5",
+    "walk_left_m3b_6",
+    "walk_left_m3b_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 65,
+   "src": [
+    "M3-walkB/0_0",
+    "M3-walkB/0_1",
+    "M3-walkB/0_2",
+    "M3-walkB/0_3",
+    "M3-walkB/1_0",
+    "M3-walkB/1_1",
+    "M3-walkB/1_2",
+    "M3-walkB/1_3"
+   ]
+  },
   {
    "group": "Rion พิกเซล · ชุดครบ · ท่าศึก",
    "id": "idle",
@@ -600,62 +656,6 @@
     "M3-walkA/1_1",
     "M3-walkA/1_2",
     "M3-walkA/1_3"
-   ]
-  },
-  {
-   "group": "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
-   "id": "walk_right_m3b",
-   "label": "เดินขวา · master v2 ชีต B (8 ภาพ)",
-   "frames": [
-    "walk_right_m3b_0",
-    "walk_right_m3b_1",
-    "walk_right_m3b_2",
-    "walk_right_m3b_3",
-    "walk_right_m3b_4",
-    "walk_right_m3b_5",
-    "walk_right_m3b_6",
-    "walk_right_m3b_7"
-   ],
-   "ms": 90,
-   "loop": true,
-   "w": 65,
-   "src": [
-    "M3-walkB/0_0",
-    "M3-walkB/0_1",
-    "M3-walkB/0_2",
-    "M3-walkB/0_3",
-    "M3-walkB/1_0",
-    "M3-walkB/1_1",
-    "M3-walkB/1_2",
-    "M3-walkB/1_3"
-   ]
-  },
-  {
-   "group": "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
-   "id": "walk_left_m3b",
-   "label": "เดินซ้าย · master v2 ชีต B (พลิก)",
-   "frames": [
-    "walk_left_m3b_0",
-    "walk_left_m3b_1",
-    "walk_left_m3b_2",
-    "walk_left_m3b_3",
-    "walk_left_m3b_4",
-    "walk_left_m3b_5",
-    "walk_left_m3b_6",
-    "walk_left_m3b_7"
-   ],
-   "ms": 90,
-   "loop": true,
-   "w": 65,
-   "src": [
-    "M3-walkB/0_0",
-    "M3-walkB/0_1",
-    "M3-walkB/0_2",
-    "M3-walkB/0_3",
-    "M3-walkB/1_0",
-    "M3-walkB/1_1",
-    "M3-walkB/1_2",
-    "M3-walkB/1_3"
    ]
   },
   {

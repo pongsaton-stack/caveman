@@ -47,6 +47,7 @@ def F(name, n):
 G_BATTLE, G_MAGIC, G_FIELD, G_GESTURE, G_MOOD, G_EXTRA = (
 	"Rion พิกเซล · ชุดครบ · ท่าศึก", "Rion พิกเซล · ชุดครบ · ร่ายเวทย์", "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
 	"Rion พิกเซล · ชุดครบ · ท่าทาง", "Rion พิกเซล · ชุดครบ · พัก/อารมณ์", "Rion พิกเซล · ชุดครบ · ศึกเสริม")
+G_WALK = "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)"
 FAM = [("SL", "คม"), ("CR", "ทุบ"), ("PC", "แทง"), ("ST", "ยิง"), ("DV", "กล"), ("BD", "มือเปล่า")]
 # ถืออาวุธระดับ 2–5: แถวในชีต 15-x ตามลำดับ FAM · แถวที่ Flow วาดผิดแทนด้วย 17-1b / fix (ผลตรวจรอบ 3 ใน PROMPT_PACK.md)
 WEAPON = {
@@ -58,6 +59,8 @@ WEAPON = {
 
 # (กลุ่ม, id, ชื่อ, เฟรม, ms, วน, พลิก)
 CLIPS = [
+	(G_WALK, "walk_right_m3b", "เดินขวา · master v2 ชีต B (8 ภาพ)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, False),
+	(G_WALK, "walk_left_m3b", "เดินซ้าย · master v2 ชีต B (พลิก)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, True),
 	(G_BATTLE, "idle", "ยืนศึกถือมีด", R("14-1", 0, range(6)), IDLE, True, False),
 	(G_BATTLE, "attack", "ฟันมีด (วิ่งเข้า → ฟาด)", R("14-1", 1, range(6)), ATK, False, False),
 	(G_BATTLE, "hurt", "โดนตี (มีดแปะด้วยโค้ดช่อง 2–5)", F("hurt", 6), ATK, False, False),
@@ -81,8 +84,6 @@ CLIPS = [
 	(G_FIELD, "walk_left_m2", "เดินซ้าย · master ไม่มีนาฬิกา (พลิกจากเดินขวา)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, True),
 	(G_FIELD, "walk_right_m3a", "เดินขวา · master v2 ชีต A (8 ภาพ)", R("M3-walkA", 0, range(4)) + R("M3-walkA", 1, range(4)), RUN, True, False),
 	(G_FIELD, "walk_left_m3a", "เดินซ้าย · master v2 ชีต A (พลิก)", R("M3-walkA", 0, range(4)) + R("M3-walkA", 1, range(4)), RUN, True, True),
-	(G_FIELD, "walk_right_m3b", "เดินขวา · master v2 ชีต B (8 ภาพ)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, False),
-	(G_FIELD, "walk_left_m3b", "เดินซ้าย · master v2 ชีต B (พลิก)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, True),
 	(G_FIELD, "walk_left_mu", "เดินซ้าย · prompt Muse (แถว 1–2 = 8 ภาพ)", R("MU-walkL", 0, range(4)) + R("MU-walkL", 1, range(4)), RUN, True, False),
 	(G_FIELD, "walk_left_mu_all", "เดินซ้าย · prompt Muse ทั้ง 16 ภาพ (แถว 3 หัวโตกว่าแถวอื่น)", [("MU-walkL", f"{r}_{c}") for r in range(4) for c in range(4)], RUN, True, False),
 	(G_FIELD, "walk_right_mu", "เดินขวา · prompt Muse (3+3+4 = 10 ภาพ · นาฬิกาสลับข้าง)", R("MU-walkR", 0, range(3)) + R("MU-walkR", 1, range(3)) + R("MU-walkR", 2, range(4)), RUN, True, False),

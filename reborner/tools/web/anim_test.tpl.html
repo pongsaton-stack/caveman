@@ -992,6 +992,8 @@ function fbLabPose(t, comp) {   // ท่ายืนร่าย: ยิงช�
 	return k(t < 0.1 ? 0 : t > 5.2 ? 0 : 1);
 }
 for (const pre of ['ตัวอย่าง VFX', 'แนว RS3', 'SL01 × ฟันวิญญาณ', 'ตัวอย่างจากคลิป']) { const i = GROUPS.findIndex(g => g.name.startsWith(pre)); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
+// ท่าเดินหลักแบบ master v2 (ชีต B · kwan 18 ต.ค.) = กลุ่มแรกของแท็บท่าขยับ + คลิปเริ่มต้นของหน้า
+{ const i = GROUPS.findIndex(g => g.name.startsWith('★ Rion master v2')); if (i > 0) GROUPS.unshift(...GROUPS.splice(i, 1)); }
 // ── ชีต VFX Protagonist (kwan 6 ต.ค. "ตัดมาใส่ในเทสแยกแทป เชคดูถ้าไม่เนียน จัดการให้สวยงาม") ──
 // แผงท่า: แถวละ 1 คลิป · เฟรมในชีต = ภาพหลัก แต่ละภาพแตกเป็น SUB เฟรมย่อยไว้เฟด · ค่าทั้งหมดเป็นค่าดูในหน้าเทส ไม่ใช่ค่าเกม
 const VXS = DATA.vfx_sheet, VX = { SUB: 3, KEY_SEC: 0.12, K: 1.6, PW: 150, PH: 120, STILL_SEC: 1.2,
@@ -2186,7 +2188,7 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 // ── สถานะผู้ชม ──
 const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'magic', 'skillnew', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups', magic: 'magicGroups', skillnew: 'skillnewGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
-const S = { tab: 'clips', last: { clips: 'px_west_w' }, clip: 'px_west_w', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
+const S = { tab: 'clips', last: { clips: CLIPS.rpk_walk_left_m3b ? 'rpk_walk_left_m3b' : 'px_west_w' }, clip: CLIPS.rpk_walk_left_m3b ? 'rpk_walk_left_m3b' : 'px_west_w', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', rollFoe: 'M01', fbElem: 'fire', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, vxs: true, rigW: null, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
