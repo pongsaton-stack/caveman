@@ -12,6 +12,8 @@
   "16-1": 0.1851,
   "16-1b/0": 0.1582,
   "17-3b": 0.2176,
+  "M-walkA": 0.1239,
+  "M-walkB": 0.1071,
   "16-1b": 0.1274,
   "16-2": 0.1773,
   "16-3": 0.1565,
@@ -428,6 +430,54 @@
     "17-3b/0_3",
     "17-3b/0_4",
     "17-3b/0_5"
+   ]
+  },
+  {
+   "group": "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
+   "id": "walk_left_m",
+   "label": "เดินซ้าย · แบบ master (พลิกจากภาพที่ Flow วาดหันขวา)",
+   "frames": [
+    "walk_left_m_0",
+    "walk_left_m_1",
+    "walk_left_m_2",
+    "walk_left_m_3",
+    "walk_left_m_4",
+    "walk_left_m_5"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 57,
+   "src": [
+    "M-walkA/0_0",
+    "M-walkA/0_1",
+    "M-walkA/0_2",
+    "M-walkA/0_3",
+    "M-walkA/0_4",
+    "M-walkA/0_5"
+   ]
+  },
+  {
+   "group": "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
+   "id": "walk_right_m",
+   "label": "เดินขวา · แบบ master",
+   "frames": [
+    "walk_right_m_0",
+    "walk_right_m_1",
+    "walk_right_m_2",
+    "walk_right_m_3",
+    "walk_right_m_4",
+    "walk_right_m_5"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 51,
+   "src": [
+    "M-walkB/0_0",
+    "M-walkB/0_1",
+    "M-walkB/0_2",
+    "M-walkB/0_3",
+    "M-walkB/0_4",
+    "M-walkB/0_5"
    ]
   },
   {
