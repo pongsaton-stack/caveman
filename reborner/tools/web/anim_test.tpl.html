@@ -211,6 +211,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 		<section class="box" id="paneSkillnew" hidden>
 			<p class="muted wnote">ท่าในต้นไม้ (techs.csv) ใส่มอนชุดใหม่ · ตอนนี้สายคม 7 ท่า (ชีต 18-1 จาก Google Flow · ช่องที่ลืมมีดแปะด้วยโค้ด) · Rion หันซ้ายแบบจอสู้ · ภาพเท่านั้น ไม่ใช่ค่าเกม · ท่าแถว/ทั้งหมดยังเล่นใส่เป้าเดียว</p>
 			<p class="seg pkFoeBox" id="pkFoe3" role="group" aria-label="มอนที่โดน (สกิล)"></p>
+			<p class="seg" id="pkLab" role="group" aria-label="แล็บ VFX (สายคม 17 ท่า)"></p>
 			<div class="clips" id="skillnewGroups"></div>
 		</section>
 
@@ -600,6 +601,13 @@ function pkvView(c) {
 	if (a.school === 'แดง' && F >= 6 && F < tl.HIT + 10) { ctx.fillStyle = 'rgba(60,0,0,0.18)'; ctx.fillRect(-8, -8, W + 16, H + 16); }
 	// อัญเชิญ: ยักษ์ไฟลุกหลังมอน (วาดก่อนมอน)
 	if (a.proj === 'summon' && F >= tl.S0) { const u = F - tl.S0, k = Math.min(1, u / 8), fade = d > 6 ? Math.max(0, 1 - (d - 6) / 8) : 1; if (fade > 0) { ctx.save(); ctx.globalAlpha = fade; pkGuardian(MX, G, k, F, d >= 0 && d < 6); ctx.restore(); } }
+	// แล็บ VFX ซ้อนทุกครั้งที่ฟัน (สายคม 17 ท่า): ครั้งแรกเต็มชุด · ครั้งถัดไปเฉพาะรอยฟัน (ดาววาบเล็กลง) สลับทิศ · ไม้ตายครั้งสุดท้ายใหญ่ขึ้น · วงพื้นวาดใต้มอน
+	const labMode = S.pkLab ?? 'auto', labFile = !a.kf || !labMode ? '' : labMode === 'auto' ? (a.ult ? 'spirit_slash' : 'star_slash') : labMode, labC = labFile && labComp(labFile);
+	const pkLab = under => { if (!labC) return; c.labI = c.labI || {}; const at = { x: mx0 + mw / 2, y: my0 + mh * 0.55 }, tw = Math.min(mw, 64);
+		a.hits.forEach((h, k) => { const last = k === a.hits.length - 1 && k > 0, key = [labFile, m.id, k].join('|');
+			const inst = c.labI[key] || (c.labI[key] = labInst(k ? { layers: labC.layers.filter(l => l.part === 'slash').map(l => ({ ...l, params: { ...l.params, _flashK: 0.45 } })) } : labC, at, (a.push < 0) !== (k % 2 === 1) ? 1 : -1, tw * (last && a.ult ? 1.35 : 1)));
+			const T = (F - (h - 2)) * PKV.SEC; for (const l of inst) { if (l.under !== under) continue; const t = T - l.start; if (t >= 0 && t < l.dur) l.draw(t * l.sp); } }); };
+	pkLab(true);
 	// ── มอน ──
 	const dl = d - Math.max(0, ...(a.extra || [0]).filter(o => d >= o)), kb = d >= 0 && !a.status && !a.self ? Math.round(-(a.push || 5) * Math.max(0, 1 - dl / 10)) : 0, dying = c.die && F >= tl.D0, t = F - tl.D0;
 	// คมสวน: มอนวิ่งเข้ามาตี Rion (counter = [เริ่มวิ่ง, ถึงตัว, ตี]) แล้วโดนฟันสวนกระเด็นกลับที่เดิม
@@ -664,6 +672,7 @@ function pkvView(c) {
 	if (a.proj && a.proj !== 'summon' && F >= tl.S0 && F < tl.S0 + 2) fbPixHit(hx, hy, F - tl.S0, false, cp, 11);
 	// ── เอฟเฟกต์ตอนโดน ตามชนิด ──
 	if (a.blade && d >= -1) pkBladeFx(a, d, F, { mx, my0, mw, mh, mcx, mcy, G, W, H, dying });
+	pkLab(false);
 	if (a.kf) {   // สายคม 17 ท่า: ของเฉพาะท่า
 		const bb = pkBody(F), hx0 = rx + rim.width / 2 - 22 * (bb.face || 1), hy0 = G - bb.lift - 60;
 		if (a.star && F >= a.star && F < a.star + 20) { const P = pkStarPts(mcx, mcy, mw, mh), q = F - a.star, al = Math.max(0, 1 - q / 20);   // เก็บมีด = ดาวทั้งดวงสว่างวาบ
@@ -3805,6 +3814,10 @@ function boot() {
 			const x = ic.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(im, 0, 0, im.width * k, im.height * k);
 			b.append(ic, (monName[id] || id) + ' · ' + ((DATA.body || {})[id] || '?')); b.setAttribute('aria-pressed', String(id === S.rollFoe));
 			b.onclick = () => { S.rollFoe = id; for (const x of box.querySelectorAll('button')) x.setAttribute('aria-pressed', String(x.dataset.v === id)); }; box.append(b); } }
+	{ const box = $('pkLab'), lab = document.createElement('span'); lab.className = 'muted'; lab.textContent = 'แล็บ VFX (สายคม 17 ท่า):'; box.append(lab);   // kwan 18 ต.ค. "ใช้ vfx ใน lab มาปรับใช้ด้วย"
+		for (const [v, t] of [['auto', 'ตามท่า (★ ฟันวิญญาณ · ท่าปกติ ฟันดวงดาว)'], ['spirit_slash', 'ฟันวิญญาณทุกท่า'], ['star_slash', 'ฟันดวงดาวทุกท่า'], ['', 'ปิด']]) {
+			const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = v; b.textContent = t; b.setAttribute('aria-pressed', String(v === (S.pkLab ?? 'auto')));
+			b.onclick = () => { S.pkLab = v; for (const x of box.querySelectorAll('button')) x.setAttribute('aria-pressed', String(x.dataset.v === v)); }; box.append(b); } }
 	{ const box = $('labSheet'), opts = [['', 'แล็บ VFX: ปิด'], ...LAB().filter(c => !LAB_CASTER.has(c.file)).map(c => [c.file, c.comp.name])];
 		for (const [v, t] of opts) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = v; b.textContent = t; b.setAttribute('aria-pressed', String(v === S.labSheet));
 			b.onclick = () => { S.labSheet = v; for (const x of box.children) x.setAttribute('aria-pressed', String(x.dataset.v === v)); }; box.append(b); } }
