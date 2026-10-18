@@ -33,10 +33,16 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
         ยังแก้ด้วยโค้ดไม่ได้: ชีตไม่มีท่าขาผ่านกันจริง (ภาพที่ 3 ขายังกาง) · ขาสองครึ่งรอบเป็นข้างเดียวกัน (ไม่สลับขาใกล้/ไกล)
     **ทดลอง PixelLab (kwan 18 ต.ค. "ถ้าใช้ pixellab จบไหม" → "1 ใส่แล้ว")**: `tools/sprites/pixellab_walk.py` (API v2 · คีย์จาก env `PIXELLAB_API_KEY` เท่านั้น · พิมพ์ยอดคงเหลือก่อน/หลังทุกคำสั่งที่เสียเครดิต)
       ขั้น: `ref` (master → ตัดเขียว → ตัวสูง 72 ผืน 96 · ไม่ต่อเน็ต) → `balance` → `character` (/create-character-v3 4 ทิศ · ภาพอ้างอิงหันหน้า) → `walk east` (/characters/animations mode v3 8 เฟรม) → `fetch` (ZIP → `assets/sprites/pixellab_draft/zip/`)
-      ภาพอ้างอิง `assets/sprites/pixellab_draft/ref_south.png` ทำแล้ว · **คีย์ยังไม่เข้า session ที่ kwan ใส่ (ต้องเปิด session ใหม่)** · ยังไม่ได้เรียก API จริง · ขนาดภาพ API 32–256 จุด
+      ภาพอ้างอิง `assets/sprites/pixellab_draft/ref_south.png` · ขนาดภาพ API 32–256 จุด · `call()` ลองใหม่ 5 ครั้งเมื่อเน็ตหลุดก่อนส่งคำขอ (proxy ของ session ตัดบ่อย)
+      ✅ **รันจริงแล้ว 18 ต.ค. (session ใหม่)**: ยอด trial 27 → character (2 gen · 132 วิ) → 25 → walk east (2 gen · 110 วิ) → **23 จาก 40** · character_id ใน state.json
+        ได้ 8 เฟรม 124x124 ตัวสูง 70–73 (ชีต B 70–73) · ยอดหัวขึ้นลง 33–35 (ชีต B 34–37) · หันข้างจริง ขาผ่านกันจริง (ชีต B ทำไม่ได้) · ปีกหมวกชี้หน้า · เป้หลัง · ไม่มีนาฬิกา · 63 สี (ชีต B 39)
+        ต่างจาก master: หัวเล็กกว่า (ไม่ chibi เท่า) · แว่นบนหมวกเห็นน้อย · กางเกงยาวกว่า · ภาพเทียบ `pixellab_draft/compare_walk_east.png/.gif` (บน PixelLab · ล่าง ชีต B)
+        `page` → `pixellab_draft/px/` ผืน 112 เท้าแถว 108 (เท่า rion_pack_px) · anim_test_build.py `rion_pack_clips()` แทรก 2 คลิปท้ายกลุ่มเดินหลัก (ความเร็วดู 90 ms · ในเกม 37.5 ms · พื้นเลื่อน 48)
+        ตรวจในเบราว์เซอร์: คลิปเล่นได้ เท้าลงเส้นพื้น ไม่มี error · 1200/400px ไม่เลื่อนข้าง · แถบไฟล์ขึ้น rion_pack_px/ (ป้ายผิดโฟลเดอร์ ภาพถูก)
+        **ยังไม่ได้เผยแพร่หน้า animation test** — ระบบอนุญาตบล็อกเพราะหน้าแชร์แบบใครมีลิงก์ก็ดูได้ → kwan ต้องอนุญาตก่อน แล้วรัน anim_test_build.py + publish ทับ MoNVTd…
   แบบก่อนหน้า (Flow หมวกน้ำเงิน 16 ต.ค. · `rion_flow_ref.png`) = แบบเดียวกันแนวภาพคม → ใช้ประกอบได้ · ภาพ master ใหม่เป็นภาพอ้างอิงหลัก
 **งานค้างล่าสุด (อ่านก่อนเมื่อเริ่ม session ใหม่ · อัปเดต 18 ต.ค. 2026)**: ท่าเดิน Rion master v2 ชีต B แก้สมจริงแล้ว (หน้า animation test Version 113 · ยังไม่เข้าเกม) →
-  กำลังทดลอง PixelLab: kwan ใส่ `PIXELLAB_API_KEY` แล้ว แต่ session เดิมมองไม่เห็น (ค่า environment เข้าเฉพาะ session ใหม่) · ขั้นต่อไป: `python3 tools/sprites/pixellab_walk.py balance` → `character` → `walk east` → `fetch` → ลงหน้าเทสเทียบกับชีต B · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
+  PixelLab เดินขวา **ทำแล้ว 18 ต.ค.** (เหลือ 23 gen) · ขั้นต่อไป: เผยแพร่หน้า animation test (รอ kwan อนุญาต) → kwan เทียบกับชีต B แล้วตัดสินว่าใช้ PixelLab ต่อไหม (ทิศอื่น `walk west north south` · 2 gen/ทิศ) · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
 **ท่า/เอฟเฟกต์/อนิเมชั่นใหม่ ต้องทำให้ลองได้ในหน้า animation test ก่อนทุกครั้ง** (กฎ 3 ต.ค. 2026) แล้วค่อยเข้าเกมเมื่อ kwan ดูแล้ว — หน้า: https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw
 
 ## ลิงก์ที่ปักไว้

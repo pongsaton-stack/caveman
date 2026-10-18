@@ -19,6 +19,16 @@ def webp(path, q=80):
 	b = io.BytesIO(); Image.open(path).save(b, 'WEBP', quality=q, method=6)
 	return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
 
+def rion_pack_clips():
+	"""คลิปชุดครบ (rion_pack_px) · คลิป PixelLab แทรกต่อท้ายกลุ่มเดินหลัก ให้อยู่ติดชีต B"""
+	def clips(p):
+		return json.load(open(p, encoding='utf-8'))['clips'] if os.path.isfile(p) else []
+	rp = clips(os.path.join(SPR, 'rion_pack_px/index.json'))
+	pl = clips(os.path.join(SPR, 'pixellab_draft/px/index.json'))
+	n = max((i + 1 for i, c in enumerate(rp) if pl and c['group'] == pl[0]['group']), default=len(rp))
+	return rp[:n] + pl + rp[n:]
+
+
 def png(path):
 	with open(path, 'rb') as f:
 		return 'data:image/png;base64,' + base64.b64encode(f.read()).decode()
@@ -55,6 +65,12 @@ def sprites():
 		for f in sorted(os.listdir(rp)):
 			if f.endswith('.png'):
 				out['rpk/' + f[:-4]] = png(os.path.join(rp, f))
+	# PixelLab ท่าเดินจาก master v2 (tools/sprites/pixellab_walk.py page · ร่าง · 18 ต.ค.) → คลิปเดียวกับชุดครบ วางคู่ชีต B
+	pl = os.path.join(SPR, 'pixellab_draft/px')
+	if os.path.isdir(pl):
+		for f in sorted(os.listdir(pl)):
+			if f.endswith('.png'):
+				out['rpk/' + f[:-4]] = png(os.path.join(pl, f))
 	# มอนภูมิภาค 1 พิกเซล (tools/sprites/monsters_px.py · ชีตรอบ 10 · ร่าง)
 	md = os.path.join(SPR, 'monsters_px_draft')
 	if os.path.isdir(md):
@@ -278,7 +294,7 @@ def main(out_path):
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
 		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
-		'rion_pack': json.load(open(os.path.join(SPR, 'rion_pack_px/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_pack_px/index.json')) else [],   # ชุดท่าครบ (prompt pack)
+		'rion_pack': rion_pack_clips(),   # ชุดท่าครบ (prompt pack) + PixelLab
 		'px_weapons': json.load(open(os.path.join(SPR, 'rion_px_weapons_draft/index.json'), encoding='utf-8'))['clips'] if os.path.isfile(os.path.join(SPR, 'rion_px_weapons_draft/index.json')) else [],   # ชีต 15-1 (แบบ Flow)
 		'poses64': json.load(open(os.path.join(SPR, 'poses64_draft/index.json'), encoding='utf-8'))['poses'],
 		'draft_map': draft_map(),

@@ -1,0 +1,23 @@
+{
+ "character_id": "c378a9f5-65e8-44a9-99aa-a65c6238e5ce",
+ "character_job": "44db973d-ee44-472e-8b0d-4789fdf9bed0",
+ "character_usage": null,
+ "character_status": "completed",
+ "walk": [
+  {
+   "background_job_ids": [
+    "1e14aa3f-c3bb-42d9-b6bf-0c6f15cf3707"
+   ],
+   "directions": [
+    "east"
+   ],
+   "animation_group_id": "d2f93e21-7151-4f87-81f8-77dbc0b24cf1",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  }
+ ],
+ "walk_jobs": {
+  "1e14aa3f-c3bb-42d9-b6bf-0c6f15cf3707": "completed"
+ }
+}

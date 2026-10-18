@@ -7,6 +7,7 @@
   python3 tools/sprites/pixellab_walk.py character    สร้างตัวละครจากภาพอ้างอิง 4 ทิศ (/create-character-v3 · ~ceil(w*h*4/65536) gen)
   python3 tools/sprites/pixellab_walk.py walk [ทิศ…]  ท่าเดินของตัวละครที่สร้างแล้ว (ค่าเริ่ม east · /characters/animations)
   python3 tools/sprites/pixellab_walk.py fetch        ดึง ZIP ของตัวละคร แตกภาพลง OUT
+  python3 tools/sprites/pixellab_walk.py page         ท่าเดินจาก ZIP → px/ (ผืนเดียวกับ rion_pack_px) ให้หน้า animation test
 ผลทั้งหมดอยู่ใน assets/sprites/pixellab_draft/ (.gdignore · ร่าง ยังไม่เข้าเกม) · state.json เก็บ character_id / job id
 """
 import base64
@@ -75,11 +76,19 @@ def call(method, path, body=None, raw=False):
 	req = urllib.request.Request(API + path, method=method,
 		data=json.dumps(body).encode() if body is not None else None,
 		headers={"Authorization": "Bearer " + key(), "Content-Type": "application/json"})
-	try:
-		with urllib.request.urlopen(req, timeout=120) as r:
-			data = r.read()
-	except urllib.error.HTTPError as e:
-		sys.exit(f"{method} {path} → HTTP {e.code}: {e.read().decode()[:2000]}")
+	# proxy ของ session ตัดการเชื่อมต่อบ่อย · URLError = หลุดก่อนส่งคำขอครบ ลองใหม่ได้ไม่เสียเครดิตซ้ำ
+	for i in range(5):
+		try:
+			with urllib.request.urlopen(req, timeout=120) as r:
+				data = r.read()
+			break
+		except urllib.error.HTTPError as e:
+			sys.exit(f"{method} {path} → HTTP {e.code}: {e.read().decode()[:2000]}")
+		except urllib.error.URLError as e:
+			print(f"  เน็ตหลุด ({e.reason}) ลองใหม่ครั้งที่ {i + 1}", flush=True)
+			time.sleep(2 ** (i + 1))
+	else:
+		sys.exit(f"{method} {path} → เชื่อมต่อไม่ได้ 5 ครั้ง")
 	return data if raw else json.loads(data)
 
 
@@ -160,7 +169,38 @@ def fetch():
 		print(" ", n, Image.open(os.path.join(dst, n)).size)
 
 
+PAGE_H, PAGE_FEET = 112, 108   # ผืน/แถวเท้าเดียวกับ rion_pack_px (CANVAS_H · FEET) → เทียบกับชีต B ได้ตรง
+G_WALK = "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)"
+
+
+def page():
+	"""ZIP ท่าเดิน → OUT/px/<คลิป>_<i>.png + index.json (รูปแบบคลิปเดียวกับ rion_pack_px) ให้หน้า animation test วางคู่ชีต B
+	เลื่อนทุกเฟรมเท่ากัน (เท้าต่ำสุด = แถว PAGE_FEET · กลางกรอบรวม) → คงการขึ้นลง/ส่ายตัวที่ PixelLab วาดมา"""
+	src = os.path.join(OUT, "zip", "Idle/animations/walk")
+	dst = os.path.join(OUT, "px")
+	os.makedirs(dst, exist_ok=True)
+	clips = []
+	for d in sorted(os.listdir(src)):
+		fs = [Image.open(os.path.join(src, d, f)).convert("RGBA") for f in sorted(os.listdir(os.path.join(src, d))) if f.endswith(".png")]
+		bb = [f.getchannel("A").getbbox() for f in fs]
+		x0, y0, x1, y1 = min(b[0] for b in bb), min(b[1] for b in bb), max(b[2] for b in bb), max(b[3] for b in bb)
+		W = x1 - x0 + 24
+		names = []
+		for i, f in enumerate(fs):
+			c = Image.new("RGBA", (W, PAGE_H))
+			c.alpha_composite(f, (12 - x0, PAGE_FEET - y1))
+			n = f"pixellab_walk_{d}_{i}"
+			c.save(os.path.join(dst, n + ".png"))
+			names.append(n)
+		for cid, label, ms in ((f"pixellab_walk_{d}", "ความเร็วดู", 90), (f"pixellab_walk_{d}_game", "ความเร็วในเกม", 37.5)):
+			clips.append({"group": G_WALK, "id": cid, "label": f"PixelLab · เดิน {d} · {label} (ทดลอง 18 ต.ค. · จาก master v2)",
+				"frames": names, "ms": ms, "loop": True, "w": W, "travel": 48 if d == "east" else -48 if d == "west" else 0, "src": ["pixellab " + d]})
+	json.dump({"_doc": "PixelLab ท่าเดินจาก master v2 · tools/sprites/pixellab_walk.py page · ร่าง ยังไม่เข้าเกม", "clips": clips},
+		open(os.path.join(dst, "index.json"), "w"), ensure_ascii=False, indent=1)
+	print("คลิป", [c["id"] for c in clips], "→", dst)
+
+
 if __name__ == "__main__":
 	cmd = sys.argv[1] if len(sys.argv) > 1 else "ref"
-	{"ref": make_ref, "balance": balance, "character": character, "fetch": fetch,
+	{"ref": make_ref, "balance": balance, "character": character, "fetch": fetch, "page": page,
 	 "walk": lambda: walk(sys.argv[2:] or ["east"])}[cmd]()
