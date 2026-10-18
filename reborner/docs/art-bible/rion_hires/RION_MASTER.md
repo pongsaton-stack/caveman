@@ -27,9 +27,10 @@ Solid flat pure green chroma-key background, no shadow, no ground line, no text,
 front view, full body, standing still with arms relaxed at his sides, feet planted at the bottom edge, centered, single character.
 ```
 
-### การจัดชีต (SHEET LAYOUT) — ใส่ทุกชีตท่าขยับ ลดงานตัดภาพ (บทเรียนชีตเดินแรก 18 ต.ค.: ตัวชิดกันจนเศษเท้า/หมวกติดเฟรมข้าง)
+### การจัดชีต (SHEET LAYOUT) — ใส่ทุกชีตท่าขยับ
+แก้ 18 ต.ค. รอบ 2: รอบแรกสั่ง "ตัวสูงเกือบเต็มภาพ" + 6 ภาพแถวเดียวบน 16:9 = ขัดกันเอง (ช่องละ ~230 จุด ตัวกว้าง ~250) Flow จึงทิ้งช่องว่าง → ใช้ 2 แถว × 4 ภาพ ตัวสูงราว 1/3 ของภาพ
 ```
-Exactly 6 frames in ONE horizontal row. Wide empty green gaps between frames: at least half a character width of pure green between any two characters, no body part, shadow or effect may cross into the gap. Same character size and same head-to-body proportions in every frame, feet on one shared baseline, the character fills most of the image height.
+8 frames arranged in a grid of 2 rows x 4 columns, read left to right, top row first. Each character is about one third of the image height, centered in its own cell. Wide empty green space around every character: no body part, shadow or effect touches or crosses into another cell. Same character size and same head-to-body proportions in every frame, feet on the same baseline within each row.
 ```
 
 ### ทิศ (DIRECTION) — Flow ชอบวาดหันขวาเสมอ ต้องบอกด้วยส่วนของร่างกาย ไม่ใช่แค่คำว่า left/right
