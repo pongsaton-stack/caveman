@@ -36,5 +36,22 @@
  ],
  "slash_jobs": {
   "4d0ab50d-9387-40d0-8983-9f9a7eb1ec6a": "completed"
+ },
+ "slash2": [
+  {
+   "background_job_ids": [
+    "fedc4e9e-2c81-42e6-9028-bef99fdd85a8"
+   ],
+   "directions": [
+    "west"
+   ],
+   "animation_group_id": "cae114df-461b-49ce-8ff2-af1c5f9fcee6",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  }
+ ],
+ "slash2_jobs": {
+  "fedc4e9e-2c81-42e6-9028-bef99fdd85a8": "completed"
  }
 }

@@ -24,6 +24,18 @@
           "north": "Idle/rotations/north.png"
         },
         "animations": {
+          "slash2": {
+            "west": [
+              "Idle/animations/slash2/west/frame_000.png",
+              "Idle/animations/slash2/west/frame_001.png",
+              "Idle/animations/slash2/west/frame_002.png",
+              "Idle/animations/slash2/west/frame_003.png",
+              "Idle/animations/slash2/west/frame_004.png",
+              "Idle/animations/slash2/west/frame_005.png",
+              "Idle/animations/slash2/west/frame_006.png",
+              "Idle/animations/slash2/west/frame_007.png"
+            ]
+          },
           "walk": {
             "east": [
               "Idle/animations/walk/east/frame_000.png",
@@ -53,5 +65,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-18T11:33:49.648954"
+  "export_date": "2026-10-18T11:39:58.992303"
 }

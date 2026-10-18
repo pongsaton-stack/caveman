@@ -13,6 +13,7 @@
 """
 import base64
 import io
+import shutil
 import json
 import os
 import sys
@@ -34,9 +35,15 @@ DESC = ("chibi boy hero, blue cap with brass goggles, messy brown hair, white sh
 	"blue knee-length shorts, brown backpack, white socks, brown boots, no wristwatch, 32-bit pixel art")
 WALK_ACTION = "walking at a steady pace, arms swinging opposite to the legs, legs pass each other mid-step, body bobs slightly"
 # ท่าในศึกหันซ้าย (RION_MASTER) · มีดทำครัวในมือหน้าทุกเฟรม (Flow ทำมีดหายกลางท่า 3 รอบติด → จุดที่ต้องทดสอบ)
+SEEDS = {"slash2": 27}
 ACTIONS = {"walk": WALK_ACTION,
 	"slash": "slashing with a small kitchen knife held in the front hand in every frame: raise the knife behind the shoulder, "
-		"step forward and swing it down fast in an arc toward an enemy on the left, follow through, then recover to a ready stance"}
+		"step forward and swing it down fast in an arc toward an enemy on the left, follow through, then recover to a ready stance",
+	# รอบ 2 (kwan 18 ต.ค. "ลองอีกรอบ"): รอบแรกเฟรม 5–7 หมุนหันเข้ากล้อง + แทงตรง + ใบมีดยาว
+	"slash2": "side view, the body stays facing LEFT in every frame and never turns toward the camera: nose, cap brim and toes point left, "
+		"backpack on the right. A short small kitchen knife (blade about the length of the hand) stays in the front hand in every frame. "
+		"Raise the knife up behind the shoulder, step forward with the front foot and slash it down in a curved arc in front of the body "
+		"toward an enemy on the left, follow through low, then return to a ready stance still facing left"}
 
 
 def key_green(rgb):
@@ -150,7 +157,7 @@ def walk(dirs, name="walk"):
 		sys.exit("ยังไม่มีตัวละคร: รัน character ก่อน")
 	balance()
 	r = call("POST", "/characters/animations", {"character_id": s["character_id"], "animation_name": name,
-		"mode": "v3", "action_description": ACTIONS[name], "frame_count": 8, "keep_first_frame": False, "directions": dirs, "seed": 18})
+		"mode": "v3", "action_description": ACTIONS[name], "frame_count": 8, "keep_first_frame": False, "directions": dirs, "seed": SEEDS.get(name, 18)})
 	s.setdefault(name, []).append(r)
 	save_state(s)
 	print(json.dumps(r, ensure_ascii=False)[:800])
@@ -178,29 +185,45 @@ PAGE_H, PAGE_FEET = 112, 108   # ผืน/แถวเท้าเดียว�
 G_WALK = "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)"
 
 
+PAGE_CLIPS = {   # ท่าที่ลงหน้าเทส: (กลุ่ม, ชื่อ, ms ความเร็วดู, ms ในเกมหรือ None, พื้นเลื่อน/รอบ)
+	"walk": (G_WALK, "เดิน", 90, 37.5, 48),
+	"slash2": ("Rion พิกเซล · ชุดครบ · ท่าศึก", "ฟันมีด (PixelLab รอบ 2 · หันซ้ายทุกเฟรม)", 110, None, 0),
+}
+
+
 def page():
-	"""ZIP ท่าเดิน → OUT/px/<คลิป>_<i>.png + index.json (รูปแบบคลิปเดียวกับ rion_pack_px) ให้หน้า animation test วางคู่ชีต B
-	เลื่อนทุกเฟรมเท่ากัน (เท้าต่ำสุด = แถว PAGE_FEET · กลางกรอบรวม) → คงการขึ้นลง/ส่ายตัวที่ PixelLab วาดมา"""
-	src = os.path.join(OUT, "zip", "Idle/animations/walk")
+	"""ZIP → OUT/px/<คลิป>_<i>.png + index.json (รูปแบบคลิปเดียวกับ rion_pack_px) ให้หน้า animation test วางคู่ชุดเดิม
+	เลื่อนทุกเฟรมของท่าเท่ากัน (เท้าต่ำสุด = แถว PAGE_FEET · กลางกรอบรวม) → คงการขึ้นลง/ส่ายตัวที่ PixelLab วาดมา
+	ท่าที่ไม่อยู่ใน PAGE_CLIPS (เช่น slash รอบแรกที่ตัวหมุนเข้ากล้อง) ไม่ลงหน้า"""
+	base = os.path.join(OUT, "zip", "Idle/animations")
 	dst = os.path.join(OUT, "px")
-	os.makedirs(dst, exist_ok=True)
+	shutil.rmtree(dst, ignore_errors=True)
+	os.makedirs(dst)
 	clips = []
-	for d in sorted(os.listdir(src)):
-		fs = [Image.open(os.path.join(src, d, f)).convert("RGBA") for f in sorted(os.listdir(os.path.join(src, d))) if f.endswith(".png")]
-		bb = [f.getchannel("A").getbbox() for f in fs]
-		x0, y0, x1, y1 = min(b[0] for b in bb), min(b[1] for b in bb), max(b[2] for b in bb), max(b[3] for b in bb)
-		W = x1 - x0 + 24
-		names = []
-		for i, f in enumerate(fs):
-			c = Image.new("RGBA", (W, PAGE_H))
-			c.alpha_composite(f, (12 - x0, PAGE_FEET - y1))
-			n = f"pixellab_walk_{d}_{i}"
-			c.save(os.path.join(dst, n + ".png"))
-			names.append(n)
-		for cid, label, ms in ((f"pixellab_walk_{d}", "ความเร็วดู", 90), (f"pixellab_walk_{d}_game", "ความเร็วในเกม", 37.5)):
-			clips.append({"group": G_WALK, "id": cid, "label": f"PixelLab · เดิน {d} · {label} (ทดลอง 18 ต.ค. · จาก master v2)",
-				"frames": names, "ms": ms, "loop": True, "w": W, "travel": 48 if d == "east" else -48 if d == "west" else 0, "src": ["pixellab " + d]})
-	json.dump({"_doc": "PixelLab ท่าเดินจาก master v2 · tools/sprites/pixellab_walk.py page · ร่าง ยังไม่เข้าเกม", "clips": clips},
+	for anim in sorted(os.listdir(base)):
+		if anim not in PAGE_CLIPS:
+			continue
+		group, th, ms, game_ms, travel = PAGE_CLIPS[anim]
+		for d in sorted(os.listdir(os.path.join(base, anim))):
+			src = os.path.join(base, anim, d)
+			fs = [Image.open(os.path.join(src, f)).convert("RGBA") for f in sorted(os.listdir(src)) if f.endswith(".png")]
+			bb = [f.getchannel("A").getbbox() for f in fs]
+			x0, y1 = min(b[0] for b in bb), max(b[3] for b in bb)
+			W = max(b[2] for b in bb) - x0 + 24
+			names = []
+			for i, f in enumerate(fs):
+				c = Image.new("RGBA", (W, PAGE_H))
+				c.alpha_composite(f, (12 - x0, PAGE_FEET - y1))
+				n = f"pixellab_{anim}_{d}_{i}"
+				c.save(os.path.join(dst, n + ".png"))
+				names.append(n)
+			sign = {"east": 1, "west": -1}.get(d, 0)
+			for cid, label, t in ((f"pixellab_{anim}_{d}", "ความเร็วดู", ms), (f"pixellab_{anim}_{d}_game", "ความเร็วในเกม", game_ms)):
+				if t is None:
+					continue
+				clips.append({"group": group, "id": cid, "label": f"PixelLab · {th} · {d} · {label} (ทดลอง 18 ต.ค. · จาก master v2)",
+					"frames": names, "ms": t, "loop": True, "w": W, "travel": travel * sign, "src": [f"pixellab {anim} {d}"]})
+	json.dump({"_doc": "PixelLab ท่าจาก master v2 · tools/sprites/pixellab_walk.py page · ร่าง ยังไม่เข้าเกม", "clips": clips},
 		open(os.path.join(dst, "index.json"), "w"), ensure_ascii=False, indent=1)
 	print("คลิป", [c["id"] for c in clips], "→", dst)
 
@@ -209,4 +232,5 @@ if __name__ == "__main__":
 	cmd = sys.argv[1] if len(sys.argv) > 1 else "ref"
 	{"ref": make_ref, "balance": balance, "character": character, "fetch": fetch, "page": page,
 	 "walk": lambda: walk(sys.argv[2:] or ["east"]),
-	 "slash": lambda: walk(sys.argv[2:] or ["west"], "slash")}[cmd]()
+	 "slash": lambda: walk(sys.argv[2:] or ["west"], "slash"),
+	 "slash2": lambda: walk(sys.argv[2:] or ["west"], "slash2")}[cmd]()
