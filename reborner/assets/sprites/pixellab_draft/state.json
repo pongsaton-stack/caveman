@@ -181,5 +181,16 @@
   "1d8cc9bc-ab18-42dd-858d-4127402b7cf2": "completed",
   "99e2334d-5506-4e1d-98cc-f4c117c851b5": "completed",
   "0f7e54ef-fd1b-46c3-8545-903eafbfeb16": "completed"
+ },
+ "states": {
+  "fight_knife": {
+   "response": {
+    "usage": null,
+    "background_job_id": "57380f2f-39bd-4f52-887f-aeb38b85a68a",
+    "character_id": "3b7b1d28-24ee-4f3c-b181-9752d2bbbdb0",
+    "status": "queued"
+   },
+   "status": "completed"
+  }
  }
 }

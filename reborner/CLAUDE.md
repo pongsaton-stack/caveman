@@ -49,7 +49,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
           `page` รองรับหลายท่าแล้ว (`PAGE_CLIPS` · slash รอบ 1 ไม่ลงหน้า) · หน้า animation test **Version 115** กลุ่ม "ชุดครบ · ท่าศึก" คลิป "PixelLab · ฟันมีด" · ตรวจในเบราว์เซอร์ ไม่มี error เท้าลงเส้นพื้น · **ยังไม่เข้าเกม**
   แบบก่อนหน้า (Flow หมวกน้ำเงิน 16 ต.ค. · `rion_flow_ref.png`) = แบบเดียวกันแนวภาพคม → ใช้ประกอบได้ · ภาพ master ใหม่เป็นภาพอ้างอิงหลัก
 **งานค้างล่าสุด (อ่านก่อนเมื่อเริ่ม session ใหม่ · อัปเดต 18 ต.ค. 2026)**: ท่าเดิน Rion master v2 ชีต B แก้สมจริงแล้ว (หน้า animation test Version 113 · ยังไม่เข้าเกม) →
-  PixelLab เดินขวา + ฟันมีดหันซ้าย + VFX รอยมีด **ทำแล้ว 18 ต.ค.** (เหลือ 8 gen · หน้า animation test Version 115 · หน้า pixellab animation test Version 5) · ขั้นต่อไป: kwan เทียบกับชีต B / Flow 18-1 แล้วตัดสินว่าใช้ PixelLab ต่อไหม (ทิศอื่น `walk west north south` · 2 gen/ทิศ) · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
+  PixelLab เดินขวา + ฟันมีดหันซ้าย + VFX รอยมีด **ทำแล้ว 18 ต.ค.** (เหลือ 1,985 gen · Tier 1 · หน้า animation test Version 118 · หน้า pixellab animation test Version 6) · ขั้นต่อไป: kwan เทียบกับชีต B / Flow 18-1 แล้วตัดสินว่าใช้ PixelLab ต่อไหม (ทิศอื่น `walk west north south` · 2 gen/ทิศ) · รายละเอียดใต้หัวข้อ "ทดลอง PixelLab"
 **คำสั่ง PixelLab ต้องละเอียดที่สุด (kwan 18 ต.ค. 2026 "คุณต้องใส่คำสั่งให้ละเอียดที่สุด บันทึกไว้ด้วย")**: Claude เขียนคำสั่ง PixelLab เอง (ต่างจาก Flow ที่ Muse เขียน) · ห้ามส่งคำสั่งสั้นประโยคเดียว ·
   ทุกท่าต้องมีครบ 8 ส่วน: ทิศล็อกตลอดท่า · ของในมือ (ขนาด/มือไหน/ทุกเฟรม) · ลำดับท่าทีละจังหวะ ≈ จำนวนเฟรม · หลักโมเมนตัม (ท่าโจมตี) · ส่วนที่คงที่ทุกเฟรม · สิ่งที่ห้าม · CHARACTER + STYLE ของ RION_MASTER ตามตัวอักษร ·
   ทำผ่าน `MOVES` + `python3 tools/sprites/pixellab_walk.py prompt <ท่า>` (ดูคำสั่งเต็มก่อนเสียเครดิต) แล้ว `anim <ท่า> [ทิศ]` · กฎ ขั้นตอน และตารางผลที่ลองแล้วอยู่ใน `docs/art-bible/rion_hires/PIXELLAB_PROMPTS.md` (เพิ่มแถวทุกครั้งที่ลอง)
@@ -605,6 +605,8 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
       ตรวจ: 34 คลิป × 3 โหมด เดินครบทุกเฟรม ไม่มี error · ภาพ `docs/art-bible/pixellab_test/blade17_lab.png` · ข้อจำกัด: แสงแล็บเป็นแสงฟุ้งไม่ใช่พิกเซล (ต่างแนวกับตัวละคร) · ประกายดาวของฟันดวงดาวขึ้นที่มอนก่อนฟันโดน 2 เฟรม
     **State (kwan 18 ต.ค. ส่งสรุปคลิป "PixelLab Character States" จาก Muse → เลือก "2" สร้าง State ท่าสู้ถือมีดก่อน)**: API มีครบ (`/create-character-state` · `keep_first_frame` · `custom_start_frame` · `end_frame` · โหมด pixminimax ถึง 40 เฟรม)
       `pixellab_walk.py state fight_knife` (ใหม่) → **HTTP 402: State ผืน 112 ราคาอย่างน้อย 15 gen** (ยอดจริงเหลือ **7** ไม่ใช่ 8 · หักทีหลังอีก 1) · ไม่เสียเครดิต · ผืน 96 (kwan เลือก "2") = **อย่างน้อย 10 gen** ก็ไม่พอ · ยังไม่ได้ State · ต้องเติมเครดิตก่อน
+      ✅ **19 ต.ค. kwan สมัคร Tier 1: Pixel Apprentice (2,000 gen/เดือน)** → `state fight_knife` ผืน 96 หักจริง **15 gen → เหลือ 1,985** · ได้ 4 ทิศ ท่าสู้ถือมีดเล่มเดียว หันข้างจริง หน้าตาเดิม (ร่าง) ·
+        ภาพ `pixellab_draft/states/fight_knife/fight_knife/rotations/` · character_id ใน state.json["states"] · หน้ามาสเตอร์ PixelLab Version 6 · **ขั้นต่อไป: เจนท่าจาก State (keep_first_frame) รอ kwan ดูภาพก่อน**
   เจอระหว่างตรวจ: ท่าเดิม rg5 dv5 dv6 fs3 พลัง 0 ไม่มีผลในโค้ด = กดใช้ไม่ได้ · dv1/dv2/fs4/rg6 ผลที่เขียนไว้ไม่มีในโค้ด · ช่องเดิม A4/B4/C4 ต่างกัน 34–54% · รวมทั้งต้นไม้ กล −14.6% → รอ kwan ตัดสินก่อนแก้
 ## งานถัดไปตามลำดับ
 1. ✅ รัน Sim headless → เทียบตารางเป้า (`docs/SIM_REPORT_2026-09-25.md`) · ✅ เพิ่มบอส B1 เข้า Sim แล้ว · ✅ ยอมรับเป้ามีดทำครัวใหม่ (GDD 11.29)

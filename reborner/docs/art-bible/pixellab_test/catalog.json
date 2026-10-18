@@ -84,6 +84,28 @@
           "notes": "/create-character-v3 จากภาพอ้างอิงหันหน้า (ref_south.png) · ภาพนิ่งทิศละ 1 ภาพ ผืน 96"
         },
         {
+          "id": "state_fight_knife",
+          "name": "State · ท่าสู้ถือมีด (ภาพนิ่ง 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "fight_knife"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "/create-character-state ผืน 96 · 15 gen (2000 → 1985 · ผืน 96 ปฏิเสธที่ 'อย่างน้อย 10' แต่หักจริง 15) · 131 วิ · ได้: ตัวเดิมหน้าตา/สีเดิม ครบ 4 ทิศ · ย่อเข่า ขากาง · มีดทำครัวเล่มเดียวในมือหน้า ชี้ขึ้นหน้า · หันข้างจริงไม่หันเข้ากล้อง · ไว้เป็นภาพเริ่มของท่าโจมตี (keep_first_frame)"
+        },
+        {
           "id": "walk",
           "name": "เดิน",
           "kind": "loop",

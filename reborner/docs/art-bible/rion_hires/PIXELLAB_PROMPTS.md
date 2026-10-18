@@ -48,4 +48,4 @@
 - หลักการ: สร้าง State = ตัวเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ → ใช้เป็นภาพเริ่มของท่า (`keep_first_frame` · `custom_start_frame`) แทนภาพยืนมือเปล่า · ท่ายาว = ต่อหลายช่วงด้วย `end_frame` (interpolation)
 - คำสั่ง: `python3 tools/sprites/pixellab_walk.py state fight_knife` (`STATES` ใน pixellab_walk.py · edit_description ≤ 1000 ตัวอักษร · palette จากตัวเดิม) · `fetch_state` ดึงภาพ
 - ลองแล้ว 18 ต.ค.: ผืน 112x112 → **HTTP 402 "This edit costs at least 15 generations"** (มี 7) · ไม่เสียเครดิต · ผืน 96 (ขนาดเดิม · kwan เลือก "2") → **HTTP 402 "at least 10 generations"** ไม่เสียเครดิต · State ตัว 4 ทิศ = ≥10 gen (ผืน 96) / ≥15 gen (ผืน 112)
-
+- ✅ 19 ต.ค. (kwan สมัคร Tier 1 · 2,000 gen) `state fight_knife` ผืน 96 → **หักจริง 15 gen** (ระบบบอก "อย่างน้อย 10") · 131 วิ · ได้ครบ 4 ทิศ: หน้าตา/สีเดิม · ท่าสู้ย่อเข่า · มีดทำครัวเล่มเดียวมือหน้า · หันข้างจริง · ภาพ `assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/` · เทียบ `docs/art-bible/pixellab_test/state_fight_knife_cmp.png`

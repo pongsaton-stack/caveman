@@ -1,0 +1,146 @@
+{
+  "group_id": "4ea6c264-7ccd-4087-b7b2-0cf6ba9b7062",
+  "states": [
+    {
+      "character": {
+        "id": "c378a9f5-65e8-44a9-99aa-a65c6238e5ce",
+        "name": "Idle",
+        "prompt": "chibi boy hero, blue cap with brass goggles, messy brown hair, white short-sleeve collared shirt, blue necktie, blue knee-length shorts, brown backpack, white socks, brown boots, no wristwatch, 32-bit pixel art",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "low top-down",
+        "created_at": "2026-10-18T10:09:40.103154+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "west": "Idle/rotations/west.png",
+          "east": "Idle/rotations/east.png",
+          "north": "Idle/rotations/north.png"
+        },
+        "animations": {
+          "bl15_v": {
+            "west": [
+              "Idle/animations/bl15_v/west/frame_000.png",
+              "Idle/animations/bl15_v/west/frame_001.png",
+              "Idle/animations/bl15_v/west/frame_002.png",
+              "Idle/animations/bl15_v/west/frame_003.png",
+              "Idle/animations/bl15_v/west/frame_004.png",
+              "Idle/animations/bl15_v/west/frame_005.png",
+              "Idle/animations/bl15_v/west/frame_006.png",
+              "Idle/animations/bl15_v/west/frame_007.png"
+            ]
+          },
+          "bt5_v": {
+            "west": [
+              "Idle/animations/bt5_v/west/frame_000.png",
+              "Idle/animations/bt5_v/west/frame_001.png",
+              "Idle/animations/bt5_v/west/frame_002.png",
+              "Idle/animations/bt5_v/west/frame_003.png",
+              "Idle/animations/bt5_v/west/frame_004.png",
+              "Idle/animations/bt5_v/west/frame_005.png",
+              "Idle/animations/bt5_v/west/frame_006.png",
+              "Idle/animations/bt5_v/west/frame_007.png"
+            ]
+          },
+          "slash2": {
+            "west": [
+              "Idle/animations/slash2/west/frame_000.png",
+              "Idle/animations/slash2/west/frame_001.png",
+              "Idle/animations/slash2/west/frame_002.png",
+              "Idle/animations/slash2/west/frame_003.png",
+              "Idle/animations/slash2/west/frame_004.png",
+              "Idle/animations/slash2/west/frame_005.png",
+              "Idle/animations/slash2/west/frame_006.png",
+              "Idle/animations/slash2/west/frame_007.png"
+            ]
+          },
+          "bl16_v": {
+            "west": [
+              "Idle/animations/bl16_v/west/frame_000.png",
+              "Idle/animations/bl16_v/west/frame_001.png",
+              "Idle/animations/bl16_v/west/frame_002.png",
+              "Idle/animations/bl16_v/west/frame_003.png",
+              "Idle/animations/bl16_v/west/frame_004.png",
+              "Idle/animations/bl16_v/west/frame_005.png",
+              "Idle/animations/bl16_v/west/frame_006.png",
+              "Idle/animations/bl16_v/west/frame_007.png",
+              "Idle/animations/bl16_v/west/frame_008.png",
+              "Idle/animations/bl16_v/west/frame_009.png",
+              "Idle/animations/bl16_v/west/frame_010.png",
+              "Idle/animations/bl16_v/west/frame_011.png"
+            ]
+          },
+          "walk": {
+            "east": [
+              "Idle/animations/walk/east/frame_000.png",
+              "Idle/animations/walk/east/frame_001.png",
+              "Idle/animations/walk/east/frame_002.png",
+              "Idle/animations/walk/east/frame_003.png",
+              "Idle/animations/walk/east/frame_004.png",
+              "Idle/animations/walk/east/frame_005.png",
+              "Idle/animations/walk/east/frame_006.png",
+              "Idle/animations/walk/east/frame_007.png"
+            ]
+          },
+          "slash": {
+            "west": [
+              "Idle/animations/slash/west/frame_000.png",
+              "Idle/animations/slash/west/frame_001.png",
+              "Idle/animations/slash/west/frame_002.png",
+              "Idle/animations/slash/west/frame_003.png",
+              "Idle/animations/slash/west/frame_004.png",
+              "Idle/animations/slash/west/frame_005.png",
+              "Idle/animations/slash/west/frame_006.png",
+              "Idle/animations/slash/west/frame_007.png"
+            ]
+          },
+          "bl15_v2": {
+            "west": [
+              "Idle/animations/bl15_v2/west/frame_000.png",
+              "Idle/animations/bl15_v2/west/frame_001.png",
+              "Idle/animations/bl15_v2/west/frame_002.png",
+              "Idle/animations/bl15_v2/west/frame_003.png",
+              "Idle/animations/bl15_v2/west/frame_004.png",
+              "Idle/animations/bl15_v2/west/frame_005.png",
+              "Idle/animations/bl15_v2/west/frame_006.png",
+              "Idle/animations/bl15_v2/west/frame_007.png"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "character": {
+        "id": "3b7b1d28-24ee-4f3c-b181-9752d2bbbdb0",
+        "name": "fight_knife",
+        "prompt": "chibi boy hero, blue cap with brass goggles, messy brown hair, white short-sleeve collared shirt, blue necktie, blue knee-length shorts, brown backpack, white socks, brown boots, no wristwatch, 32-bit pixel art",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "low top-down",
+        "created_at": "2026-10-18T23:47:27.391252+00:00"
+      },
+      "folder": "fight_knife",
+      "frames": {
+        "rotations": {
+          "south": "fight_knife/rotations/south.png",
+          "west": "fight_knife/rotations/west.png",
+          "east": "fight_knife/rotations/east.png",
+          "north": "fight_knife/rotations/north.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-18T23:49:44.337798"
+}
