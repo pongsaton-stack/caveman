@@ -44,6 +44,9 @@ header p{margin:0;color:var(--muted);font-size:13px}
 .seg .btn:first-child{border-radius:3px 0 0 3px}
 .seg .btn:last-child{border-radius:0 3px 3px 0}
 .seg .btn+.btn{border-left:0}
+/* แถวเลือกมอน: มอน 15 ตัวแล้ว ปุ่มเรียงแถวเดียวล้นจอ (kwan 19 ต.ค. "เวปล้นจอ") → ตัดบรรทัด ปุ่มแยกกัน ชื่อไม่หักกลางคำ */
+.pkFoeBox{display:flex;flex-wrap:wrap;gap:4px;align-items:center;max-width:100%}
+.pkFoeBox .btn{border-radius:3px!important;border-left:1px solid var(--line,#555)!important;white-space:nowrap}
 .lbl{font-size:12px;color:var(--muted);letter-spacing:.04em;margin:0 0 6px}
 .strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
 .strip button{flex:0 0 auto;display:grid;justify-items:center;gap:2px;background:#26221b;border:1px solid var(--line);border-radius:3px;padding:4px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
