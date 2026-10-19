@@ -26,7 +26,7 @@
     "hurt"
    ],
    "size": [
-    46,
+    43,
     57
    ],
    "src": "pixellab"
@@ -56,8 +56,8 @@
     "hurt"
    ],
    "size": [
-    66,
-    78
+    55,
+    72
    ],
    "src": "pixellab"
   },
@@ -65,13 +65,14 @@
    "id": "M29",
    "name": "โกลเลมสลัก",
    "body": "หิน",
-   "n": 1,
+   "n": 2,
    "roles": [
-    "idle"
+    "idle",
+    "hurt"
    ],
    "size": [
-    46,
-    86
+    67,
+    88
    ],
    "src": "pixellab"
   }

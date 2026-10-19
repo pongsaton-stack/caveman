@@ -133,6 +133,43 @@ def _find(mid, *parts):
 	return []
 
 
+def _fit(im, size):
+	"""ท่าขยับบางตัวได้ผืนใหญ่กว่าภาพหมุน (M29 120 vs 96) → วางกลางผืนขนาดเดียวกัน (ขอบเพิ่มรอบตัวเท่ากันทุกด้าน)"""
+	if im.size == size:
+		return im
+	c = Image.new("RGBA", size)
+	c.alpha_composite(im, ((size[0] - im.width) // 2, (size[1] - im.height) // 2)) if im.width <= size[0] else c.paste(im.crop(((im.width - size[0]) // 2, (im.height - size[1]) // 2, (im.width + size[0]) // 2, (im.height + size[1]) // 2)))
+	return c
+
+
+def _clean_hurt(idle, frames):
+	"""ท่าโดนตีที่ PixelLab วาดประกาย/ลำแสงติดมา (สั่งห้ามแล้วก็ยังวาด · 19 ต.ค.) และบางเฟรมเป็นก้อนเบลอ (M17)
+	→ เลือกเฟรมที่สีแปลกปลอมน้อยสุดและตัวขยับจากท่ายืนจริง → ลบพิกเซลที่สีห่างจากสีของท่ายืน → เก็บก้อนใหญ่สุด"""
+	import numpy as np
+	from scipy import ndimage
+	ia = np.array(idle)
+	pal = np.unique(ia[ia[..., 3] > 127][:, :3], axis=0).astype(int)
+	lum = lambda a: a[..., :3].astype(int) @ np.array([299, 587, 114]) // 1000
+	hi = np.percentile(lum(ia)[ia[..., 3] > 127], 99) + 12   # ประกายสว่างกว่าจุดสว่างสุดของตัว
+	area0 = (ia[..., 3] > 127).sum()
+	def far(a):
+		px = a[..., :3].reshape(-1, 1, 3).astype(int)
+		d = np.min(((px - pal[None]) ** 2).sum(-1), axis=1).reshape(a.shape[:2])
+		return ((d > 40 ** 2) | ((lum(a) > hi) & (d > 15 ** 2))) & (a[..., 3] > 127)   # สว่าง + สีไม่ตรงตัว = ประกาย (หัวกะโหลกขาวของ M08 ไม่โดน)
+	def score(im):
+		a = np.array(im); body = a[..., 3] > 127
+		moved = np.abs(a[..., 3].astype(int) - ia[..., 3].astype(int)).sum() / 255
+		blob = 1 if body.sum() > 1.5 * area0 else 0   # ก้อนเบลอ (M17) ใหญ่กว่าตัวจริงมาก
+		return far(a).sum() / max(1, body.sum()) + (1 if moved < 20 else 0) + blob
+	a = np.array(min(frames, key=score)).copy()
+	a[far(a)] = 0
+	lab, n = ndimage.label(a[..., 3] > 127)
+	if n > 1:
+		keep = 1 + int(np.argmax(ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))))
+		a[lab != keep] = 0
+	return Image.fromarray(a, "RGBA")
+
+
 def page():
 	"""ภาพหันขวา (east) = ยืน · ท่าโดนตีเฟรมที่ถอยมากสุด = โดน → ครอปกรอบรวม เว้นขอบ 4 · ตัวลอย (float) เว้นใต้ตัว 12 ให้ลอยเหนือพื้นแบบค้างคาว"""
 	dst = os.path.join(OUT, "px")
@@ -147,9 +184,7 @@ def page():
 			continue
 		ims = [Image.open(east[0]).convert("RGBA")]
 		if hurt:
-			fr = [Image.open(p).convert("RGBA") for p in hurt]
-			cx0 = sum(ims[0].getchannel("A").getbbox()[::2]) / 2
-			ims.append(min(fr, key=lambda im: sum(im.getchannel("A").getbbox()[::2]) / 2 - cx0))   # ถอยไปซ้ายมากสุด
+			ims.append(_clean_hurt(ims[0], [_fit(Image.open(p).convert("RGBA"), ims[0].size) for p in hurt]))
 		bb = [im.getchannel("A").getbbox() for im in ims]
 		x0, y0, x1, y1 = min(b[0] for b in bb), min(b[1] for b in bb), max(b[2] for b in bb), max(b[3] for b in bb)
 		pad = 12 if m["float"] else 0
