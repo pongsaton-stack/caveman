@@ -319,6 +319,12 @@ STATES = {
 		"No second knife, no sword, no glow, no slash trail, no motion lines, no shadow, no ground, no background, no text.")},
 }
 
+try:   # State ท่าตัวของต้นไม้ 17 ท่า × 6 สาย (pixellab_states17.py · รายการให้ kwan ตรวจ docs/design/STATE_POSES_17.md) · SL_A_stance = fight_knife ที่ทำแล้ว
+	from pixellab_states17 import STATES17 as _S17
+	STATES.update({k: v for k, v in _S17.items() if k != "SL_A_stance"})
+except ImportError:
+	pass
+
 
 def make_state(name):
 	s = state()
