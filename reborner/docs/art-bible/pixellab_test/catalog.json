@@ -332,6 +332,402 @@
           "ms": 90,
           "game_ms": null,
           "notes": "ไม่ผ่าน (ใช้ได้บางช่วง): ตัว State เตะ · ภาพเริ่ม = ท่ายืนสู้ของ State ทุ่ม (custom_start_frame) · เฟรม 1–5 ย่อ→กระโดดลอยถูก · เฟรม 6–8 หันหลังให้กล้องเห็นเป้ = หมุนจริง · แต่ขาเตะต่ำระดับเอว ไม่เหยียดถึงหัว · เฟรม 9–11 หันหน้าเข้ากล้อง เฟรม 10 เป้ย้ายมาอยู่หน้าอก · เฟรม 12 กลับหันซ้าย · 3 gen (1952 → 1949)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_BT_A_stance",
+          "name": "State ท่ายืนสู้ ทุบ · ค้อน (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "BT_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_PT_A_stance",
+          "name": "State ท่ายืนสู้ แทง · ไขควง (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "PT_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_RG_A_stance",
+          "name": "State ท่ายืนสู้ ยิง · ธนู (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "RG_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_DV_A_stance",
+          "name": "State ท่ายืนสู้ กล · รีโมต (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "DV_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_FS_A_stance",
+          "name": "State ท่ายืนสู้ มือเปล่า · นวม (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "FS_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_bl",
+          "name": "ยืนในศึก คม · มีด (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/idle_bl_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_bl"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl0_set",
+          "name": "โจมตีพื้นฐาน bl0 · คม · มีด (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_bt",
+          "name": "ยืนในศึก ทุบ · ค้อน (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/animations/idle_bt_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_bt"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bt0_set",
+          "name": "โจมตีพื้นฐาน bt0 · ทุบ · ค้อน (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/animations/bt0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · เส้นฟาดฟ้าเฟรม 2/4/5 ลบแล้ว เหลือเศษเล็กน้อยเฟรม 4"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_pt",
+          "name": "ยืนในศึก แทง · ไขควง (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/animations/idle_pt_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_pt"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "pt0_set",
+          "name": "โจมตีพื้นฐาน pt0 · แทง · ไขควง (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/animations/pt0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "pt0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · ตัดเฟรม 5 (วงลมขาวพันรอบตัว)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_rg",
+          "name": "ยืนในศึก ยิง · ธนู (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/animations/idle_rg_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_rg"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "rg0_set",
+          "name": "โจมตีพื้นฐาน rg0 · ยิง · ธนู (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/animations/rg0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "rg0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_dv",
+          "name": "ยืนในศึก กล · รีโมต (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/animations/idle_dv_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_dv"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "dv0_set",
+          "name": "โจมตีพื้นฐาน dv0 · กล · รีโมต (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/animations/dv0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "dv0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_fs",
+          "name": "ยืนในศึก มือเปล่า · นวม (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/animations/idle_fs_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_fs"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "fs0_set",
+          "name": "โจมตีพื้นฐาน fs0 · มือเปล่า · นวม (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/animations/fs0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "fs0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · ตัดเฟรม 1–2 (เส้นลมขาวพาดทับอก ลบแล้วหัวขาด)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "hurt_k",
+          "name": "โดนตี ถือมีด (6 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/hurt_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hurt_k"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · ลบเปลวขาวที่วาดติดมา"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 110,
+          "game_ms": null,
+          "id": "ko_k",
+          "name": "ล้ม มีดหลุดมือ (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/ko_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "ko_k"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "walk_ns",
+          "name": "เดินขึ้น/ลง (8 เฟรม/ทิศ)",
+          "kind": "loop",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/zip/Idle/animations/walk_v-eb599d32/south",
+            "north": "assets/sprites/pixellab_draft/zip/Idle/animations/walk_v/north"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "walk"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · เดินลงลบรอยเหงื่อ · เดินขึ้นเฟรม 2–7 เห็นแว่นบนหมวกจากข้างหลัง"
         }
       ]
     },

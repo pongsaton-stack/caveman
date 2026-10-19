@@ -1,0 +1,328 @@
+{
+ "_doc": "ชุด Rion ในเกมจาก PixelLab · tools/sprites/pixellab_rion_set.py · ร่าง ยังไม่เข้าเกม",
+ "clips": [
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_idle_bl",
+   "label": "ยืนในศึก · คม · มีด · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 71 จุด)",
+   "frames": [
+    "pls_idle_bl_0",
+    "pls_idle_bl_1",
+    "pls_idle_bl_2",
+    "pls_idle_bl_3"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife idle_bl_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_atk_bl",
+   "label": "โจมตีพื้นฐาน bl0 · คม · มีด · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1035 จุด)",
+   "frames": [
+    "pls_atk_bl_0",
+    "pls_atk_bl_1",
+    "pls_atk_bl_2",
+    "pls_atk_bl_3",
+    "pls_atk_bl_4",
+    "pls_atk_bl_5",
+    "pls_atk_bl_6",
+    "pls_atk_bl_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl0_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_idle_bt",
+   "label": "ยืนในศึก · ทุบ · ค้อน · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 973 จุด)",
+   "frames": [
+    "pls_idle_bt_0",
+    "pls_idle_bt_1",
+    "pls_idle_bt_2",
+    "pls_idle_bt_3"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_A_stance idle_bt_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_atk_bt",
+   "label": "โจมตีพื้นฐาน bt0 · ทุบ · ค้อน · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1825 จุด)",
+   "frames": [
+    "pls_atk_bt_0",
+    "pls_atk_bt_1",
+    "pls_atk_bt_2",
+    "pls_atk_bt_3",
+    "pls_atk_bt_4",
+    "pls_atk_bt_5",
+    "pls_atk_bt_6",
+    "pls_atk_bt_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_A_stance bt0_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_idle_pt",
+   "label": "ยืนในศึก · แทง · ไขควง · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 883 จุด)",
+   "frames": [
+    "pls_idle_pt_0",
+    "pls_idle_pt_1",
+    "pls_idle_pt_2",
+    "pls_idle_pt_3"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab PT_A_stance idle_pt_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_atk_pt",
+   "label": "โจมตีพื้นฐาน pt0 · แทง · ไขควง · 7 เฟรม (PixelLab · ลบแสงที่วาดติดมา 18 จุด)",
+   "frames": [
+    "pls_atk_pt_0",
+    "pls_atk_pt_1",
+    "pls_atk_pt_2",
+    "pls_atk_pt_3",
+    "pls_atk_pt_4",
+    "pls_atk_pt_5",
+    "pls_atk_pt_6"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab PT_A_stance pt0_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_idle_rg",
+   "label": "ยืนในศึก · ยิง · ธนู · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_idle_rg_0",
+    "pls_idle_rg_1",
+    "pls_idle_rg_2",
+    "pls_idle_rg_3"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab RG_A_stance idle_rg_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_atk_rg",
+   "label": "โจมตีพื้นฐาน rg0 · ยิง · ธนู · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 164 จุด)",
+   "frames": [
+    "pls_atk_rg_0",
+    "pls_atk_rg_1",
+    "pls_atk_rg_2",
+    "pls_atk_rg_3",
+    "pls_atk_rg_4",
+    "pls_atk_rg_5",
+    "pls_atk_rg_6",
+    "pls_atk_rg_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab RG_A_stance rg0_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_idle_dv",
+   "label": "ยืนในศึก · กล · รีโมต · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 492 จุด)",
+   "frames": [
+    "pls_idle_dv_0",
+    "pls_idle_dv_1",
+    "pls_idle_dv_2",
+    "pls_idle_dv_3"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab DV_A_stance idle_dv_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_atk_dv",
+   "label": "โจมตีพื้นฐาน dv0 · กล · รีโมต · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 43 จุด)",
+   "frames": [
+    "pls_atk_dv_0",
+    "pls_atk_dv_1",
+    "pls_atk_dv_2",
+    "pls_atk_dv_3",
+    "pls_atk_dv_4",
+    "pls_atk_dv_5",
+    "pls_atk_dv_6",
+    "pls_atk_dv_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab DV_A_stance dv0_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_idle_fs",
+   "label": "ยืนในศึก · มือเปล่า · นวม · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 72 จุด)",
+   "frames": [
+    "pls_idle_fs_0",
+    "pls_idle_fs_1",
+    "pls_idle_fs_2",
+    "pls_idle_fs_3"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab FS_A_stance idle_fs_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_atk_fs",
+   "label": "โจมตีพื้นฐาน fs0 · มือเปล่า · นวม · 6 เฟรม (PixelLab · ลบแสงที่วาดติดมา 2350 จุด)",
+   "frames": [
+    "pls_atk_fs_0",
+    "pls_atk_fs_1",
+    "pls_atk_fs_2",
+    "pls_atk_fs_3",
+    "pls_atk_fs_4",
+    "pls_atk_fs_5"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab FS_A_stance fs0_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_hurt",
+   "label": "โดนตี · ถือมีด · 6 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1746 จุด)",
+   "frames": [
+    "pls_hurt_0",
+    "pls_hurt_1",
+    "pls_hurt_2",
+    "pls_hurt_3",
+    "pls_hurt_4",
+    "pls_hurt_5"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife hurt_k_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_ko",
+   "label": "ล้ม · มีดหลุดมือ · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 265 จุด)",
+   "frames": [
+    "pls_ko_0",
+    "pls_ko_1",
+    "pls_ko_2",
+    "pls_ko_3",
+    "pls_ko_4",
+    "pls_ko_5",
+    "pls_ko_6",
+    "pls_ko_7"
+   ],
+   "ms": 110,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife ko_k_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_walk_s",
+   "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
+   "frames": [
+    "pls_walk_s_0",
+    "pls_walk_s_1",
+    "pls_walk_s_2",
+    "pls_walk_s_3",
+    "pls_walk_s_4",
+    "pls_walk_s_5",
+    "pls_walk_s_6",
+    "pls_walk_s_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab base walk_v-eb599d32 south"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_walk_n",
+   "label": "เดินขึ้น (หันหลัง) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 269 จุด)",
+   "frames": [
+    "pls_walk_n_0",
+    "pls_walk_n_1",
+    "pls_walk_n_2",
+    "pls_walk_n_3",
+    "pls_walk_n_4",
+    "pls_walk_n_5",
+    "pls_walk_n_6",
+    "pls_walk_n_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab base walk_v north"
+   ]
+  }
+ ]
+}

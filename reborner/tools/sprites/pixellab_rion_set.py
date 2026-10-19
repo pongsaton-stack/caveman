@@ -23,9 +23,11 @@ SCHOOL = {"bl": ("fight_knife", "คม · มีด"), "bt": ("BT_A_stance", "�
 	"rg": ("RG_A_stance", "ยิง · ธนู"), "dv": ("DV_A_stance", "กล · รีโมต"), "fs": ("FS_A_stance", "มือเปล่า · นวม")}
 # (คลิป, ชื่อ, State, โฟลเดอร์ท่า, ทิศ, เฟรมที่ใช้ (None = ทั้งหมด), ms, วน)
 CLIPS = []
+# เฟรมที่ตัด (ตรวจด้วยตา 19 ต.ค.): fs0 เฟรม 1–2 เส้นลมขาวพาดทับอก ลบแล้วหัวขาด · pt0 เฟรม 5 วงลมขาวพันรอบตัว
+KEEP = {"pls_atk_fs": [0, 3, 4, 5, 6, 7], "pls_atk_pt": [0, 1, 2, 3, 4, 6, 7]}
 for s, (st, th) in SCHOOL.items():
 	CLIPS.append((f"pls_idle_{s}", f"ยืนในศึก · {th}", st, f"idle_{s}_v", "west", None, 180, True))
-	CLIPS.append((f"pls_atk_{s}", f"โจมตีพื้นฐาน {s}0 · {th}", st, f"{s}0_v", "west", None, 90, False))
+	CLIPS.append((f"pls_atk_{s}", f"โจมตีพื้นฐาน {s}0 · {th}", st, f"{s}0_v", "west", KEEP.get(f"pls_atk_{s}"), 90, False))
 CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "hurt_k_v", "west", None, 90, False),
 	("pls_ko", "ล้ม · มีดหลุดมือ", "fight_knife", "ko_k_v", "west", None, 110, False),
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
@@ -47,6 +49,20 @@ def clean(im, ref):
 	body = a[..., 3] > 127
 	far = body & ((d > 40 ** 2) | ((lum(a) > hi) & (d > 15 ** 2)))
 	keep = body & ~far
+	# เส้นฟาด/วงหมัด/ประกายสีขาวเทา สีตรงกับเสื้อขาว ลบด้วยสีไม่ได้ → ก้อนสีซีดที่รอบก้อนเป็นพื้นโปร่งเกินครึ่ง = เอฟเฟกต์ (เสื้อ/ใบมีดจริงมีเส้นขอบเข้มล้อม)
+	rgb = a[..., :3].astype(int)
+	pale = keep & (rgb.max(-1) - rgb.min(-1) < 40) & (lum(a) > 110)
+	plab, pn = ndimage.label(pale)
+	for i in range(1, pn + 1):
+		comp = plab == i
+		ring = ndimage.binary_dilation(comp) & ~comp
+		if ring.sum() and (ring & ~keep).sum() / ring.sum() > 0.5:
+			keep &= ~comp; far |= comp
+	# ขอบน้ำเงินของเส้นฟาดสีฟ้า (สีตรงกับหมวก) → พิกเซลน้ำเงินที่ห่างเส้นฟาดสีฟ้าที่ลบไปแล้วไม่เกิน 2 จุด
+	blue = keep & (rgb[..., 2] > rgb[..., 0] + 50) & (rgb[..., 2] > rgb[..., 1] + 20)
+	cyan = far & (rgb[..., 1] > 150) & (rgb[..., 2] > 200) & (rgb[..., 0] < 170)   # เฉพาะเส้นฟาดสีฟ้า (แว่นทองที่ถูกลบในเดินขึ้นไม่นับ · ไม่งั้นกินขอบหมวก)
+	edge = blue & ndimage.binary_dilation(cyan, iterations=2)
+	keep &= ~edge; far |= edge
 	lab, n = ndimage.label(keep)
 	if n > 1:
 		sz = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))

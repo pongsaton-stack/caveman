@@ -30,7 +30,9 @@ def rion_pack_clips():
 	extra = [{'group': '', 'id': 'pl_slash2', 'label': 'PixelLab ฟันมีดรอบ 2 (พลิกหันขวา)', 'frames': ['pl_slash2_%d' % i for i in range(8)], 'ms': 110, 'loop': False, 'w': 104, 'travel': 0, 'hidden': True}] if pl else []
 	extra += [{'group': '', 'id': cid, 'label': 'PixelLab จาก State (พลิกหันขวา)', 'frames': ['%s_%d' % (cid, i) for i in range(len(fs))], 'ms': 90, 'loop': False, 'w': 120, 'travel': 0, 'hidden': True}
 		for cid, fs in PL_STATE_CLIPS.items() if all(os.path.isfile(f) for f in fs)]
-	return rp[:n] + pl + rp[n:] + extra
+	# ชุด Rion ในเกมแบบ PixelLab (tools/sprites/pixellab_rion_set.py · kwan 19 ต.ค. "เปลี่ยนเป็น PixelLab ทั้งชุด" · ร่าง ยังไม่เข้าเกม) · หันซ้ายตามภาพดิบ
+	ps = clips(os.path.join(SPR, 'pixellab_draft/px_set/index.json'))
+	return ps + rp[:n] + pl + rp[n:] + extra
 
 
 # ท่ายากจาก State (kwan 19 ต.ค. "ลองท่ายากก่อน 2 ท่า" → ไม่ผ่านทั้งคู่ → "1" ประกอบด้วยโค้ดจากช่วงที่ผ่าน) · ใช้เฉพาะเฟรมที่ไม่หันเข้ากล้อง
@@ -113,6 +115,11 @@ def sprites():
 					b = io.BytesIO(); ImageOps.mirror(Image.open(os.path.join(pl, f))).save(b, 'PNG')
 					out['rpk/pl_slash2_' + f.rsplit('_', 1)[1][:-4]] = 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
 	out.update(pl_state_frames())
+	ps = os.path.join(SPR, 'pixellab_draft/px_set')
+	if os.path.isdir(ps):
+		for f in sorted(os.listdir(ps)):
+			if f.endswith('.png'):
+				out['rpk/' + f[:-4]] = png(os.path.join(ps, f))
 	# มอนภูมิภาค 1 พิกเซล (tools/sprites/monsters_px.py · ชีตรอบ 10 · ร่าง)
 	md = os.path.join(SPR, 'monsters_px_draft')
 	if os.path.isdir(md):
