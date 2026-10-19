@@ -959,6 +959,85 @@ function pkvSound(F) {
 	if (c.die && F === tl.D0 + 7 && a.death === 'CR') AU_SFX.hit('CR', true);
 	if (c.die && F === tl.D0 + 10 && a.death === 'ICE') auNoise(0.3, 'highpass', 3000, 8000, 0.6, 3);
 }
+// ★ ฉากต่อสู้พื้นฐาน · Rion PixelLab คม มีด (kwan 19 ต.ค. "ยืนในศึก → วิ่งไปที่มอน มีฝุ่นนิดๆ → ถึงจุดปะทะออกท่าโจมตีพื้นฐาน จังหวะพอดี → กระโดดฉากถอยหลัง 2–3 สเตปในท่าตั้งรับ → กลับมายืนในศึก")
+// ภาพ = ชุด px_set (pls_idle_bl ยืนในศึก 4 · pls_atk_bl โจมตี bl0 8 ภาพ: 0–3 ง้าง · 4 ฟาด · 5–7 ตามแรง) · ไม่มีภาพวิ่งถือมีด → วิ่ง = ภาพยืนในศึกโน้มตัว + เด้งตามก้าว (ยังถือมีด)
+// หลักโมเมนตัม (kwan 10 ต.ค.): ง้างระหว่างวิ่ง · ฟาดตอนถึงตัว = จังหวะแตะพื้น · ไถลต่อตามแรง ไม่หยุดตั้งท่า · ค่าทั้งหมดเป็นค่าภาพของหน้าเทส ไม่ใช่ค่าเกม
+const BLC = { SEC: 0.06, IDLE: 18, RUN: 18, HIT: 36, HOP0: 46, HOPS: 3, HOP: 11, END: 100, STEP: 6 };
+const blcKey = F => {   // ภาพ Rion ตามเฟรม
+	const { IDLE, HIT, HOP0, HOPS, HOP } = BLC, idle = f => `rpk/pls_idle_bl_${Math.floor(f / 4) % 4}`;
+	if (F < IDLE) return idle(F);
+	if (F < HIT - 8) return 'rpk/pls_idle_bl_0';   // วิ่งในท่าตั้งการ์ด
+	if (F < HIT) return `rpk/pls_atk_bl_${Math.min(3, Math.floor((F - (HIT - 8)) / 2))}`;   // ง้างระหว่างวิ่ง 8 เฟรม
+	if (F < HIT + 3) return 'rpk/pls_atk_bl_4';   // ฟาด (+ หยุดภาพ)
+	if (F < HOP0) return `rpk/pls_atk_bl_${Math.min(7, 5 + Math.floor((F - HIT - 3) / 2))}`;
+	if (F < HOP0 + HOPS * HOP) return 'rpk/pls_idle_bl_0';   // กระโดดถอยในท่าตั้งรับ
+	return idle(F - HOP0 - HOPS * HOP);
+};
+function blcState(F, home, near) {   // ตำแหน่ง x + ยก/เอน/ยุบของ Rion
+	const { IDLE, RUN, HIT, HOP0, HOPS, HOP, STEP } = BLC, b = { x: home, lift: 0, lean: 0, sy: 1, sx: 1 };
+	const e = v => v * v * (3 - 2 * v), slide = 7, stop = near - slide;
+	if (F < IDLE) { b.sy = 1 - 0.015 * (Math.floor(F / 4) % 2); return b; }
+	if (F < HIT) { const u = (F - IDLE) / RUN; b.x = home + (near - home) * (u * u * 0.4 + u * 0.6);   // เร่งออกตัว
+		const ph = ((F - IDLE) % STEP) / STEP; b.lift = Math.round(3 * Math.sin(Math.PI * ph)); b.lean = -0.14 * Math.min(1, u * 3);
+		if (ph === 0) { b.sy = 0.95; b.sx = 1.03; } return b; }
+	if (F < HOP0) { const q = F - HIT; b.x = near - slide * (1 - (1 - Math.min(1, q / 6)) ** 2); b.lean = q < 3 ? -0.18 : -0.18 * Math.max(0, 1 - (q - 3) / 5);   // ไถลตามแรง
+		if (q < 2) { b.sy = 0.93; b.sx = 1.05; } return b; }
+	const end = HOP0 + HOPS * HOP;
+	if (F < end) { const k = Math.floor((F - HOP0) / HOP), q = (F - HOP0) % HOP, x0 = stop + (home - stop) * k / HOPS, x1 = stop + (home - stop) * (k + 1) / HOPS;   // ย่อ 2 · ลอย 7 · ลงยุบ 2
+		if (q < 2) { b.x = x0; b.sy = [0.9, 0.84][q]; b.sx = 1.06; }
+		else if (q < 9) { const u = (q - 2) / 7; b.x = x0 + (x1 - x0) * e(u); b.lift = Math.round(4 * (k === HOPS - 1 ? 10 : 13) * u * (1 - u)); b.lean = 0.1; }
+		else { b.x = x1; b.sy = q === 9 ? 0.86 : 0.94; b.sx = 1.05; }
+		return b; }
+	b.sy = 1 - 0.015 * (Math.floor((F - end) / 4) % 2); return b;
+}
+function blcView(c) {
+	const F = S.frame, m = pkMon(), { W, H, G, MX } = PKV, { HIT } = BLC;
+	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
+	const mim = IMG[pkRole(m, 'idle')]; if (!mim) return;
+	const mw = mim.width, mh = mim.height, mx0 = Math.round(MX - mw / 2), my0 = G - mh, d = F - HIT;
+	const home = W - 100, near = mx0 + mw - 34;   // ภาพฟาด: ปลายมีดอยู่ราว x34 ของผืน 120 → มีดเข้าเนื้อมอน
+	const hold = d >= 0 && d < 2, f = hold ? HIT : F;   // หยุดภาพ 2 เฟรมตอนกระทบ
+	const shk = d >= 0 && d < 5 ? 2.5 * (1 - d / 5) : 0, rs = vRng(F * 31 + 7);
+	drawBg(); ctx.save(); ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk)); drawBg();
+	// มอน: ยืนหายใจ → โดน (วาบขาว 2 · ผงะ 10 · กระเด็นถอย 6 แล้วกลับ)
+	const kb = d >= 0 ? Math.round(-6 * Math.max(0, 1 - Math.max(0, d - 2) / 10)) : 0;
+	const mkey = d >= 0 && d < 10 ? pkRole(m, 'hurt') : pkRole(m, 'idle', Math.floor(F / 4) % 3), oc = pkTint(mkey, '#fff', d >= 0 && d < 2 ? 1 : 0), mi = IMG[mkey];
+	ctx.drawImage(oc, mx0 + kb, G - mi.height);
+	// ฝุ่นที่เท้า: ทุกก้าวตอนวิ่ง (ค่อยๆ ใหญ่ขึ้นตามความเร็ว) · ไถลหลังฟาด · ทุกครั้งที่ลงจากกระโดดถอย
+	const puffs = [];
+	for (let t = BLC.IDLE; t < HIT; t += BLC.STEP) puffs.push([t, 0.6 + 0.4 * (t - BLC.IDLE) / BLC.RUN, 1]);
+	puffs.push([HIT, 1.3, 1]);
+	for (let k = 0; k < BLC.HOPS; k++) puffs.push([BLC.HOP0 + k * BLC.HOP + 9, 0.9, -1]);
+	for (const [t, sz, dir] of puffs) { const q = F - t; if (q < 0 || q >= 10) continue; const st = blcState(t, home, near), fx = st.x + 60 + dir * 6;
+		for (let i = 0; i < 5; i++) { const r = fbHash(t, i, 1), x = fx + dir * (4 + i * 3 + q * (1 + r)), y = G - 1 - (r * 3 + q * 0.6) * sz, s = Math.max(1, Math.round((3 - q * 0.25) * sz));
+			if (fbHash(t, i, q) < q / 12) continue; fbPx(x, y, q < 4 ? '#e2d6c0' : '#cdbfa6', s, Math.max(1, s - 1)); } }
+	if (d >= 0 && d < 7) for (let i = 0; i < 6; i++) fbPx(near + 30 + i * 4 + d * 2, G - 1 - fbHash(i, 9, 1) * 2, '#d8ccb8', 2, 1);   // รอยไถล
+	// Rion (ภาพหันซ้ายอยู่แล้ว) · เงาพื้นตอนลอย · ร่างติดตาตอนวิ่งเร็ว
+	const st = blcState(f, home, near), key = blcKey(f), im = IMG[key];
+	const drawR = (k, s, al) => { const ii = IMG[k]; if (!ii) return; ctx.save(); ctx.globalAlpha = al; ctx.translate(Math.round(s.x + 60), Math.round(G - s.lift)); ctx.rotate(s.lean); ctx.scale(s.sx, s.sy); ctx.drawImage(ii, -60, -108); ctx.restore(); };
+	if (st.lift > 1) for (let i = -9; i <= 9; i++) if (Math.abs(i) < 9 * Math.max(0.4, 1 - st.lift / 40)) fbPx(st.x + 60 + i * 1.6, G - 1, 'rgba(40,30,24,0.4)', 2, 1);
+	if (F > HIT - 8 && F < HIT) for (let g = 2; g >= 1; g--) drawR(blcKey(F - g), blcState(F - g, home, near), 0.15 * (3 - g));
+	if (im) drawR(key, st, 1);
+	// กระทบ: รอยฟันเสี้ยว 3 ชั้น + ดาวกระแทก + ประกายเหล็ก + ป้ายเสียง
+	const mcx = mx0 + kb + mw / 2, mcy = my0 + mh * 0.5;
+	if (d >= 0 && d < 9) { const prog = Math.min(1, (d + 2) / 3), al = d < 3 ? 1 : Math.max(0, 1 - (d - 3) / 6); pkCrescent(mcx + 6, mcy, Math.min(34, Math.max(mw, mh) * 0.45), 0.85, -70, 160, 4, prog, al); }   // รอยฟันขนาดตามมอน ไม่เกิน 34 (B1 เดิมกวาดเกินครึ่งจอ)
+	if (d >= 0 && d < 4) pkStar(mcx + 4, mcy - 4, 6 + d * 4, '#ffffff', '#9ae6ff');
+	if (d >= 0 && d < 12) for (let i = 0; i < 12; i++) { const an = fbHash(i, 3, 1) * Math.PI * 2, v = 2 + fbHash(i, 3, 2) * 3, x = mcx + Math.cos(an) * v * d, y = mcy + Math.sin(an) * v * d + 0.25 * d * d; if (y < G - 1) fbPx(x, y, d < 5 ? '#ffffff' : '#ffd24a', 2, 2); }
+	if (d >= 0 && d < 14) pkText('ฉัวะ!', Math.max(4, mcx - 14), Math.max(16, my0 - 8 - Math.min(5, d)), '#ffffff');
+	ctx.restore();
+	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(`${m.name} ${m.id} · ยืนในศึก → วิ่ง → ฟัน (bl0) → กระโดดถอย 3 สเตป`, 4, H - 2);
+	if (S.grid) drawGrid();
+}
+function blcSound(F) {
+	if (!S.sound || !AU) return; const m = pkMon(), big = m.id === 'B1' ? 0.6 : 1, { IDLE, HIT, STEP, HOP0, HOP, HOPS } = BLC;
+	if (F >= IDLE && F < HIT && (F - IDLE) % STEP === 0) auNoise(0.07, 'lowpass', 900, 200, 0.35 + 0.25 * (F - IDLE) / BLC.RUN, 1);   // ฝีเท้า
+	if (F === HIT - 6) AU_SFX.release.SL();
+	if (F === HIT) { AU_SFX.hit('SL', false); auMon(monVoice(m.id), false, big); }
+	for (let k = 0; k < HOPS; k++) { if (F === HOP0 + k * HOP + 2) auNoise(0.06, 'bandpass', 600, 1600, 0.25, 2); if (F === HOP0 + k * HOP + 9) auNoise(0.09, 'lowpass', 700, 150, 0.45, 1); }   // ดีดตัว · ลงพื้น
+}
+{ const fr = Array.from({ length: BLC.END }, (_, F) => blcKey(F));
+	if ((DATA.rion_pack || []).some(c => c.id === 'pls_atk_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'blc_bl0', `ยืนในศึก → วิ่งเข้า (ฝุ่น) → ฟัน bl0 ตอนถึงตัว → กระโดดถอย 3 สเตป ท่าตั้งรับ → ยืนในศึก · ${BLC.END} เฟรม`,
+		fr, BLC.SEC, { blc: true, stage: [PKV.W, PKV.H] }); }
 // Rion พิกเซลถืออาวุธ 6 สาย (ชีต 15-1 จาก Google Flow แบบหมวกน้ำเงิน · kwan 16 ต.ค. · ร่าง ยังไม่เข้าเกม) — ยืนถือ 3 จังหวะ แล้วเล่นท่าโจมตีครบชุด · ความเร็ว ATTACK_FRAME_SEC เท่าท่าฟันในเกม
 for (const w of (DATA.px_weapons || [])) {
 	const k = Array.from({ length: w.n }, (_, i) => `pxw/${w.family}_${i}`);
@@ -2367,7 +2446,8 @@ for (const sc of DATA.spells || []) for (const sp of sc.spells) {   // ท่า
 // ── สถานะผู้ชม ──
 const CLIP_TABS = ['clips', 'monsters', 'bosses', 'sksheet', 'vxsheet', 'arms', 'weapons', 'spells', 'magic', 'skillnew', 'items', 'structs', 'vehicles', 'npcs'], GROUP_BOX = { clips: 'clipGroups', monsters: 'monGroups', bosses: 'bossGroups', sksheet: 'skGroups', vxsheet: 'vxGroups', arms: 'armGroups', magic: 'magicGroups', skillnew: 'skillnewGroups' };
 const isClip = () => CLIP_TABS.includes(S.tab);
-const S = { tab: 'clips', last: { clips: CLIPS.rpk_walk_left_m3b ? 'rpk_walk_left_m3b' : 'px_west_w' }, clip: CLIPS.rpk_walk_left_m3b ? 'rpk_walk_left_m3b' : 'px_west_w', frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
+const S0CLIP = CLIPS.blc_bl0 ? 'blc_bl0' : CLIPS.rpk_walk_left_m3b ? 'rpk_walk_left_m3b' : 'px_west_w';
+const S = { tab: 'clips', last: { clips: S0CLIP }, clip: S0CLIP, frame: 0, acc: 0, playing: true, speed: 1, bg: 'stage', onion: false, grid: false,
 	hero: { x: 168, y: 38 }, cine: true, saga: false, labSheet: '', rollFoe: 'M01', fbElem: 'fire', style: 'cine', glim: false, zoom: { k: 1, x: 0, y: 0 }, hitstop: 0, shakeAmp: 3, shakeDur: 0.35,
 	foe: 'M01', count: 3, vxs: true, rigW: null, prof: 45, wpn: 14, school: 'คม', tech: null, fx: [], seq: null, heroFrame: 'rion/west', flash: new Map(), shake: 0, dim: 0 };
 try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.includes(t)) S.tab = t; } catch (e) {}
@@ -2411,6 +2491,7 @@ function spr(key, x, y, opt = {}) {
 // ── โหมดท่าขยับ ──
 function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
+	if (c.blc) return blcView(c);
 	if (c.pkv) return pkvView(c);
 	if (c.fire) return fireView(c);
 	if (c.fireLab) return fbLabView(c);
@@ -3557,7 +3638,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		LOGICAL_H = 0; clipView();
 	} else {
