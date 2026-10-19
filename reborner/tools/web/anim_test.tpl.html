@@ -515,7 +515,8 @@ for (const die of [false, true]) for (const r of (DATA.tree17 || []).filter(r =>
 		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [a.W, PKV.H], tab: 'skillnew' });
 }
 // ท่ายากสายมือเปล่า (kwan 19 ต.ค. ลอง PixelLab ทุ่ม/เตะหมุน → ไม่ผ่าน → "1" ประกอบด้วยโค้ด) · ตัว Rion = เฟรม PixelLab จาก State ช่วงที่ไม่หันเข้ากล้อง (pl_fs10 · pl_fs12 ใน anim_test_build.py)
-// pl_fs10: 0 ยืนสู้ · 1–5 ยื่นสองมือจับ · 6 หันหน้า (ตอนหมุนตัว) · 7–9 หันหลังให้มอน ย่อ · pl_fs12: 0 ยืน · 1–2 ย่อ · 3 กระโดด · 4 ลอยเตะต่ำ · 5–7 หันหลังกลางอากาศ · 8 ภาพนิ่ง State เตะ
+// pl_fs10: 0 ยืนสู้ · 1–5 ยื่นสองมือจับ · 6 หันหน้า (ตอนหมุนตัว) · 7–9 หันหลังให้มอน ย่อ · pl_fs12: 0 ยืน · 1–2 ย่อ · 3 กระโดด · 4 ลอยเตะต่ำ · 5–7 หันหลังกลางอากาศ · 8–11 State เตะ มุมซ้าย หลัง ขวา หน้า
+// เตะหมุน: หมุนตัวด้วยการสลับมุมจริงทีละ 1–2 เฟรม (เดิมบีบภาพตาม cos → ดูแบนเหมือนแผ่นกระดาษ · kwan 19 ต.ค. "ทำไมตอนกระโดดหมุนตัว มันดูแบนๆ")
 // grab = [จับ, เริ่มยก, กระแทกพื้น] → โค้ดดึงมอนข้ามไหล่ไปตกอีกฝั่ง · turn = หมุนตัวรอบแกนตั้ง (บีบ/พลิกภาพ) · lift ใส่ด้วยคีย์ (ภาพทุกเฟรมเท้าลงพื้น)
 const PK_FS_MOVE = {
 	fs10: { clip: 'pl_fs10', strike: 9, hits: [32], grab: [18, 27, 32], d0: 42, death: 'CR', sfx: 'ตูม!!', txt: [[18, 'จับ!'], [27, 'ฮึบ!']],
@@ -523,9 +524,9 @@ const PK_FS_MOVE = {
 			K17(23, 'near', 6, { dx: -18, sq: 0.3 }), K17(24, 'near', 7, { dx: -28, sq: 0.5 }), K17(27, 'near', 7, { dx: -30, sq: 0.8 }), K17(29, 'near', 8, { dx: -28, sq: -0.1, lean: 0.15 }), K17(32, 'near', 9, { dx: -24, sq: 0.3, lean: 0.35 }),
 			K17(38, 'near', 9, { dx: -24, lean: 0.3 }), K17(40, 'near', 8, { dx: -24, lean: 0.1 }), K17(42, 'near', 6, { dx: -22 }), K17(44, 'near', 0, { dx: -22 }), K17(46, 'near', 0, { dx: -22, sq: 0.5 }), K17(47, 'near', 0, { dx: -22, arc: 36 }), K17(59, 'home', 0, { sq: 0.5 }), K17(62, 'home', 0)] },
 	fs12: { clip: 'pl_fs12', strike: 8, hits: [25, 33], push: 16, death: 'BD', sfx: 'ปัง!!', txt: [[25, 'ย้าก!']],
-		keys: [K17(0, 'home', 0), K17(12, 'home', 1, { sq: 0.3 }), K17(15, 'home', 2, { sq: 0.7 }), K17(16, 'home', 3, { sq: -0.1 }), K17(18, 'near', 3, { dx: 40, lift: 22, turn: 0.6 * Math.PI }),
-			K17(20, 'near', 6, { dx: 20, lift: 32, turn: 1.2 * Math.PI }), K17(22, 'near', 7, { dx: -16, lift: 32, turn: 1.7 * Math.PI }), K17(24, 'near', 8, { dx: -42, lift: 26, turn: 2 * Math.PI }), K17(27, 'near', 8, { dx: -42, lift: 26, turn: 2 * Math.PI }),
-			K17(28, 'near', 6, { dx: -40, lift: 30, turn: 2.6 * Math.PI }), K17(30, 'near', 7, { dx: -40, lift: 32, turn: 3.3 * Math.PI }), K17(32, 'near', 8, { dx: -42, lift: 26, turn: 4 * Math.PI }), K17(36, 'near', 8, { dx: -40, lift: 22, turn: 4 * Math.PI }),
+		keys: [K17(0, 'home', 0), K17(12, 'home', 1, { sq: 0.3 }), K17(15, 'home', 2, { sq: 0.7 }), K17(16, 'home', 3, { sq: -0.1 }), K17(18, 'near', 9, { dx: 40, lift: 22 }), K17(20, 'near', 10, { dx: 20, lift: 30 }), K17(22, 'near', 11, { dx: 0, lift: 32 }),
+			K17(24, 'near', 8, { dx: -42, lift: 26 }), K17(27, 'near', 8, { dx: -42, lift: 26 }), K17(28, 'near', 9, { dx: -40, lift: 30 }), K17(29, 'near', 10, { dx: -40, lift: 32 }), K17(31, 'near', 11, { dx: -40, lift: 30 }),
+			K17(32, 'near', 8, { dx: -42, lift: 26 }), K17(36, 'near', 8, { dx: -40, lift: 22 }),
 			K17(37, 'near', 4, { dx: -30, lift: 16 }), K17(40, 'near', 2, { dx: -24, sq: 0.7 }), K17(42, 'near', 1, { dx: -24, sq: 0.4 }), K17(44, 'near', 0, { dx: -24 }), K17(46, 'near', 0, { dx: -24, sq: 0.5 }), K17(47, 'near', 0, { dx: -24, arc: 30 }), K17(59, 'home', 0, { sq: 0.5 }), K17(62, 'home', 0)] } };
 for (const die of [false, true]) for (const r of (DATA.tree17 || []).filter(r => PK_FS_MOVE[r.tech_id])) {
 	const m = PK_FS_MOVE[r.tech_id], ult = +r.req_prof >= K.ULT_PROF && r.effect !== 'counter';

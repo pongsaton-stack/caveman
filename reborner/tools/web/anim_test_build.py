@@ -34,12 +34,12 @@ def rion_pack_clips():
 
 
 # ท่ายากจาก State (kwan 19 ต.ค. "ลองท่ายากก่อน 2 ท่า" → ไม่ผ่านทั้งคู่ → "1" ประกอบด้วยโค้ดจากช่วงที่ผ่าน) · ใช้เฉพาะเฟรมที่ไม่หันเข้ากล้อง
-# ทุ่ม fs10_s: 0–5 ยื่นมือจับ · 6 หันหน้า (ใช้แค่ตอนหมุนตัว 1 เฟรม) · 7–9 หันขวาย่อ (= หันหลังให้มอน) · เตะ fs12_s: 0–7 ยืน ย่อ กระโดด หันหลัง + ภาพนิ่ง State เตะ (ท้ายสุด)
+# ทุ่ม fs10_s: 0–5 ยื่นมือจับ · 6 หันหน้า (ใช้แค่ตอนหมุนตัว 1 เฟรม) · 7–9 หันขวาย่อ (= หันหลังให้มอน) · เตะ fs12_s: 0–7 ยืน ย่อ กระโดด หันหลัง + ภาพนิ่ง State เตะ 4 มุม (ซ้าย หลัง ขวา หน้า)
 _ST = os.path.join(SPR, 'pixellab_draft/states')
 PL_STATE_CLIPS = {
 	'pl_fs10': [os.path.join(_ST, 'FS_B_throw/FS_B_throw/animations/fs10_s_v/west/frame_%03d.png' % i) for i in range(10)],
 	'pl_fs12': [os.path.join(_ST, 'FS_B_spinkick/FS_B_spinkick/animations/fs12_s_v/west/frame_%03d.png' % i) for i in range(8)]
-		+ [os.path.join(_ST, 'FS_B_spinkick/FS_B_spinkick/rotations/west.png')]}
+		+ [os.path.join(_ST, 'FS_B_spinkick/FS_B_spinkick/rotations/%s.png' % d) for d in ('west', 'north', 'east', 'south')]}   # 8–11 = ท่าเตะ 4 มุม (หมุนตัวด้วยการสลับมุมจริง ไม่บีบภาพ)
 
 
 def pl_state_frames():
