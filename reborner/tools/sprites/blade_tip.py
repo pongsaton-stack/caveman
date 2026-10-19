@@ -58,6 +58,25 @@ def find_tip(path):
 	return best and best[:3]
 
 
+def swing(paths, pivot, sign=None):
+	"""ปลายใบทีละภาพ → [(ปลาย, มุม, รัศมี) หรือ None] · มุมรอบ pivot ต่อเนื่องจากภาพที่เจนก่อนหน้า
+	sign −1 = มุมลดลงตลอด · +1 = เพิ่มตลอด · None = หมุนทางสั้น"""
+	out, prev = [], None
+	for p in paths:
+		b = find_tip(p)
+		if not b: out.append(None); continue
+		(x, y) = b[0]; a = math.degrees(math.atan2(y - pivot[1], x - pivot[0]))
+		if prev is not None:
+			if sign is None:
+				while a > prev + 180: a -= 360
+				while a < prev - 180: a += 360
+			else:
+				while sign * (a - prev) < 0: a += 360 * sign
+				while sign * (a - prev) >= 360: a -= 360 * sign
+		prev = a; out.append(((x, y), a, math.hypot(x - pivot[0], y - pivot[1])))
+	return out
+
+
 def main():
 	args = sys.argv[1:]; pivot = check = sign = None
 	if '--pivot' in args: i = args.index('--pivot'); pivot = tuple(map(float, args[i + 1].split(','))); del args[i:i + 2]

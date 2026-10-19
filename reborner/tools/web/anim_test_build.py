@@ -283,6 +283,26 @@ OLD_RION = re.compile(r'^(rion/|held/|rig/|cut/|spl/|skc/|vxs/|npc/|p64/rion_)')
 PX_EXTRA = {'dodge': 'dodge', 'watch': 'watch', 'roll': 'jump_roll', 'victory': 'victory'}   # ท่าแบบ Flow 14-2 ที่เกมยังไม่ใช้ → ผืนเดียวกับ rion_px (96x112 เท้าแถว 110)
 
 
+# ทางปลายอาวุธของท่าฟันในฉากต่อสู้ (รอยมีดตามปลายจริง · BLC_SWING ในเทมเพลต) — วัดจากภาพทุกครั้งที่สร้างหน้า ด้วย tools/sprites/blade_tip.py
+# clip: (จุดหมุน = ไหล่ขวา, เฟรมเริ่มเหวี่ยง = ง้างสุด, เฟรมสุดท้าย, ทิศ −1 = มุมลดลง = ฟันข้ามหัวลงหน้าเมื่อหันซ้าย)
+SWINGS = {'pls_atk_bl': ((62, 68), 4, 7, -1)}
+
+
+def swing_paths():
+	import importlib.util
+	spec = importlib.util.spec_from_file_location('blade_tip', os.path.join(ROOT, 'tools/sprites/blade_tip.py')); bt = importlib.util.module_from_spec(spec); spec.loader.exec_module(bt)
+	out = {}
+	for clip, (pivot, f0, f1, sign) in SWINGS.items():
+		paths = [os.path.join(SPR, 'pixellab_draft/px_set', '%s_%d.png' % (clip, i)) for i in range(f0, f1 + 1)]
+		if not all(os.path.isfile(p) for p in paths): continue
+		res = bt.swing(paths, pivot, sign)
+		miss = [f0 + i for i, r in enumerate(res) if r is None]
+		if miss: sys.exit('blade_tip: หาปลายอาวุธ %s เฟรม %s ไม่เจอ — ดูภาพด้วย --check แล้วแก้ค่าใน blade_tip.py ก่อน' % (clip, miss))
+		out[clip] = {'P': list(pivot), 'f0': f0, 'A': [round(r[1], 1) for r in res], 'R': [round(r[2], 1) for r in res], 'tip': [list(r[0]) for r in res]}
+		print('ทางปลายอาวุธ', clip, 'มุม', out[clip]['A'], 'รัศมี', out[clip]['R'])
+	return out
+
+
 def px_extra():
 	import importlib.util
 	spec = importlib.util.spec_from_file_location('rpg', os.path.join(ROOT, 'tools/sprites/rion_px_game.py')); g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
@@ -373,6 +393,7 @@ def main(out_path):
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
 		'astra_vfx': astra_vfx(),
 		'monsters_px': sum((json.load(open(p, encoding='utf-8'))['monsters'] for p in (os.path.join(SPR, 'monsters_px_draft/index.json'), os.path.join(SPR, 'pixellab_draft/monsters/px/index.json')) if os.path.isfile(p)), []),
+		'swing': swing_paths(),   # ทางปลายอาวุธ (blade_tip.py)
 		'rion_pack': rion_pack_clips(),   # ชุดท่าครบ (prompt pack) + PixelLab
 		# ต้นไม้ท่า 17 ท่า (ร่าง · tools/data/skill17_proposal.py + skill17_content.py) → ชื่อ/จำนวนครั้ง/เลือดไหล/ท่าทาง ของคลิปสายคม 17 ท่า (kwan 18 ต.ค. "ปรับชื่อและท่าทางให้ตรงกับรายละเอียดในต้นไม้ท่า")
 		'tree17': list(csv.DictReader(open(os.path.join(ROOT, 'docs/design/skill_trees_17.csv'), encoding='utf-8'))),
