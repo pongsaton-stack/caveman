@@ -349,7 +349,8 @@
     "status": "processing",
     "enhanced_prompt": null,
     "enhance_usage": null
-   }
+   },
+   "hurt_status": "completed"
   },
   "M29": {
    "character_id": "309d22a9-ed42-4b2f-a43c-b2e797d0f4fb",
@@ -361,7 +362,19 @@
     "estimated_generations": 7,
     "first_direction_generated": true
    },
-   "status": "completed"
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "325b88d9-389a-4b45-89a2-00f2a0f787bd"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "2f47ca35-d4b5-43de-82c7-043f1f93ad82",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  }
 }
