@@ -302,6 +302,25 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_hop_bl",
+   "label": "กระโดดถอยถือมีด · 5 เฟรม (PixelLab · ลบแสงที่วาดติดมา 7 จุด)",
+   "frames": [
+    "pls_hop_bl_0",
+    "pls_hop_bl_1",
+    "pls_hop_bl_2",
+    "pls_hop_bl_3",
+    "pls_hop_bl_4"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife hop_k_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_walk_s",
    "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
    "frames": [

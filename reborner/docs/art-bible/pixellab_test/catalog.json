@@ -731,6 +731,25 @@
         {
           "status": "draft",
           "date": "2026-10-19",
+          "gens": 2,
+          "seed": 33,
+          "ms": 60,
+          "game_ms": null,
+          "id": "hop_k",
+          "name": "กระโดดถอยถือมีด (8 เฟรม · ใช้ 5)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/hop_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hop_k"
+          },
+          "notes": "ฉากต่อสู้ blc_bl0 ช่วงกระโดดถอย (kwan 19 ต.ค. \"1+2\") · ยอด 1,805 → 1,801 หลังเจน (รวม run_k ที่หักทีหลัง) · เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม ไม่ใช้ · ภาพจัดแล้ว px_set/pls_hop_bl_0–4 · ลงพื้นใช้ภาพย่อ (1)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
           "gens": null,
           "seed": null,
           "ms": 90,

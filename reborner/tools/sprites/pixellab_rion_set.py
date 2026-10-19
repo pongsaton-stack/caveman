@@ -31,6 +31,7 @@ for s, (st, th) in SCHOOL.items():
 CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "hurt_k_v", "west", None, 90, False),
 	("pls_ko", "ล้ม · มีดหลุดมือ", "fight_knife", "ko_k_v", "west", None, 110, False),
 	("pls_run_bl", "วิ่งถือมีด", "fight_knife", "run_k_v", "west", [0, 1, 2, 3, 4, 5], 60, True),
+	("pls_hop_bl", "กระโดดถอยถือมีด", "fight_knife", "hop_k_v", "west", [0, 1, 2, 3, 4], 60, False),   # hop_k เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม → ตัดทิ้ง · ลงพื้นใช้ภาพย่อ (1) ด้วยโค้ด
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 
