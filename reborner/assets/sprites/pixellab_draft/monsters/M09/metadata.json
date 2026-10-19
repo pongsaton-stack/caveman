@@ -27,10 +27,19 @@
           "west": "Idle/rotations/west.png",
           "south-west": "Idle/rotations/south-west.png"
         },
-        "animations": {}
+        "animations": {
+          "hurt": {
+            "east": [
+              "Idle/animations/hurt/east/frame_000.png",
+              "Idle/animations/hurt/east/frame_001.png",
+              "Idle/animations/hurt/east/frame_002.png",
+              "Idle/animations/hurt/east/frame_003.png"
+            ]
+          }
+        }
       }
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-19T01:11:21.715161"
+  "export_date": "2026-10-19T01:24:32.578357"
 }
