@@ -19,6 +19,23 @@ def webp(path, q=80):
 	b = io.BytesIO(); Image.open(path).save(b, 'WEBP', quality=q, method=6)
 	return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
 
+def astra_vfx():
+	"""ชีต VFX จาก Astra (index ของ astra_vfx_cut.py) + เสียง wav ฝังเป็น data URI · เวลาเสียงดังสุด (วิ) ใช้วางเสียงให้ตรงจังหวะกระทบ"""
+	p = os.path.join(SPR, 'astra_vfx_draft/index.json')
+	if not os.path.isfile(p):
+		return {}
+	import wave
+	import numpy as np
+	sheets = json.load(open(p, encoding='utf-8'))['sheets']
+	for name, sh in sheets.items():
+		wp = os.path.join(ROOT, 'docs/art-bible/vfx/astra', sh['sound'])
+		if os.path.isfile(wp):
+			w = wave.open(wp); a = np.abs(np.frombuffer(w.readframes(w.getnframes()), np.int16)); sr = w.getframerate()
+			sh['peak'] = round(int(np.argmax([a[i:i + 441].max() for i in range(0, len(a), 441)])) * 441 / sr, 2)
+			sh['wav'] = 'data:audio/wav;base64,' + base64.b64encode(open(wp, 'rb').read()).decode()
+	return sheets
+
+
 def rion_pack_clips():
 	"""คลิปชุดครบ (rion_pack_px) · คลิป PixelLab แทรกต่อท้ายกลุ่มเดินหลัก ให้อยู่ติดชีต B"""
 	def clips(p):
@@ -115,6 +132,12 @@ def sprites():
 					b = io.BytesIO(); ImageOps.mirror(Image.open(os.path.join(pl, f))).save(b, 'PNG')
 					out['rpk/pl_slash2_' + f.rsplit('_', 1)[1][:-4]] = 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
 	out.update(pl_state_frames())
+	# VFX จาก Astra ย่อเป็นพิกเซล (tools/sprites/astra_vfx_cut.py · kwan 19 ต.ค. เลือก "1" ลองแบบผสม BK-1 BK-4 · ร่าง)
+	av = os.path.join(SPR, 'astra_vfx_draft')
+	if os.path.isdir(av):
+		for f in sorted(os.listdir(av)):
+			if f.endswith('.png'):
+				out['avx/' + f[:-4]] = png(os.path.join(av, f))
 	ps = os.path.join(SPR, 'pixellab_draft/px_set')
 	if os.path.isdir(ps):
 		for f in sorted(os.listdir(ps)):
@@ -348,6 +371,7 @@ def main(out_path):
 		# Rion พิกเซล: แถวล่างสุดของตัวต่อภาพ (ฉาก VFX วางเท้าลงพื้นเสมอ · ภาพวิ่ง/ง้างในชีตลอยอยู่ 17–21 จุด)
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
+		'astra_vfx': astra_vfx(),
 		'monsters_px': sum((json.load(open(p, encoding='utf-8'))['monsters'] for p in (os.path.join(SPR, 'monsters_px_draft/index.json'), os.path.join(SPR, 'pixellab_draft/monsters/px/index.json')) if os.path.isfile(p)), []),
 		'rion_pack': rion_pack_clips(),   # ชุดท่าครบ (prompt pack) + PixelLab
 		# ต้นไม้ท่า 17 ท่า (ร่าง · tools/data/skill17_proposal.py + skill17_content.py) → ชื่อ/จำนวนครั้ง/เลือดไหล/ท่าทาง ของคลิปสายคม 17 ท่า (kwan 18 ต.ค. "ปรับชื่อและท่าทางให้ตรงกับรายละเอียดในต้นไม้ท่า")

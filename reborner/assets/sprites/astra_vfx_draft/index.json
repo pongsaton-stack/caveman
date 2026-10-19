@@ -1,0 +1,47 @@
+{
+ "_doc": "VFX จาก Astra ย่อเป็นพิกเซล 96 · tools/sprites/astra_vfx_cut.py · ร่าง",
+ "sheets": {
+  "bk1": {
+   "hit": [
+    5,
+    6
+   ],
+   "tail": [
+    7
+   ],
+   "frames": [
+    "bk1_0",
+    "bk1_1",
+    "bk1_2",
+    "bk1_3",
+    "bk1_4",
+    "bk1_5",
+    "bk1_6",
+    "bk1_7"
+   ],
+   "size": 96,
+   "sound": "sfx-bk1.wav"
+  },
+  "bk4": {
+   "hit": [
+    5,
+    6
+   ],
+   "tail": [
+    7
+   ],
+   "frames": [
+    "bk4_0",
+    "bk4_1",
+    "bk4_2",
+    "bk4_3",
+    "bk4_4",
+    "bk4_5",
+    "bk4_6",
+    "bk4_7"
+   ],
+   "size": 96,
+   "sound": "sfx-bk4.wav"
+  }
+ }
+}

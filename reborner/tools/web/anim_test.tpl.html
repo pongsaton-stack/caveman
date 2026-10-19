@@ -392,6 +392,9 @@ const PKV = { SEC: 0.06, W: 300, H: 168, G: 158, MX: 74,
 		{ id: 'BK-2', name: 'ลมตู้แช่', school: 'ดำ', el: 'น้ำแข็ง', clip: 'black', strike: 5, proj: 'wind', fly: 5, hit: 'ICE', death: 'ICE', sfx: 'วู้ววว!', charge: 'ice' },
 		{ id: 'BK-3', name: 'ไฟฉายแสงจ้า', school: 'ดำ', el: 'แสง', clip: 'black', strike: 5, proj: 'beam', fly: 2, hit: 'LIGHT', death: 'LIGHT', sfx: 'วิ้ง!!', charge: 'light' },
 		{ id: 'BK-4', name: 'หลอดไฟดับ', school: 'ดำ', el: 'มืด', clip: 'black', strike: 5, proj: 'rift', fly: 3, hit: 'DARK', death: 'DARK', sfx: 'ฟึ่บ…', charge: 'dark' },
+		// แบบผสม Astra (kwan 19 ต.ค. เลือก "1"): โค้ดคุมรวมพลัง/ทางพุ่ง/อาการมอน/ท่าตาย · ภาพกระทบ + หาง = ชีต Astra ย่อเป็นพิกเซล (astra_vfx_cut.py) · เสียง = wav ของ Astra วางให้จุดดังสุดตรงกระทบ
+		{ id: 'BK-1', name: 'ไฟแช็กพ่น', school: 'ดำ', el: 'ไฟ', clip: 'black', strike: 5, proj: 'flame', fly: 4, hit: 'FI', death: 'FI', sfx: 'พรึ่บ!', charge: 'fire', astra: 'bk1' },
+		{ id: 'BK-4', name: 'หลอดไฟดับ', school: 'ดำ', el: 'มืด', clip: 'black', strike: 5, proj: 'rift', fly: 3, hit: 'DARK', death: 'DARK', sfx: 'ฟึ่บ…', charge: 'dark', astra: 'bk4' },
 		{ id: 'BK-5', name: 'ถังแก๊สระเบิด', school: 'ดำ', el: 'ไฟ', clip: 'black', strike: 5, proj: 'gas', fly: 11, hit: 'BOOM', death: 'FI', sfx: 'ตูมมม!!', charge: 'fire' },
 		{ id: 'BK-6', name: 'เข็มน้ำแข็งเจาะเกราะ', school: 'ดำ', el: 'น้ำแข็ง', clip: 'black', strike: 5, proj: 'needle', fly: 5, hit: 'NEEDLE', death: 'ICE', sfx: 'ฉึก ฉึก ฉึก!', charge: 'ice' },
 		{ id: 'RD-2', name: 'เทปกาวหน่วง', school: 'แดง', el: '—', clip: 'red', strike: 3, proj: 'x', fly: 8, hit: 'TAPE', status: 'ช้าลง (หน่วงคิว)', sfx: 'แปะ!' },
@@ -440,7 +443,8 @@ for (const die of [false, true]) for (const a of PKV.BLADE) {
 for (const die of [false, true]) for (const a of PKV.SPELLS) {
 	if (die && a.status) continue;   // คาถาสถานะไม่มีดาเมจ → ไม่มีท่าตาย
 	const tl = pkTimeline(a, die); if (!tl.pk) continue;
-	addClip(`เวทย์${a.school}${die ? ' · โดนแล้วตาย' : a.self ? ' · ใส่ตัวเอง' : a.status ? ' · ใส่สถานะ' : ' · โดน'}`, `pks_${a.id}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} (${a.el})${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
+	if (a.astra && !(DATA.astra_vfx || {})[a.astra]) continue;
+	addClip(a.astra ? 'เวทย์ดำ · ผสม Astra (ภาพกระทบ + เสียงจาก Astra · ร่าง)' : `เวทย์${a.school}${die ? ' · โดนแล้วตาย' : a.self ? ' · ใส่ตัวเอง' : a.status ? ' · ใส่สถานะ' : ' · โดน'}`, `pks_${a.id}${a.astra ? '_astra' : ''}_${die ? 'die' : 'hit'}`, `${a.id} ${a.name} (${a.el})${a.astra ? ' · ผสม Astra' : ''}${die ? ' → ตาย' : ''} · ${tl.N} เฟรม`,
 		Array.from({ length: tl.N }, (_, F) => 'rpk/' + tl.pk.frames[tl.pose(F)]), PKV.SEC, { pkv: true, atk: a, die, stage: [PKV.W, PKV.H], tab: 'magic' });
 }
 // สายคม 17 ท่าตามต้นไม้ท่า (kwan 18 ต.ค. "ใช้โค้ดปรับชื่อและท่าทางให้ตรงกับรายละเอียดในต้นไม้ท่า") · ตัว Rion = PixelLab ฟันมีดรอบ 2 (ภาพ 0 ยืน · 1–3 ง้าง · 4 ฟาด · 5–7 ตามแรง)
@@ -725,7 +729,9 @@ function pkvView(c) {
 		if (a.counter && F >= a.counter[2] && F < a.counter[2] + 4) pkStar(home + 34, G - 52, 6 + (F - a.counter[2]) * 4, '#ffffff', '#ffd24a');   // ปัด
 		for (const [tf, txt] of (a.txt || [])) if (F >= tf && F < tf + 12) pkText(txt, hx0 - 10, Math.max(14, G - bb.lift - 104 - Math.min(4, F - tf)), '#ffffff');
 	}
-	if (d >= 0 && !dying && !a.self && !a.blade) { const o = { mx, my0, mw, mh, mcx, mcy, G, cp }; pkHit(a, d, F, o);
+	if (a.astra) pkAstra(a.astra, d, mcx, mcy, Math.max(mw, mh));
+	if (a.astra && d >= 0 && d < 12 && a.sfx) pkText(a.sfx, Math.max(4, mcx - 14), Math.max(14, my0 - 14 - Math.min(4, d)), '#ffffff');
+	if (d >= 0 && !dying && !a.self && !a.blade && !a.astra) { const o = { mx, my0, mw, mh, mcx, mcy, G, cp }; pkHit(a, d, F, o);
 		(a.extra || []).forEach((off, i) => { if (d >= off) pkHit({ ...a, sfx: '', mirror: i % 2 === 0 }, d - off, F, o); });   // ฟันซ้ำ: ครั้งที่ 2 กลับทิศ
 		if (a.bleed && d >= 6) for (let i = 0; i < 5; i++) { const q = (d + i * 4) % 14, x = mcx - 10 + i * 5, y = mcy - 6 + q * 2; if (y < G - 2) fbPx(x, y, q < 6 ? '#e8401a' : '#8a1a10', 2, q < 4 ? 3 : 2); }   // เลือดไหล
 		if (a.bleed && d >= 14 && !dying) pkText('เลือดไหล', Math.max(4, mcx - 24), Math.max(28, my0 - 14), '#ff8a7a'); }
@@ -774,6 +780,21 @@ function pkBladeFx(a, d, F, o) {
 		if (dl >= 6) pkText('เลือดไหล', Math.max(4, mcx - 24), Math.max(28, my0 - 14), '#ff8a7a'); }
 	if (d >= 0 && dl < 10) { ctx.save(); ctx.font = `bold ${a.ult ? 18 : 14}px system-ui, sans-serif`; ctx.lineWidth = 4; ctx.strokeStyle = '#0a1030'; ctx.fillStyle = '#ffffff';   // ข้อความเสียงใหญ่ เด้งตอนโดน
 		const k = Math.min(1, (d + 1) / 2), ty = Math.max(20, Math.round(my0 - 6 - Math.min(6, d))); ctx.translate(mcx, ty); ctx.scale(k * 1.15, k * 1.15); ctx.textAlign = 'center'; ctx.strokeText(a.sfx, 0, 0); ctx.fillStyle = '#9ae6ff'; ctx.fillText(a.sfx, 1, 1); ctx.fillStyle = '#ffffff'; ctx.fillText(a.sfx, 0, 0); ctx.restore(); }
+}
+// ภาพกระทบ + หางจากชีต Astra (96 จุด · ขยาย nearest ตามขนาดมอน) · กระทบ 2 ภาพ (2 + 4 เฟรม) · หาง 10 เฟรม จางลง
+function pkAstra(name, d, cx, cy, msz) {
+	const sh = (DATA.astra_vfx || {})[name]; if (!sh || d < 0 || d >= 16) return;
+	const k = d < 2 ? sh.hit[0] : d < 6 ? sh.hit[sh.hit.length - 1] : sh.tail[0], im = IMG['avx/' + sh.frames[k]]; if (!im) return;
+	const S = Math.max(64, Math.min(128, Math.round(msz * 1.5 / 16) * 16));   // ×1.7 บังมอนทั้งตัว → ×1.5 ยังเห็นขอบตัว
+	ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = d < 6 ? 1 : Math.max(0, 1 - (d - 6) / 10);
+	ctx.drawImage(im, Math.round(cx - S / 2), Math.round(cy - S / 2), S, S); ctx.restore();
+}
+const AU_WAV = {};   // wav ของ Astra ถอดเสียงครั้งเดียว
+function auWav(name) {
+	const sh = (DATA.astra_vfx || {})[name]; if (!AU || !sh || !sh.wav) return;
+	const play = b => { const src = AU.ac.createBufferSource(), g = AU.ac.createGain(); g.gain.value = 0.9; src.buffer = b; src.connect(g); g.connect(AU.out); src.start(); };
+	if (AU_WAV[name]) return play(AU_WAV[name]);
+	fetch(sh.wav).then(r => r.arrayBuffer()).then(x => AU.ac.decodeAudioData(x)).then(b => { AU_WAV[name] = b; play(b); }).catch(() => {});
 }
 function pkHit(a, d, F, o) {
 	const { mx, my0, mw, mh, mcx, mcy, G, cp } = o, P = FB_PAL.fire, h = a.hit;
@@ -920,6 +941,8 @@ function pkDeath(id, key, mx, G, t) {
 }
 function pkvSound(F) {
 	const c = CLIPS[S.clip]; if (!S.sound || !AU || !c || !c.pkv) return; const a = c.atk, tl = pkTimeline(a, c.die), m = pkMon(), big = m.id === 'B1' ? 0.6 : 1;
+	if (a.astra) { const sh = (DATA.astra_vfx || {})[a.astra]; if (sh && F === Math.max(0, tl.HIT - Math.round((sh.peak || 0) / PKV.SEC))) auWav(a.astra);
+		if (F === tl.HIT) auMon(monVoice(m.id), false, big); if (c.die && F === tl.D0) auMon(monVoice(m.id), true, big); return; }
 	if (a.charge && F === 8) AU_SFX.charge(a.charge === 'holy' ? 'DV' : a.charge === 'ice' || a.charge === 'light' ? 'DV' : 'CR');
 	if (F === tl.S0) { if (a.school) { auNoise(0.3, 'bandpass', a.charge === 'ice' ? 2000 : 700, a.charge === 'ice' ? 6000 : 2200, 0.5, 1.5); auTone(0.16, 'sawtooth', a.charge === 'dark' ? 90 : 240, a.charge === 'dark' ? 45 : 110, 0.14, 0, 0.004, { lp: 900 }); }
 		else (AU_SFX.release[a.id] || AU_SFX.release.SL)(); }
