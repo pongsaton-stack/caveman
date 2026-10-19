@@ -964,12 +964,13 @@ function pkvSound(F) {
 // หลักโมเมนตัม (kwan 10 ต.ค.): ง้างระหว่างวิ่ง · ฟาดตอนถึงตัว = จังหวะแตะพื้น · ไถลต่อตามแรง ไม่หยุดตั้งท่า · ค่าทั้งหมดเป็นค่าภาพของหน้าเทส ไม่ใช่ค่าเกม
 // กระโดดถอย (kwan 19 ต.ค. "ไม่เป็นธรรมชาติ" → 1+2): ภาพ PixelLab hop_k (0 ยืน · 1 ย่อ · 2 ถีบ · 3 ขาเหยียดลง · 4 ลอยเข่าพับ) · สเตปแรกไกล/สูงสุดแล้วเบาลง (แรงส่งจากการฟันหมด) · ลอยความเร็วคงที่ · ลงยุบด้วยภาพย่อ
 const BLC = { SEC: 0.06, IDLE: 18, RUN: 18, HIT: 36, HOP0: 44, END: 100, STEP: 3, RUNF: 6,   // STEP = เฟรมต่อก้าว (วงวิ่ง 6 ภาพ = 2 ก้าว)
-	HOPS: [{ d: 0.5, c: 2, a: 9, l: 2, h: 16 }, { d: 0.3, c: 2, a: 7, l: 2, h: 12 }, { d: 0.2, c: 2, a: 5, l: 3, h: 5 }] };   // สัดส่วนระยะ · ย่อ · ลอย · ลง · สูง
+	HOPS: [{ d: 0.5, c: 2, a: 9, l: 2, h: 16 }, { d: 0.3, c: 2, a: 7, l: 0, h: 12 }, { d: 0.2, skid: 10 }] };   // สัดส่วนระยะ · ย่อ · ลอย · ลง · สูง · สเตป 2 ไม่หยุดตอนลง (l 0) → ไถลต่อทันทีด้วยความเร็วเดิม · สเตป 3 = ไถลถอยตั้งหลัก 10 เฟรม (kwan 19 ต.ค. เลือก "1": กระโดดเตี้ยครั้งที่ 3 ดูขัด)
+const blcN = h => h.skid || h.c + h.a + h.l;
 const blcRun = () => !!IMG['rpk/pls_run_bl_0'], blcHopImg = () => !!IMG['rpk/pls_hop_bl_4'];
-const blcHopEnd = () => BLC.HOP0 + BLC.HOPS.reduce((t, h) => t + h.c + h.a + h.l, 0);
+const blcHopEnd = () => BLC.HOP0 + BLC.HOPS.reduce((t, h) => t + blcN(h), 0);
 function blcHop(F) {   // สเตปที่ F อยู่: k · q (เฟรมในสเตป) · ช่วงระยะ f0→f1 (0–1 ของ stop→home)
 	let t = BLC.HOP0, f0 = 0;
-	for (let k = 0; k < BLC.HOPS.length; k++) { const h = BLC.HOPS[k], n = h.c + h.a + h.l;
+	for (let k = 0; k < BLC.HOPS.length; k++) { const h = BLC.HOPS[k], n = blcN(h);
 		if (F >= t && F < t + n) return { k, q: F - t, h, f0, f1: f0 + h.d, t }; t += n; f0 += h.d; }
 	return null;
 }
@@ -992,6 +993,7 @@ const blcKey = F => {   // ภาพ Rion ตามเฟรม
 	const hp = blcHop(F);
 	if (hp) { if (!blcHopImg()) return 'rpk/pls_idle_bl_0';   // ไม่มีภาพกระโดด = ท่าตั้งรับเดิม
 		const { q, h, k } = hp, j = i => `rpk/pls_hop_bl_${i}`;
+		if (h.skid) return q < h.skid - 1 ? j(1) : j(0);   // ไถลในท่าย่อ → เฟรมสุดท้ายลุกตั้งการ์ด
 		if (q < h.c) return j(1);   // ย่อ
 		if (q < h.c + h.a) { const u = (q - h.c + 1) / (h.a + 1), P = blcArc(hp);   // ภาพตามความสูงของโค้ง: เข่าพับ (ภาพลอยเอง 11) เฉพาะช่วงสูงพอ · ขาขึ้น = ถีบ · ขาลง = ขาเหยียดหาพื้น
 			return j(P >= blcArtLift(j(4)) ? 4 : u <= 0.5 ? 2 : 3); }
@@ -1009,7 +1011,9 @@ function blcState(F, home, near) {   // ตำแหน่ง x + ยก/เอ�
 	if (F < HOP0) { const q = F - HIT; b.x = near - slide * (1 - (1 - Math.min(1, q / 6)) ** 2); b.lean = q < 3 ? -0.18 : -0.18 * Math.max(0, 1 - (q - 3) / 5);   // ไถลตามแรง
 		if (q < 2) { b.sy = 0.93; b.sx = 1.05; } return b; }
 	const end = blcHopEnd(), hp = blcHop(F);
-	if (hp) { const { q, h } = hp, art = blcHopImg(), homeA = home - BLC.HOPS[BLC.HOPS.length - 1].d * 8, x0 = stop + (homeA - stop) * hp.f0 + (hp.k ? BLC.HOPS[hp.k - 1].d * 8 : 0), x1 = stop + (homeA - stop) * hp.f1;   // homeA: ไถลสุดท้ายจบตรงจุดเริ่มพอดี
+	if (hp) { const { q, h } = hp, art = blcHopImg(), homeA = home - (BLC.HOPS[BLC.HOPS.length - 1].skid ? 0 : BLC.HOPS[BLC.HOPS.length - 1].d * 8), x0 = stop + (homeA - stop) * hp.f0 + (hp.k && BLC.HOPS[hp.k - 1].l ? BLC.HOPS[hp.k - 1].d * 8 : 0), x1 = stop + (homeA - stop) * hp.f1;   // homeA: ไถลสุดท้ายจบตรงจุดเริ่มพอดี
+		if (h.skid) { const u = Math.min(1, (q + 1) / (h.skid - 2));   // ไถล: เริ่มเร็วเท่าตอนลง แล้วเบรกจนหยุด · ช่วงบนเอนไปหน้าต้านแรง
+			b.x = x0 + (x1 - x0) * (1 - (1 - u) ** 2); b.lean = -0.05 * (1 - u); return b; }
 		if (q < h.c) { b.x = x0; if (!art) { b.sy = [0.9, 0.84][q] || 0.86; b.sx = 1.06; } }   // ย่อ (ภาพย่อเอง)
 		else if (q < h.c + h.a) { const u = (q - h.c + 1) / h.a;   // ลอย: แนวนอนความเร็วคงที่ · แนวตั้งพาราโบลา
 			b.x = x0 + (x1 - x0) * u; b.lift = Math.max(0, blcArc(hp) - (art ? blcArtLift(blcKey(F)) : 0)); b.lean = 0.05 * (1 - u); }
@@ -1035,7 +1039,8 @@ function blcView(c) {
 	const puffs = [];
 	for (let t = BLC.IDLE; t < HIT; t += BLC.STEP) puffs.push([t, 0.45 + 0.4 * (t - BLC.IDLE) / BLC.RUN, 1]);
 	puffs.push([HIT, 1.3, 1]);
-	{ let t = BLC.HOP0; for (const h of BLC.HOPS) { puffs.push([t + 1, 0.4 + h.d, -1]); t += h.c + h.a; puffs.push([t, 0.4 + h.d * 1.4, 1]); t += h.l; } }   // ถีบตัว (ฝุ่นไปหน้า) · ลงพื้น (ฝุ่นไปหลังตามแรง)
+	{ let t = BLC.HOP0; for (const h of BLC.HOPS) { if (h.skid) { for (let i = 0; i < h.skid - 2; i += 2) puffs.push([t + i, 0.9 - i * 0.08, 1]); t += h.skid; continue; }   // ไถล: ฝุ่นลากตามเท้า เล็กลงตามความเร็ว
+		puffs.push([t + 1, 0.4 + h.d, -1]); t += h.c + h.a; puffs.push([t, 0.4 + h.d * 1.4, 1]); t += h.l; } }   // ถีบตัว (ฝุ่นไปหน้า) · ลงพื้น (ฝุ่นไปหลังตามแรง)
 	for (const [t, sz, dir] of puffs) { const q = F - t; if (q < 0 || q >= 10) continue; const st = blcState(t, home, near), fx = st.x + 60 + dir * 6;
 		for (let i = 0; i < 5; i++) { const r = fbHash(t, i, 1), x = fx + dir * (4 + i * 3 + q * (1 + r)), y = G - 1 - (r * 3 + q * 0.6) * sz, s = Math.max(1, Math.round((3 - q * 0.25) * sz));
 			if (fbHash(t, i, q) < q / 12) continue; fbPx(x, y, q < 4 ? '#e2d6c0' : '#cdbfa6', s, Math.max(1, s - 1)); } }
@@ -1062,7 +1067,8 @@ function blcSound(F) {
 	if (F >= IDLE && F < HIT && (F - IDLE) % STEP === 0) auNoise(0.07, 'lowpass', 900, 200, 0.35 + 0.25 * (F - IDLE) / BLC.RUN, 1);   // ฝีเท้า
 	if (F === HIT - 6) AU_SFX.release.SL();
 	if (F === HIT) { AU_SFX.hit('SL', false); auMon(monVoice(m.id), false, big); }
-	{ let t = BLC.HOP0; for (const h of BLC.HOPS) { if (F === t + h.c) auNoise(0.06, 'bandpass', 600, 1600, 0.15 + h.d * 0.3, 2); t += h.c + h.a; if (F === t) auNoise(0.09, 'lowpass', 700, 150, 0.2 + h.d * 0.6, 1); t += h.l; } }   // ดีดตัว · ลงพื้น เบาลงทีละสเตป
+	{ let t = BLC.HOP0; for (const h of BLC.HOPS) { if (h.skid) { if (F === t) auNoise(0.4, 'lowpass', 1400, 300, 0.3, 2); t += h.skid; continue; }   // เสียงลากเท้า
+		if (F === t + h.c) auNoise(0.06, 'bandpass', 600, 1600, 0.15 + h.d * 0.3, 2); t += h.c + h.a; if (F === t) auNoise(0.09, 'lowpass', 700, 150, 0.2 + h.d * 0.6, 1); t += h.l; } }   // ดีดตัว · ลงพื้น เบาลงทีละสเตป
 }
 { const fr = Array.from({ length: BLC.END }, (_, F) => blcKey(F));
 	if ((DATA.rion_pack || []).some(c => c.id === 'pls_atk_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'blc_bl0', `ยืนในศึก → วิ่งเข้า (ฝุ่น) → ฟัน bl0 ตอนถึงตัว → กระโดดถอย 3 สเตป ท่าตั้งรับ → ยืนในศึก · ${BLC.END} เฟรม`,
