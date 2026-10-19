@@ -345,6 +345,82 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "idle_pt",
+   "dir": "west",
+   "seed": 33,
+   "state": "PT_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "0b209834-4fb8-4e0a-a174-93874fa2fafc"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "71475c46-9e10-4bd3-9e37-4b169ab8bb3d",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "rg0",
+   "dir": "west",
+   "seed": 27,
+   "state": "RG_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "4d18add2-59b6-49af-a85b-529ecd7ceaa5"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "85c28000-2177-4db9-ba16-884ceadc7dcc",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_rg",
+   "dir": "west",
+   "seed": 33,
+   "state": "RG_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "7d8a3108-1806-492e-a537-0c382c16d191"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "6960ae6d-8fa3-48e8-9078-f9f4d4133b99",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "dv0",
+   "dir": "west",
+   "seed": 27,
+   "state": "DV_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "5ed24a0d-b2d7-4bc9-ae4c-6714d67fd8a2"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "01b4d7c5-7d35-4191-af24-647b82109c3a",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -359,7 +435,11 @@
   "c4d9b5f9-ae95-475a-bf86-19162d62aa66": "completed",
   "139e094b-7d42-43a8-8989-4bd3d63ddf13": "completed",
   "5352dff6-3eb6-4307-880a-d6325f427353": "completed",
-  "a2ded448-c450-4441-a285-f65db003a8fc": "completed"
+  "a2ded448-c450-4441-a285-f65db003a8fc": "completed",
+  "25002d09-22cd-450e-9209-2e2ecd505536": "completed",
+  "0b209834-4fb8-4e0a-a174-93874fa2fafc": "completed",
+  "4d18add2-59b6-49af-a85b-529ecd7ceaa5": "completed",
+  "7d8a3108-1806-492e-a537-0c382c16d191": "completed"
  },
  "states": {
   "fight_knife": {

@@ -192,8 +192,8 @@ def page():
 		for i, im in enumerate(ims):
 			c = Image.new("RGBA", (w, h))
 			c.alpha_composite(im.crop((x0, y0, x1, y1)), (4, 4))
-			c.save(os.path.join(dst, f"{mid}_{i}.png"))
-		out.append({"id": mid, "name": m["name"], "body": m["body"], "n": len(ims), "roles": ["idle", "hurt"][:len(ims)], "size": [w, h], "src": "pixellab"})
+			c.save(os.path.join(dst, f"{mid}p_{i}.png"))   # รหัส +p: ไม่ชนกับมอนชุด Flow รหัสเดียวกัน (M07 M08 · 19 ต.ค.) ในหน้าเทส
+		out.append({"id": mid + "p", "name": m["name"] + " (PixelLab)", "body": m["body"], "n": len(ims), "roles": ["idle", "hurt"][:len(ims)], "size": [w, h], "src": "pixellab"})
 	json.dump({"_doc": "มอนเทสร่างกาย 9 แบบ จาก PixelLab (tools/sprites/pixellab_monsters.py · ร่าง ยังไม่เข้าเกม)", "monsters": out},
 		open(os.path.join(dst, "index.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 	print("มอน", [(o["id"], o["size"], o["n"]) for o in out], "→", dst)

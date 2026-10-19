@@ -1,5 +1,5 @@
 {
- "_doc": "มอนภูมิภาค 1 พิกเซล 32-bit จากชีตรอบ 10 (GPT · kwan 16 ต.ค. 2026)",
+ "_doc": "มอนภูมิภาค 1 พิกเซล 32-bit จากชีตรอบ 10 (Google Flow · kwan 16 ต.ค. 2026)",
  "palette": "ต่อตัว ≤ 32",
  "rion_ratio": 1.362,
  "monsters": [
@@ -121,6 +121,118 @@
    "anchor": [
     54,
     138
+   ]
+  },
+  {
+   "id": "M02",
+   "name": "หนูท่อ",
+   "n": 8,
+   "roles": [
+    "idle",
+    "wind",
+    "idle",
+    "wind",
+    "atk",
+    "follow",
+    "hurt",
+    "ko"
+   ],
+   "scale": 0.1839,
+   "size": [
+    75,
+    48
+   ],
+   "anchor": [
+    37,
+    45
+   ]
+  },
+  {
+   "id": "M04",
+   "name": "เห็ดพิษ",
+   "n": 7,
+   "roles": [
+    "idle",
+    "idle",
+    "wind",
+    "atk",
+    "follow",
+    "hurt",
+    "ko"
+   ],
+   "scale": 0.2238,
+   "size": [
+    75,
+    70
+   ],
+   "anchor": [
+    39,
+    67
+   ]
+  },
+  {
+   "id": "M05",
+   "name": "กาสามตา",
+   "n": 6,
+   "roles": [
+    "wind",
+    "idle",
+    "atk",
+    "follow",
+    "hurt",
+    "ko"
+   ],
+   "scale": 0.1872,
+   "size": [
+    71,
+    62
+   ],
+   "anchor": [
+    36,
+    59
+   ]
+  },
+  {
+   "id": "M07",
+   "name": "ผีไฟป่า",
+   "n": 4,
+   "roles": [
+    "idle",
+    "hurt",
+    "atk",
+    "ko"
+   ],
+   "scale": 0.2701,
+   "size": [
+    94,
+    69
+   ],
+   "anchor": [
+    52,
+    66
+   ]
+  },
+  {
+   "id": "M08",
+   "name": "โครงกระดูกเดินเวร",
+   "n": 7,
+   "roles": [
+    "idle",
+    "idle",
+    "wind",
+    "atk",
+    "follow",
+    "hurt",
+    "ko"
+   ],
+   "scale": 0.1641,
+   "size": [
+    76,
+    69
+   ],
+   "anchor": [
+    38,
+    66
    ]
   }
  ]
