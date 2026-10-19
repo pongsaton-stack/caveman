@@ -23,13 +23,14 @@ SCHOOL = {"bl": ("fight_knife", "คม · มีด"), "bt": ("BT_A_stance", "�
 	"rg": ("RG_A_stance", "ยิง · ธนู"), "dv": ("DV_A_stance", "กล · รีโมต"), "fs": ("FS_A_stance", "มือเปล่า · นวม")}
 # (คลิป, ชื่อ, State, โฟลเดอร์ท่า, ทิศ, เฟรมที่ใช้ (None = ทั้งหมด), ms, วน)
 CLIPS = []
-# เฟรมที่ตัด (ตรวจด้วยตา 19 ต.ค.): fs0 เฟรม 1–2 เส้นลมขาวพาดทับอก ลบแล้วหัวขาด · pt0 เฟรม 5 วงลมขาวพันรอบตัว
+# เฟรมที่ตัด (ตรวจด้วยตา 19 ต.ค.): run_k เฟรม 6–7 ซีดขาว+ประกายวาดติด · fs0 เฟรม 1–2 เส้นลมขาวพาดทับอก ลบแล้วหัวขาด · pt0 เฟรม 5 วงลมขาวพันรอบตัว
 KEEP = {"pls_atk_fs": [0, 3, 4, 5, 6, 7], "pls_atk_pt": [0, 1, 2, 3, 4, 6, 7]}
 for s, (st, th) in SCHOOL.items():
 	CLIPS.append((f"pls_idle_{s}", f"ยืนในศึก · {th}", st, f"idle_{s}_v", "west", None, 180, True))
 	CLIPS.append((f"pls_atk_{s}", f"โจมตีพื้นฐาน {s}0 · {th}", st, f"{s}0_v", "west", KEEP.get(f"pls_atk_{s}"), 90, False))
 CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "hurt_k_v", "west", None, 90, False),
 	("pls_ko", "ล้ม · มีดหลุดมือ", "fight_knife", "ko_k_v", "west", None, 110, False),
+	("pls_run_bl", "วิ่งถือมีด", "fight_knife", "run_k_v", "west", [0, 1, 2, 3, 4, 5], 60, True),
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 

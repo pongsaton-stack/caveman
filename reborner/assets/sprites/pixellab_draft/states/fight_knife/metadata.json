@@ -172,6 +172,18 @@
               "fight_knife/animations/hurt_k_v/west/frame_005.png"
             ]
           },
+          "run_k_v": {
+            "west": [
+              "fight_knife/animations/run_k_v/west/frame_000.png",
+              "fight_knife/animations/run_k_v/west/frame_001.png",
+              "fight_knife/animations/run_k_v/west/frame_002.png",
+              "fight_knife/animations/run_k_v/west/frame_003.png",
+              "fight_knife/animations/run_k_v/west/frame_004.png",
+              "fight_knife/animations/run_k_v/west/frame_005.png",
+              "fight_knife/animations/run_k_v/west/frame_006.png",
+              "fight_knife/animations/run_k_v/west/frame_007.png"
+            ]
+          },
           "bl0_v": {
             "west": [
               "fight_knife/animations/bl0_v/west/frame_000.png",
@@ -521,5 +533,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-19T02:13:44.609065"
+  "export_date": "2026-10-19T14:11:18.822263"
 }

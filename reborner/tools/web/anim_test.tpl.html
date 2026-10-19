@@ -960,13 +960,14 @@ function pkvSound(F) {
 	if (c.die && F === tl.D0 + 10 && a.death === 'ICE') auNoise(0.3, 'highpass', 3000, 8000, 0.6, 3);
 }
 // ★ ฉากต่อสู้พื้นฐาน · Rion PixelLab คม มีด (kwan 19 ต.ค. "ยืนในศึก → วิ่งไปที่มอน มีฝุ่นนิดๆ → ถึงจุดปะทะออกท่าโจมตีพื้นฐาน จังหวะพอดี → กระโดดฉากถอยหลัง 2–3 สเตปในท่าตั้งรับ → กลับมายืนในศึก")
-// ภาพ = ชุด px_set (pls_idle_bl ยืนในศึก 4 · pls_atk_bl โจมตี bl0 8 ภาพ: 0–3 ง้าง · 4 ฟาด · 5–7 ตามแรง) · ไม่มีภาพวิ่งถือมีด → วิ่ง = ภาพยืนในศึกโน้มตัว + เด้งตามก้าว (ยังถือมีด)
+// ภาพ = ชุด px_set (pls_idle_bl ยืนในศึก 4 · pls_run_bl วิ่งถือมีด 6 ภาพ = 2 ก้าว (PixelLab run_k 19 ต.ค.) · pls_atk_bl โจมตี bl0 8 ภาพ: 0–3 ง้าง · 4 ฟาด · 5–7 ตามแรง) · ไม่มีภาพวิ่ง = ภาพยืนโน้มตัว + เด้งตามก้าว
 // หลักโมเมนตัม (kwan 10 ต.ค.): ง้างระหว่างวิ่ง · ฟาดตอนถึงตัว = จังหวะแตะพื้น · ไถลต่อตามแรง ไม่หยุดตั้งท่า · ค่าทั้งหมดเป็นค่าภาพของหน้าเทส ไม่ใช่ค่าเกม
-const BLC = { SEC: 0.06, IDLE: 18, RUN: 18, HIT: 36, HOP0: 46, HOPS: 3, HOP: 11, END: 100, STEP: 6 };
+const BLC = { SEC: 0.06, IDLE: 18, RUN: 18, HIT: 36, HOP0: 46, HOPS: 3, HOP: 11, END: 100, STEP: 3, RUNF: 6 };   // STEP = เฟรมต่อก้าว (วงวิ่ง 6 ภาพ = 2 ก้าว)
+const blcRun = () => !!IMG['rpk/pls_run_bl_0'];
 const blcKey = F => {   // ภาพ Rion ตามเฟรม
 	const { IDLE, HIT, HOP0, HOPS, HOP } = BLC, idle = f => `rpk/pls_idle_bl_${Math.floor(f / 4) % 4}`;
 	if (F < IDLE) return idle(F);
-	if (F < HIT - 8) return 'rpk/pls_idle_bl_0';   // วิ่งในท่าตั้งการ์ด
+	if (F < HIT - 8) return blcRun() ? `rpk/pls_run_bl_${(F - IDLE) % BLC.RUNF}` : 'rpk/pls_idle_bl_0';   // วิ่งถือมีด (ไม่มีภาพ = ท่าตั้งการ์ด)
 	if (F < HIT) return `rpk/pls_atk_bl_${Math.min(3, Math.floor((F - (HIT - 8)) / 2))}`;   // ง้างระหว่างวิ่ง 8 เฟรม
 	if (F < HIT + 3) return 'rpk/pls_atk_bl_4';   // ฟาด (+ หยุดภาพ)
 	if (F < HOP0) return `rpk/pls_atk_bl_${Math.min(7, 5 + Math.floor((F - HIT - 3) / 2))}`;
@@ -978,7 +979,8 @@ function blcState(F, home, near) {   // ตำแหน่ง x + ยก/เอ�
 	const e = v => v * v * (3 - 2 * v), slide = 7, stop = near - slide;
 	if (F < IDLE) { b.sy = 1 - 0.015 * (Math.floor(F / 4) % 2); return b; }
 	if (F < HIT) { const u = (F - IDLE) / RUN; b.x = home + (near - home) * (u * u * 0.4 + u * 0.6);   // เร่งออกตัว
-		const ph = ((F - IDLE) % STEP) / STEP; b.lift = Math.round(3 * Math.sin(Math.PI * ph)); b.lean = -0.14 * Math.min(1, u * 3);
+		if (blcRun() && F < HIT - 8) { b.lean = -0.04 * Math.min(1, u * 3); return b; }   // ภาพวิ่งก้าว/เอนเองแล้ว
+		const ph = ((F - IDLE) % 6) / 6; b.lift = Math.round(3 * Math.sin(Math.PI * ph)); b.lean = -0.14 * Math.min(1, u * 3);
 		if (ph === 0) { b.sy = 0.95; b.sx = 1.03; } return b; }
 	if (F < HOP0) { const q = F - HIT; b.x = near - slide * (1 - (1 - Math.min(1, q / 6)) ** 2); b.lean = q < 3 ? -0.18 : -0.18 * Math.max(0, 1 - (q - 3) / 5);   // ไถลตามแรง
 		if (q < 2) { b.sy = 0.93; b.sx = 1.05; } return b; }
@@ -1005,7 +1007,7 @@ function blcView(c) {
 	ctx.drawImage(oc, mx0 + kb, G - mi.height);
 	// ฝุ่นที่เท้า: ทุกก้าวตอนวิ่ง (ค่อยๆ ใหญ่ขึ้นตามความเร็ว) · ไถลหลังฟาด · ทุกครั้งที่ลงจากกระโดดถอย
 	const puffs = [];
-	for (let t = BLC.IDLE; t < HIT; t += BLC.STEP) puffs.push([t, 0.6 + 0.4 * (t - BLC.IDLE) / BLC.RUN, 1]);
+	for (let t = BLC.IDLE; t < HIT; t += BLC.STEP) puffs.push([t, 0.45 + 0.4 * (t - BLC.IDLE) / BLC.RUN, 1]);
 	puffs.push([HIT, 1.3, 1]);
 	for (let k = 0; k < BLC.HOPS; k++) puffs.push([BLC.HOP0 + k * BLC.HOP + 9, 0.9, -1]);
 	for (const [t, sz, dir] of puffs) { const q = F - t; if (q < 0 || q >= 10) continue; const st = blcState(t, home, near), fx = st.x + 60 + dir * 6;

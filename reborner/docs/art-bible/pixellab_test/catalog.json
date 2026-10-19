@@ -712,6 +712,25 @@
         {
           "status": "draft",
           "date": "2026-10-19",
+          "gens": 2,
+          "seed": 33,
+          "ms": 60,
+          "game_ms": null,
+          "id": "run_k",
+          "name": "วิ่งถือมีด (8 เฟรม · ใช้ 6)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/run_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "run_k"
+          },
+          "notes": "ฉากต่อสู้ blc_bl0 ช่วงวิ่ง (kwan 19 ต.ค. เลือก \"1\") · จาก State fight_knife · ราว 2 gen (ยอดหักทีหลัง ตอนจบยังเห็น 1,805) · เฟรม 6–7 ซีดขาว+ประกายวาดติด ไม่ใช้ · ภาพจัดแล้ว px_set/pls_run_bl_0–5"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
           "gens": null,
           "seed": null,
           "ms": 90,
