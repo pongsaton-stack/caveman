@@ -330,7 +330,7 @@ function addClip(group, id, label, frames, sec, opt = {}) {
 // คลิป 1 = หายใจวน (ภาพ idle) · คลิป 2 = โจมตี → โดนตี → ล้ม (ค้างท่าล้ม) · ความเร็ว FOE_IDLE_SEC / ATTACK_FRAME_SEC ตามในเกม
 for (const m of (DATA.monsters_px || [])) {
 	const k = r => m.roles.map((x, i) => x === r ? `mpx/${m.id}_${i}` : null).filter(Boolean);
-	const st = [m.size[0] + 8, m.size[1] + 8], G = 'มอนภูมิภาค 1 · พิกเซล (รอบ 10 · ร่าง)';
+	const st = [m.size[0] + 8, m.size[1] + 8], G = m.src === 'pixellab' ? 'มอนเทสร่างกาย 9 แบบ · PixelLab (ร่าง)' : 'มอนภูมิภาค 1 · พิกเซล (รอบ 10 · ร่าง)';
 	const idle = k('idle'), seq = [idle[0], idle[0], ...k('wind'), ...k('wind'), ...k('atk'), ...k('atk'), ...k('follow'), idle[0], idle[0], ...k('hurt'), ...k('hurt'), idle[0], ...k('ko')];
 	addClip(G, `mpx_${m.id}_idle`, `${m.name} ${m.id} · หายใจ ${idle.length} ภาพ`, [...idle, ...idle.slice(1, -1).reverse()], K.FOE_IDLE_SEC / 2, { tab: m.id.startsWith('B') ? 'bosses' : 'monsters', stage: st, mon: m.id });
 	addClip(G, `mpx_${m.id}_act`, `${m.name} ${m.id} · โจมตี → โดนตี → ล้ม`, seq, K.ATTACK_FRAME_SEC * 1.5, { tab: m.id.startsWith('B') ? 'bosses' : 'monsters', stage: st, hold: true, mon: m.id });

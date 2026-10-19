@@ -119,6 +119,12 @@ def sprites():
 		for f in sorted(os.listdir(md)):
 			if f.endswith('.png'):
 				out['mpx/' + f[:-4]] = png(os.path.join(md, f))
+	# มอนเทสร่างกาย 9 แบบ จาก PixelLab (tools/sprites/pixellab_monsters.py page · M07 M08 M09 M17 M29 · ร่าง) · คีย์เดียวกับชุดเดิม (mpx/) → ใช้ปุ่มเลือกมอนชุดเดียวกัน
+	pm = os.path.join(SPR, 'pixellab_draft/monsters/px')
+	if os.path.isdir(pm):
+		for f in sorted(os.listdir(pm)):
+			if f.endswith('.png'):
+				out['mpx/' + f[:-4]] = png(os.path.join(pm, f))
 	# ไอคอนอาวุธ 30 ชิ้น พิกเซล (tools/sprites/weapons_icons_px.py · ชีตรอบ 12 · ร่าง)
 	wi = os.path.join(SPR, 'weapons_icons_draft')
 	if os.path.isdir(wi):
@@ -335,7 +341,7 @@ def main(out_path):
 		# Rion พิกเซล: แถวล่างสุดของตัวต่อภาพ (ฉาก VFX วางเท้าลงพื้นเสมอ · ภาพวิ่ง/ง้างในชีตลอยอยู่ 17–21 จุด)
 		'px_feet': {f[:-4]: Image.open(os.path.join(SPR, 'rion_px', f)).getchannel('A').getbbox()[3] for f in sorted(os.listdir(os.path.join(SPR, 'rion_px'))) if f.endswith('.png')},
 		'px_extra': {k: sum(1 for x in os.listdir(os.path.join(SPR, 'rion_flow_draft/main_px')) if re.fullmatch(v + r'_\d+\.png', x)) for k, v in PX_EXTRA.items()},
-		'monsters_px': json.load(open(os.path.join(SPR, 'monsters_px_draft/index.json'), encoding='utf-8'))['monsters'] if os.path.isfile(os.path.join(SPR, 'monsters_px_draft/index.json')) else [],
+		'monsters_px': sum((json.load(open(p, encoding='utf-8'))['monsters'] for p in (os.path.join(SPR, 'monsters_px_draft/index.json'), os.path.join(SPR, 'pixellab_draft/monsters/px/index.json')) if os.path.isfile(p)), []),
 		'rion_pack': rion_pack_clips(),   # ชุดท่าครบ (prompt pack) + PixelLab
 		# ต้นไม้ท่า 17 ท่า (ร่าง · tools/data/skill17_proposal.py + skill17_content.py) → ชื่อ/จำนวนครั้ง/เลือดไหล/ท่าทาง ของคลิปสายคม 17 ท่า (kwan 18 ต.ค. "ปรับชื่อและท่าทางให้ตรงกับรายละเอียดในต้นไม้ท่า")
 		'tree17': list(csv.DictReader(open(os.path.join(ROOT, 'docs/design/skill_trees_17.csv'), encoding='utf-8'))),

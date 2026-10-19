@@ -1,0 +1,36 @@
+{
+  "group_id": "80382a13-bf85-416f-98cf-2f7bac30e6ec",
+  "states": [
+    {
+      "character": {
+        "id": "4ab20576-d170-4009-be11-94d90644897f",
+        "name": "Idle",
+        "prompt": "A single monster for a turn-based JRPG battle, full body, centered. Cute and warm Ghibli-like creature design, readable chunky silhouette, thick dark outline. No background, no ground, no shadow, no text, no extra characters, no weapons other than those described. A short, round little skeleton night-watchman. Cream and warm light-brown bones, a big round skull with small warm orange lights glowing inside the eye sockets, a tattered triangular grey-brown hooded cloak over the shoulders, an old brass lantern held in one bony hand at its side, short bony arms and legs in a waddling stance. A diligent old guard, cute rather than scary. Palette: #D2BD9A, #A2927B, #6F4B33, #92552D. 2D pixel art, classic 32-bit era style (16/32-bit JRPG, SNES and PlayStation 1 look), crisp square pixels, limited palette, flat shading with hard edges, no anti-aliasing, no smooth gradients, no 3D rendering.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-19T01:05:41.269247+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-19T01:08:41.404915"
+}

@@ -1,0 +1,36 @@
+{
+  "group_id": "e89a83d8-059b-4013-96ec-4219b63901f1",
+  "states": [
+    {
+      "character": {
+        "id": "bc474fe0-ebb1-4070-8219-a5a850eeabce",
+        "name": "Idle",
+        "prompt": "A single monster for a turn-based JRPG battle, full body, centered. Cute and warm Ghibli-like creature design, readable chunky silhouette, thick dark outline. No background, no ground, no shadow, no text, no extra characters, no weapons other than those described. A small round clockwork toy soldier robot hovering above the ground. Old brass round body, one big round eye in the middle of the face glowing warm yellow, a wind-up key sticking out of its back, short jointed mechanical arms holding a small round brass shield, a little soldier helmet crest on top. An old toy soldier come alive, endearing. Palette: #B37A55, #92552D, #8A7460, outline #2F1B10. 2D pixel art, classic 32-bit era style (16/32-bit JRPG, SNES and PlayStation 1 look), crisp square pixels, limited palette, flat shading with hard edges, no anti-aliasing, no smooth gradients, no 3D rendering.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "custom",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-19T01:11:23.235918+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-19T01:13:58.350430"
+}

@@ -250,5 +250,66 @@
    },
    "status": "completed"
   }
+ },
+ "monsters": {
+  "M07": {
+   "character_id": "6764861d-f43e-4d2a-869a-3c0d4b399bb1",
+   "create": {
+    "usage": null,
+    "background_job_id": "a7cf8b6d-e953-4b1e-86db-99f44a341c01",
+    "character_id": "6764861d-f43e-4d2a-869a-3c0d4b399bb1",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed"
+  },
+  "M08": {
+   "character_id": "4ab20576-d170-4009-be11-94d90644897f",
+   "create": {
+    "usage": null,
+    "background_job_id": "6adab8ce-6f9c-4f1e-927f-15b340bed38a",
+    "character_id": "4ab20576-d170-4009-be11-94d90644897f",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed"
+  },
+  "M09": {
+   "character_id": "46b8229b-4ac7-4a5b-9e5e-b7d6ee1f5869",
+   "create": {
+    "usage": null,
+    "background_job_id": "cd159e6d-63a9-40c3-ad79-02b6f36fff58",
+    "character_id": "46b8229b-4ac7-4a5b-9e5e-b7d6ee1f5869",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed"
+  },
+  "M17": {
+   "character_id": "bc474fe0-ebb1-4070-8219-a5a850eeabce",
+   "create": {
+    "usage": null,
+    "background_job_id": "2aef5c78-da73-477e-ae04-a89502d10d1b",
+    "character_id": "bc474fe0-ebb1-4070-8219-a5a850eeabce",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed"
+  },
+  "M29": {
+   "character_id": "309d22a9-ed42-4b2f-a43c-b2e797d0f4fb",
+   "create": {
+    "usage": null,
+    "background_job_id": "0c05a339-f0b8-4d4e-adad-4c9a09cf0060",
+    "character_id": "309d22a9-ed42-4b2f-a43c-b2e797d0f4fb",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   }
+  }
  }
 }
