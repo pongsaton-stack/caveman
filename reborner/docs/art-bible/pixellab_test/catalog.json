@@ -250,6 +250,88 @@
           "ms": 90,
           "game_ms": null,
           "notes": "ไม่ผ่าน: แผน = PixelLab ทำแค่ฟันอยู่กับที่ 12 จังหวะ (IN_PLACE_NOT ห้ามพุ่ง/หมุนตัว) โค้ดทำพุ่ง/พลิก/ร่างติดตา · เฟรม 4–5 และ 7–8 หันเข้ากล้อง · มีดหายเฟรม 7–9 · เฟรม 10 วาดส่วนโค้งแสงทั้งที่ห้าม · 12 เฟรมยาวเกิน ทิศ/ของในมือหลุด · 3 gen (11 → 8) · ทางแทน: ประกอบไม้ตายด้วยโค้ดจากคลิปที่ผ่าน (ฟันมีดรอบ 2) ดู ult_bl16_compose.gif (ไม่อยู่ในหน้านี้เพราะประกอบด้วยโค้ด)"
+        },
+        {
+          "id": "state_fs_throw",
+          "name": "State · ทุ่มข้ามไหล่ (FS_B_throw)",
+          "kind": "still",
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "FS_B_throw"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "ไม่ผ่านในฐานะท่าทุ่ม: ได้ท่ายืนสู้ย่อต่ำมือพันผ้าขาว (ไม่หันหลังให้เป้า · ไม่จับไหล่) — ขัดกับประโยค 'stay in a true side view facing the same direction' ในคำสั่งเดียวกัน · ใช้ได้เป็นท่ายืนสู้สายมือเปล่า · 15 gen (1985 → 1970)"
+        },
+        {
+          "id": "state_fs_spinkick",
+          "name": "State · เตะกลางอากาศ (FS_B_spinkick)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "FS_B_spinkick"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "ผ่านบางส่วน: ลอยกลางอากาศ เตะเหยียดขาตรงไปข้างหน้าครบ 4 ทิศ หน้าตาเดิม · แต่เป็นเตะกระโดด ไม่ใช่เตะหมุน (ตัวไม่บิด) · ขาเตะระดับเอว ไม่ถึงหัว · 15 gen (1970 → 1955)"
+        },
+        {
+          "id": "fs10_s",
+          "name": "ทุ่มข้ามไหล่ fs10 · จาก State (10 เฟรม)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 3,
+          "seed": 31,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/animations/fs10_s_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "fs10_s"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ไม่ผ่าน: ตัว State ทุ่ม · ภาพเริ่ม = ท่ายืนสู้ของ State · เฟรม 1–6 ยื่นสองมือจับไปหน้าซ้ายถูก (ใช้ได้) · ไม่มีหมุนหลัง/ย่อ/เหวี่ยงข้ามไหล่เลย · เฟรม 7 หันหน้าเข้ากล้อง · เฟรม 8–10 หันขวาตั้งท่า (หมุนกลับตัวแทนการทุ่ม) · มือพันผ้าครบทุกเฟรม · 3 gen (1955 → 1952)"
+        },
+        {
+          "id": "fs12_s",
+          "name": "เตะหมุนกลางอากาศ fs12 · จาก State (12 เฟรม)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 3,
+          "seed": 31,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/animations/fs12_s_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "fs12_s"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ไม่ผ่าน (ใช้ได้บางช่วง): ตัว State เตะ · ภาพเริ่ม = ท่ายืนสู้ของ State ทุ่ม (custom_start_frame) · เฟรม 1–5 ย่อ→กระโดดลอยถูก · เฟรม 6–8 หันหลังให้กล้องเห็นเป้ = หมุนจริง · แต่ขาเตะต่ำระดับเอว ไม่เหยียดถึงหัว · เฟรม 9–11 หันหน้าเข้ากล้อง เฟรม 10 เป้ย้ายมาอยู่หน้าอก · เฟรม 12 กลับหันซ้าย · 3 gen (1952 → 1949)"
         }
       ]
     },

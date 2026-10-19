@@ -174,13 +174,53 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "fs10_s",
+   "dir": "west",
+   "seed": 31,
+   "state": "FS_B_throw",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "74917eaa-0985-4dcc-af17-14f526578650"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "d52edf08-cb15-4dbf-b6c2-5d3dae7c0b03",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "fs12_s",
+   "dir": "west",
+   "seed": 31,
+   "state": "FS_B_spinkick",
+   "start": "FS_B_throw",
+   "response": {
+    "background_job_ids": [
+     "f31fe6f4-6081-4ff9-a59d-793f3179e368"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "b12d164e-29a8-4094-96e0-debf9549f3a2",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
   "fbdfa0a7-4f8c-4977-8f84-14b5d0910761": "completed",
   "1d8cc9bc-ab18-42dd-858d-4127402b7cf2": "completed",
   "99e2334d-5506-4e1d-98cc-f4c117c851b5": "completed",
-  "0f7e54ef-fd1b-46c3-8545-903eafbfeb16": "completed"
+  "0f7e54ef-fd1b-46c3-8545-903eafbfeb16": "completed",
+  "74917eaa-0985-4dcc-af17-14f526578650": "completed",
+  "f31fe6f4-6081-4ff9-a59d-793f3179e368": "completed"
  },
  "states": {
   "fight_knife": {
@@ -188,6 +228,24 @@
     "usage": null,
     "background_job_id": "57380f2f-39bd-4f52-887f-aeb38b85a68a",
     "character_id": "3b7b1d28-24ee-4f3c-b181-9752d2bbbdb0",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "FS_B_throw": {
+   "response": {
+    "usage": null,
+    "background_job_id": "81824d68-18e7-47b4-a6ea-997aafd8df90",
+    "character_id": "8d6cd16b-15ab-4c7a-843d-677730911484",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "FS_B_spinkick": {
+   "response": {
+    "usage": null,
+    "background_job_id": "c70e8959-ed4f-409c-ac7e-6170c8025b47",
+    "character_id": "d3d3b69f-fed6-4db5-9d70-31eeeeacdafe",
     "status": "queued"
    },
    "status": "completed"

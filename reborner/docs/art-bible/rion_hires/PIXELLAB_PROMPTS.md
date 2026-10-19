@@ -49,3 +49,11 @@
 - คำสั่ง: `python3 tools/sprites/pixellab_walk.py state fight_knife` (`STATES` ใน pixellab_walk.py · edit_description ≤ 1000 ตัวอักษร · palette จากตัวเดิม) · `fetch_state` ดึงภาพ
 - ลองแล้ว 18 ต.ค.: ผืน 112x112 → **HTTP 402 "This edit costs at least 15 generations"** (มี 7) · ไม่เสียเครดิต · ผืน 96 (ขนาดเดิม · kwan เลือก "2") → **HTTP 402 "at least 10 generations"** ไม่เสียเครดิต · State ตัว 4 ทิศ = ≥10 gen (ผืน 96) / ≥15 gen (ผืน 112)
 - ✅ 19 ต.ค. (kwan สมัคร Tier 1 · 2,000 gen) `state fight_knife` ผืน 96 → **หักจริง 15 gen** (ระบบบอก "อย่างน้อย 10") · 131 วิ · ได้ครบ 4 ทิศ: หน้าตา/สีเดิม · ท่าสู้ย่อเข่า · มีดทำครัวเล่มเดียวมือหน้า · หันข้างจริง · ภาพ `assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/` · เทียบ `docs/art-bible/pixellab_test/state_fight_knife_cmp.png`
+- **ท่ายากจาก State (kwan 19 ต.ค. "ลองท่ายากก่อน 2 ท่า คือทุ่มข้ามไหล่กับเตะหมุนกลางอากาศ")** · 36 gen (1985 → 1949) · ภาพ `docs/art-bible/pixellab_test/state_fs_throw_spinkick.png` (State 4 ทิศ) + `fs_throw_spinkick.png` (ท่าขยับ)
+  | ขั้น | คำสั่ง | seed | gen | ผล |
+  |---|---|---|---|---|
+  | State FS_B_throw | `state FS_B_throw` (STATES17 · หันหลังให้เป้า ย่อ จับเหนือไหล่) | 27 | 15 | ไม่ผ่าน · ได้ท่ายืนสู้ย่อต่ำมือพันผ้า ไม่หันหลัง · ประโยค "true side view facing the same direction" ในแม่แบบ BASE ขัดกับท่าหันหลัง → ท่าที่ต้องหันหลังต้องตัดประโยคนี้ออก |
+  | State FS_B_spinkick | `state FS_B_spinkick` | 27 | 15 | ผ่านบางส่วน · ลอยเตะขาเหยียดครบ 4 ทิศ หน้าตาเดิม · แต่เตะกระโดดตรง ไม่บิดตัว · ขาระดับเอว |
+  | ทุ่ม fs10_s west 10 เฟรม | `PL_STATE=FS_B_throw anim fs10_s` · `facing` เขียนทิศเอง (หันหลังเฟรม 4–7) · ไม่วาดศัตรู | 31 | 3 | ไม่ผ่าน · เฟรม 1–6 ยื่นมือจับถูก · ไม่หมุนหลัง ไม่ทุ่ม · เฟรม 7 หันเข้ากล้อง · 8–10 หันขวา |
+  | เตะหมุน fs12_s west 12 เฟรม | `PL_STATE=FS_B_spinkick PL_START=FS_B_throw anim fs12_s` (custom_start_frame = ท่ายืนสู้) | 31 | 3 | ไม่ผ่าน · 1–5 ย่อ→กระโดดถูก · 6–8 หันหลังให้กล้อง = หมุนจริง · ขาเตะต่ำ · 9–11 หันเข้ากล้อง (เฟรม 10 เป้อยู่หน้าอก) |
+  **บทเรียน**: ท่าที่ตัวต้องหมุน/หันหลัง PixelLab ทำไม่ได้แม้มี State (ตรงกับ bl16) · ส่วนที่ใช้ได้ = จังหวะสั้นที่ไม่หมุน (ยื่นมือจับ · ย่อ-กระโดด) → ท่าหมุน/ทุ่มให้ประกอบด้วยโค้ด (พลิกภาพ · หมุน · ขยับมอน) จากช่วงที่ผ่าน · ท่าในสาย RG/FS ที่ต้องหมุน/ทุ่ม (fs8 fs10 fs12 bl4 bl12 bt9 bt12) ไม่ควรเจนเป็นคลิปเต็ม

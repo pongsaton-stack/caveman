@@ -87,6 +87,44 @@ MOVES = {
 		"not": ["the knife disappearing in any frame", "a second knife", "a long sword or dagger", "the knife sticking straight up above the cap"]},
 }
 
+# ท่ายากจาก State (kwan 19 ต.ค. "ลองท่ายากก่อน 2 ท่า ทุ่มข้ามไหล่กับเตะหมุนกลางอากาศ") · ไม่วาดศัตรู (โค้ดขยับมอนเอง)
+WRAPS = "white cloth hand wraps wound around both hands and wrists (part of the hands, not a weapon)"
+NO_FOE = ["an opponent or any second figure (the enemy is added later in code)", "a front view facing the camera"]
+MOVES.update({
+	"fs10_s": {"dir": "west", "held": WRAPS, "attack": True, "frames": 10, "seed": 31,
+		"facing": ("It starts and ends facing LEFT. In frames 4-7 the body pivots half a turn so the back and the backpack face LEFT toward the enemy "
+			"while the head looks back over the shoulder; it turns through a side view only and never shows a front view."),
+		"beats": [
+			"low fighting stance facing left, knees bent, wrapped fists up in front of the chest, same as the start image",
+			"step the front foot forward to the left and reach both open hands forward at chest height, as if grabbing an enemy's collar and sleeve",
+			"both hands close into gripping fists and pull back toward the chest, weight shifting onto the front foot",
+			"pivot on the front foot: the body turns half a turn so the back and backpack now face LEFT, knees bent low, fists still gripping in front of the shoulder, head looking back over the shoulder",
+			"hips drop low and push back to the left, both fists pulled down over the shoulder in front of the chest, loading the throw",
+			"explosive throw: the legs straighten, the upper body bends forward and down toward the RIGHT, both arms whip down from over the shoulder to the knees",
+			"follow-through: body bent forward deeply, both fists low near the ground on the right side, as if the enemy just slammed into the floor",
+			"pivot back: the body turns half a turn back to face LEFT while rising",
+			"settle into the low fighting stance facing left, knees bent",
+			"low fighting stance facing left, same as the first frame"],
+		"not": NO_FOE + ["the hand wraps disappearing", "a weapon"]},
+	"fs12_s": {"dir": "west", "held": WRAPS, "attack": True, "frames": 12, "seed": 31,
+		"facing": ("It starts and ends facing LEFT. In the air the body spins through a back view (back and backpack toward the camera) "
+			"to face RIGHT for the kick, then unwinds through the back view to face LEFT again; it never shows a front view."),
+		"beats": [
+			"low fighting stance facing left, wrapped fists up, same as the start image",
+			"crouch deeper, arms tucked to the chest, weight on both feet, ready to jump",
+			"jump straight up off both feet, knees tucked under the body",
+			"rising in the air and spinning: back and backpack toward the camera, arms pulled in tight",
+			"top of the jump: the body now faces RIGHT, head looking back over the shoulder at the enemy on the left, kicking leg chambered with the knee bent",
+			"spinning back kick: the leg shoots out straight to the LEFT at head height, heel first, body leaning away to the right, arms out for balance",
+			"kick fully extended to the left at head height, body almost horizontal",
+			"the leg pulls back in and the body unwinds through the back view",
+			"facing LEFT again, dropping down, knees bent under the body",
+			"landing on both feet, knees bending deep to absorb the fall",
+			"rising out of the landing",
+			"low fighting stance facing left, same as the first frame"],
+		"not": NO_FOE + ["the hand wraps disappearing", "a weapon", "both legs kicking at once"]},
+})
+
 # ท่าต้นไม้ 17 ท่า × 6 สาย (102 ท่า · tools/sprites/pixellab_skills.py) — ใช้คำสั่งเดียวกัน: prompt <รหัสท่า> · anim <รหัสท่า>
 try:
 	import csv as _csv
@@ -115,7 +153,9 @@ def build_action(move, d):
 	"""ประกอบ action_description 8 ส่วน · ส่วน 7–8 (CHARACTER + STYLE) ส่งเป็น description แยก (ดู build_description)"""
 	m, mb = MOVES[move], master_blocks()
 	parts = []
-	if d in DIR_BLOCK:
+	if m.get("facing"):   # ท่าที่ต้องหันหลังให้เป้ากลางท่า (ทุ่ม/เตะหมุน) เขียนทิศเอง
+		parts.append(mb[DIR_BLOCK[d]] + " " + m["facing"])
+	elif d in DIR_BLOCK:
 		parts.append(mb[DIR_BLOCK[d]] + " The body keeps this exact facing in every frame and never turns toward the camera.")
 	else:
 		parts.append("Front view facing the viewer in every frame.")
@@ -275,14 +315,20 @@ def anim(move, dirs=None):
 		sys.exit("ยังไม่มีตัวละคร: รัน character ก่อน")
 	m = MOVES[move]
 	dirs = dirs or [m["dir"]]
+	# PL_STATE=<ชื่อ State> = ท่าขยับของตัว State (ภาพเริ่ม = ท่าของ State) · PL_START=<ชื่อ State> = ใช้ภาพทิศเดียวกันของ State นั้นเป็นภาพเริ่ม
+	cid = s["states"][os.environ["PL_STATE"]]["response"]["character_id"] if os.environ.get("PL_STATE") else s["character_id"]
 	balance()
 	for d in dirs:
 		show_prompt(move, d)
-		body = {"character_id": s["character_id"], "animation_name": f"{move}_v" + os.environ.get("PL_SUFFIX", ""), "mode": "v3",
+		body = {"character_id": cid, "animation_name": f"{move}_v" + os.environ.get("PL_SUFFIX", ""), "mode": "v3",
 			"description": build_description(), "action_description": build_action(move, d),
 			"frame_count": m["frames"], "keep_first_frame": False, "directions": [d], "seed": m["seed"]}
+		if os.environ.get("PL_START"):
+			n = os.environ["PL_START"]
+			body["custom_start_frame"] = b64(os.path.join(OUT, "states", n, n, "rotations", d + ".png"))
 		r = call("POST", "/characters/animations", body)
-		s.setdefault("anim", []).append({"move": move, "dir": d, "seed": m["seed"], "response": r})
+		s.setdefault("anim", []).append({"move": move, "dir": d, "seed": m["seed"], "state": os.environ.get("PL_STATE"),
+			"start": os.environ.get("PL_START"), "response": r})
 		save_state(s)
 		for jid in r.get("background_job_ids") or ([r["background_job_id"]] if r.get("background_job_id") else []):
 			j = wait(jid, f"{move} {d}")
