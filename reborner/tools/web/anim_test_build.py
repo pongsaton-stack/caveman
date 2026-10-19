@@ -28,7 +28,41 @@ def rion_pack_clips():
 	n = max((i + 1 for i, c in enumerate(rp) if pl and c['group'] == pl[0]['group']), default=len(rp))
 	# PixelLab ฟันมีดรอบ 2 พลิกหันขวา (ภาพสร้างใน sprites()) → ตัว Rion ในแท็บสกิล ชุดใหม่ แบบ PixelLab · ไม่ลงแท็บท่าขยับ (hidden)
 	extra = [{'group': '', 'id': 'pl_slash2', 'label': 'PixelLab ฟันมีดรอบ 2 (พลิกหันขวา)', 'frames': ['pl_slash2_%d' % i for i in range(8)], 'ms': 110, 'loop': False, 'w': 104, 'travel': 0, 'hidden': True}] if pl else []
+	extra += [{'group': '', 'id': cid, 'label': 'PixelLab จาก State (พลิกหันขวา)', 'frames': ['%s_%d' % (cid, i) for i in range(len(fs))], 'ms': 90, 'loop': False, 'w': 120, 'travel': 0, 'hidden': True}
+		for cid, fs in PL_STATE_CLIPS.items() if all(os.path.isfile(f) for f in fs)]
 	return rp[:n] + pl + rp[n:] + extra
+
+
+# ท่ายากจาก State (kwan 19 ต.ค. "ลองท่ายากก่อน 2 ท่า" → ไม่ผ่านทั้งคู่ → "1" ประกอบด้วยโค้ดจากช่วงที่ผ่าน) · ใช้เฉพาะเฟรมที่ไม่หันเข้ากล้อง
+# ทุ่ม fs10_s: 0–5 ยื่นมือจับ · 6 หันหน้า (ใช้แค่ตอนหมุนตัว 1 เฟรม) · 7–9 หันขวาย่อ (= หันหลังให้มอน) · เตะ fs12_s: 0–7 ยืน ย่อ กระโดด หันหลัง + ภาพนิ่ง State เตะ (ท้ายสุด)
+_ST = os.path.join(SPR, 'pixellab_draft/states')
+PL_STATE_CLIPS = {
+	'pl_fs10': [os.path.join(_ST, 'FS_B_throw/FS_B_throw/animations/fs10_s_v/west/frame_%03d.png' % i) for i in range(10)],
+	'pl_fs12': [os.path.join(_ST, 'FS_B_spinkick/FS_B_spinkick/animations/fs12_s_v/west/frame_%03d.png' % i) for i in range(8)]
+		+ [os.path.join(_ST, 'FS_B_spinkick/FS_B_spinkick/rotations/west.png')]}
+
+
+def pl_state_frames():
+	"""ผืน 120x112 เท้าแถว 108 (แบบ rion_pack_px) · เท้าแต่ละเฟรมลงพื้น (การลอยใส่ด้วยคีย์เฟรมในหน้า) · แนวนอนใช้ขอบซ้ายรวมของคลิป
+	ภาพนิ่ง State (ผืนต่างขนาด) วางกลางกรอบให้ตรงกลางกรอบเฟรมแรก · พลิกหันขวาแบบชุดครบ (หน้าเทสพลิกกลับหันซ้าย)"""
+	import io
+	from PIL import Image, ImageOps
+	out = {}
+	for cid, files in PL_STATE_CLIPS.items():
+		if not all(os.path.isfile(f) for f in files):
+			continue
+		ims = [Image.open(f).convert('RGBA') for f in files]
+		bb = [im.getchannel('A').getbbox() for im in ims]
+		same = [b for im, b in zip(ims, bb) if im.size == ims[0].size]
+		x0 = min(b[0] for b in same)
+		cx0 = (bb[0][0] + bb[0][2]) / 2 - x0
+		for i, (im, b) in enumerate(zip(ims, bb)):
+			c = Image.new('RGBA', (120, 112))
+			ox = 30 - x0 if im.size == ims[0].size else round(30 + cx0 - (b[0] + b[2]) / 2)
+			c.alpha_composite(im, (ox, 108 - b[3]))
+			buf = io.BytesIO(); ImageOps.mirror(c).save(buf, 'PNG')
+			out['rpk/%s_%d' % (cid, i)] = 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()
+	return out
 
 
 def png(path):
@@ -78,6 +112,7 @@ def sprites():
 					from PIL import Image, ImageOps
 					b = io.BytesIO(); ImageOps.mirror(Image.open(os.path.join(pl, f))).save(b, 'PNG')
 					out['rpk/pl_slash2_' + f.rsplit('_', 1)[1][:-4]] = 'data:image/png;base64,' + base64.b64encode(b.getvalue()).decode()
+	out.update(pl_state_frames())
 	# มอนภูมิภาค 1 พิกเซล (tools/sprites/monsters_px.py · ชีตรอบ 10 · ร่าง)
 	md = os.path.join(SPR, 'monsters_px_draft')
 	if os.path.isdir(md):
