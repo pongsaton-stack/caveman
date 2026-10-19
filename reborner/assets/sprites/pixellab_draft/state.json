@@ -262,7 +262,19 @@
     "estimated_generations": 7,
     "first_direction_generated": true
    },
-   "status": "completed"
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "77c98884-ec91-49c2-ae79-88cb3493c00a"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "2f41e949-7797-4ab3-aca6-d448a3a1deff",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   },
   "M08": {
    "character_id": "4ab20576-d170-4009-be11-94d90644897f",
@@ -309,7 +321,8 @@
     "status": "processing",
     "estimated_generations": 7,
     "first_direction_generated": true
-   }
+   },
+   "status": "completed"
   }
  }
 }
