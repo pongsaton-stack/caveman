@@ -750,6 +750,25 @@
         {
           "status": "draft",
           "date": "2026-10-19",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl0_v2",
+          "name": "ฟันมีดพื้นฐาน bl0 รอบ 2 · มือขวาทุกเฟรม (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl0_v2/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl0"
+          },
+          "notes": "แทนรอบแรก (kwan 19 ต.ค. จับได้ว่าง้างมือขวาแต่ฟันมือซ้าย) · คำสั่ง ONE_HAND ใน pixellab_skills.py · ยอด 1,801 → 1,799 · วาดเส้นฟาดฟ้าติดมาเฟรม 5–6 ลบแล้ว · ใบมีดเฟรม 5 ถูกลบไปด้วย วาดคืนด้วยโค้ด (BLADE)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
           "gens": null,
           "seed": null,
           "ms": 90,

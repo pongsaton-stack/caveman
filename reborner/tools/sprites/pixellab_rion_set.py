@@ -24,16 +24,44 @@ SCHOOL = {"bl": ("fight_knife", "คม · มีด"), "bt": ("BT_A_stance", "�
 # (คลิป, ชื่อ, State, โฟลเดอร์ท่า, ทิศ, เฟรมที่ใช้ (None = ทั้งหมด), ms, วน)
 CLIPS = []
 # เฟรมที่ตัด (ตรวจด้วยตา 19 ต.ค.): run_k เฟรม 6–7 ซีดขาว+ประกายวาดติด · fs0 เฟรม 1–2 เส้นลมขาวพาดทับอก ลบแล้วหัวขาด · pt0 เฟรม 5 วงลมขาวพันรอบตัว
+# bl0 รอบ 2 (kwan 19 ต.ค.): รอบแรกสลับมือกลางท่า (ง้างมือขวา ฟันมือซ้าย) → เจนใหม่ระบุมือขวาทุกเฟรม
+ATK_ANIM = {"bl": "bl0_v2"}
 KEEP = {"pls_atk_fs": [0, 3, 4, 5, 6, 7], "pls_atk_pt": [0, 1, 2, 3, 4, 6, 7]}
 for s, (st, th) in SCHOOL.items():
 	CLIPS.append((f"pls_idle_{s}", f"ยืนในศึก · {th}", st, f"idle_{s}_v", "west", None, 180, True))
-	CLIPS.append((f"pls_atk_{s}", f"โจมตีพื้นฐาน {s}0 · {th}", st, f"{s}0_v", "west", KEEP.get(f"pls_atk_{s}"), 90, False))
+	CLIPS.append((f"pls_atk_{s}", f"โจมตีพื้นฐาน {s}0 · {th}", st, ATK_ANIM.get(s, f"{s}0_v"), "west", KEEP.get(f"pls_atk_{s}"), 90, False))
 CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "hurt_k_v", "west", None, 90, False),
 	("pls_ko", "ล้ม · มีดหลุดมือ", "fight_knife", "ko_k_v", "west", None, 110, False),
 	("pls_run_bl", "วิ่งถือมีด", "fight_knife", "run_k_v", "west", [0, 1, 2, 3, 4, 5], 60, True),
 	("pls_hop_bl", "กระโดดถอยถือมีด", "fight_knife", "hop_k_v", "west", [0, 1, 2, 3, 4], 60, False),   # hop_k เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม → ตัดทิ้ง · ลงพื้นใช้ภาพย่อ (1) ด้วยโค้ด
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
+
+
+# ใบมีดที่ clean() ลบไปพร้อมเส้นฟาดฟ้า (ใบมีดเรืองขาวฟ้าทับเส้นฟาด) → วาดคืนตามแนวด้ามที่เหลือ · พิกัดในผืน 120x112 หลังจัดวาง
+# bl0 รอบ 2 เฟรม 5 (จังหวะฟาด): ด้ามชี้ลงซ้ายจบที่ (32, 75) · สีใบมีด/ขอบจากเฟรม 6 (ใบมีดเดียวกันที่ไม่ถูกลบ)
+BLADE = {("pls_atk_bl", 5): ((32, 75), (-1, 1), 7, "pls_atk_bl", 6)}
+
+
+def draw_blade(c, end, step, n, ref_cid, ref_i):
+	"""ใบมีดแนวเฉียง 2 จุด ขอบเข้ม ต่อจากปลายด้าม end ไปทาง step n จุด · ปลายแหลม 1 จุด"""
+	ref = np.array(Image.open(os.path.join(OUT, f"{ref_cid}_{ref_i}.png")).convert("RGBA")).astype(int)
+	sat = ref[..., :3].max(-1) - ref[..., :3].min(-1); lum = ref[..., :3].mean(-1)
+	blade = (ref[..., 3] > 127) & (sat < 40) & (lum > 120)
+	light = tuple(np.median(ref[blade][:, :4], axis=0).astype(int))
+	edge = tuple(np.median(ref[ndimage.binary_dilation(blade) & ~blade & (ref[..., 3] > 127)][:, :4], axis=0).astype(int))
+	a = np.array(c); core = set()
+	for k in range(1, n + 1):
+		x, y = end[0] + step[0] * k, end[1] + step[1] * k
+		core.add((x, y))
+		if k < n: core.add((x - step[0], y))   # สองจุดต่อแถว ปลายเหลือจุดเดียว
+	for x, y in core: a[y, x] = light
+	for x, y in core:
+		for dx in (-1, 0, 1):
+			for dy in (-1, 0, 1):
+				u, v = x + dx, y + dy
+				if (u, v) not in core and a[v, u, 3] < 128: a[v, u] = edge
+	c.paste(Image.fromarray(a.astype(np.uint8), "RGBA"))
 
 
 def src(st, anim, d):
@@ -94,6 +122,9 @@ def main():
 		for i, im in enumerate(ims):
 			c = Image.new("RGBA", (120, 112)); c.alpha_composite(im, (30 - x0 + max(0, (60 - (max(b[2] for b in bb) - x0)) // 2), 108 - y1))
 			n = f"{cid}_{i}"; c.save(os.path.join(OUT, n + ".png")); names.append(n)
+		for (bc, bi), spec in BLADE.items():   # หลังบันทึกครบทั้งคลิป (ใช้สีจากเฟรมอื่นของคลิปเดียวกัน)
+			if bc == cid and bi < len(names):
+				f = os.path.join(OUT, f"{cid}_{bi}.png"); c = Image.open(f).convert("RGBA"); draw_blade(c, *spec); c.save(f)
 		clips.append({"group": G, "id": cid, "label": f"{th} · {len(names)} เฟรม (PixelLab · ลบแสงที่วาดติดมา {removed} จุด)", "frames": names, "ms": ms,
 			"loop": loop, "w": 120, "travel": 0, "src": [f"pixellab {st or 'base'} {anim} {d}"]})
 		report.append((cid, len(names), removed))

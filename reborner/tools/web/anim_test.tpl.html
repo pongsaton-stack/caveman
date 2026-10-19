@@ -960,7 +960,7 @@ function pkvSound(F) {
 	if (c.die && F === tl.D0 + 10 && a.death === 'ICE') auNoise(0.3, 'highpass', 3000, 8000, 0.6, 3);
 }
 // ★ ฉากต่อสู้พื้นฐาน · Rion PixelLab คม มีด (kwan 19 ต.ค. "ยืนในศึก → วิ่งไปที่มอน มีฝุ่นนิดๆ → ถึงจุดปะทะออกท่าโจมตีพื้นฐาน จังหวะพอดี → กระโดดฉากถอยหลัง 2–3 สเตปในท่าตั้งรับ → กลับมายืนในศึก")
-// ภาพ = ชุด px_set (pls_idle_bl ยืนในศึก 4 · pls_run_bl วิ่งถือมีด 6 ภาพ = 2 ก้าว (PixelLab run_k 19 ต.ค.) · pls_atk_bl โจมตี bl0 8 ภาพ: 0–3 ง้าง · 4 ฟาด · 5–7 ตามแรง) · ไม่มีภาพวิ่ง = ภาพยืนโน้มตัว + เด้งตามก้าว
+// ภาพ = ชุด px_set (pls_idle_bl ยืนในศึก 4 · pls_run_bl วิ่งถือมีด 6 ภาพ = 2 ก้าว (PixelLab run_k 19 ต.ค.) · pls_atk_bl โจมตี bl0 รอบ 2 มือขวาทุกเฟรม 8 ภาพ: 0 ตั้งการ์ด · 1–4 ง้าง · 5 ฟาด · 6–7 ตามแรง) · ไม่มีภาพวิ่ง = ภาพยืนโน้มตัว + เด้งตามก้าว
 // หลักโมเมนตัม (kwan 10 ต.ค.): ง้างระหว่างวิ่ง · ฟาดตอนถึงตัว = จังหวะแตะพื้น · ไถลต่อตามแรง ไม่หยุดตั้งท่า · ค่าทั้งหมดเป็นค่าภาพของหน้าเทส ไม่ใช่ค่าเกม
 // กระโดดถอย (kwan 19 ต.ค. "ไม่เป็นธรรมชาติ" → 1+2): ภาพ PixelLab hop_k (0 ยืน · 1 ย่อ · 2 ถีบ · 3 ขาเหยียดลง · 4 ลอยเข่าพับ) · สเตปแรกไกล/สูงสุดแล้วเบาลง (แรงส่งจากการฟันหมด) · ลอยความเร็วคงที่ · ลงยุบด้วยภาพย่อ
 const BLC = { SEC: 0.06, IDLE: 18, RUN: 18, HIT: 36, HOP0: 44, END: 100, STEP: 3, RUNF: 6,   // STEP = เฟรมต่อก้าว (วงวิ่ง 6 ภาพ = 2 ก้าว)
@@ -987,9 +987,9 @@ const blcKey = F => {   // ภาพ Rion ตามเฟรม
 	const { IDLE, HIT, HOP0, HOPS } = BLC, idle = f => `rpk/pls_idle_bl_${Math.floor(f / 4) % 4}`;
 	if (F < IDLE) return idle(F);
 	if (F < HIT - 8) return blcRun() ? `rpk/pls_run_bl_${(F - IDLE) % BLC.RUNF}` : 'rpk/pls_idle_bl_0';   // วิ่งถือมีด (ไม่มีภาพ = ท่าตั้งการ์ด)
-	if (F < HIT) return `rpk/pls_atk_bl_${Math.min(3, Math.floor((F - (HIT - 8)) / 2))}`;   // ง้างระหว่างวิ่ง 8 เฟรม
-	if (F < HIT + 3) return 'rpk/pls_atk_bl_4';   // ฟาด (+ หยุดภาพ)
-	if (F < HOP0) return `rpk/pls_atk_bl_${Math.min(7, 5 + Math.floor((F - HIT - 3) / 2))}`;
+	if (F < HIT) return `rpk/pls_atk_bl_${1 + Math.min(3, Math.floor((F - (HIT - 8)) / 2))}`;   // ง้างระหว่างวิ่ง 8 เฟรม (bl0 รอบ 2: 1–4 ง้างข้ามไหล่ขวา)
+	if (F < HIT + 3) return 'rpk/pls_atk_bl_5';   // ฟาด (+ หยุดภาพ)
+	if (F < HOP0) return `rpk/pls_atk_bl_${Math.min(7, 6 + Math.floor((F - HIT - 3) / 2))}`;
 	const hp = blcHop(F);
 	if (hp) { if (!blcHopImg()) return 'rpk/pls_idle_bl_0';   // ไม่มีภาพกระโดด = ท่าตั้งรับเดิม
 		const { q, h, k } = hp, j = i => `rpk/pls_hop_bl_${i}`;
@@ -1027,7 +1027,7 @@ function blcView(c) {
 	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
 	const mim = IMG[pkRole(m, 'idle')]; if (!mim) return;
 	const mw = mim.width, mh = mim.height, mx0 = Math.round(MX - mw / 2), my0 = G - mh, d = F - HIT;
-	const home = W - 100, near = mx0 + mw - 34;   // ภาพฟาด: ปลายมีดอยู่ราว x34 ของผืน 120 → มีดเข้าเนื้อมอน
+	const home = W - 100, near = mx0 + mw - 42;   // ภาพฟาด (bl0 รอบ 2 เฟรม 5): ปลายมีดอยู่ราว x45 ของผืน 120 → มีดเข้าเนื้อมอน
 	const hold = d >= 0 && d < 2, f = hold ? HIT : F;   // หยุดภาพ 2 เฟรมตอนกระทบ
 	const shk = d >= 0 && d < 5 ? 2.5 * (1 - d / 5) : 0, rs = vRng(F * 31 + 7);
 	drawBg(); ctx.save(); ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk)); drawBg();

@@ -162,6 +162,18 @@
           "north": "fight_knife/rotations/north.png"
         },
         "animations": {
+          "bl0_v2": {
+            "west": [
+              "fight_knife/animations/bl0_v2/west/frame_000.png",
+              "fight_knife/animations/bl0_v2/west/frame_001.png",
+              "fight_knife/animations/bl0_v2/west/frame_002.png",
+              "fight_knife/animations/bl0_v2/west/frame_003.png",
+              "fight_knife/animations/bl0_v2/west/frame_004.png",
+              "fight_knife/animations/bl0_v2/west/frame_005.png",
+              "fight_knife/animations/bl0_v2/west/frame_006.png",
+              "fight_knife/animations/bl0_v2/west/frame_007.png"
+            ]
+          },
           "hop_k_v": {
             "west": [
               "fight_knife/animations/hop_k_v/west/frame_000.png",
@@ -545,5 +557,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-19T14:50:20.144215"
+  "export_date": "2026-10-19T15:49:53.985660"
 }

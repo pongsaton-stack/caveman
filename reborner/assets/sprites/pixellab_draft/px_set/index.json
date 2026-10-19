@@ -22,7 +22,7 @@
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_atk_bl",
-   "label": "โจมตีพื้นฐาน bl0 · คม · มีด · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1035 จุด)",
+   "label": "โจมตีพื้นฐาน bl0 · คม · มีด · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1057 จุด)",
    "frames": [
     "pls_atk_bl_0",
     "pls_atk_bl_1",
@@ -38,7 +38,7 @@
    "w": 120,
    "travel": 0,
    "src": [
-    "pixellab fight_knife bl0_v west"
+    "pixellab fight_knife bl0_v2 west"
    ]
   },
   {

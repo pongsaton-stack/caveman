@@ -137,7 +137,7 @@ except (ImportError, FileNotFoundError):
 # ชุด Rion ในเกม (kwan 19 ต.ค. เลือก "เปลี่ยนเป็น PixelLab ทั้งชุด" · docs/art-bible/pixellab_test/ASSET_LIBRARY_PLAN.md ลำดับ 1)
 # ยืนในศึก 6 สาย = State ท่าสู้ (fight_knife · <สาย>_A_stance) + ท่าหายใจ 4 เฟรม · โดนตี/ล้ม = จาก fight_knife · โจมตีพื้นฐาน = ท่าราก bl0 bt0 pt0 rg0 dv0 fs0 จาก State สายนั้น
 GAME_STATE = {"bl0": "fight_knife", "bt0": "BT_A_stance", "pt0": "PT_A_stance", "rg0": "RG_A_stance", "dv0": "DV_A_stance", "fs0": "FS_A_stance"}
-KNIFE = "a short small kitchen knife, blade about the length of the hand, held by the handle in the front hand (the hand nearest the viewer)"
+KNIFE = "a short small kitchen knife, blade about the length of the hand, held by the handle in the RIGHT hand (the same hand as in the start image) in every frame; it never passes to the other hand"   # เดิม "front hand" = มือซ้ายเมื่อหันซ้าย ขัดกับภาพ State (kwan 19 ต.ค.)
 MOVES.update({
 	"hurt_k": {"dir": "west", "held": KNIFE, "attack": False, "frames": 6, "seed": 33,
 		"beats": ["struck from the front (the enemy is on the left): the body jerks back to the RIGHT, eyes squeezed shut, the knife still gripped",
@@ -167,7 +167,7 @@ MOVES.update({
 			"rising out of the landing, knees still a little bent, knife at guard",
 			"fighting stance facing left, same as the first frame"],
 		"not": ["turning toward the camera", "turning the back to the enemy", "a second knife", "slash trails or motion lines", "dust clouds", "swinging the knife"]},
-	"ko_k": {"dir": "west", "held": "the same short kitchen knife; it slips out of the front hand in frame 4 and then lies on the ground beside the body", "attack": False, "frames": 8, "seed": 33,
+	"ko_k": {"dir": "west", "held": "the same short kitchen knife; it slips out of the right hand in frame 4 and then lies on the ground beside the body", "attack": False, "frames": 8, "seed": 33,
 		"beats": ["struck hard from the front: body jerks back to the RIGHT, eyes squeezed shut",
 			"knees buckle, body sagging",
 			"dropping onto both knees, head lolling",
