@@ -286,6 +286,8 @@ PX_EXTRA = {'dodge': 'dodge', 'watch': 'watch', 'roll': 'jump_roll', 'victory': 
 # ทางปลายอาวุธของท่าฟันในฉากต่อสู้ (รอยมีดตามปลายจริง · BLC_SWING ในเทมเพลต) — วัดจากภาพทุกครั้งที่สร้างหน้า ด้วย tools/sprites/blade_tip.py
 # clip: (จุดหมุน = ไหล่ขวา, เฟรมเริ่มเหวี่ยง = ง้างสุด, เฟรมสุดท้าย, ทิศ −1 = มุมลดลง = ฟันข้ามหัวลงหน้าเมื่อหันซ้าย)
 SWINGS = {'pls_atk_bl': ((62, 68), 4, 7, -1)}
+# ท่าพุ่ง: ปลายอาวุธทุกเฟรม → รอยตามทางปลายในฉาก (ตัวเคลื่อนเร็ว ทางปลายเป็นเส้นตรงตามตัว) · ค่า = เฟรมที่ฉากใช้ (ต้องหาเจน)
+TIPS = {'pls_bl1': [3, 5, 6, 7]}
 
 
 def swing_paths():
@@ -300,6 +302,14 @@ def swing_paths():
 		if miss: sys.exit('blade_tip: หาปลายอาวุธ %s เฟรม %s ไม่เจอ — ดูภาพด้วย --check แล้วแก้ค่าใน blade_tip.py ก่อน' % (clip, miss))
 		out[clip] = {'P': list(pivot), 'f0': f0, 'A': [round(r[1], 1) for r in res], 'R': [round(r[2], 1) for r in res], 'tip': [list(r[0]) for r in res]}
 		print('ทางปลายอาวุธ', clip, 'มุม', out[clip]['A'], 'รัศมี', out[clip]['R'])
+	for clip, need in TIPS.items():   # ปลายอาวุธทุกเฟรมของคลิป (รอยตามทางปลายจริงในฉาก · ท่าพุ่ง) · เฟรมที่ฉากใช้ต้องหาเจน
+		paths = sorted(glob.glob(os.path.join(SPR, 'pixellab_draft/px_set', clip + '_*.png')), key=lambda p: int(re.search(r'_(\d+)\.png$', p).group(1)))
+		if not paths: continue
+		tips = [(lambda b: list(b[0]) if b else None)(bt.find_tip(p)) for p in paths]
+		miss = [i for i in need if i >= len(tips) or tips[i] is None]
+		if miss: sys.exit('blade_tip: หาปลายอาวุธ %s เฟรม %s ไม่เจอ' % (clip, miss))
+		out.setdefault('tips', {})[clip] = tips
+		print('ปลายอาวุธทุกเฟรม', clip, tips)
 	return out
 
 

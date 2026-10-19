@@ -321,6 +321,28 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bl1",
+   "label": "เขี้ยวพุ่ง bl1 · มีด · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 54 จุด)",
+   "frames": [
+    "pls_bl1_0",
+    "pls_bl1_1",
+    "pls_bl1_2",
+    "pls_bl1_3",
+    "pls_bl1_4",
+    "pls_bl1_5",
+    "pls_bl1_6",
+    "pls_bl1_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl1_v2 west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_walk_s",
    "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
    "frames": [

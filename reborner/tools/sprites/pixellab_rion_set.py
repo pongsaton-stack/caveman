@@ -34,6 +34,7 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_ko", "ล้ม · มีดหลุดมือ", "fight_knife", "ko_k_v", "west", None, 110, False),
 	("pls_run_bl", "วิ่งถือมีด", "fight_knife", "run_k_v", "west", [0, 1, 2, 3, 4, 5], 60, True),
 	("pls_hop_bl", "กระโดดถอยถือมีด", "fight_knife", "hop_k_v", "west", [0, 1, 2, 3, 4], 60, False),   # hop_k เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม → ตัดทิ้ง · ลงพื้นใช้ภาพย่อ (1) ด้วยโค้ด
+	("pls_bl1", "เขี้ยวพุ่ง bl1 · มีด", "fight_knife", "bl1_v2", "west", None, 90, False),   # รอบ 2 (kwan 19 ต.ค. "ขอลองเขี้ยวพุ่ง"): รอบแรกเฟรม 5–6 ฟันมือซ้าย + เฟรม 3 มีดหาย → เจนใหม่ระบุแขนไกล/ใกล้ทุกจังหวะ
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 
@@ -41,6 +42,18 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 # ใบมีดที่ clean() ลบไปพร้อมเส้นฟาดฟ้า (ใบมีดเรืองขาวฟ้าทับเส้นฟาด) → วาดคืนตามแนวด้ามที่เหลือ · พิกัดในผืน 120x112 หลังจัดวาง
 # bl0 รอบ 2 เฟรม 5 (จังหวะฟาด): ด้ามชี้ลงซ้ายจบที่ (32, 75) · สีใบมีด/ขอบจากเฟรม 6 (ใบมีดเดียวกันที่ไม่ถูกลบ)
 BLADE = {("pls_atk_bl", 5): ((32, 75), (-1, 1), 7, "pls_atk_bl", 6)}
+# ใบมีดที่ clean() ลบไส้ขาวเหลือแต่โครงขาด → ล้างโครงในกรอบ clear แล้วคัดลอกใบมีด (พร้อมขอบ) จากเฟรมอ้างอิงในกรอบ src เลื่อนตาม shift
+# bl1 รอบ 2 เฟรม 6 (จังหวะแทง): กำปั้นอยู่ซ้ายของเฟรม 7 พอดี 3 จุด ความสูงเท่ากัน · ใบมีดเฟรม 7 ชี้ซ้ายแนวนอนเหมือนกัน
+BLADE_COPY = {("pls_bl1", 6): (7, (-3, 0), (26, 64, 36, 73), (30, 64, 39, 73))}
+
+
+def copy_blade(f, ref, shift, clear, srcbox):
+	a = np.array(Image.open(f).convert("RGBA")); r = np.array(Image.open(ref).convert("RGBA"))
+	a[clear[1]:clear[3], clear[0]:clear[2]] = 0
+	for y in range(srcbox[1], srcbox[3]):
+		for x in range(srcbox[0], srcbox[2]):
+			if r[y, x, 3] >= 128: a[y + shift[1], x + shift[0]] = r[y, x]
+	Image.fromarray(a).save(f)
 
 
 def draw_blade(c, end, step, n, ref_cid, ref_i):
@@ -125,6 +138,8 @@ def main():
 		for (bc, bi), spec in BLADE.items():   # หลังบันทึกครบทั้งคลิป (ใช้สีจากเฟรมอื่นของคลิปเดียวกัน)
 			if bc == cid and bi < len(names):
 				f = os.path.join(OUT, f"{cid}_{bi}.png"); c = Image.open(f).convert("RGBA"); draw_blade(c, *spec); c.save(f)
+		for (bc, bi), (ri, sh, clr, sb) in BLADE_COPY.items():
+			if bc == cid and max(bi, ri) < len(names): copy_blade(os.path.join(OUT, f"{cid}_{bi}.png"), os.path.join(OUT, f"{cid}_{ri}.png"), sh, clr, sb)
 		clips.append({"group": G, "id": cid, "label": f"{th} · {len(names)} เฟรม (PixelLab · ลบแสงที่วาดติดมา {removed} จุด)", "frames": names, "ms": ms,
 			"loop": loop, "w": 120, "travel": 0, "src": [f"pixellab {st or 'base'} {anim} {d}"]})
 		report.append((cid, len(names), removed))
