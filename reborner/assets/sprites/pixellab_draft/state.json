@@ -299,7 +299,8 @@
     "status": "processing",
     "enhanced_prompt": null,
     "enhance_usage": null
-   }
+   },
+   "hurt_status": "completed"
   },
   "M09": {
    "character_id": "46b8229b-4ac7-4a5b-9e5e-b7d6ee1f5869",
@@ -311,7 +312,19 @@
     "estimated_generations": 7,
     "first_direction_generated": true
    },
-   "status": "completed"
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "1514845d-65e7-4eeb-8f5e-3ef3e49569b9"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "84f1a27a-cce8-4c5c-895c-194a16c6c9b9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   },
   "M17": {
    "character_id": "bc474fe0-ebb1-4070-8219-a5a850eeabce",
