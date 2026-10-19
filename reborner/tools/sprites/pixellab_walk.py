@@ -134,6 +134,39 @@ except (ImportError, FileNotFoundError):
 	pass
 
 
+# ชุด Rion ในเกม (kwan 19 ต.ค. เลือก "เปลี่ยนเป็น PixelLab ทั้งชุด" · docs/art-bible/pixellab_test/ASSET_LIBRARY_PLAN.md ลำดับ 1)
+# ยืนในศึก 6 สาย = State ท่าสู้ (fight_knife · <สาย>_A_stance) + ท่าหายใจ 4 เฟรม · โดนตี/ล้ม = จาก fight_knife · โจมตีพื้นฐาน = ท่าราก bl0 bt0 pt0 rg0 dv0 fs0 จาก State สายนั้น
+GAME_STATE = {"bl0": "fight_knife", "bt0": "BT_A_stance", "pt0": "PT_A_stance", "rg0": "RG_A_stance", "dv0": "DV_A_stance", "fs0": "FS_A_stance"}
+KNIFE = "a short small kitchen knife, blade about the length of the hand, held by the handle in the front hand (the hand nearest the viewer)"
+MOVES.update({
+	"hurt_k": {"dir": "west", "held": KNIFE, "attack": False, "frames": 6, "seed": 33,
+		"beats": ["struck from the front (the enemy is on the left): the body jerks back to the RIGHT, eyes squeezed shut, the knife still gripped",
+			"the biggest recoil: leaning back to the right, knees bending, arms flung back a little",
+			"stagger one small step back to the right",
+			"regain balance, body upright again",
+			"raise the knife back to the ready position",
+			"fighting stance facing left, same as the start image"],
+		"not": ["dropping the knife", "falling down", "blood"]},
+	"ko_k": {"dir": "west", "held": "the same short kitchen knife; it slips out of the front hand in frame 4 and then lies on the ground beside the body", "attack": False, "frames": 8, "seed": 33,
+		"beats": ["struck hard from the front: body jerks back to the RIGHT, eyes squeezed shut",
+			"knees buckle, body sagging",
+			"dropping onto both knees, head lolling",
+			"falling backward to the RIGHT, the knife slipping out of the hand",
+			"landing flat on the back, lying on the ground with the head to the right and feet to the left",
+			"a small bounce of the body on the ground",
+			"lying still on the back, eyes closed (swirly dizzy eyes are fine)",
+			"lying still, same as the previous frame"],
+		"not": ["blood", "the body turning to face the camera before landing"]},
+})
+for _r, _st in GAME_STATE.items():
+	MOVES["idle_" + _r[:2]] = {"dir": "west", "held": MOVES[_r]["held"] if _r in MOVES else KNIFE, "attack": False, "frames": 4, "seed": 33,
+		"beats": ["fighting stance facing left, same as the start image",
+			"breathe in: chest rises one pixel, shoulders lift slightly, the held item bobs up slightly",
+			"breathe out: chest and shoulders come back down",
+			"fighting stance, same as the first frame (ready to loop)"],
+		"not": ["stepping", "turning", "swinging the held item"]}
+
+
 def master_blocks():
 	"""อ่านบล็อกจาก RION_MASTER.md ตามตัวอักษร: CHARACTER · STYLE · LEFT/RIGHT/BACK"""
 	t = open(MASTER_MD, encoding="utf-8").read()
