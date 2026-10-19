@@ -274,7 +274,8 @@
     "status": "processing",
     "enhanced_prompt": null,
     "enhance_usage": null
-   }
+   },
+   "hurt_status": "completed"
   },
   "M08": {
    "character_id": "4ab20576-d170-4009-be11-94d90644897f",
@@ -286,7 +287,19 @@
     "estimated_generations": 7,
     "first_direction_generated": true
    },
-   "status": "completed"
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "7017b2f9-ba2c-49a4-a1c1-f6c634b5f92c"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "a274b272-670d-4b14-8814-3d3b2b794b6f",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   },
   "M09": {
    "character_id": "46b8229b-4ac7-4a5b-9e5e-b7d6ee1f5869",
