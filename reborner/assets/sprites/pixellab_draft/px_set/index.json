@@ -384,6 +384,72 @@
    "src": [
     "pixellab base walk_v north"
    ]
+  },
+  {
+   "group": "★ ทดลอง · เปลี่ยนอาวุธด้วยโค้ด (bl0 · ร่าง)",
+   "id": "swap_SL01-1",
+   "label": "มีดครัว SL01-1 · ท่าฟัน bl0 ลบมีดแล้ววางไอคอนอาวุธที่มือ · 8 เฟรม (ไม่เสียเครดิต)",
+   "frames": [
+    "swap_SL01-1_0",
+    "swap_SL01-1_1",
+    "swap_SL01-1_2",
+    "swap_SL01-1_3",
+    "swap_SL01-1_4",
+    "swap_SL01-1_5",
+    "swap_SL01-1_6",
+    "swap_SL01-1_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "weapon_swap pls_atk_bl + weapons300_draft/SL01-1"
+   ]
+  },
+  {
+   "group": "★ ทดลอง · เปลี่ยนอาวุธด้วยโค้ด (bl0 · ร่าง)",
+   "id": "swap_SL02-1",
+   "label": "มีดสับ SL02-1 · ท่าฟัน bl0 ลบมีดแล้ววางไอคอนอาวุธที่มือ · 8 เฟรม (ไม่เสียเครดิต)",
+   "frames": [
+    "swap_SL02-1_0",
+    "swap_SL02-1_1",
+    "swap_SL02-1_2",
+    "swap_SL02-1_3",
+    "swap_SL02-1_4",
+    "swap_SL02-1_5",
+    "swap_SL02-1_6",
+    "swap_SL02-1_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "weapon_swap pls_atk_bl + weapons300_draft/SL02-1"
+   ]
+  },
+  {
+   "group": "★ ทดลอง · เปลี่ยนอาวุธด้วยโค้ด (bl0 · ร่าง)",
+   "id": "swap_SL08-1",
+   "label": "เคียว SL08-1 · ท่าฟัน bl0 ลบมีดแล้ววางไอคอนอาวุธที่มือ · 8 เฟรม (ไม่เสียเครดิต)",
+   "frames": [
+    "swap_SL08-1_0",
+    "swap_SL08-1_1",
+    "swap_SL08-1_2",
+    "swap_SL08-1_3",
+    "swap_SL08-1_4",
+    "swap_SL08-1_5",
+    "swap_SL08-1_6",
+    "swap_SL08-1_7"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "weapon_swap pls_atk_bl + weapons300_draft/SL08-1"
+   ]
   }
  ]
 }

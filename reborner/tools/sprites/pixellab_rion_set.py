@@ -146,6 +146,7 @@ def main():
 	json.dump({"_doc": "ชุด Rion ในเกมจาก PixelLab · tools/sprites/pixellab_rion_set.py · ร่าง ยังไม่เข้าเกม", "clips": clips},
 		open(os.path.join(OUT, "index.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 	for r in report: print(*r)
+	import weapon_swap; weapon_swap.main()   # คลิปเปลี่ยนอาวุธด้วยโค้ด (ใช้ภาพ pls_atk_bl ที่เพิ่งสร้าง)
 
 
 if __name__ == "__main__":

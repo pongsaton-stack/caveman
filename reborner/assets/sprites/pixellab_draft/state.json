@@ -611,6 +611,25 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "slash_fist",
+   "dir": "west",
+   "seed": 27,
+   "state": null,
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "5a085bcd-9219-4fc3-a76e-d921f778eff3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5ab5b4cb-3eb7-4d5b-9590-27bc5b0d2784",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -640,7 +659,8 @@
   "2b41aece-4422-4c9c-a8b8-19b291aa9de3": "completed",
   "3be80c9d-6106-433a-b7cf-14afbeed0cc3": "completed",
   "baa14db9-31fc-49e7-982c-514e26317312": "completed",
-  "a2ee25ef-48ed-4e62-bc10-a14f16a76b06": "completed"
+  "a2ee25ef-48ed-4e62-bc10-a14f16a76b06": "completed",
+  "5a085bcd-9219-4fc3-a76e-d921f778eff3": "completed"
  },
  "states": {
   "fight_knife": {

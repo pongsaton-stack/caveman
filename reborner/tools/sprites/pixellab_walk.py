@@ -157,6 +157,22 @@ MOVES.update({
 			"airborne moment again: far leg forward, near leg back",
 			"far foot lands under the body, knee bending, same as the first frame (ready to loop)"],
 		"not": ["turning toward the camera", "a second knife", "slash trails or motion lines", "swinging the knife", "dust clouds"]},
+	# ฟันมือเปล่ากำหมัด (kwan 20 ต.ค. "1 มาครับ ขอดูฝีมือ"): search_help ของ PixelLab แนะนำเจนมือเปล่าแล้ววางอาวุธด้วยโค้ด (คำสั่งข้อความคุมมือไม่ได้แน่นอน)
+	# ท่าเดียวกับ bl0 รอบ 2 · กำปั้นขวา (แขนไกล) ต้องเห็นทุกเฟรม = จุดวางด้ามอาวุธ · ทดลองวางมีดครัว SL01 · มีดสับ SL02 · เคียว SL08
+	"slash_fist": {"dir": "west", "held": ("nothing: both hands are bare and empty, no weapon, no glove, no tool; the RIGHT hand (the far arm) is a tight closed fist "
+			"as if gripping a short handle, the knuckles facing forward, and that fist stays closed and clearly visible in every frame; "
+			"the near LEFT arm stays bent with its empty fist low at the chest and never covers the face"), "attack": True, "frames": 8, "seed": 27,
+		"beats": ["ready stance facing left, knees bent, the far right fist held low in front of the belly, the near left fist at the chest",
+			"step forward with the front foot, the far right arm lifts the closed fist back over the right shoulder, the near left fist stays at the chest",
+			"wind-up peak: the far right fist is high behind the right shoulder above the cap, elbow bent, still a closed fist",
+			"the far right arm swings the closed fist forward over the head and down toward the left",
+			"the far right fist chops diagonally down in front of the body at chest height as the front foot lands, arm extended toward the left",
+			"follow-through: the far right fist low beside the front knee, body leaning forward, near left fist still at the chest",
+			"pull the far right fist back up toward the belly, rising",
+			"ready stance again facing left, same as the first frame"],
+		"not": ["any weapon, knife, stick or tool in either hand", "gloves or wraps on the hands", "an open hand or spread fingers on the right hand",
+			"the fist switching to the other arm", "the empty left hand raised in front of the face", "slash trails, motion lines, sparkles or glowing effects",
+			"turning toward the camera"]},
 	"hop_k": {"dir": "west", "held": KNIFE, "attack": False, "frames": 8, "seed": 33,
 		"beats": ["fighting stance facing left, knife held at guard in front of the chest, same as the start image",
 			"crouch to jump backward: both knees bend deep, hips drop, upper body leans slightly back to the RIGHT, knife still at guard",
