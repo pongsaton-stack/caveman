@@ -53,8 +53,9 @@ def sprite(icon, grip, idir, length, angle):
 	K = 8; s = length / max(1.0, R.axis(icon)[2])
 	big = icon.resize((32 * K, 32 * K), Image.NEAREST); pad = 32 * K * 2
 	can = Image.new("RGBA", (pad, pad)); can.paste(big, (int(pad / 2 - grip[0] * K), int(pad / 2 - grip[1] * K)), big)
-	if 90 < angle % 360 < 270: can = can.transpose(Image.FLIP_LEFT_RIGHT); rot = angle - 180 + idir
-	else: rot = angle - idir
+	# หมุนอย่างเดียว ไม่พลิก (kwan 20 ต.ค. "โจมตีแล้วอาวุธในมือสลับด้านทั้ง 3 อัน"): weapon_sprite พลิกเมื่อชี้ซ้าย → ชี้ซ้ายเฟรม 0–1/5–7 ชี้ขวาเฟรม 3–4 ด้านคม/ตะขอกลับข้างกลางท่า
+	# หมุนล้วน = ด้านคม (ด้านตามเข็มของแกนในไอคอน) นำทางตอนฟันลงตามเข็มตลอดท่า
+	rot = angle - idir
 	a = np.asarray(can.rotate(rot, Image.NEAREST)); k = max(1, round(K / s)); h = a.shape[0] // k
 	out = np.zeros((h, h, 4), np.uint8)
 	for y in range(h):
