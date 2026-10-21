@@ -387,15 +387,21 @@ def draft_map():
 
 COMBAT_KEEP = re.compile(r'^(rpk/pls_|mpx/)')   # หน้า "ฉากต่อสู้" ใช้แค่ Rion PixelLab (px_set) + มอนชุดใหม่
 
+# ฉากเฉพาะหน้า "ฉากต่อสู้" (ไม่ใช่ภาพ PixelLab → ไม่ใส่ catalog ของหน้ามาสเตอร์) · box = ภาพไม่ใช่พิกเซลเท่ากันทั้งภาพ ย่อด้วยค่าเฉลี่ย (nearest ทำเม็ดแตก)
+COMBAT_BGS = [
+	# kwan 21 ต.ค. "เพิ่มฉากหลัง" · ภาพตั้ง 768x1376 → ครอปแนวนอนช่วงลานหินล่าง · เส้นพื้น y 1250 (ลานหินกลาง)
+	{'id': 'frost_volcano', 'name': 'ภูเขาไฟหิมะ · ลานหินหน้าหุบเหว', 'file': 'docs/art-bible/pixellab_test/bg_frost_volcano.jpg', 'ground': 1250 / 1376, 'scale': 1, 'box': True},
+]
+
 def combat_bgs():
 	"""ฉากหลังของหน้า "ฉากต่อสู้" = ฉากเดียวกับหน้ามาสเตอร์ PixelLab (catalog.json backgrounds) ครอปเป็นเวที 300x168 ให้เส้นพื้นของภาพตรงพื้นเวที (แถว 158)"""
 	import io
 	cat = json.load(open(os.path.join(ROOT, 'docs/art-bible/pixellab_test/catalog.json'), encoding='utf-8'))
 	out, meta = {}, []
-	for b in cat['backgrounds']:
+	for b in cat['backgrounds'] + COMBAT_BGS:
 		im = Image.open(os.path.join(ROOT, b['file'])).convert('RGB')
 		im = im.resize((im.width // b['scale'], im.height // b['scale']), Image.NEAREST)   # ภาพขยาย 3 เท่าจากพิกเซลจริง → คืนขนาดพิกเซลจริง
-		im = im.resize((300, round(im.height * 300 / im.width)), Image.NEAREST)
+		im = im.resize((300, round(im.height * 300 / im.width)), Image.BOX if b.get('box') else Image.NEAREST)
 		y0 = max(0, min(im.height - 168, round(im.height * b['ground']) - 158))
 		bb = io.BytesIO(); im.crop((0, y0, 300, y0 + 168)).save(bb, 'PNG')
 		out['bgs/' + b['id']] = 'data:image/png;base64,' + base64.b64encode(bb.getvalue()).decode()
