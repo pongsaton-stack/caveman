@@ -48,6 +48,18 @@
               "Idle/animations/bl15_v/west/frame_007.png"
             ]
           },
+          "slash_fist_v": {
+            "west": [
+              "Idle/animations/slash_fist_v/west/frame_000.png",
+              "Idle/animations/slash_fist_v/west/frame_001.png",
+              "Idle/animations/slash_fist_v/west/frame_002.png",
+              "Idle/animations/slash_fist_v/west/frame_003.png",
+              "Idle/animations/slash_fist_v/west/frame_004.png",
+              "Idle/animations/slash_fist_v/west/frame_005.png",
+              "Idle/animations/slash_fist_v/west/frame_006.png",
+              "Idle/animations/slash_fist_v/west/frame_007.png"
+            ]
+          },
           "bt5_v": {
             "west": [
               "Idle/animations/bt5_v/west/frame_000.png",
@@ -162,6 +174,14 @@
           "north": "fight_knife/rotations/north.png"
         },
         "animations": {
+          "glim_shift_v2": {
+            "west": [
+              "fight_knife/animations/glim_shift_v2/west/frame_000.png",
+              "fight_knife/animations/glim_shift_v2/west/frame_001.png",
+              "fight_knife/animations/glim_shift_v2/west/frame_002.png",
+              "fight_knife/animations/glim_shift_v2/west/frame_003.png"
+            ]
+          },
           "bl0_v2": {
             "west": [
               "fight_knife/animations/bl0_v2/west/frame_000.png",
@@ -581,5 +601,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-19T17:14:04.634820"
+  "export_date": "2026-10-21T01:36:13.902147"
 }

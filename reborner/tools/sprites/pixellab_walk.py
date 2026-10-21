@@ -173,6 +173,14 @@ MOVES.update({
 		"not": ["any weapon, knife, stick or tool in either hand", "gloves or wraps on the hands", "an open hand or spread fingers on the right hand",
 			"the fist switching to the other arm", "the empty left hand raised in front of the face", "slash trails, motion lines, sparkles or glowing effects",
 			"turning toward the camera"]},
+	# ท่ากลางของการเกิดประกาย (kwan 21 ต.ค. "1 เจนภาพท่ากลาง"): ภาพเริ่ม = bl0_v2 เฟรม 4 (ง้างมีดข้ามไหล่ขวาสุด) · ภาพจบ = bl1_v2 เฟรม 3 (ย่อต่ำ มีดต่ำข้างสะโพก)
+	#   PL_STATE=fight_knife PL_START_IMG=<bl0_v2/west/frame_004> PL_END_IMG=<bl1_v2/west/frame_003> anim glim_shift west
+	"glim_shift": {"dir": "west", "held": KNIFE, "attack": False, "frames": 4, "seed": 27,
+		"beats": ["same as the start image: wind-up with the knife raised over the right shoulder in the far right hand, the near left fist at the chest; he changes his mind and the far right arm starts to lower the knife down behind the body, knees start to bend",
+			"the far right hand brings the knife down past the right side of the chest toward the hip, the blade still visible, the near left fist stays at the chest in front of the shirt, knees bending deeper, weight shifting onto the back foot",
+			"crouching lower, the far right hand holds the knife low beside the right hip pointing forward, the near left fist at the chest, body leaning forward ready to spring",
+			"same as the end image: deep crouch, knife low beside the hip in the far right hand pointing forward, near left fist at the chest, ready to lunge"],
+		"not": ["switching the knife to the near left hand", "the near left arm covering the face", "turning toward the camera", "a second knife", "slash trails, motion lines, sparkles or glow"]},
 	"hop_k": {"dir": "west", "held": KNIFE, "attack": False, "frames": 8, "seed": 33,
 		"beats": ["fighting stance facing left, knife held at guard in front of the chest, same as the start image",
 			"crouch to jump backward: both knees bend deep, hips drop, upper body leans slightly back to the RIGHT, knife still at guard",
@@ -395,6 +403,11 @@ def anim(move, dirs=None):
 		if os.environ.get("PL_START"):
 			n = os.environ["PL_START"]
 			body["custom_start_frame"] = b64(os.path.join(OUT, "states", n, n, "rotations", d + ".png"))
+		# ท่ากลางระหว่างสองภาพ (interpolation · kwan 21 ต.ค. "เจนภาพท่ากลาง"): PL_START_IMG / PL_END_IMG = ไฟล์ภาพดิบขนาดเดียวกัน (ภาพจบเปิดโหมด end_frame)
+		if os.environ.get("PL_START_IMG"):
+			body["custom_start_frame"] = b64(os.environ["PL_START_IMG"])
+		if os.environ.get("PL_END_IMG"):
+			body["end_frame"] = b64(os.environ["PL_END_IMG"])
 		r = call("POST", "/characters/animations", body)
 		s.setdefault("anim", []).append({"move": move, "dir": d, "seed": m["seed"], "state": os.environ.get("PL_STATE"),
 			"start": os.environ.get("PL_START"), "response": r})

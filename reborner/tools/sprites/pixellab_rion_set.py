@@ -35,6 +35,7 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_run_bl", "วิ่งถือมีด", "fight_knife", "run_k_v", "west", [0, 1, 2, 3, 4, 5], 60, True),
 	("pls_hop_bl", "กระโดดถอยถือมีด", "fight_knife", "hop_k_v", "west", [0, 1, 2, 3, 4], 60, False),   # hop_k เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม → ตัดทิ้ง · ลงพื้นใช้ภาพย่อ (1) ด้วยโค้ด
 	("pls_bl1", "เขี้ยวพุ่ง bl1 · มีด", "fight_knife", "bl1_v2", "west", None, 90, False),   # รอบ 2 (kwan 19 ต.ค. "ขอลองเขี้ยวพุ่ง"): รอบแรกเฟรม 5–6 ฟันมือซ้าย + เฟรม 3 มีดหาย → เจนใหม่ระบุแขนไกล/ใกล้ทุกจังหวะ
+	("pls_glim_shift", "ท่ากลางประกาย · ง้าง → ย่อ (มีด)", "fight_knife", "glim_shift_v2", "west", None, 90, False),   # รอบแรกเซิร์ฟเวอร์ PixelLab หมดเวลา (ไม่หักเครดิต) · kwan 21 ต.ค. "เจนภาพท่ากลาง": end_frame จาก bl0_v2 เฟรม 4 → bl1_v2 เฟรม 3
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 
@@ -45,6 +46,11 @@ BLADE = {("pls_atk_bl", 5): ((32, 75), (-1, 1), 7, "pls_atk_bl", 6)}
 # ใบมีดที่ clean() ลบไส้ขาวเหลือแต่โครงขาด → ล้างโครงในกรอบ clear แล้วคัดลอกใบมีด (พร้อมขอบ) จากเฟรมอ้างอิงในกรอบ src เลื่อนตาม shift
 # bl1 รอบ 2 เฟรม 6 (จังหวะแทง): กำปั้นอยู่ซ้ายของเฟรม 7 พอดี 3 จุด ความสูงเท่ากัน · ใบมีดเฟรม 7 ชี้ซ้ายแนวนอนเหมือนกัน
 BLADE_COPY = {("pls_bl1", 6): (7, (-3, 0), (26, 64, 36, 73), (30, 64, 39, 73))}
+
+
+# ท่าเชื่อมระหว่างสองคลิป: แต่ละคลิปจัดวางแยกกัน (ตามกรอบรวมของคลิป) → ภาพดิบตำแหน่งเดียวกันลงผืนต่างกันได้ (atk_bl กับ bl1 ห่าง 11 จุด)
+# → ภาพท่าเชื่อมเลื่อนตำแหน่งทีละเฟรมจากตำแหน่งของคลิปต้นทางไปคลิปปลายทาง ไม่กระตุกตอนต่อ (ต้องอยู่หลังทั้งสองคลิปใน CLIPS)
+ALIGN_BLEND = {"pls_glim_shift": ("pls_atk_bl", "pls_bl1")}
 
 
 def copy_blade(f, ref, shift, clear, srcbox):
@@ -119,7 +125,7 @@ def clean(im, ref):
 
 def main():
 	shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT)
-	clips, report = [], []
+	clips, report, place = [], [], {}
 	for cid, th, st, anim, d, use, ms, loop in CLIPS:
 		files, rot = src(st, anim, d)
 		if not files:
@@ -132,8 +138,13 @@ def main():
 		bb = [im.getchannel("A").getbbox() for im in ims]
 		x0, y1 = min(b[0] for b in bb), max(b[3] for b in bb)
 		names = []
+		place[cid] = (30 - x0 + max(0, (60 - (max(b[2] for b in bb) - x0)) // 2), 108 - y1)
 		for i, im in enumerate(ims):
-			c = Image.new("RGBA", (120, 112)); c.alpha_composite(im, (30 - x0 + max(0, (60 - (max(b[2] for b in bb) - x0)) // 2), 108 - y1))
+			at = place[cid]
+			if cid in ALIGN_BLEND:
+				(ax, ay), (bx, by), u = place[ALIGN_BLEND[cid][0]], place[ALIGN_BLEND[cid][1]], i / max(1, len(ims) - 1)
+				at = (round(ax + (bx - ax) * u), round(ay + (by - ay) * u))
+			c = Image.new("RGBA", (120, 112)); c.alpha_composite(im, at)
 			n = f"{cid}_{i}"; c.save(os.path.join(OUT, n + ".png")); names.append(n)
 		for (bc, bi), spec in BLADE.items():   # หลังบันทึกครบทั้งคลิป (ใช้สีจากเฟรมอื่นของคลิปเดียวกัน)
 			if bc == cid and bi < len(names):

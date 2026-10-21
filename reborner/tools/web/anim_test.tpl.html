@@ -974,6 +974,9 @@ const BLC_MV = {
 //   เปลี่ยนใจกลางทาง: ย่อ ถีบพุ่ง แทงด้วยท่าที่เพิ่งคิดได้ (เขี้ยวพุ่ง bl1 = กิ่ง A ถัดจากฟันในต้นไม้ท่า) · เวลาหยุด P เฟรม ไม่นับในจังหวะท่า (ฉากเดิน F0 → ท่า F)
 //   ค่าภาพหน้าเทส ไม่ใช่ค่าเกม · ประกายในเกม (Battle._glimmer) ยังเป็นป้าย "★ ประกาย!" แบบเดิม
 BLC_MV.glim = Object.assign({}, BLC_MV.bl1, { glim: true, WIND: 20, FZ: 26, P: 34, sfx: 'เขี้ยวพุ่ง!!', what: '★ ประกาย! ฟัน → เขี้ยวพุ่ง' });
+// ท่ากลาง (kwan 21 ต.ค. "1 เจนภาพท่ากลาง"): PixelLab glim_shift (ภาพเริ่ม = ง้างสุด bl0 เฟรม 4 · ภาพจบ = ย่อ bl1 เฟรม 3 · โหมด end_frame) → px_set pls_glim_shift 0–3
+//   มีภาพ: ง้างเร็วขึ้น (18–22 · ภาพง้าง 1 2 2 3 4) เวลาหยุดที่ 22 → เวลาเดิน ลดมีดลงระหว่างวิ่งต่อ 23–26 (ท่ากลาง 0 1 2 3) → ย่อ 27 ตามเดิม · ไม่มีภาพ = สลับจากง้างเป็นย่อทันทีแบบเดิม
+if ((DATA.rion_pack || []).some(c => c.id === 'pls_glim_shift')) Object.assign(BLC_MV.glim, { WIND: 18, FZ: 22, SHIFT: 'rpk/pls_glim_shift_' });
 const glimMap = F0 => { const g = F0 - BM.FZ; return g < 0 ? [F0, -1] : g < BM.P ? [BM.FZ, g] : [F0 - BM.P, -1]; };   // [เฟรมท่า, เฟรมในช่วงเวลาหยุด (−1 = ไม่หยุด)]
 let BM = BLC_MV.bl0;
 const blcN = h => h.skid || h.c + h.a + h.l;
@@ -998,6 +1001,8 @@ const blcKey = F => {   // ภาพ Rion ตามเฟรม
 	const { IDLE, HIT, HOP0, HOPS } = BLC, idle = f => `rpk/pls_idle_bl_${Math.floor(f / 4) % 4}`;
 	if (F < IDLE) return idle(F);
 	if (BM.id === 'bl1' && F < HOP0) { const k = i => BM.img + i;   // ภาพ bl1 รอบ 2: 3 ย่อ · 5 พุ่ง · 6 แทง · 7 ตามแรง (เฟรม 4 มีดชิดปาก ไม่ใช้)
+		if (BM.glim && BM.SHIFT && F > BM.FZ && F < BM.CROUCH) return BM.SHIFT + Math.min(3, F - BM.FZ - 1);   // ท่ากลาง 0–3 เฟรมละภาพ: ลดมีดจากไหล่ → หลังเป้ (ภาพ 2 แขนไกลอยู่หลังลำตัว มีดถูกบัง) → มาที่อก
+		if (BM.glim && BM.SHIFT && F >= BM.WIND && F <= BM.FZ) return `rpk/pls_atk_bl_${[1, 2, 2, 3, 4][F - BM.WIND]}`;
 		if (BM.glim && F >= BM.WIND && F < BM.CROUCH) return `rpk/pls_atk_bl_${1 + Math.min(3, Math.floor((F - BM.WIND) / 2))}`;   // ประกาย: ง้างฟันธรรมดาระหว่างวิ่ง (ค้างที่ง้างสุดตอนเวลาหยุด)
 		if (F < BM.CROUCH) return blcRun() ? `rpk/pls_run_bl_${(F - IDLE) % BLC.RUNF}` : 'rpk/pls_idle_bl_0';
 		if (F < BM.LAUNCH) return k(3);
