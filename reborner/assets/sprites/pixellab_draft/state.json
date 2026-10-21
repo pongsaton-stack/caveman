@@ -706,6 +706,44 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "guard_k",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "eddd8c1c-27bd-48a9-b841-b6f1d468bdbc"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5421728e-6259-429a-93ca-78fed34ebdea",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "guard2_k",
+   "dir": "west",
+   "seed": 41,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "f690078c-1fa1-4d60-afdb-42d80aaab1a3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e666ad6f-2649-49ba-8262-ec727f593248",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -739,7 +777,9 @@
   "5a085bcd-9219-4fc3-a76e-d921f778eff3": "completed",
   "d3b04e01-a3c0-487a-9481-8a43c08b7daf": "completed",
   "4a942bd4-5fc6-468c-a5e3-fb63f614a746": "completed",
-  "0a6b9784-626f-4561-8671-52d2a24ab073": "completed"
+  "0a6b9784-626f-4561-8671-52d2a24ab073": "completed",
+  "eddd8c1c-27bd-48a9-b841-b6f1d468bdbc": "completed",
+  "f690078c-1fa1-4d60-afdb-42d80aaab1a3": "completed"
  },
  "states": {
   "fight_knife": {

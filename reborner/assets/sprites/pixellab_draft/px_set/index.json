@@ -260,6 +260,24 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_guard",
+   "label": "ตั้งรับ · ถือมีด · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1 จุด)",
+   "frames": [
+    "pls_guard_0",
+    "pls_guard_1",
+    "pls_guard_2",
+    "pls_guard_3"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife guard2_k_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_ko",
    "label": "ล้ม · มีดหลุดมือ · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 265 จุด)",
    "frames": [

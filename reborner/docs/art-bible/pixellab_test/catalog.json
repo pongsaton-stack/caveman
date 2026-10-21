@@ -748,6 +748,44 @@
           "notes": "ฉากต่อสู้ blc_bl0 ช่วงกระโดดถอย (kwan 19 ต.ค. \"1+2\") · ยอด 1,805 → 1,801 หลังเจน (รวม run_k ที่หักทีหลัง) · เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม ไม่ใช้ · ภาพจัดแล้ว px_set/pls_hop_bl_0–4 · ลงพื้นใช้ภาพย่อ (1)"
         },
         {
+          "status": "fail",
+          "date": "2026-10-21",
+          "gens": 2,
+          "seed": 33,
+          "ms": 90,
+          "game_ms": null,
+          "id": "guard_k",
+          "name": "ตั้งรับถือมีด รอบ 1 (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/guard_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "guard_k"
+          },
+          "notes": "มอนโจมตีกลับ (kwan 21 ต.ค.) · ไม่ผ่าน: เฟรม 2–3 วาดประกาย · เฟรม 4–7 หันขวาและมีดหาย · เฟรม 1 แทบไม่ต่างจากท่ายืน"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 1,
+          "seed": 41,
+          "ms": 90,
+          "game_ms": null,
+          "id": "guard2_k",
+          "name": "ตั้งรับถือมีด รอบ 2 (4 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/guard2_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "guard2_k"
+          },
+          "notes": "ฉากต่อสู้ mon_M01_guard · ไม่มีจังหวะกระทบในคำสั่ง (แรงกระแทก/ถอยทำด้วยโค้ด) · หันซ้ายครบ มีดในมือเดียวกับภาพ State ทุกเฟรม · ยอดเหลือ 1,786 หลังเจน 2 รอบ · ภาพจัดแล้ว px_set/pls_guard_0–3"
+        },
+        {
           "status": "draft",
           "date": "2026-10-19",
           "gens": 2,
