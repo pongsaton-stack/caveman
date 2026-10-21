@@ -1132,7 +1132,8 @@ function blcView(c) {
 }
 function blcSound(Fs) {
 	if (!S.sound || !AU) return; let F = Fs;
-	if (BM.glim) { const [f, g] = glimMap(Fs); if (g >= 0) return glimSound(g); F = f; if (Fs === 100) { auTone(0.18, 'triangle', 1318, 1318, 0.1); auTone(0.3, 'triangle', 1760, 1760, 0.08, 0.09); } }   // เวลาหยุด = เสียงประกายอย่างเดียว · ป้ายได้ท่าใหม่ const m = pkMon(), big = m.id === 'B1' ? 0.6 : 1, { IDLE, HIT, STEP } = BLC, b1 = BM.id === 'bl1';
+	if (BM.glim) { const [f, g] = glimMap(Fs); if (g >= 0) return glimSound(g); F = f; if (Fs === 100) { auTone(0.18, 'triangle', 1318, 1318, 0.1); auTone(0.3, 'triangle', 1760, 1760, 0.08, 0.09); } }   // เวลาหยุด = เสียงประกายอย่างเดียว · ป้ายได้ท่าใหม่
+	const m = pkMon(), big = m.id === 'B1' ? 0.6 : 1, { IDLE, HIT, STEP } = BLC, b1 = BM.id === 'bl1';
 	if (F >= IDLE && F < (b1 ? BM.CROUCH : HIT) && (F - IDLE) % STEP === 0) auNoise(0.07, 'lowpass', 900, 200, 0.35 + 0.25 * (F - IDLE) / BLC.RUN, 1);   // ฝีเท้า
 	if (b1 && F === BM.CROUCH) auNoise(0.18, 'lowpass', 1600, 400, 0.35, 2);   // เบรกลากเท้า
 	if (b1 && F === BM.LAUNCH) { auNoise(0.1, 'lowpass', 600, 120, 0.6, 1); AU_SFX.release.SL(); }   // ถีบพื้น + ลมพุ่ง
