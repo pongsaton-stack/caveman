@@ -1,6 +1,7 @@
 # tools/web/anim_test_build.py — สร้างหน้า "animation test" จากข้อมูลเกมปัจจุบัน
 # อ่านสไปรต์จาก assets/ + techs.csv + monsters.csv + ค่าคงที่จาก Formulas.gd / BattleScreen.gd / Overworld.gd
 # ข้อมูลฝังในไฟล์ HTML · ภาพแยกเป็นก้อน JSON ข้างหน้าเว็บ (อัปโหลดเป็นไฟล์ประกอบของ Artifact) · รัน: python3 tools/web/anim_test_build.py <out.html>
+# หน้า "ฉากต่อสู้" (เทมเพลตเดียวกัน โหมด combat): python3 tools/web/anim_test_build.py --combat <out.html>
 import glob, base64, csv, json, os, re, sys
 from PIL import Image
 
@@ -384,9 +385,29 @@ def draft_map():
 			out.setdefault(e['lastlight_archetype'], []).append('%s %s' % (e['id'], names[e['id']]))
 	return out
 
-def main(out_path):
+COMBAT_KEEP = re.compile(r'^(rpk/pls_|mpx/)')   # หน้า "ฉากต่อสู้" ใช้แค่ Rion PixelLab (px_set) + มอนชุดใหม่
+
+def combat_bgs():
+	"""ฉากหลังของหน้า "ฉากต่อสู้" = ฉากเดียวกับหน้ามาสเตอร์ PixelLab (catalog.json backgrounds) ครอปเป็นเวที 300x168 ให้เส้นพื้นของภาพตรงพื้นเวที (แถว 158)"""
+	import io
+	cat = json.load(open(os.path.join(ROOT, 'docs/art-bible/pixellab_test/catalog.json'), encoding='utf-8'))
+	out, meta = {}, []
+	for b in cat['backgrounds']:
+		im = Image.open(os.path.join(ROOT, b['file'])).convert('RGB')
+		im = im.resize((im.width // b['scale'], im.height // b['scale']), Image.NEAREST)   # ภาพขยาย 3 เท่าจากพิกเซลจริง → คืนขนาดพิกเซลจริง
+		im = im.resize((300, round(im.height * 300 / im.width)), Image.NEAREST)
+		y0 = max(0, min(im.height - 168, round(im.height * b['ground']) - 158))
+		bb = io.BytesIO(); im.crop((0, y0, 300, y0 + 168)).save(bb, 'PNG')
+		out['bgs/' + b['id']] = 'data:image/png;base64,' + base64.b64encode(bb.getvalue()).decode()
+		meta.append({'id': b['id'], 'name': b['name']})
+	return out, meta
+
+def main(out_path, combat=False):
 	spr = sprites()
 	mon_ids = sorted({k.split('/')[1].split('_')[0] for k in spr if k.startswith('mon/') and not k.split('/')[1].startswith('COMP')})
+	if combat:   # kwan 21 ต.ค. "แยก ★ ฉากต่อสู้ · Rion PixelLab มาเป็นอาติเฟคใหม่ ชื่อ ฉากต่อสู้ เอามอน ฉาก เสียงประกอบ เข้ามาด้วย"
+		spr = {k: v for k, v in spr.items() if COMBAT_KEEP.match(k)}
+		bgs, bg_meta = combat_bgs(); spr.update(bgs)
 	data = {
 		'sprites': spr,
 		'techs': techs(),
@@ -445,6 +466,7 @@ def main(out_path):
 			'FOE_AREA': [float(v) for v in re.search(r'const FOE_AREA\s*:?=\s*Vector2\(([0-9.]+),\s*([0-9.]+)\)', open(os.path.join(ROOT, 'world/BattleScreen.gd'), encoding='utf-8').read()).groups()],
 		},
 	}
+	if combat: data['mode'] = 'combat'; data['bgs'] = bg_meta
 	# ภาพสไปรต์แยกเป็นไฟล์ก้อน <ชื่อหน้า>_sprites_<i>.json ข้างหน้าเว็บ (kwan 6 ต.ค. "เพิ่มลิมิตหน้าเทสเป็น 100 MB")
 	# Artifact รับไฟล์ละ ≤ 16 MB แต่หลายไฟล์ต่อหน้าได้ → หน้าเว็บเก็บแค่ชื่อภาพ แล้วโหลดก้อนภาพด้วย fetch ก่อนเริ่ม
 	# อัปโหลด: Artifact publish ด้วย files = {ชื่อก้อน: path} ทุกก้อน (พิมพ์รายชื่อไว้ท้ายผล) · เปิดในเครื่องต้องผ่าน http server (file:// โหลด fetch ไม่ได้)
@@ -461,6 +483,7 @@ def main(out_path):
 	data['sprites'] = {k: 1 for k in spr}; data['sprite_chunks'] = names
 	tpl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'anim_test.tpl.html'), encoding='utf-8').read()
 	html = tpl.replace('/*__DATA__*/null', json.dumps(data, ensure_ascii=False, separators=(',', ':')))
+	if combat: html = html.replace('<title>animation test</title>', '<title>ฉากต่อสู้</title>', 1)
 	open(out_path, 'w', encoding='utf-8').write(html)
 	sizes = [len(html)] + [os.path.getsize(os.path.join(out_dir, n)) for n in names]
 	if max(sizes) > FILE_LIMIT or sum(sizes) > TOTAL_LIMIT:
@@ -471,4 +494,5 @@ def main(out_path):
 	print('ก้อนภาพ:', ' '.join(names))
 
 if __name__ == '__main__':
-	main(sys.argv[1] if len(sys.argv) > 1 else 'anim_test.html')
+	args = [a for a in sys.argv[1:] if a != '--combat']
+	main(args[0] if args else 'anim_test.html', combat='--combat' in sys.argv)   # --combat = หน้า "ฉากต่อสู้" (เฉพาะฉากต่อสู้ Rion PixelLab + มอน + ฉาก + เสียง)

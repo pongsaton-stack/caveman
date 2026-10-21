@@ -305,6 +305,7 @@ const DIRS = [['south', 'ลง'], ['north', 'ขึ้น'], ['west', 'ซ้�
 const CLIPS = {};
 const GROUPS = [];
 function addClip(group, id, label, frames, sec, opt = {}) {
+	if (DATA.mode === 'combat' && !/^★ (ฉากต่อสู้|การเกิดประกาย)/.test(group)) return;   // หน้า "ฉากต่อสู้" (anim_test_build.py --combat) มีแค่ฉากต่อสู้ + ประกาย
 	if (['clips', 'arms', 'vxsheet'].includes(opt.tab || 'clips') && [...frames, ...(opt.panels || []).flatMap(p => p.keys || [])].some(k => typeof k === 'string' && /^(rion\/|held\/|rig\/|cut\/|spl\/|p64\/rion_|npc\/)/.test(k))) return;   // kwan 16 ต.ค.: Rion แบบเก่าออกจากทุกหน้า
 	CLIPS[id] = Object.assign({ id, label, frames, sec, loop: true }, opt);
 	let g = GROUPS.find(x => x.name === group);
@@ -1147,7 +1148,7 @@ function blcView(c) {
 	if (d >= 0 && d < 14) pkText(BM.sfx, Math.max(4, mcx - 14), Math.max(BM.glim ? 24 : 16, my0 - 8 - Math.min(5, d)), BM.glim ? '#ffe27a' : '#ffffff');   // ประกาย: ชื่อท่ายาว สระบนไม่ล้นขอบจอบน (B1 สูง)
 	ctx.restore();
 	if (BM.glim) glimFx({ F0, F, t: gz, st, key, G, W, H, near, mcx, my0 });
-	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(`${m.name} ${m.id} · ยืนในศึก → วิ่ง → ${BM.what} → กระโดดถอย 3 สเตป`, 4, H - 2);
+	sceneCaption(`${m.name} ${m.id} · ยืนในศึก → วิ่ง → ${BM.what} → กระโดดถอย 3 สเตป`);
 	if (S.grid) drawGrid();
 }
 function blcSound(Fs) {
@@ -1226,6 +1227,11 @@ function aotDraw(g, al = 1, tint) {   // Rion · หมุนรอบกลา�
 	const { G } = PKV, py = g.rot ? 72 : 108; ctx.save(); ctx.globalAlpha = al; ctx.translate(Math.round(g.cx), Math.round(G - g.lift - (108 - py)));
 	if (g.rot) ctx.rotate(g.rot); ctx.scale(g.sx, g.sy); ctx.drawImage(src, -60, -py); ctx.restore();
 }
+function sceneCaption(t) {   // ป้ายท้ายเวทีฉากต่อสู้ · บนภาพฉาก (หน้า "ฉากต่อสู้") มีแถบเข้มรองให้อ่านออก
+	const { W, H } = PKV, img = S.bg.startsWith('bg:');
+	if (img) { ctx.fillStyle = 'rgba(16,12,8,0.62)'; ctx.fillRect(0, H - 10, W, 10); }
+	ctx.fillStyle = img ? '#f0e4c8' : '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(t, 4, H - 2);
+}
 function aotView(c) {
 	const F = S.frame, A = AOT, { W, H, G } = PKV; cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
 	const g = aotGeo(F), { m, mw, mh, mx0, legs, cy, far, home } = g, d = F - A.B, hold = d >= 0 && d < 2;
@@ -1280,7 +1286,7 @@ function aotView(c) {
 	if (F >= A.TURN + 2 && F < A.B) { const k = F - A.TURN - 2; ctx.save(); ctx.globalAlpha = Math.min(1, k / 2); ctx.font = 'bold 9px system-ui, sans-serif'; ctx.fillStyle = '#2a1a14'; ctx.fillText('.'.repeat(1 + Math.min(2, k >> 1)), mx0 + mw / 2 - 4, G - mh - 4); ctx.restore(); }   // เงียบ: มอนยังไม่รู้ตัว
 	ctx.restore();
 	slowFx({ F, d: F - A.LAND + 4, mcx: mx0 + mw / 2, my0: G - Math.round(mh * kneel), W });
-	ctx.fillStyle = '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(`${m.name} ${m.id} · ย่อชาร์จ → สว่านทะลุใต้ขา → เงียบ → แผลระเบิด มอนทรุด → ตีลังกากลับ (ตัดเอ็น bl7)`, 4, H - 2);
+	sceneCaption(`${m.name} ${m.id} · ตัดเอ็น: ชาร์จ → สว่านใต้ขา → เงียบ → แผลระเบิด → ตีลังกากลับ`);
 	if (S.grid) drawGrid();
 }
 function aotSound(F) {
@@ -1338,7 +1344,9 @@ function glimFx(o) {
 			ctx.font = '900 15px Sarabun, "Noto Sans Thai", sans-serif'; ctx.lineWidth = 3; ctx.strokeStyle = '#2a1a14'; ctx.fillStyle = '#ffe27a'; const tx0 = L0 + 18;
 			const r = BM.row, nm = r.name_th, nw = Math.ceil(ctx.measureText(nm).width), SC = { single: 'เดี่ยว', row: 'ทั้งแถว', column: 'ทะลุแนว', all: 'ทั้งหมด' };
 			ctx.strokeText(nm, tx0, y0 + 19); ctx.fillText(nm, tx0, y0 + 19);
-			ctx.font = 'bold 8px system-ui, sans-serif'; ctx.fillStyle = '#ffffff'; ctx.fillText(`ท่าใหม่ · ${r.school} กิ่ง${r.branch} · ${SC[r.scope] || r.scope} · พลัง ${r.power}${+r.hits > 1 ? ' × ' + r.hits : ''}`, tx0 + nw + 10, y0 + 17); ctx.restore(); }
+			ctx.font = 'bold 8px system-ui, sans-serif'; ctx.fillStyle = '#ffffff'; const ix = tx0 + nw + 10, l1 = `ท่าใหม่ · ${r.school} กิ่ง${r.branch}`, l2 = `${SC[r.scope] || r.scope} · พลัง ${r.power}${+r.hits > 1 ? ' × ' + r.hits : ''}`;
+			if (ctx.measureText(l1 + ' · ' + l2).width <= W - 6 - ix) ctx.fillText(l1 + ' · ' + l2, ix, y0 + 17); else { ctx.fillText(l1, ix, y0 + 12); ctx.fillText(l2, ix, y0 + 22); }   // ไม่พอบรรทัดเดียว (ชื่อท่ายาว) → 2 บรรทัด ไม่ล้นขอบขวา
+			ctx.restore(); }
 		if (t >= 27) { const u = Math.min(1, (t - 27) / (P - 29)), [tlx, tly] = BM.tipAt || [86, 62], tipx = st.x + tlx, tipy = G - st.lift - (108 - tly);   // หลอดแตกเป็นเศษทอง วิ่งเข้าปลายมีดที่ง้างค้าง
 			for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 + 0.3, r = 6 + 10 * Math.sin(Math.PI * Math.min(1, u * 1.4)), e = u * u, x = bx + Math.cos(a) * r * (1 - e) + (tipx - bx) * e, y = by - 10 + Math.sin(a) * r * (1 - e) + (tipy - by + 10) * e;
 				if (u < 1) { fbPx(x, y, i % 3 ? '#ffd040' : '#ffffff', 2, 2); fbPx(x - Math.cos(a) * 2, y - Math.sin(a) * 2, 'rgba(255,180,40,0.5)', 1, 1); } }
@@ -2779,7 +2787,10 @@ try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.
 let LOGICAL_H = 0;   // ฉาก VFX ที่เผื่อเหนือหัวให้ Rion พิกเซล (vfxScene) = ความสูงฉากเดิม ไม่นับแถบที่เผื่อ
 const W = () => cv.width, H = () => LOGICAL_H || cv.height;
 function drawBg() {
-	if (S.bg === 'stage') {
+	if (S.bg.startsWith('bg:')) {   // หน้า "ฉากต่อสู้": ภาพฉาก PixelLab ครอปเป็นเวที 300x168 (เส้นพื้นของภาพ = แถว 158) · เวทีขนาดอื่นใช้เวทีเรียบ
+		const im = IMG['bgs/' + S.bg.slice(3)]; if (im && W() === im.width && H() === im.height) { ctx.drawImage(im, 0, 0); return; }
+	}
+	if (S.bg === 'stage' || S.bg.startsWith('bg:')) {
 		ctx.fillStyle = '#a7b5a0'; ctx.fillRect(0, 0, W(), H());
 		const gy = Math.round(H() * 0.62);
 		ctx.fillStyle = '#d4b08a'; ctx.fillRect(0, gy, W(), H() - gy);
@@ -3990,7 +4001,7 @@ function setRead(t) {
 		$('rdMs').textContent = c.frames.length > 1 ? (c.sec * 1000).toFixed(c.sec < 0.01 ? 1 : 0) + ' ms' : 'ภาพนิ่ง';
 		const k = c.frames[S.frame], fold = { rion: 'rion_lastlight_draft', dog: 'dog_lastlight_draft', mon: 'monsters_ll', draft: 'monsters_ll_draft', cmp: 'compendium_anim', smp: 'compendium_samples', wpn: 'weapons_draft', held: 'weapons_held', spl: 'spells_draft', p64: 'poses64_draft', cut: 'sheet_cut_draft', wsh: 'weapons_sheet_draft', wst: 'weapons_stack_draft', w3d: 'weapons_3d_draft', env: 'env_sheet_draft', rig: 'rion_rig_draft', skf: 'skills_sheet_draft', skc: 'skills_sheet_draft', vxs: 'vfx_sheet_draft', itm: 'items_draft', stc: 'structures_draft', veh: 'vehicles_draft', npc: 'npcs_draft', tile: '../tiles_ll', px: 'rion_px', pxw: 'rion_px_weapons_draft', mpx: 'monsters_px_draft', wic: 'weapons_icons_draft', rpk: 'rion_pack_px' }[k.split('/')[0]];
 		$('rdFile').textContent = c.vx ? `${VXS.sheet} · ${c.pieces ? 'กรอบ ' + c.pieces[S.frame].box.join(',') : 'แถว ' + c.label + ' · แสง ' + fold + '/' + c.vx.atlas + '.png'}`
-			: fold === undefined ? k : `assets/sprites/${fold}/${k.split('/')[1]}.png`;
+			: k.startsWith('rpk/pls_') ? `assets/sprites/pixellab_draft/px_set/${k.slice(4)}.png` : fold === undefined ? k : `assets/sprites/${fold}/${k.split('/')[1]}.png`;   // px_set ลงทะเบียนใต้ rpk/ (rion_pack_clips) แต่ไฟล์อยู่ pixellab_draft/px_set
 	} else {
 		const tt = t || S.tech;
 		$('rdClip').textContent = tt ? 'สกิล · ' + tt.name_th : 'สกิล — เลือกท่าด้านขวา';
@@ -4309,7 +4320,23 @@ function boot() {
 		· ท่า <code>data/techs.csv</code> (${DATA.techs.length} ท่า) · มอน <code>data/monsters.csv</code> (เฉพาะตัวที่มีรูป ${DATA.monsters.length} ตัว)
 		· จังหวะ: เดิน ${Math.round(WALK_SEC * 1000)} ms/เฟรม (MOVE_TIME ${K.MOVE_TIME} วิ ต่อช่อง = ก้าวละ 2 เฟรม) · ฟัน/โดนตี/ล้ม ${Math.round(K.ATTACK_FRAME_SEC * 1000)} ms · มอนหายใจ ${Math.round(K.FOE_IDLE_SEC * 1000)} ms · เอฟเฟกต์ ${K.FX_SEC} วิ
 		· สร้างใหม่: <code>python3 tools/web/anim_test_build.py out.html</code>`;
+	if (DATA.mode === 'combat') combatMode();
 	requestAnimationFrame(tick);
+}
+function combatMode() {   // หน้า "ฉากต่อสู้" (kwan 21 ต.ค.): เทมเพลตเดียวกับ animation test · ซ่อนแท็บอื่น · เลือกมอน + ฉาก + เปิดเสียง/เพลงได้จากแผงเวที
+	document.title = 'ฉากต่อสู้'; document.querySelector('h1').textContent = 'ฉากต่อสู้';
+	document.querySelector('header p').textContent = 'Rion PixelLab (คม มีด) สู้กับมอนชุดใหม่ · เลือกท่าทางขวา · เลือกมอนและฉากได้ · กดเปิดเสียงก่อน (เบราว์เซอร์ให้เล่นเสียงหลังกดเท่านั้น) · ร่าง ยังไม่เข้าเกม';
+	document.querySelector('.tabs').hidden = true; $('stage').style.aspectRatio = PKV.W + ' / ' + PKV.H;   // เวทีฉากต่อสู้ 300x168 ไม่ใช่ 3:2 (ไม่ให้มีแถบดำบนล่าง)
+	$('skillRef').hidden = true; $('btnOnion').hidden = true;
+	const seg = $('segBg'); seg.innerHTML = ''; seg.setAttribute('aria-label', 'ฉาก');
+	for (const [v, t] of [...(DATA.bgs || []).map(b => ['bg:' + b.id, b.name]), ['stage', 'เวทีเรียบ']]) { const b = document.createElement('button'); b.className = 'btn'; b.dataset.v = v; b.textContent = t; seg.append(b); }
+	S.bg = DATA.bgs && DATA.bgs.length ? 'bg:' + DATA.bgs[0].id : 'stage'; press(seg, S.bg);
+	const row = document.createElement('div'); row.className = 'transport'; row.style.marginTop = '8px'; row.append($('btnSound'), $('btnMusic'));
+	seg.closest('.box').append(row);
+	for (const b of document.querySelectorAll('#pkFoe > button:not([data-v])')) b.remove();   // ปุ่ม 🔈 ซ้ำกับปุ่มเสียงหลัก
+	const lab = document.querySelector('#pkFoe .muted'); if (lab) lab.textContent = 'มอน:';
+	$('foot').innerHTML = `สร้างจากไฟล์เกม: ภาพ Rion <code>assets/sprites/pixellab_draft/px_set</code> · มอน <code>monsters_px_draft</code> + <code>pixellab_draft/monsters/px</code> · ฉาก <code>docs/art-bible/pixellab_test/bg_*.jpg</code> · ท่า/เสียงชุดเดียวกับหน้า animation test (สังเคราะห์ในหน้า ไม่มีไฟล์เสียง)
+		· สร้างใหม่: <code>python3 tools/web/anim_test_build.py --combat out.html</code>`;
 }
 
 // ภาพอยู่ในไฟล์ก้อน (DATA.sprite_chunks · anim_test_build.py) → โหลดก้อนก่อน แทนที่ค่าในตาราง แล้วค่อยโหลดภาพและเริ่มหน้า
