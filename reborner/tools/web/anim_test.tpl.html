@@ -1087,7 +1087,7 @@ function blcPathTrail(pts, th, al, light) {   // แถบรอยตามจ�
 	ctx.restore();
 }
 function blcView(c) {
-	BM = BLC_MV[c.mv || 'bl0']; const F0 = S.frame, [F, gz] = BM.glim ? glimMap(F0) : [F0, -1];
+	BM = BLC_MV[c.mv || 'bl0']; const F0 = S.frame, [F, gz] = BM.glim ? glimMap(F0) : [F0, -1]; S.bgStop = gz >= 0;   // เวลาหยุดของประกาย = ฉากขยับหยุดด้วย (หิมะ/น้ำค้างกลางอากาศ)
 	const m = pkMon(), { W, H, G, MX } = PKV, { HIT } = BLC;
 	cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
 	const mim = IMG[pkRole(m, 'idle')]; if (!mim) return;
@@ -2790,9 +2790,64 @@ try { const t = localStorage.getItem('at_tab'); if (t === 'skills' || CLIP_TABS.
 // ── วาด ──
 let LOGICAL_H = 0;   // ฉาก VFX ที่เผื่อเหนือหัวให้ Rion พิกเซล (vfxScene) = ความสูงฉากเดิม ไม่นับแถบที่เผื่อ
 const W = () => cv.width, H = () => LOGICAL_H || cv.height;
+// ฉากขยับ (kwan 21 ต.ค. "ลอง 3 ทุกฉาก") · วาดทับภาพฉากก่อนตัวละคร · t = วินาทีจริงที่เดินเฉพาะตอนเล่น (S.bgT ใน tick) ไม่ผูกกับเฟรมคลิป → คลิปวนรอบแล้วหิมะไม่กระโดด
+// พิกัด = จุดในภาพฉาก 300x168 วัดจากภาพขยายตาราง 5 จุด · พิกเซลเต็มทุกจุด (fillRect จำนวนเต็ม) ยกเว้นแสงตะเกียงและหมอก
+const bgH = i => { const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
+function bgPx(x, y, w, h, c, a) { ctx.globalAlpha = a; ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
+function bgFall(x0, x1, y0, y1, t, n, seed, sp) {   // น้ำตก: ขีดสว่างวิ่งลงตามคอลัมน์ · จางที่ปลายบน/ล่าง
+	const H = y1 - y0;
+	for (let i = 0; i < n; i++) { const x = x0 + Math.floor(bgH(seed + i) * (x1 - x0 + 1)), len = 2 + Math.floor(bgH(seed + i + 50) * 4);
+		const y = y0 + ((bgH(seed + i + 90) * H + t * sp * (0.8 + bgH(seed + i + 7) * 0.5)) % H), e = Math.min(1, (y - y0) / 4, (y1 - y) / 4);
+		bgPx(x, y, 1, len, i % 3 ? '#cfefff' : '#ffffff', 0.55 * Math.max(0, e)); }
+}
+function bgFoam(cx, cy, w, t, seed) {   // ฟองน้ำตกกระทบ
+	for (let i = 0; i < 7; i++) { const ph = (t * 3 + bgH(seed + i)) % 1, x = cx + (bgH(seed + i + 20) - 0.5) * w + (ph - 0.5) * 2 * (i % 2 ? 1 : -1);
+		bgPx(x, cy - ph * 4, 1, 1, '#ffffff', 0.7 * (1 - ph)); }
+}
+function bgFlakes(t, n, seed, col, vy, vx, sway, a0, big) {   // หิมะ/เถ้าร่วง 3 ชั้นลึก (ชั้นใกล้เร็วและใหญ่กว่า)
+	for (let i = 0; i < n; i++) { const L = i % 3, sp = vy * (0.6 + L * 0.45) * (0.85 + bgH(seed + i) * 0.3);
+		const y = (bgH(seed + i + 300) * 180 + t * sp) % 180 - 6, x = ((bgH(seed + i + 600) * 330 + t * vx * (0.6 + L * 0.4) + Math.sin(t * 1.3 + i) * sway * (L + 1)) % 330 + 330) % 330 - 15;
+		bgPx(x, y, big && L === 2 ? 2 : 1, big && L === 2 ? 2 : 1, col, a0 + L * 0.18); }
+}
+function bgGlow(x, y, r, col, a) { ctx.globalAlpha = a; ctx.globalCompositeOperation = 'lighter'; const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); ctx.globalCompositeOperation = 'source-over'; }
+function bgAmbient(id, im, t) {
+	ctx.save();
+	if (id === 'frost_volcano') {
+		bgFall(168, 186, 0, 52, t, 26, 11, 55); bgFall(223, 242, 0, 26, t, 18, 31, 55);   // น้ำตกน้ำแข็ง 2 สาย
+		for (let i = 0; i < 3; i++) { const x = 70 + ((t * (3 + i) + i * 40) % 110), y = 52 + i * 12 + Math.sin(t * 0.4 + i) * 3;   // หมอกในหุบเหว ลอยช้า
+			ctx.globalAlpha = 0.10; const g = ctx.createRadialGradient(x, y, 0, x, y, 22); g.addColorStop(0, '#e6eef8'); g.addColorStop(1, 'rgba(230,238,248,0)'); ctx.fillStyle = g; ctx.fillRect(x - 22, y - 22, 44, 44); }
+		const fl = 0.75 + 0.25 * Math.sin(t * 9) * Math.sin(t * 5.3 + 1);   // ไฟตะเกียง: แสงวูบ + เปลวพิกเซล + ถ่านลอย
+		bgGlow(208, 72, 34, '#ff9a40', 0.22 * fl);
+		for (let dx = -4; dx <= 4; dx++) { const h = Math.max(0, 9 - Math.abs(dx) * 2 + Math.round(Math.sin(t * 14 + dx * 1.7) * 1.5 + Math.sin(t * 23 + dx) * 1));
+			for (let k = 0; k < h; k++) bgPx(208 + dx, 79 - k, 1, 1, k > h * 0.7 ? '#d8401c' : k > h * 0.35 ? '#ff9a30' : '#ffe68a', 0.85); }
+		for (let i = 0; i < 6; i++) { const ph = (t * 0.7 + bgH(70 + i)) % 1; bgPx(208 + (bgH(80 + i) - 0.5) * 8 + Math.sin(t * 3 + i) * 2 * ph, 70 - ph * 26, 1, 1, ph < 0.5 ? '#ffd27a' : '#ff7a2a', 1 - ph); }
+		bgFlakes(t, 75, 1, '#f2f6ff', 10, -3, 2, 0.45, true);   // หิมะ
+	} else if (id === 'ash_village') {
+		const bx0 = 207, bx1 = 233, by0 = 125, by1 = 168;   // ธงขาดบนเสา: แถวผ้าเหลื่อมตามคลื่นลม ปลายล่างแกว่งมากสุด
+		for (let y = by0; y < by1; y++) { const k = (y - by0) / (by1 - by0), off = Math.round(Math.sin(t * 2.4 - y * 0.22) * 1.6 * k);
+			if (off) { ctx.globalAlpha = 1; ctx.drawImage(im, bx0, y, bx1 - bx0, 1, bx0 + off, y, bx1 - bx0, 1); } }
+		for (const [cx, cy, sd] of [[232, 7, 0], [290, 11, 9]]) for (let i = 0; i < 5; i++) {   // ควันปล่อง ลอยขึ้นเอียงตามลม
+			const ph = (t * 0.25 + i / 5 + bgH(sd)) % 1, r = 2 + ph * 7; ctx.globalAlpha = 0.4 * (1 - ph) * Math.min(1, ph * 6); ctx.fillStyle = i % 2 ? '#5d544d' : '#7a7068';
+			ctx.beginPath(); ctx.arc(cx - ph * 18 + Math.sin(t + i) * 1.5, cy - ph * 14, r, 0, Math.PI * 2); ctx.fill(); }
+		for (let i = 0; i < 14; i++) { const ph = (t * (0.18 + bgH(200 + i) * 0.12) + bgH(210 + i)) % 1;   // ถ่านไฟลอยจากหมู่บ้าน กะพริบ
+			bgPx(180 + bgH(220 + i) * 120 + Math.sin(t * 2 + i) * 3 - ph * 10, 100 - ph * 105, 1, 1, i % 2 ? '#ffb24a' : '#ff6a28', (1 - ph) * (0.6 + 0.4 * Math.sin(t * 11 + i))); }
+		bgFlakes(t, 55, 400, '#d7cdbf', 6, -5, 3, 0.35, false);   // เถ้าร่วง
+	} else if (id === 'flooded_ruins') {
+		bgFall(83, 92, 33, 56, t, 14, 3, 40); bgFall(117, 123, 34, 56, t, 9, 13, 40); bgFall(96, 101, 6, 18, t, 6, 23, 35); bgFall(273, 287, 62, 80, t, 12, 43, 40);   // น้ำตก 4 สาย
+		bgFoam(88, 57, 10, t, 5); bgFoam(120, 57, 7, t, 15); bgFoam(280, 81, 12, t, 25);
+		for (let i = 0; i < 14; i++) { const ph = (t * 0.9 + bgH(500 + i)) % 1, a = Math.max(0, Math.sin(ph * Math.PI)) ** 3;   // ประกายบนแอ่งน้ำ
+			const [x0, y0, w, h] = i % 2 ? [27, 112, 72, 16] : [202, 102, 76, 15]; const x = x0 + bgH(520 + i) * w, y = y0 + bgH(540 + i) * h;
+			bgPx(x, y, 1, 1, '#ffffff', a); if (a > 0.6) { bgPx(x - 1, y, 3, 1, '#d8f4ff', a * 0.5); bgPx(x, y - 1, 1, 3, '#d8f4ff', a * 0.5); } }
+		for (let j = 0; j < 3; j++) { const ph = (t / 1.6 + j / 3) % 1, n = Math.floor(t / 1.6 + j / 3), q = j % 2 ? [32, 114, 64, 12] : [206, 104, 68, 12];   // วงน้ำหยด
+			const x = q[0] + bgH(n * 7 + j) * q[2], y = q[1] + bgH(n * 7 + j + 3) * q[3], r = 1 + ph * 7;
+			ctx.globalAlpha = 0.5 * (1 - ph); ctx.strokeStyle = '#e4f7ff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(Math.round(x) + 0.5, Math.round(y) + 0.5, r, r * 0.4, 0, 0, Math.PI * 2); ctx.stroke(); }
+		for (let i = 0; i < 10; i++) { const ph = (t * 0.5 + bgH(700 + i)) % 1; bgPx(105 + bgH(710 + i) * 60 + ph * 6, 2 + bgH(720 + i) * 14, 2, 1, '#cfeff4', 0.35 * Math.sin(ph * Math.PI)); }   // ระลอกคลองบน
+	}
+	ctx.restore();
+}
 function drawBg() {
 	if (S.bg.startsWith('bg:')) {   // หน้า "ฉากต่อสู้": ภาพฉาก PixelLab ครอปเป็นเวที 300x168 (เส้นพื้นของภาพ = แถว 158) · เวทีขนาดอื่นใช้เวทีเรียบ
-		const im = IMG['bgs/' + S.bg.slice(3)]; if (im && W() === im.width && H() === im.height) { ctx.drawImage(im, 0, 0); return; }
+		const im = IMG['bgs/' + S.bg.slice(3)]; if (im && W() === im.width && H() === im.height) { ctx.drawImage(im, 0, 0); bgAmbient(S.bg.slice(3), im, S.bgT || 0); return; }
 	}
 	if (S.bg === 'stage' || S.bg.startsWith('bg:')) {
 		ctx.fillStyle = '#a7b5a0'; ctx.fillRect(0, 0, W(), H());
@@ -3968,6 +4023,7 @@ function playTech(t) {
 let last = performance.now();
 function tick(now) {
 	const raw = Math.min(0.1, (now - last) / 1000); last = now;
+	if (S.playing && !(S.bgStop && CLIPS[S.clip] && CLIPS[S.clip].blc)) S.bgT = (S.bgT || 0) + raw;   // เวลาฉากขยับ (bgAmbient) · หยุดตอนเวลาหยุดของประกาย
 	let dt = raw * S.speed;
 	if (S.hitstop > 0 && S.tab === 'skills' && S.playing) { S.hitstop -= raw; dt *= 0.06; }   // หยุดภาพตอนกระทบ (hit-stop)
 	else if (S.slow && S.slow.left > 0 && S.tab === 'skills' && S.playing) { S.slow.left -= raw; dt *= S.slow.k; }   // สโลว์โมชันหลังหยุดภาพ
