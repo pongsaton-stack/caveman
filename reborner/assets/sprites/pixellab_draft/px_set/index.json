@@ -361,6 +361,42 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bl7",
+   "label": "ตัดเอ็น bl7 (กาลี) · มีด · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_bl7_0",
+    "pls_bl7_1",
+    "pls_bl7_2",
+    "pls_bl7_3"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl7_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bl7_back",
+   "label": "ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 826 จุด)",
+   "frames": [
+    "pls_bl7_back_0",
+    "pls_bl7_back_1",
+    "pls_bl7_back_2",
+    "pls_bl7_back_3"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl7_back_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_walk_s",
    "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
    "frames": [

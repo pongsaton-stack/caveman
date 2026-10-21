@@ -181,6 +181,14 @@ MOVES.update({
 			"crouching lower, the far right hand holds the knife low beside the right hip pointing forward, the near left fist at the chest, body leaning forward ready to spring",
 			"same as the end image: deep crouch, knife low beside the hip in the far right hand pointing forward, near left fist at the chest, ready to lunge"],
 		"not": ["switching the knife to the near left hand", "the near left arm covering the face", "turning toward the camera", "a second knife", "slash trails, motion lines, sparkles or glow"]},
+	# ตัดเอ็น bl7 ช่วงถอยแบบกาลี (kwan 21 ต.ค.): bl7_v เฟรม 5–7 ยังเดินหน้า ไม่ถอย → เจนแยกด้วย end_frame: ภาพเริ่ม bl7_v เฟรม 5 (ปาดสุด) → ภาพจบ bl7_v เฟรม 0 (ตั้งการ์ด)
+	#   PL_STATE=fight_knife PL_START_IMG=<bl7_v/west/frame_005> PL_END_IMG=<bl7_v/west/frame_000> anim bl7_back west
+	"bl7_back": {"dir": "west", "held": KNIFE, "attack": False, "frames": 4, "seed": 27,
+		"beats": ["same as the start image: the far right arm extended forward with the knife after the slash, the near left fist at the chest; the back foot starts to step backward, body still facing left",
+			"first short step back: the back foot lands behind, weight shifts back, the far right hand circles the knife back toward the chest, the near left fist at the chest, still facing left toward the enemy",
+			"second short step back: the front foot slides back, knees bent, the knife at guard in front of the chest in the far right hand, near left fist at the chest",
+			"same as the end image: low fighting stance facing left, knife at guard in the far right hand"],
+		"not": ["walking forward", "turning around or showing the back", "switching the knife to the near left hand", "a second knife", "sparkles, slash trails, motion lines or glow"]},
 	"hop_k": {"dir": "west", "held": KNIFE, "attack": False, "frames": 8, "seed": 33,
 		"beats": ["fighting stance facing left, knife held at guard in front of the chest, same as the start image",
 			"crouch to jump backward: both knees bend deep, hips drop, upper body leans slightly back to the RIGHT, knife still at guard",

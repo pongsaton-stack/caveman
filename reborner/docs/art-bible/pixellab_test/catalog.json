@@ -861,6 +861,44 @@
             "key": "glim_shift"
           },
           "notes": "โหมด end_frame ครั้งแรก: ภาพเริ่ม bl0_v2 เฟรม 4 (ง้างสุด) · ภาพจบ bl1_v2 เฟรม 3 · มีดมือขวาทุกเฟรม (เฟรม 2 มีดถูกลำตัวบัง เพราะแขนไกลอยู่หลังตัว) · รอบแรกเซิร์ฟเวอร์หมดเวลา ไม่หักเครดิต · รอบ 2 ใช้ 13 นาที · ยอด 1,793 → 1,792"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl7_v",
+          "name": "ตัดเอ็น bl7 (กาลี) · ใช้ 4 จาก 8 เฟรม",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl7_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl7"
+          },
+          "notes": "คำสั่งกาลี (ตัดเขี้ยวงู · ก้าวต่ำ · มีดวนวง · ถอยก้าวสั้น) ระบุแขนไกล/กำปั้นใกล้ทุกจังหวะ → มือขวาครบ · ใช้เฟรม 0 1 4 5 · ไม่ผ่าน: ไม่ย่อต่ำ · เฟรม 2–3 มีดชิดหน้า · 5–7 เดินหน้าไม่ถอย · 6 วาดประกาย · 7 มีดหาย"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 1,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl7_back_v",
+          "name": "ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame 4 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl7_back_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl7_back"
+          },
+          "notes": "ภาพเริ่ม bl7_v เฟรม 5 (ปาด) → ภาพจบ bl7_v เฟรม 0 · ถอยหันหน้าหาเป้า มีดกลับการ์ดมือขวา · วาดวงขาวติดเฟรม 1–2 (ลบด้วย clean) · ต่ำกว่าภาพต้นทาง 2 จุด (ALIGN_X) · ยอด 1,792 → 1,789 รวมท่า bl7"
         }
       ]
     },

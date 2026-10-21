@@ -36,6 +36,8 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_hop_bl", "กระโดดถอยถือมีด", "fight_knife", "hop_k_v", "west", [0, 1, 2, 3, 4], 60, False),   # hop_k เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม → ตัดทิ้ง · ลงพื้นใช้ภาพย่อ (1) ด้วยโค้ด
 	("pls_bl1", "เขี้ยวพุ่ง bl1 · มีด", "fight_knife", "bl1_v2", "west", None, 90, False),   # รอบ 2 (kwan 19 ต.ค. "ขอลองเขี้ยวพุ่ง"): รอบแรกเฟรม 5–6 ฟันมือซ้าย + เฟรม 3 มีดหาย → เจนใหม่ระบุแขนไกล/ใกล้ทุกจังหวะ
 	("pls_glim_shift", "ท่ากลางประกาย · ง้าง → ย่อ (มีด)", "fight_knife", "glim_shift_v2", "west", None, 90, False),   # รอบแรกเซิร์ฟเวอร์ PixelLab หมดเวลา (ไม่หักเครดิต) · kwan 21 ต.ค. "เจนภาพท่ากลาง": end_frame จาก bl0_v2 เฟรม 4 → bl1_v2 เฟรม 3
+	("pls_bl7", "ตัดเอ็น bl7 (กาลี) · มีด", "fight_knife", "bl7_v", "west", [0, 1, 4, 5], 90, False),   # kwan 21 ต.ค.: ใช้ 0 ตั้งการ์ด · 1 ก้าวเข้ามีดวนขึ้น · 4 มีดวนลงหน้า · 5 ปาด (2–3 มีดชิดหน้า · 6 ประกายวาดติด · 7 มีดหาย · 5–7 เดินหน้าไม่ถอย)
+	("pls_bl7_back", "ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame)", "fight_knife", "bl7_back_v", "west", None, 90, False),
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 
@@ -51,6 +53,8 @@ BLADE_COPY = {("pls_bl1", 6): (7, (-3, 0), (26, 64, 36, 73), (30, 64, 39, 73))}
 # ท่าเชื่อมระหว่างสองคลิป: แต่ละคลิปจัดวางแยกกัน (ตามกรอบรวมของคลิป) → ภาพดิบตำแหน่งเดียวกันลงผืนต่างกันได้ (atk_bl กับ bl1 ห่าง 11 จุด)
 # → ภาพท่าเชื่อมเลื่อนตำแหน่งทีละเฟรมจากตำแหน่งของคลิปต้นทางไปคลิปปลายทาง ไม่กระตุกตอนต่อ (ต้องอยู่หลังทั้งสองคลิปใน CLIPS)
 ALIGN_BLEND = {"pls_glim_shift": ("pls_atk_bl", "pls_bl1")}
+# วางแนวนอนตามคลิปอื่น แต่เท้าตามกรอบตัวเอง: bl7_back (end_frame จาก bl7_v) PixelLab วาดต่ำกว่าภาพต้นทาง 2 จุด → วางทั้งคลิปเท่า pls_bl7 แล้วเท้าลอย/จม
+ALIGN_X = {"pls_bl7_back": "pls_bl7"}
 
 
 def copy_blade(f, ref, shift, clear, srcbox):
@@ -141,6 +145,8 @@ def main():
 		place[cid] = (30 - x0 + max(0, (60 - (max(b[2] for b in bb) - x0)) // 2), 108 - y1)
 		for i, im in enumerate(ims):
 			at = place[cid]
+			if cid in ALIGN_X:
+				at = (place[ALIGN_X[cid]][0], at[1])
 			if cid in ALIGN_BLEND:
 				(ax, ay), (bx, by), u = place[ALIGN_BLEND[cid][0]], place[ALIGN_BLEND[cid][1]], i / max(1, len(ims) - 1)
 				at = (round(ax + (bx - ax) * u), round(ay + (by - ay) * u))
