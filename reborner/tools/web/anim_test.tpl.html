@@ -1440,6 +1440,134 @@ if ((DATA.rion_pack || []).some(c => c.id === 'pls_hop_bl')) addClip('★ ฉา
 	Array.from({ length: KW.END }, (_, F) => kwGeo(F, true).key), KW.SEC, { kw: true, stage: [PKV.W, PKV.H] });
 if ((DATA.rion_pack || []).some(c => c.id === 'pls_spin_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'aot_bl7', `ตัดเอ็น bl7 แบบ Attack on Titan: ย่อชาร์จ → พุ่งหมุนสว่านทะลุใต้ขา (ภาพหมุนตัวจริง 4 มุม) → ไถลโผล่อีกฝั่งหันกลับ → เงียบ → แผลหลังขาระเบิด ไอพุ่ง มอนทรุดคุกเข่า → ตีลังกาข้ามหัวกลับ → มอนช้าลง · ${AOT.END} เฟรม`,
 	Array.from({ length: AOT.END }, (_, F) => aotGeo(F, true).key), AOT.SEC, { aot: true, stage: [PKV.W, PKV.H] });
+// ── เขี้ยวพัน bl2 แบบงูพันเหยื่อ (kwan 22 ต.ค. เลือก "1" จาก 3 ไอเดีย · ท่าในข้อมูล: ตี 3 ครั้ง + เลือดไหล 50% · ศาสตร์อ้างอิง กาลีซินาวาลี ฟันสลับเลขแปด)
+//   บทเรียนตัดเอ็นแบบกาลี (ตีตกเพราะ "ดูไม่ต่างจากฟันปกติ") → ไม่ยืนฟันอยู่กับที่: Rion วนรอบตัวมอนเป็นเลขแปด ทางมีดทิ้งวงแสงพันรอบตัว 3 วง แล้วกระตุกมีดให้วงรัดจนแตกเป็นเลือด
+//   วิ่งเข้าฟันครั้งที่ 1 จากหน้า (เฉียงลง) → ตีลังกาข้ามหัวมอน ง้างกลางอากาศ ฟันครั้งที่ 2 จากหลังตอนเท้าแตะพื้น (เฉียงขึ้น) →
+//   หมุนสว่านผ่านหลังตัวมอนกลับมาฝั่งหน้า (ภาพหมุนตัวจริง 4 มุม · ถูกตัวมอนบัง) ฟันครั้งที่ 3 ดิ่งลง → กระตุกมีด วงแสงรัด มอนถูกบีบ → แตกเป็นเลือด → กระโดดถอยกลับที่
+//   วงที่ k เกิดตอนฟันครั้งที่ k · ครึ่งหลังของวง (sin < 0) วาดก่อนมอน · ครึ่งหน้าวาดทับ · ภาพทั้งหมดจาก px_set เดิม (ไม่เสียเครดิต) · ค่าภาพของหน้าเทส ไม่ใช่ค่าเกม
+const WR = { END: 110, RUN: 18, WIND: 22, H1: 26, LEAP: 29, TUCK: 30, WIND2: 37, H2: 41, DASH: 44, H3: 54, CINCH: 56, BURST: 63, HOP: 68, HOP2: 77, HOME: 86, MX: 112, SEC: 0.06 };
+const WR_ROWS = [0.36, 0.56, 0.76];   // ความสูงวงที่ 1–3 (สัดส่วนจากหัวลงเท้าของเนื้อตัวมอน)
+function wrEdges(al, mw, mh, row) {   // ขอบซ้าย/ขวาของเนื้อมอนที่แถว row (ภาพ) · ไม่มีเนื้อ = หาแถวล่างลงไป
+	for (let r = Math.max(0, row); r < mh; r++) { let l = -1, rr = -1; for (let x = 0; x < mw; x++) if (al.a(x, r)) { if (l < 0) l = x; rr = x; } if (l >= 0) return [l, rr]; }
+	return [Math.round(mw * 0.2), Math.round(mw * 0.8)];
+}
+function wrGeo(F, reg) {   // ฉากที่ F: มอน (ขอบ · วง) · Rion (cx · lift · ภาพ · พลิก · หมุน · อยู่หลังมอน)
+	const m = reg ? null : pkMon(), ik = m ? pkRole(m, 'idle') : null, al = ik ? kwAlpha(ik) : null, mim = (ik && IMG[ik]) || { width: 48, height: 48 }, { W, G } = PKV, K = WR;
+	const mw = mim.width, mh = mim.height, mx0 = Math.round(K.MX - mw / 2), home = W - 40;
+	let top0 = Math.round(mh * 0.3); if (al) top0: for (let y = 0; y < mh; y++) for (let x = 0; x < mw; x++) if (al.a(x, y)) { top0 = y; break top0; }
+	const bh = mh - top0, sw = BLC_SWING.A ? blcSwingPt(BLC_SWING.A[1]) : [25, 82], reach = Math.round(sw[0] - 60), tipUp = 108 - Math.round(sw[1]);   // ปลายมีดภาพฟาด (วัดอัตโนมัติ): ห่างกลางตัว reach · สูงจากเท้า tipUp
+	const [le, re] = al ? wrEdges(al, mw, mh, mh - tipUp) : [Math.round(mw * 0.2), Math.round(mw * 0.8)];
+	const xr = mx0 + re - 4 - reach, xl = Math.max(22, mx0 + le + 4 + reach);   // ปลายมีดจมเนื้อ 4 จุด · ฝั่งหน้า (หันซ้าย) / ฝั่งหลัง (พลิกหันขวา)
+	const rings = WR_ROWS.map(fr => { const row = Math.round(top0 + bh * fr), [l, r] = al ? wrEdges(al, mw, mh, row) : [Math.round(mw * 0.25), Math.round(mw * 0.75)], rx = (r - l) / 2 + 7;
+		return { cx: mx0 + (l + r) / 2, cy: G - mh + row, rx, ry: Math.max(3, Math.round(rx * 0.2)) }; });
+	const apex = Math.max(30, Math.min(86, bh + 8));   // ตีลังกาข้ามหัว: ลูกขดตัวพ้นหัวมอน · ไม่เกิน 86 (หัวไม่หลุดขอบบน)
+	const r = { m, al, ik, mw, mh, mx0, bh, home, xr, xl, rings, reach, tipUp, cx: home, lift: 0, key: `rpk/pls_idle_bl_${Math.floor(F / 4) % 4}`, flip: false, rot: 0, sx: 1, sy: 1, back: false };
+	if (F < K.RUN) return r;
+	if (F < K.H1) { const t = (F - K.RUN + 1) / (K.H1 - K.RUN + 1); r.cx = home + (xr - home) * (0.4 * t * t + 0.6 * t); r.key = F < K.WIND ? `rpk/pls_run_bl_${(F - K.RUN) % 6}` : `rpk/pls_atk_bl_${1 + F - K.WIND}`; return r; }   // วิ่งเร่ง → ง้างระหว่างวิ่ง
+	if (F < K.LEAP) { r.cx = xr - (F - K.H1); r.key = `rpk/pls_atk_bl_${5 + F - K.H1}`; if (F === K.H1) { r.sx = 1.04; r.sy = 0.95; } return r; }   // ฟัน 1 ตอนถึงตัว (เฉียงลง) · ตามแรง
+	if (F < K.H2) { const xa = xr - 2, t = (F - K.LEAP + 1) / (K.H2 - K.LEAP + 1); r.cx = xa + (xl - xa) * t; r.lift = Math.round(4 * apex * t * (1 - t));   // ตีลังกาข้ามหัวมอน ลงฝั่งหลัง
+		if (F === K.LEAP) r.key = 'rpk/pls_hop_bl_2';
+		else if (F < K.WIND2) { const e = (F - K.TUCK + 1) / (K.WIND2 - K.TUCK); r.key = 'rpk/pls_hop_bl_4'; r.rot = -2 * Math.PI * e; r.flip = e > 0.5; }   // ขดตัวหมุนหน้า 1 รอบ · กลับหัวกลางรอบ = เปลี่ยนไปหันขวา
+		else { r.key = `rpk/pls_atk_bl_${Math.min(4, 1 + F - K.WIND2)}`; r.flip = true; }   // ง้างกลางอากาศขาลง (หันขวาเข้าหาหลังมอน)
+		return r; }
+	if (F < K.DASH) { r.cx = xl - 2 * (F - K.H2 + 1) + 2; r.key = `rpk/pls_atk_bl_${5 + F - K.H2}`; r.flip = true; if (F === K.H2) { r.sx = 1.04; r.sy = 0.95; } return r; }   // ฟัน 2 ตอนเท้าแตะ (เฉียงขึ้น) · แรงส่งพาไถลออก
+	const xd = xl - 6;
+	if (F < K.H3) { if (F === K.DASH) { r.cx = xd; r.key = 'rpk/pls_bl1_3'; r.flip = true; r.sy = 0.94; return r; }   // ย่อถีบ
+		const t = (F - K.DASH) / (K.H3 - K.DASH); r.cx = xd + (xr - xd) * t; r.key = aotSpin(((3 - (K.H3 - 1 - F)) % 4 + 4) % 4); r.sx = r.sy = 0.94;   // สว่านผ่านหลังมอน: ซ้าย→หลัง→ขวา→หน้า วน · เฟรมก่อนฟัน = หน้า
+		r.back = F < K.H3 - 1; return r; }   // ทั้งช่วงสว่าน = วิ่งฝั่งไกลของมอน (ถูกตัวมอนบัง) · เฟรมก่อนฟันโผล่ออกมาข้างหน้า
+	if (F < K.CINCH) { r.cx = xr - (F - K.H3); r.key = `rpk/pls_atk_bl_${5 + F - K.H3}`; if (F === K.H3) { r.sx = 1.05; r.sy = 0.94; } return r; }   // ฟัน 3 ดิ่งลง
+	if (F < K.BURST) { r.cx = xr - 2 + (F - K.CINCH > 2 && F % 2 ? 1 : 0); r.key = 'rpk/pls_atk_bl_7'; r.sy = 0.97; return r; }   // ค้างแรง ขึงวงแสง (ตัวสั่น)
+	const x0 = xr + 1, xm = x0 + Math.round((home - x0) * 0.62);
+	if (F < K.HOP) { r.cx = x0 + (F - K.BURST < 3 ? 3 : 2); r.key = F - K.BURST < 3 ? 'rpk/pls_atk_bl_1' : 'rpk/pls_atk_bl_0'; return r; }   // กระตุกมีดกลับ = วงรัด
+	const hop = (t0, t1, xa, xb, h) => { const n = t1 - t0, q = F - t0; if (q === 0) { r.cx = xa; r.key = 'rpk/pls_hop_bl_1'; r.sy = 0.94; return; }
+		const t = q / (n - 1); r.cx = xa + (xb - xa) * Math.min(1, t); r.lift = Math.round(4 * h * Math.min(1, t) * (1 - Math.min(1, t))); r.key = q === 1 ? 'rpk/pls_hop_bl_2' : t < 0.5 ? 'rpk/pls_hop_bl_3' : 'rpk/pls_hop_bl_3'; };
+	if (F < K.HOP2) { hop(K.HOP, K.HOP2, x0, xm, 14); return r; }   // กระโดดถอยหันหน้าหาเป้า 2 สเตป
+	if (F < K.HOME) { hop(K.HOP2, K.HOME, xm, home, 8); return r; }
+	r.cx = home; if (F < K.HOME + 2) { r.key = 'rpk/pls_hop_bl_1'; r.sy = 0.94; } return r;
+}
+function wrRing(rg, k, F, front, s) {   // วงแสงที่ k: กวาดออกจากจุดฟันตามทางที่ Rion วน · ครึ่งหน้า/หลังวาดแยกชั้น · s = สเกลตอนรัด
+	const K = WR, t0 = [K.H1, K.H2, K.H3][k], p = Math.min(1, (F - t0 + 1) / [9, 9, 6][k]); if (p <= 0 || F >= K.BURST) return;
+	const a0 = [-0.3, Math.PI + 0.3, 0][k], dir = [1, 1, 1][k], n = Math.max(24, Math.round(rg.rx * 4)), lit = F >= K.CINCH ? 0.6 + 0.4 * Math.sin(F * 1.7) : 1;
+	for (let i = 0; i <= n * p; i++) { const a = a0 + dir * 2 * Math.PI * i / n, sn = Math.sin(a); if ((sn >= 0) !== front) continue;
+		const x = rg.cx + Math.cos(a) * rg.rx * s, y = rg.cy + sn * rg.ry * s, head = i > n * p - 4 && p < 1;
+		fbPx(x - 1, y - 1, `rgba(154,230,255,${(front ? 0.75 : 0.45) * lit})`, 3, 2); fbPx(x, y - 1, head ? '#ffffff' : `rgba(255,255,255,${(front ? 0.95 : 0.55) * lit})`, 1, 1); }
+}
+function wrView(c) {
+	const F = S.frame, K = WR, { W, H, G } = PKV; cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
+	const g = wrGeo(F), { m, mw, mh, mx0, bh, rings, reach, tipUp } = g, hk = [K.H1, K.H2, K.H3].map(t => F - t), dz = F - K.CINCH, db = F - K.BURST;
+	const shk = hk.some(d => d >= 0 && d < 3) ? 2 * (1 - Math.min(...hk.filter(d => d >= 0)) / 3) : db >= 0 && db < 6 ? 3.5 * (1 - db / 6) : dz >= 0 && db < 0 ? 0.6 : 0, rs = vRng(F * 31 + 7);
+	drawBg(); ctx.save(); ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk)); drawBg();
+	const dim = F >= K.LEAP && F < K.H3 ? 0.12 : dz >= 0 && db < 6 ? 0.22 : 0;
+	if (dim) { ctx.save(); ctx.globalAlpha = dim; ctx.fillStyle = '#10142a'; ctx.fillRect(-8, -8, W + 16, H + 16); ctx.restore(); }
+	const cz = dz < 0 ? 0 : db < 0 ? Math.pow((dz + 1) / (K.BURST - K.CINCH), 2) : 0, s = 1 - 0.42 * cz;   // รัด: วงหดเข้า เร่งตอนท้าย
+	// ชั้นหลัง: ครึ่งหลังของวง · Rion ตอนสว่านผ่านหลังมอน
+	rings.forEach((rg, k) => wrRing(rg, k, F, false, s));
+	if (g.back) { for (let k = 2; k >= 1; k--) { const gp = wrGeo(F - k); if (gp.back) aotDraw(gp, 0.12 * (3 - k), '#9ae6ff'); } aotDraw(g, 0.9); }
+	// มอน: ผงะทุกครั้งที่โดน (ทิศตามข้างที่ฟัน) · ถูกบีบตอนรัด · แตก = วาบ → เลือดไหล (อมแดงเป็นจังหวะ)
+	const kbs = [-3, 3, -3], kb = hk.reduce((a, d, i) => a + (d >= 0 && d < 4 ? Math.round(kbs[i] * (1 - d / 4)) : 0), 0) + (db >= 0 && db < 6 ? -Math.round(4 * (1 - db / 6)) : 0);
+	const hurt = hk.some(d => d >= 0 && d < 5) || cz > 0.3 || (db >= 0 && db < 10), mkey = hurt ? pkRole(m, 'hurt') : pkRole(m, 'idle', Math.floor(F / 4) % 3), mi = IMG[mkey];
+	const bleed = db >= 6, fl = hk.some(d => d >= 0 && d < 2) || (db >= 0 && db < 2) ? 1 : bleed ? 0.05 + 0.07 * Math.max(0, Math.sin(F * 0.5)) : 0;
+	const oc = pkTint(mkey, bleed && fl < 1 ? '#c02838' : '#fff', fl), sqx = 1 - 0.1 * cz + (db >= 0 && db < 3 ? 0.06 : 0), sqy = 1 + 0.05 * cz - (db >= 0 && db < 3 ? 0.08 : 0);
+	const dw = Math.round(mi.width * sqx), dh = Math.round(mi.height * sqy), mcx = mx0 + mw / 2 + kb;
+	ctx.drawImage(oc, Math.round(mcx - dw / 2), G - dh, dw, dh);
+	// แผล 3 รอยตามทิศฟัน (เฉียงลง · เฉียงขึ้น · ดิ่ง) ค้างจนแตก
+	const ty = G - tipUp, cut = [[g.xr + reach, ty, 8, -10, -8, 9], [g.xl - reach, ty, -7, 9, 8, -10], [g.xr + reach - 1, ty, 1, -13, -2, 10]];
+	cut.forEach(([x, y, ax, ay, bx2, by2], i) => { const d = hk[i]; if (d < 0 || db >= 14) return; const al = db < 0 ? 1 : 1 - db / 14;
+		if (d < 3) pkSlashLine(x + ax + kb, y + ay, x + bx2 + kb, y + by2, 2, Math.min(1, (d + 1) / 2), al);   // วาบตอนฟัน แล้วเหลือแผลแดงบาง
+		else { const L = Math.hypot(bx2 - ax, by2 - ay); for (let j = 0; j <= L; j++) { const px = x + kb + ax + (bx2 - ax) * j / L, py = y + ay + (by2 - ay) * j / L; fbPx(px, py, `rgba(42,26,20,${0.8 * al})`, 2, 1); fbPx(px, py, `rgba(208,40,56,${al})`, 1, 1); } } });
+	// ชั้นหน้า: ครึ่งหน้าของวง · เส้นขึงจากปลายมีดถึงวงล่าง (ตอนรัด)
+	rings.forEach((rg, k) => wrRing(rg, k, F, true, s));
+	if (dz >= 0 && db < 0) { const tx = g.cx + reach, rg = rings[2], ex = rg.cx + rg.rx * s * Math.cos(0.35), ey = rg.cy + rg.ry * s * Math.sin(0.35), L = Math.hypot(ex - tx, ey - ty);
+		for (let i = 0; i <= L; i++) fbPx(tx + (ex - tx) * i / L, ty + (ey - ty) * i / L, `rgba(220,248,255,${0.6 + 0.3 * Math.sin(F + i * 0.3)})`, 1, 1); }
+	// แตก: วงขาดเป็นเศษแสง + เลือดพุ่ง (ก้อนกลมแดงตกตามแรงโน้มถ่วง) · ต่อจากนั้นหยดเลือดจากรอยวง
+	if (db >= 0 && db < 18) rings.forEach((rg, k) => { for (let i = 0; i < 14; i++) { const a = i * 2 * Math.PI / 14 + k, v = 1.2 + fbHash(i, k, 3) * 1.6, x = rg.cx + Math.cos(a) * rg.rx * 0.58 + Math.cos(a) * v * db * 1.4, y = rg.cy + Math.sin(a) * rg.ry * 0.58 - 0.6 * v * db + 0.12 * db * db;
+		if (db < 10) fbPx(x, y, `rgba(220,248,255,${1 - db / 10})`, 1, 1);
+		const bx3 = rg.cx + (fbHash(i, k, 7) - 0.5) * rg.rx + (fbHash(i, k, 5) - 0.5) * 3.2 * db, by3 = rg.cy + (fbHash(i, k, 8) - 0.5) * rg.ry * 2 - (1.2 + fbHash(i, k, 6) * 2) * db + 0.16 * db * db;   // เลือดกระเซ็นจากทั่วรอยวง (ไม่เรียงเป็นเส้น)
+		if (i < 10 && db >= 1 && by3 < G - 1) pxDisc(bx3, by3, Math.max(0.6, 1.6 - db * 0.06), `rgba(${190 + (i % 3) * 20},30,${40 + (i % 2) * 10},${Math.max(0, 1 - db / 18)})`); } });
+	if (bleed && F < K.END - 4) rings.forEach((rg, k) => { for (let j = 0; j < 2; j++) { const t0 = K.BURST + 6 + k * 3 + j * 7, q = (F - t0) % 14; if (F < t0) continue;
+		const x = rg.cx + (j ? -0.4 : 0.35) * rg.rx * 0.6, y = rg.cy + rg.ry * 0.5 + q * q * 0.18; if (y < G - 1) { fbPx(x, y, '#2a1a14', 2, 3); fbPx(x, y + 1, '#d02838', 1, 1); } } });
+	// ฝุ่น: ฝีเท้า · ตีลังกาออก/ลง · ถีบสว่าน · กระโดดถอย
+	const puffs = [[K.LEAP, g.xr, 1, 1], [K.H2, g.xl, -1, 1.1], [K.DASH, g.xl - 6, -1, 1.2], [K.H3, g.xr, 1, 0.9], [K.HOP, g.xr + 1, -1, 0.9], [K.HOP2, wrGeo(K.HOP2).cx, -1, 0.7], [K.HOME, g.home, 1, 0.6]];
+	for (let t = K.RUN + 1; t < K.H1; t += 3) puffs.push([t, wrGeo(t).cx + 6, 1, 0.5 + 0.5 * (t - K.RUN) / 8]);
+	for (const [t, fx, dir, sz] of puffs) { const q = F - t; if (q < 0 || q >= 10) continue;
+		for (let i = 0; i < 5; i++) { const r = fbHash(t, i, 1), x = fx + dir * (3 + i * 3 + q * (1 + r)), y = G - 1 - (r * 3 + q * 0.6) * sz, sz2 = Math.max(1, Math.round((3 - q * 0.25) * sz)); if (fbHash(t, i, q) < q / 12) continue; fbPx(x, y, q < 4 ? '#e2d6c0' : '#cdbfa6', sz2, Math.max(1, sz2 - 1)); } }
+	// Rion (ชั้นหน้า): เงาตอนลอย · ร่างติดตาตอนตีลังกา · วาดตัว
+	if (!g.back) { if (g.lift > 2) for (let i = -9; i <= 9; i++) if (Math.abs(i) < 9 * Math.max(0.35, 1 - g.lift / 90)) fbPx(g.cx + i * 1.6, G - 1, 'rgba(40,30,24,0.4)', 2, 1);
+		if (F > K.LEAP && F < K.H2) for (let k = 2; k >= 1; k--) aotDraw(wrGeo(F - k), 0.14 * (3 - k), '#9ae6ff');
+		if (F > K.DASH && F < K.H3) for (let k = 2; k >= 1; k--) { const gp = wrGeo(F - k); if (!gp.back) aotDraw(gp, 0.14 * (3 - k), '#9ae6ff'); }
+		aotDraw(g, 1); }
+	// ฟันโดน: ดาวที่ปลายมีด + ประกายเหล็ก · ป้ายเสียงสลับข้าง
+	cut.forEach(([x, y], i) => { const d = hk[i]; if (d < 0 || d >= 4) return; pkStar(x + kb, y, 3 + d * 3, '#ffffff', '#9ae6ff');
+		for (let j = 0; j < 6; j++) { const a = (i === 1 ? 0 : Math.PI) + (fbHash(j, i, 1) - 0.5) * 1.6, v = 2 + fbHash(j, i, 2) * 2; fbPx(x + Math.cos(a) * v * d, y + Math.sin(a) * v * d + 0.3 * d * d, d < 2 ? '#ffffff' : '#9ae6ff', 1, 1); } });
+	hk.forEach((d, i) => { if (d >= 0 && d < 8) pkText('ฉับ!', i === 1 ? Math.max(4, g.xl - reach - 6) : Math.min(W - 36, g.xr + reach + 6 + i * 4), Math.max(16, ty - (i === 1 ? 30 : 22 + i * 8) - Math.min(4, d)), '#ffffff'); });
+	if (dz >= 2 && db < 0) pkText('รัด…', Math.max(4, mx0 - 6), Math.max(16, G - bh - 8), '#9ae6ff');
+	if (db >= 0 && db < 4) pkStar(mcx, rings[1].cy, 12 + db * 6, '#ffffff', '#ff8a7a');
+	if (db >= 0 && db < 14) pkText('ฟึ่บ!!', Math.max(4, mx0 - 10), Math.max(18, G - bh - 6 - Math.min(5, db)), '#ffffff');
+	if (bleed) { const ix = Math.round(mcx), iy = Math.max(14, G - bh - 12) + Math.round(Math.sin(F * 0.25)), O = '#2a1a14';   // ไอคอนหยดเลือดเหนือหัว + ป้าย
+		ctx.save(); ctx.globalAlpha = Math.min(1, Math.max(0, (db - 14) / 4)); for (let r = 0; r < 7; r++) { const w = r < 2 ? 1 + r : r < 5 ? 4 + (r - 2) : 7 - (r - 4) * 2; fbPx(ix - w / 2 - 1, iy + r, O, w + 2, 1); fbPx(ix - w / 2, iy + r, r === 2 ? '#ff8a8a' : '#d02838', w, 1); }
+		fbPx(ix - 4, iy + 7, O, 7, 1); if (db >= 14 && db < 60) pkText('เลือดไหล', ix + 8, iy + 7, '#ff9aa8'); ctx.restore(); }
+	ctx.restore();
+	if (S.bubble !== false && F >= K.WIND - 2 && F < K.H1 + 3) rs3Bubble(glimRow('bl2').name_th + '!', g.cx, Math.max(14, G - g.lift - 74), F - K.WIND + 2, F < K.H1 ? 1 : (K.H1 + 3 - F) / 3);
+	{ const h = csHit('bl2', m.id);   // ตัวเลขดาเมจทุกครั้งที่ฟัน (ท่ามี 3 ครั้งในข้อมูล) · เรียงขึ้นทีละแถว
+		if (h) [K.H1, K.H2, K.H3].forEach((t, i) => dmgPop(h.v, Math.round(Math.max(34, Math.min(W - 34, mx0 + mw / 2)) + (i - 1) * 28), Math.max(30, G - bh - 12) - i * 6, F - t, '#ffffff', i === 2 ? (h.aff > 0 ? 'อ่อนแอ!' : h.aff < 0 ? 'ต้านทาน' : '') : '', h.aff > 0 ? '#ffe08a' : '#c8c8c8')); }
+	sceneCaption(`${m.name} ${m.id} · เขี้ยวพัน: ฟันหน้า → ตีลังกาข้ามหัว ฟันหลัง → สว่านผ่านหลัง ฟันหน้า → วงแสงรัด → แตก เลือดไหล (โอกาส 50%)`);
+	if (S.grid) drawGrid();
+}
+function wrSound(F) {
+	if (!S.sound || !AU) return; const K = WR, m = pkMon(), big = m.id === 'B1' ? 0.6 : 1;
+	if (F >= K.RUN && F < K.H1 && (F - K.RUN) % 3 === 0) auNoise(0.06, 'lowpass', 900, 200, 0.22 + 0.2 * (F - K.RUN) / 8, 1);   // ฝีเท้า
+	if (F === K.WIND || F === K.WIND2) AU_SFX.release.SL();   // เงื้อ
+	if (F === K.H1 || F === K.H2 || F === K.H3) { AU_SFX.hit('SL', false); auTone(0.08, 'triangle', 2600, 3400, 0.06); if (F === K.H1) auMon(monVoice(m.id), false, big); }   // ฉับ + วงแสงเริ่มพัน
+	if (F === K.LEAP) { auNoise(0.08, 'lowpass', 700, 150, 0.35, 1); auNoise(0.3, 'bandpass', 600, 1800, 0.18, 2, 0.04); }   // ถีบตีลังกา
+	if (F === K.DASH) { auNoise(0.1, 'lowpass', 600, 120, 0.5, 1); }
+	if (F > K.DASH && F < K.H3 && (F - K.DASH) % 2 === 1) auNoise(0.1, 'bandpass', 1400 + (F - K.DASH) * 110, 3000, 0.18, 3);   // สว่านหวีด
+	if (F >= K.CINCH && F < K.BURST && (F - K.CINCH) % 2 === 0) auTone(0.12, 'sawtooth', 160 + (F - K.CINCH) * 40, 220 + (F - K.CINCH) * 46, 0.05, 0, 0.002, { lp: 1800 });   // วงรัด: เสียงขึงตึงไต่
+	if (F === K.BURST) { auNoise(0.05, 'highpass', 3000, 7000, 0.55, 3); auNoise(0.5, 'bandpass', 900, 400, 0.4, 1, 0.02); auNoise(0.2, 'lowpass', 400, 80, 0.6, 1); auMon(monVoice(m.id), false, big); if (typeof bgmDuck === 'function') bgmDuck(); }   // ฟึ่บ: วงขาด + เลือดพุ่ง
+	if (F === K.HOP + 1 || F === K.HOP2 + 1) auNoise(0.06, 'bandpass', 600, 1600, 0.2, 2);
+	if (F === K.HOP2 || F === K.HOME) auNoise(0.09, 'lowpass', 700, 150, 0.3, 1);
+}
+if ((DATA.rion_pack || []).some(c => c.id === 'pls_spin_bl') && (DATA.rion_pack || []).some(c => c.id === 'pls_hop_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'wr_bl2', `เขี้ยวพัน bl2 แบบงูพันเหยื่อ: วิ่งฟันหน้า → ตีลังกาข้ามหัว ฟันหลังตอนแตะพื้น → หมุนสว่านผ่านหลังมอน ฟันหน้า → วงแสง 3 วงรัดจนแตก เลือดไหล → กระโดดถอยกลับ · ${WR.END} เฟรม`,
+	Array.from({ length: WR.END }, (_, F) => wrGeo(F, true).key), WR.SEC, { wr: true, stage: [PKV.W, PKV.H] });
 // ── ตัวเลขดาเมจ (kwan 21 ต.ค. "มีเปิดปิด damage เป็นตัวเลขด้วย") · สูตรเกม Formulas.damage ค่ากลาง (สุ่ม ±5% = 1.0) · ปุ่ม "🔢 ตัวเลขดาเมจ" (S.dmgNum)
 // Rion ในฉากต่อสู้ = ความชำนาญ 20 + มีดทำครัว 14 (ค่าเดียวกับหน้า UI Kit · อาวุธ W11 = 14 ใน GDD) · ATK/DEF ตามสูตร Formulas.hero_atk / hero_def
 const CS = { PROF: 20, WPN: 14 };
@@ -3123,6 +3251,7 @@ function clipView() {
 	if (c.blc) return blcView(c);
 	if (c.aot) return aotView(c);
 	if (c.kw) return kwView(c);
+	if (c.wr) return wrView(c);
 	if (c.mon) return monAtkView(c);
 	if (c.pkv) return pkvView(c);
 	if (c.fire) return fireView(c);
@@ -4271,7 +4400,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.aot) aotSound(S.frame); else if (c.kw) kwSound(S.frame); else if (c.mon) monAtkSound(S.frame, c); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.aot) aotSound(S.frame); else if (c.kw) kwSound(S.frame); else if (c.wr) wrSound(S.frame); else if (c.mon) monAtkSound(S.frame, c); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		LOGICAL_H = 0; clipView();
 	} else {
