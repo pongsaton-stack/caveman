@@ -8,6 +8,7 @@
 """
 import json, math, os, sys
 import numpy as np
+from scipy import ndimage
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -68,6 +69,36 @@ def sprite(icon, grip, idir, length, angle):
 			cols, cnt = np.unique(use, axis=0, return_counts=True); out[y, x] = cols[cnt.argmax()]
 	small = R.WH.outline(Image.fromarray(out, "RGBA"))
 	return small, (small.size[0] / 2.0, small.size[1] / 2.0)
+
+
+NK = ["pls_atk_bl_5", "pls_atk_bl_6", "pls_atk_bl_7", "pls_hop_bl_0", "pls_hop_bl_1", "pls_hop_bl_2", "pls_hop_bl_3", "pls_hop_bl_4",
+	"pls_idle_bl_0", "pls_idle_bl_1", "pls_idle_bl_2", "pls_idle_bl_3"]
+KNIFE_SRC = "pls_atk_bl_6"   # ใบมีดชี้ซ้ายเกือบนอน ไม่ทับตัว → ตัดเก็บเป็นภาพมีดเล่มเดียว
+
+
+def empty_hand():
+	"""ผ่าเกราะ bl8 (kwan 22 ต.ค.): มีดฝังเกราะ Rion ปล่อยมือ → ภาพมือเปล่า pls_nk_<ภาพเดิม> (ลบใบ+ขอบเหมือน swap) + ภาพมีด pls_knife (ตำแหน่งในผืนเดิม)
+	ภาพที่หาใบมีดไม่เจอ (มีดถูกตัวบัง) ไม่สร้าง → ฉากใช้ภาพเดิม · คืนรายชื่อที่สร้าง"""
+	made = []
+	for n in NK:
+		p = os.path.join(PX, n + ".png")
+		if not os.path.exists(p): continue
+		f = BT.find_tip(p)
+		if not f: print("ไม่เห็นใบมีด", n); continue
+		im = Image.open(p).convert("RGBA"); src = im.copy(); gone = strip_blade(im, f[2])
+		a = np.array(im); lab, nc = ndimage.label(a[..., 3] > 0, structure=np.ones((3, 3)))   # เศษปลายใบที่ลบไม่หมด (ก้อนลอยไม่ติดตัว < 8 จุด) ทิ้ง
+		if nc > 1:
+			sz = ndimage.sum(np.ones(lab.shape), lab, range(1, nc + 1))
+			for i, c in enumerate(sz):
+				if c < 8: a[lab == i + 1] = 0
+			im = Image.fromarray(a, "RGBA")
+		im.save(os.path.join(PX, "pls_nk_" + n[4:] + ".png")); made.append(n)
+		if n == KNIFE_SRC:
+			k = Image.new("RGBA", im.size); sp, kp = src.load(), k.load()
+			for q in gone: kp[q] = sp[q]
+			k.save(os.path.join(PX, "pls_knife.png"))
+	print("มือเปล่า", len(made), "ภาพ")
+	return made
 
 
 def main():

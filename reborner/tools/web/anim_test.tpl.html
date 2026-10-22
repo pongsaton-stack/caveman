@@ -1312,6 +1312,124 @@ function aotSound(F) {
 	if (F === A.LAND) auNoise(0.09, 'lowpass', 700, 150, 0.4, 1);
 	if (F === A.LAND + 8) { auTone(0.7, 'sine', 520, 130, 0.12); auTone(0.7, 'triangle', 780, 196, 0.05, 0.05); }   // ช้าลง: เสียงไล่ต่ำ
 }
+// ── เขี้ยวผ่าเกราะ bl8 แบบคาบูโตะวาริ (ส้นเท้ากระทืบด้าม = ค้อนตอกลิ่ม) (kwan 22 ต.ค. "ขวานจามลงเกราะ แล้วค้อนตอกหลังขวานเหมือนลิ่ม · ส่งแรงกระแทกจนเกราะแตกกระจาย")
+//   ไม่มีขวาน/ค้อน (Rion ถือมีดครัว) → มีดเป็นลิ่ม: จามฝังเกราะแล้วปล่อยมือ → กระโดดส้นเท้ากระทืบด้ามมีด → รอยร้าววิ่งทั่วตัว → เกราะแตกกระจาย → ดึงมีดตีลังกากลับ
+//   ภาพ: PixelLab bl8 เจนไม่ผ่าน (ไม่ตบสันมีด · วาดเส้นฟาด · หันเข้ากล้อง) → ประกอบจากภาพที่ผ่านแล้ว + ภาพมือเปล่า pls_nk_* (weapon_swap.empty_hand ลบใบมีดออก) · มีดฝังวาดด้วยโค้ด
+//   ผลในเกม = เพิกเฉย DEF 30% เฉพาะครั้งนี้ (techs.csv ignore_def) · รอยร้าวจางหาย ไม่ใช่สถานะค้าง
+const KW = { END: 92, RUN: 14, WIND: 21, CHOP: 26, LET: 28, CROUCH: 31, UP: 33, PEAK: 37, DROP: 40, DRIVE: 42, BREAK: 50, FLIP: 52, LAND: 66, SEC: 0.06 };
+const KW_HARD = new Set(['เกราะ', 'หิน', 'กระดูก', 'กลไก']);   // ร่างแข็ง = เกราะแตกเป็นเศษ · ที่เหลือ = เนื้อแยกกระเซ็น
+const kwAlphaCache = {};
+function kwAlpha(key) {   // อัลฟาของภาพมอน (หาขอบหน้าตัว + ให้รอยร้าวอยู่บนตัวเท่านั้น)
+	if (kwAlphaCache[key]) return kwAlphaCache[key]; const im = IMG[key]; if (!im || !im.width) return null;
+	const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+	const d = x.getImageData(0, 0, im.width, im.height).data, r = { w: im.width, h: im.height, a: (px, py) => px >= 0 && py >= 0 && px < im.width && py < im.height && d[(py * im.width + px) * 4 + 3] > 100,
+		rgb: (px, py) => { const i = (Math.max(0, Math.min(im.height - 1, py)) * im.width + Math.max(0, Math.min(im.width - 1, px))) * 4; return `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`; } };
+	return (kwAlphaCache[key] = r);
+}
+function kwGeo(F, reg) {   // ฉากที่ F: มอน · จุดจาม (มีดฝัง) · Rion (cx กลางผืน · lift · ภาพ · หมุน)
+	const m = reg ? null : pkMon(), ik = m ? pkRole(m, 'idle') : null, al = ik ? kwAlpha(ik) : null, mim = (ik && IMG[ik]) || { width: 48, height: 48 }, { W, G, MX } = PKV, K = KW;
+	const mw = mim.width, mh = mim.height, mx0 = Math.round(MX - mw / 2), home = W - 40;
+	const sw = BLC_SWING.A ? blcSwingPt(BLC_SWING.A[1]) : [25, 82], by = G - 108 + Math.round(sw[1]);   // ปลายมีดภาพฟาด (วัดอัตโนมัติ) → ความสูงจุดจาม
+	let edge = mx0 + Math.round(mw * 0.8); if (al) { const row = Math.max(0, Math.min(mh - 1, by - (G - mh))); for (let x = mw - 1; x >= 0; x--) if (al.a(x, row)) { edge = mx0 + x; break; } }   // ขอบหน้าตัวมอนที่ระดับจุดจาม
+	const bx = edge - 3, near = Math.round(bx - (sw[0] - 60));   // ปลายมีดจมเข้าเกราะ 3 จุด
+	const u = [Math.cos(BLC_SWING.A ? BLC_SWING.A[1] * Math.PI / 180 : -3.5), Math.sin(BLC_SWING.A ? BLC_SWING.A[1] * Math.PI / 180 : 0.35)];   // ทิศมีดชี้เข้าตัว (จากไหล่ไปปลาย)
+	const r = { m, al, ik, mw, mh, mx0, home, near, bx, by, u, cx: home, lift: 0, key: `rpk/pls_idle_bl_${Math.floor(F / 4) % 4}`, rot: 0, sx: 1, sy: 1 };
+	if (F < K.RUN) return r;
+	const runX = t => home + (near - home) * Math.min(1, t);   // วิ่งเร่ง → ง้างระหว่างวิ่ง → จามทันทีที่ถึง (ไม่หยุดตั้งท่า)
+	if (F < K.CHOP) { const t = (F - K.RUN + 1) / (K.CHOP - K.RUN); r.cx = runX(t * t * (3 - 2 * t) * 0.35 + t * 0.65); r.key = F < K.WIND ? `rpk/pls_run_bl_${(F - K.RUN) % 6}` : `rpk/pls_atk_bl_${Math.min(4, 1 + F - K.WIND)}`; return r; }
+	if (F < K.LET) { r.cx = near; r.key = 'rpk/pls_atk_bl_5'; r.sy = 0.95; r.sx = 1.04; return r; }   // จามฝัง (หยุดภาพ 2)
+	if (F < K.CROUCH) { r.cx = near + (F - K.LET) * 2; r.key = F === K.LET ? 'rpk/pls_nk_atk_bl_6' : 'rpk/pls_nk_atk_bl_7'; return r; }   // ปล่อยมือ มีดค้างในเกราะ · ถอยครึ่งก้าว
+	const sx = near + 6, hx = bx + u[0] * -10, hy = by + u[1] * -10, kneeX = Math.round(hx - 12), topY = G - 12 - Math.round(hy) + 2;   // ด้ามมีด (จุดตอก) · ภาพขดตัว nk_hop_bl_4 จุดต่ำสุด = ส้นบูทแถว 96 x 70–75 (กลางผืน +12) → ส้นลงตรงด้าม
+	if (F < K.UP) { r.cx = sx; r.key = 'rpk/pls_nk_hop_bl_1'; r.sy = 0.94; return r; }   // ย่อเก็บแรง
+	const top = Math.max(topY + 26, 44);
+	if (F < K.DROP) { const t = (F - K.UP + 1) / (K.DROP - K.UP), e = 1 - (1 - t) * (1 - t); r.cx = sx + (kneeX - sx) * e; r.lift = Math.round(top * e); r.key = F < K.UP + 2 ? 'rpk/pls_nk_hop_bl_2' : F < K.PEAK ? 'rpk/pls_nk_hop_bl_3' : 'rpk/pls_nk_hop_bl_4'; return r; }   // ถีบขึ้นสูงเหนือด้าม (ชะลอที่ยอด)
+	if (F < K.DRIVE) { const t = (F - K.DROP + 1) / (K.DRIVE - K.DROP + 1); r.cx = kneeX; r.lift = Math.round(top + (topY - top) * t * t); r.key = 'rpk/pls_nk_hop_bl_4'; r.sy = 1.06; r.sx = 0.96; return r; }   // ดิ่งลงเร่งเต็มที่ (ตัวยืดตามแรง)
+	if (F < K.BREAK) { const q = F - K.DRIVE; r.cx = kneeX; r.lift = topY - (q < 3 ? 0 : Math.min(2, q - 2)); r.key = 'rpk/pls_nk_hop_bl_4'; r.sy = q < 3 ? 0.88 : 0.92; r.sx = q < 3 ? 1.08 : 1.05; return r; }   // ส้นกระทืบด้าม · ค้างกดลิ่มจนร้าวทั่ว (มีดจมลงทีละนิด)
+	if (F < K.LAND) { const t = (F - K.BREAK + 1) / (K.LAND - K.BREAK), e = t * t * (3 - 2 * t); r.cx = kneeX + (home - kneeX) * t; r.lift = Math.round(topY * (1 - t) + 4 * 46 * t * (1 - t)); r.key = 'rpk/pls_hop_bl_4'; r.rot = 2 * Math.PI * e; return r; }   // ดึงมีดออกตอนเกราะแตก แล้วตีลังกาหลังกลับที่
+	r.cx = home; if (F < K.LAND + 2) { r.key = 'rpk/pls_hop_bl_1'; r.sy = 0.94; return r; }   // ลงยุบ
+	return r;
+}
+function kwCracks(g) {   // รอยร้าว: 6 กิ่งเดินสุ่ม (seed คงที่) จากปลายมีดออกทั่วตัว · พิกัดเทียบจุดจาม
+	const out = []; for (let b = 0; b < 6; b++) { let x = 0, y = 0, a = Math.PI * (0.55 + b * 0.27) + (fbHash(b, 3, 1) - 0.5) * 0.5; const pts = [[0, 0]];
+		for (let s = 0; s < 26; s++) { a += (fbHash(b, s, 2) - 0.5) * 0.9; x += Math.cos(a) * 2; y += Math.sin(a) * 2; pts.push([x, y]);
+			if (s === 8 + (b % 3) * 3) { let x2 = x, y2 = y, a2 = a + (fbHash(b, s, 5) > 0.5 ? 0.9 : -0.9); for (let k = 0; k < 7; k++) { a2 += (fbHash(b, k, 6) - 0.5) * 0.6; x2 += Math.cos(a2) * 2; y2 += Math.sin(a2) * 2; pts.push([x2, y2, 1]); } } }
+		out.push(pts); } return out;
+}
+function kwView(c) {
+	const F = S.frame, K = KW, { W, H, G } = PKV; cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
+	const g = kwGeo(F), { m, mw, mh, mx0, bx, by, u, home, near } = g, dc = F - K.CHOP, dd = F - K.DRIVE, db = F - K.BREAK, hard = KW_HARD.has((DATA.body || {})[m.monster_id || m.id] || '');
+	const shk = dc >= 0 && dc < 4 ? 1.5 * (1 - dc / 4) : dd >= 0 && dd < 7 ? 4 * (1 - dd / 7) : db >= 0 && db < 6 ? 3 * (1 - db / 6) : 0, rs = vRng(F * 31 + 7);
+	drawBg(); ctx.save(); ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk)); drawBg();
+	const dim = dd >= 0 && db < 4 ? 0.2 : F >= K.UP && dd < 0 ? 0.1 : 0;
+	if (dim) { ctx.save(); ctx.globalAlpha = dim; ctx.fillStyle = '#10142a'; ctx.fillRect(-8, -8, W + 16, H + 16); ctx.restore(); }
+	// มอน: ผงะตอนจาม · ตอนตอกยุบรับแรง · เกราะแตกกระเด็นถอย
+	const kb = db >= 0 ? -Math.round(10 * Math.max(0, 1 - Math.max(0, db - 2) / 12)) : dd >= 0 && dd < 4 ? -1 : 0;
+	const hurt = (dc >= 0 && dc < 6) || (dd >= 0 && dd < 4) || (db >= 0 && db < 10), mkey = hurt ? pkRole(m, 'hurt') : pkRole(m, 'idle', Math.floor(F / 4) % 3), mi = IMG[mkey];
+	const fl = (dc >= 0 && dc < 2) || (dd >= 0 && dd < 2) || db === 0 ? 1 : 0, oc = pkTint(mkey, '#fff', fl), mx = mx0 + kb + Math.round((mw - mi.width) / 2);
+	const squash = dd >= 0 && dd < 3 ? 0.94 : 1, mhh = Math.round(mi.height * squash);
+	ctx.drawImage(oc, mx, G - mhh, mi.width, mhh);
+	// รอยร้าว: จามแล้วร้าวสั้นรอบมีด → ตอกแล้ววิ่งออกทั่วตัว → แตก → จางหาย · วาดเฉพาะบนตัวมอน (อัลฟาภาพยืน)
+	const grow = dc < 0 ? 0 : dd < 0 ? 0.12 : db < 0 ? 0.12 + 0.88 * Math.min(1, (dd + 1) / 6) : 1, fade = db < 6 ? 1 : Math.max(0, 1 - (db - 6) / 24);
+	if (grow > 0 && fade > 0 && g.al) { const ox = bx + kb - (mx0 + kb), oy = by - (G - mh);
+		for (const br of kwCracks(g)) { const n = Math.round(br.length * grow);
+			for (let i = 0; i < n; i++) { const [x, y, side] = br[i], px = Math.round(ox + x), py = Math.round(oy + y); if (!g.al.a(px, py)) continue;
+				const lit = db < 0 && dd >= 0 && i > n - 4;   // ปลายรอยที่กำลังวิ่ง = เส้นแสง
+				const col = lit ? `rgba(255,236,160,${fade})` : `rgba(26,16,12,${0.85 * fade})`, pv = i > 0 ? br[i - 1] : null;
+				fbPx(mx0 + kb + px, G - mh + py, col, 1, 1); if (pv && !side === !pv[2]) fbPx(mx0 + kb + Math.round(ox + (x + pv[0]) / 2), G - mh + Math.round(oy + (y + pv[1]) / 2), col, 1, 1);   // จุดกลางระหว่างก้าว = เส้นต่อเนื่อง
+				if (!side && i % 3 === 0 && i < n - 2) fbPx(mx0 + kb + px + 1, G - mh + py, `rgba(255,255,255,${0.25 * fade})`, 1, 1); } } }
+	// มีดฝัง: ใบจมในเกราะ เห็นสัน 3–4 จุด + ด้าม · ตอนตอกจมลงอีก 2 จุด · เกราะแตก = ดึงออกไปกับมือ Rion
+	if (F >= K.LET && F < K.BREAK) { const sink = dd < 0 ? 0 : Math.min(2, 1 + (dd >> 1)), v = [-u[0], -u[1]], bx2 = bx + kb, P = k => [bx2 + v[0] * (k - sink), by + v[1] * (k - sink)];
+		for (let k = 1; k <= 6; k++) { const [x, y] = P(k); fbPx(x, y - 1, '#2a1a14', 1, 3); fbPx(x, y, '#c8ced4', 1, 1); fbPx(x, y - 1, '#f4f6f8', 1, 1); }   // ใบ (ขอบเข้ม · สันบนสว่าง)
+		for (let k = 7; k <= 13; k++) { const [x, y] = P(k); fbPx(x, y - 1, '#2a1a14', 1, 3); fbPx(x, y, '#6a3c22', 1, 1); } const [ex, ey] = P(14); fbPx(ex, ey - 1, '#2a1a14', 1, 3); }   // ด้ามไม้ + ปลายด้าม
+	// ฝุ่น: ฝีเท้า · ถีบขึ้น · ลงพื้น
+	const puffs = [[K.UP, near + 6, 1, 1.1], [K.LAND, home, 1, 1]]; for (let t = K.RUN + 2; t < K.CHOP; t += 3) puffs.push([t, kwGeo(t).cx + 4, 1, 0.5 + 0.4 * (t - K.RUN) / 12]);
+	for (const [t, fx, dir, sz] of puffs) { const q = F - t; if (q < 0 || q >= 10) continue;
+		for (let i = 0; i < 5; i++) { const r = fbHash(t, i, 1), x = fx + dir * (3 + i * 3 + q * (1 + r)), y = G - 1 - (r * 3 + q * 0.6) * sz, s = Math.max(1, Math.round((3 - q * 0.25) * sz)); if (fbHash(t, i, q) < q / 12) continue; fbPx(x, y, q < 4 ? '#e2d6c0' : '#cdbfa6', s, Math.max(1, s - 1)); } }
+	// Rion: เงาตอนลอย · ร่างติดตาตอนดิ่ง/ตีลังกา
+	if (g.lift > 2) for (let i = -9; i <= 9; i++) if (Math.abs(i) < 9 * Math.max(0.35, 1 - g.lift / 90)) fbPx(g.cx + i * 1.6, G - 1, 'rgba(40,30,24,0.4)', 2, 1);
+	if (F >= K.DROP && F <= K.DRIVE) for (let k = 2; k >= 1; k--) aotDraw(kwGeo(F - k), 0.18 * (3 - k), '#9ae6ff');
+	if (F > K.BREAK && F < K.LAND - 4) for (let k = 2; k >= 1; k--) aotDraw(kwGeo(F - k), 0.12 * (3 - k));
+	if (F >= K.DROP && F < K.DRIVE) for (let i = 0; i < 5; i++) { const x = g.cx - 8 + i * 4, L = 10 + Math.round(fbHash(i, F, 2) * 10); for (let s = 0; s < L; s++) fbPx(x, G - g.lift - 70 - s, 'rgba(230,248,255,0.6)', 1, 1); }   // เส้นความเร็วดิ่งลง
+	aotDraw(g, 1);
+	// จาม: ประกายเหล็ก + ดาวเล็ก (เกราะรับไว้ ไม่ทะลุ)
+	if (dc >= 0 && dc < 5) { pkStar(bx, by, 4 + dc * 2, '#ffffff', '#ffd24a'); for (let i = 0; i < 8; i++) { const a = Math.PI * (1.1 + fbHash(i, 1, 1) * 0.9), v = 2 + fbHash(i, 1, 2) * 2; fbPx(bx + Math.cos(a) * v * dc, by + Math.sin(a) * v * dc + 0.3 * dc * dc, dc < 3 ? '#ffffff' : '#ffd24a', 1, 1); } }
+	// ตอก: วงแรงกระแทกจากด้าม + ดาวใหญ่ + เส้นแรงลงตามแนวมีด
+	if (dd >= 0 && dd < 6) { const hx = bx + kb - u[0] * 10, hy = by - u[1] * 10; pkStar(hx, hy, 8 + dd * 4, '#ffffff', '#ffd24a');
+		for (let i = 0; i < 20; i++) { const a = i * Math.PI / 10, r = 6 + dd * 5; if (fbHash(i, dd, 3) > 0.25) fbPx(hx + Math.cos(a) * r, hy + Math.sin(a) * r * 0.6, `rgba(255,255,255,${1 - dd / 6})`, 2, 1); }
+		for (let s = 0; s < 18; s++) fbPx(bx + kb + u[0] * s, by + u[1] * s, `rgba(255,236,160,${1 - dd / 6})`, 2, 2); }
+	// แตก: เศษเกราะ (สีจากตัวมอนรอบรอยร้าว) กระเด็นออกตามแรงลิ่ม (ไปทางซ้าย-บน) ตกกระดอนพื้น · ร่างนุ่ม = ก้อนเนื้อ/เมือกกลม
+	if (db >= 0 && db < 34 && g.al) for (let i = 0; i < 36; i++) { const sx0 = Math.round(bx - mx0 + (fbHash(i, 1, 4) - 0.65) * mw * 0.8), sy0 = Math.round(by - (G - mh) + (fbHash(i, 2, 4) - 0.7) * mh * 0.8);
+		if (!g.al.a(sx0, sy0)) continue; const col = g.al.rgb(sx0, sy0), vx = -(0.8 + fbHash(i, 3, 4) * 2.6) + (fbHash(i, 5, 4) < 0.2 ? 3 : 0), vy = -(1.4 + fbHash(i, 4, 4) * 2.8), t = db;
+		let x = mx0 + kb + sx0 + vx * t * 1.5, y = G - mh + sy0 + vy * t * 1.5 + 0.18 * t * t; if (y > G - 2) { y = G - 2 - Math.abs(Math.sin(t * 0.7)) * Math.max(0, 6 - (t - 8)) * 0.5; x = Math.max(4, x); }
+		const al = Math.max(0, 1 - Math.max(0, t - 22) / 12), s = 2 + (i % 3);
+		if (hard) { ctx.save(); ctx.globalAlpha = al; fbPx(x, y, '#2a1a14', s + 1, s + 1); fbPx(x, y, col, s, s); fbPx(x, y, 'rgba(255,240,210,0.8)', 1, 1); ctx.restore(); } else pxDisc(x, y, s * 0.7, col.replace('rgb', 'rgba').replace(')', `,${al})`)); }
+	if (db >= 0 && db < 4) { pkStar(bx + kb, by - 4, 14 + db * 6, '#ffffff', hard ? '#ffd24a' : '#ff8a7a'); ctx.save(); ctx.globalAlpha = (1 - db / 2) * 0.22; ctx.fillStyle = '#fff'; if (db < 2) ctx.fillRect(-8, -8, W + 16, H + 16); ctx.restore(); }
+	if (dc >= 0 && dc < 10) pkText('แก๊ง!', Math.min(W - 40, bx + 8), Math.max(18, by - 22 - Math.min(4, dc)), '#ffffff');
+	if (dd >= 0 && dd < 8) pkText('ตอก!!', Math.max(4, bx - 46), Math.max(18, by - 30 - Math.min(4, dd)), '#ffd24a');
+	if (db >= 0 && db < 16) pkText(hard ? 'เพล้ง!!' : 'ปึ้ก!!', Math.max(4, mx0 - 4), Math.max(18, G - mh - 4 - Math.min(5, db)), '#ffffff');
+	ctx.restore();
+	if (S.bubble !== false && F >= K.WIND - 2 && F < K.CHOP + 6) rs3Bubble(glimRow('bl8').name_th + '!', g.cx, G - 74, F - K.WIND + 2, F < K.CHOP + 3 ? 1 : (K.CHOP + 6 - F) / 3);
+	{ const h = csHit('bl8', m.id), ig = Math.round(100 * (+(((DATA.techs || []).find(t => t.tech_id === 'bl8') || {}).ignore_def) || 0));   // ดาเมจขึ้นครั้งเดียวตอนเกราะแตก (ท่ามี 1 ครั้ง)
+		if (h) dmgPop(h.v, Math.max(52, mx0 + 8), G - Math.round(mh * 0.75), db, '#ffffff', (h.aff > 0 ? 'อ่อนแอ! · ' : h.aff < 0 ? 'ต้านทาน · ' : '') + `เจาะเกราะ ${ig}%`, h.aff > 0 ? '#ffe08a' : '#c8e6ff'); }
+	sceneCaption(`${m.name} ${m.id} · ผ่าเกราะ: วิ่งจาม มีดฝังเป็นลิ่ม → กระโดดกระทืบด้าม → ร้าวทั่วตัว → แตก → ดึงมีดตีลังกากลับ`);
+	if (S.grid) drawGrid();
+}
+function kwSound(F) {
+	if (!S.sound || !AU) return; const K = KW, m = pkMon(), big = m.id === 'B1' ? 0.6 : 1, hard = KW_HARD.has((DATA.body || {})[m.monster_id || m.id] || '');
+	if (F >= K.RUN && F < K.CHOP && (F - K.RUN) % 3 === 1) auNoise(0.05, 'lowpass', 900, 200, 0.18, 1);   // ฝีเท้า
+	if (F === K.WIND + 2) AU_SFX.release.SL();   // เงื้อมีด
+	if (F === K.CHOP) { auTone(0.18, 'square', 2400, 1900, 0.12, 0, 0.002, { lp: 6000 }); auTone(0.5, 'triangle', 3100, 2900, 0.05, 0.01); auNoise(0.05, 'highpass', 3000, 6000, 0.4, 2); auMon(monVoice(m.id), false, big); }   // แก๊ง: เหล็กกระทบเกราะ ก้อง
+	if (F === K.UP) { auNoise(0.08, 'lowpass', 700, 150, 0.35, 1); auNoise(0.25, 'bandpass', 600, 1800, 0.18, 2, 0.04); }   // ถีบตัวขึ้น
+	if (F === K.DROP) auNoise(0.12, 'bandpass', 800, 2600, 0.22, 2);   // ลมดิ่ง
+	if (F === K.DRIVE) { auNoise(0.2, 'lowpass', 500, 80, 0.8, 1); auTone(0.12, 'sine', 140, 50, 0.4); auTone(0.6, 'triangle', 1800, 1700, 0.06, 0.01); if (typeof bgmDuck === 'function') bgmDuck(); }   // ตอก: กระแทกหนัก + เหล็กครวญ
+	if (F > K.DRIVE && F < K.BREAK && (F - K.DRIVE) % 2 === 1) auNoise(0.05, 'highpass', 2500 + (F - K.DRIVE) * 300, 5000, 0.16 + 0.03 * (F - K.DRIVE), 3);   // ร้าวไต่
+	if (F === K.BREAK) { auNoise(0.6, 'highpass', hard ? 2200 : 900, hard ? 6000 : 2000, 0.6, 1); auNoise(0.25, 'lowpass', 400, 70, 0.7, 1); auMon(monVoice(m.id), false, big); if (typeof bgmDuck === 'function') bgmDuck(); }   // เพล้ง: เกราะแตกกระจาย
+	if (F === K.BREAK + 2) auNoise(0.25, 'bandpass', 600, 1800, 0.18, 2);   // ลมตีลังกา
+	if (hard && F > K.BREAK + 8 && F < K.BREAK + 20 && (F - K.BREAK) % 4 === 0) auTone(0.04, 'square', 1500 + fbHash(F, 1, 1) * 1500, 900, 0.04);   // เศษตกพื้น
+	if (F === K.LAND) auNoise(0.09, 'lowpass', 700, 150, 0.4, 1);
+}
+if ((DATA.rion_pack || []).some(c => c.id === 'pls_hop_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'kw_bl8', `เขี้ยวผ่าเกราะ bl8 แบบคาบูโตะวาริ: วิ่งจามมีดฝังเกราะ ปล่อยมือ → กระโดดส้นเท้ากระทืบด้ามมีดตอกเป็นลิ่ม → ร้าวทั่วตัว → เกราะแตกกระจาย → ดึงมีดตีลังกากลับ · ${KW.END} เฟรม`,
+	Array.from({ length: KW.END }, (_, F) => kwGeo(F, true).key), KW.SEC, { kw: true, stage: [PKV.W, PKV.H] });
 if ((DATA.rion_pack || []).some(c => c.id === 'pls_spin_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'aot_bl7', `ตัดเอ็น bl7 แบบ Attack on Titan: ย่อชาร์จ → พุ่งหมุนสว่านทะลุใต้ขา (ภาพหมุนตัวจริง 4 มุม) → ไถลโผล่อีกฝั่งหันกลับ → เงียบ → แผลหลังขาระเบิด ไอพุ่ง มอนทรุดคุกเข่า → ตีลังกาข้ามหัวกลับ → มอนช้าลง · ${AOT.END} เฟรม`,
 	Array.from({ length: AOT.END }, (_, F) => aotGeo(F, true).key), AOT.SEC, { aot: true, stage: [PKV.W, PKV.H] });
 // ── ตัวเลขดาเมจ (kwan 21 ต.ค. "มีเปิดปิด damage เป็นตัวเลขด้วย") · สูตรเกม Formulas.damage ค่ากลาง (สุ่ม ±5% = 1.0) · ปุ่ม "🔢 ตัวเลขดาเมจ" (S.dmgNum)
@@ -1323,7 +1441,7 @@ function csDmg(atk, power, def, e = 1, bm = 1, guard = 1) { return Math.max(e > 
 function csHit(techId, monId) {   // Rion → มอน: ท่าใน techs.csv (ไม่มี = แถวใน tree17) · ธาตุ + ร่างกายเหมือนแท็บสกิล
 	const t = (DATA.techs || []).find(r => r.tech_id === techId) || Object.assign({ school: 'คม', element: 'ฟัน' }, glimRow(techId)), m = csMon(monId); if (!m || !t.power) return null;
 	const e = elemMult(m, t.element), bs = bodySign(t, m), bm = bs > 0 ? K.BODY_GOOD : bs < 0 ? K.BODY_BAD : 1;
-	return { v: csDmg(csAtk(), +t.power, +m.def, e, bm), hits: +t.hits || 1, aff: Math.sign((e > 1 ? 1 : e < 1 ? -1 : 0) + (bm !== 1 ? bs : 0)) };
+	return { v: csDmg(csAtk(), +t.power, +m.def * (1 - (+t.ignore_def || 0)), e, bm), hits: +t.hits || 1, aff: Math.sign((e > 1 ? 1 : e < 1 ? -1 : 0) + (bm !== 1 ? bs : 0)) };
 }
 function dmgPop(val, x, y, d, col = '#ffffff', tag = '', tagCol = '#ffe08a') {   // ตัวเลขเด้งขึ้น แล้วลอยช้า ค้าง ~1.3 วิ แล้วจาง
 	if (S.dmgNum === false || d < 0 || d >= 22) return;
@@ -2996,6 +3114,7 @@ function clipView() {
 	const c = CLIPS[S.clip], key = c.frames[S.frame], im = IMG[key];
 	if (c.blc) return blcView(c);
 	if (c.aot) return aotView(c);
+	if (c.kw) return kwView(c);
 	if (c.mon) return monAtkView(c);
 	if (c.pkv) return pkvView(c);
 	if (c.fire) return fireView(c);
@@ -4144,7 +4263,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.aot) aotSound(S.frame); else if (c.mon) monAtkSound(S.frame, c); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.aot) aotSound(S.frame); else if (c.kw) kwSound(S.frame); else if (c.mon) monAtkSound(S.frame, c); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		LOGICAL_H = 0; clipView();
 	} else {

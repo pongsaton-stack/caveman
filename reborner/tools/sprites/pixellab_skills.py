@@ -51,7 +51,16 @@ BEATS = {
 		"a short step back with the back foot, still facing left, the knife back at guard in front of the chest in the far right hand, near left fist at the chest; "
 		"a second short step back, still facing left, knees bent, knife at guard; "
 		"low Kali fighting stance again, same as the first frame"),
-	"bl8": B("ready stance facing left; grip the knife with both hands and raise it straight above the head; small hop forward, body stretched tall; at the top of the hop, knife high; drop down chopping straight down in front of the face; land with knees bent, knife low in front; rise up; ready stance"),
+	# ผ่าเกราะ · คาบูโตะวาริ (kwan 22 ต.ค. ส่งข้อมูล "ขวานจามลงเกราะ แล้วค้อนตอกหลังขวานเหมือนลิ่ม"): มีดจามฝังเกราะ → ฝ่ามือซ้ายตบสันมีดตอกลงเป็นลิ่ม · รอยร้าว/เกราะแตกทำด้วยโค้ด
+	#   รอบเดิม (ยกสองมือกระโดดจาม) ไม่ได้เจน · ดูเหมือนฟันธรรมดา → เปลี่ยนเป็นจังหวะลิ่ม · มีด = แขนขวาฝั่งไกล · มือซ้ายใกล้ว่างจนถึงจังหวะตบ
+	"bl8": B("ready stance facing left, knees bent, the knife held at chest height in the far right hand, the near left fist at the chest; "
+		"a step forward, the far right hand raises the knife high above the right shoulder, blade pointing up, the near left hand opens in front of the chest; "
+		"chop: the far right arm brings the knife straight down in front of the body and stops it at chest height, the blade horizontal with the sharp edge facing down, clearly visible; "
+		"the knife stays fixed at chest height in front, blade horizontal, the far right hand on the handle, while the near left arm lifts the open hand palm-down above the blade; "
+		"the near left open palm slams down onto the top back edge (spine) of the blade, both hands now on the knife at chest height in front of the body, knees bending; "
+		"both hands press the knife down, body dropping low and leaning forward, weight on the front foot, the blade still horizontal and visible; "
+		"the near left hand lets go and returns to a fist at the chest, the far right hand pulls the knife back toward the hip; "
+		"ready stance, knife at chest height in the far right hand, near left fist at the chest"),
 	"bl2": B("ready stance facing left; slash from upper right down to lower left; wrist turns, slash from lower left up to upper right; wrist turns again, raise the knife high; third slash straight down; knife low, body leaning forward; pull back; ready stance"),
 	"bl9": B("ready stance facing left; slowly raise the knife high above the head with both hands; hold, whole body tense, knees bent deep, mouth shouting; still tense, leaning back slightly; sudden full-power downward cut, body lunging forward; blade at the bottom, front knee deeply bent; hold the finish for a moment; straighten up into ready stance"),
 	"bl3": B("ready stance facing left; twist the waist back, knife held out to the right side at waist height; start the swing, hips turning; knife sweeps horizontally across the front at waist height toward the left; sweep continues past the left side; body fully turned, arm extended; unwind back; ready stance"),
@@ -170,6 +179,16 @@ IN_PLACE_NOT = ["turning around or facing right", "spinning the body", "jumping 
 	"a glowing ring, circle or arc of light"]
 
 
+# ท่าที่มือซ้ายมีบทบาท (ONE_HAND เดิมบอก "มือซ้ายว่างอยู่ที่อก" ขัดกับท่า) → คำบรรยายของในมือเฉพาะท่า + สิ่งที่ห้ามเพิ่ม
+HELD = {
+	"bl8": ("a short kitchen knife, blade about the length of the hand, held by the handle in the RIGHT hand (the same hand as in the start image) in every frame; it never passes to the other hand; "
+		"the left hand never grips the handle: it is an empty fist at the chest, except for two beats where its open palm presses flat on the top back edge (spine) of the blade"),
+}
+HELD_NOT = {
+	"bl8": ["the left hand gripping the knife handle", "an enemy, armor, helmet or shield drawn in front of the knife", "cracks, sparks or debris"],
+}
+
+
 def frames_for(n):
 	return n if n % 2 == 0 else n + 1
 
@@ -186,10 +205,11 @@ def skill_moves(rows):
 		if len(beats) % 2:
 			beats = beats + [beats[-1]]
 		out[r["tech_id"]] = {"dir": "west", "attack": True, "frames": len(beats), "seed": 27,
-			"held": REP[(r["school"], br)], "beats": beats,
+			"held": HELD.get(r["tech_id"], REP[(r["school"], br)]), "beats": beats,
 			"not": ["the held item disappearing in any frame", "a second copy of the held item", "a sword"]
 				+ (ONE_HAND_NOT if ONE_HAND in REP[(r["school"], br)] else [])
 				+ (COUNTER_NOT if r.get("effect") == "counter" else [])
-				+ (IN_PLACE_NOT if r["tech_id"] in IN_PLACE else []),
+				+ (IN_PLACE_NOT if r["tech_id"] in IN_PLACE else [])
+				+ HELD_NOT.get(r["tech_id"], []),
 			"name": r["name_th"]}
 	return out
