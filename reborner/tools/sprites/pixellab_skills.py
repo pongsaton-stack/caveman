@@ -62,7 +62,16 @@ BEATS = {
 		"the near left hand lets go and returns to a fist at the chest, the far right hand pulls the knife back toward the hip; "
 		"ready stance, knife at chest height in the far right hand, near left fist at the chest"),
 	"bl2": B("ready stance facing left; slash from upper right down to lower left; wrist turns, slash from lower left up to upper right; wrist turns again, raise the knife high; third slash straight down; knife low, body leaning forward; pull back; ready stance"),
-	"bl9": B("ready stance facing left; slowly raise the knife high above the head with both hands; hold, whole body tense, knees bent deep, mouth shouting; still tense, leaning back slightly; sudden full-power downward cut, body lunging forward; blade at the bottom, front knee deeply bent; hold the finish for a moment; straighten up into ready stance"),
+	# จันทร์เสี้ยวกลางหาว · จิเง็นริว (kwan 23 ต.ค. เลือก "1+2" → "2" เจนท่าทมโบะ): ยกมีดตั้งตรงข้างหัวขวา ศอกสูง เกร็งนิ่ง ตะโกน → ฟันดิ่งเดียวสุดแรง · กระโดด/พระจันทร์/รอยเสี้ยว/มอนแยก ทำด้วยโค้ด
+	#   มีดครัวด้ามสั้น จับสองมือไม่ได้ → มือขวาถือ มือซ้ายกุมทับกำปั้นขวา (ไม่จับด้าม) · ทุกจังหวะระบุแขนไกล/ใกล้ (บทเรียน bl1)
+	"bl9": B("ready stance facing left, knees bent, the knife held at chest height in the far right hand, the near left fist at the chest; "
+		"the far right hand lifts the knife up past the right side of the face, the near left hand rises and cups over the right fist; "
+		"Tonbo stance: the right fist holds the knife high beside the right side of the head at ear height, the blade pointing straight up toward the sky, both elbows raised high, the near left hand cupped over the right fist, knees bent, weight on the back foot; "
+		"the same Tonbo stance held, crouching a little deeper, whole body tense, mouth wide open shouting, the blade still pointing straight up beside the head; "
+		"explosive start of the cut: body lunging forward and down, both hands driving the knife forward over the head, the blade now pointing forward and clearly visible; "
+		"mid-cut: the knife sweeping down in front of the chest, both hands together on the right fist, body leaning far forward, front foot stepping in; "
+		"finish: the knife low in front of the front knee, the blade pointing down and forward, front knee deeply bent, back leg straight, head forward; "
+		"the same low finish held still, the knife low in front of the front knee"),
 	"bl3": B("ready stance facing left; twist the waist back, knife held out to the right side at waist height; start the swing, hips turning; knife sweeps horizontally across the front at waist height toward the left; sweep continues past the left side; body fully turned, arm extended; unwind back; ready stance"),
 	"bl10": B("ready stance facing left; lean forward and start running left, knife held low behind; running, knife coming forward; slash forward at chest height while still running, not stopping; keep running past, knife trailing behind; skid to a stop, feet sliding; turn the upper body back slightly; ready stance facing left"),
 	"bl11": B("ready stance facing left; draw the knife back behind the head; throw the knife forward with a flick, the hand now empty and extended; the empty hand stays open waiting, body leaning forward; hand still waiting, eyes forward; hand closes catching the returning knife; pull it back to the chest; ready stance holding the knife"),
@@ -181,12 +190,19 @@ IN_PLACE_NOT = ["turning around or facing right", "spinning the body", "jumping 
 
 # ท่าที่มือซ้ายมีบทบาท (ONE_HAND เดิมบอก "มือซ้ายว่างอยู่ที่อก" ขัดกับท่า) → คำบรรยายของในมือเฉพาะท่า + สิ่งที่ห้ามเพิ่ม
 HELD = {
+	"bl9": ("a short kitchen knife, blade about the length of the hand, held by the handle in the RIGHT hand (the same hand as in the start image) in every frame; it never passes to the other hand; "
+		"from the second beat on, the left hand is cupped over the back of the right fist (it never grips the blade and never covers the face)"),
 	"bl8": ("a short kitchen knife, blade about the length of the hand, held by the handle in the RIGHT hand (the same hand as in the start image) in every frame; it never passes to the other hand; "
 		"the left hand never grips the handle: it is an empty fist at the chest, except for two beats where its open palm presses flat on the top back edge (spine) of the blade"),
 }
 HELD_NOT = {
+	"bl9": ["the left hand gripping the blade", "a long sword or katana", "a glowing arc, crescent or streak of light", "a moon"],
 	"bl8": ["the left hand gripping the knife handle", "an enemy, armor, helmet or shield drawn in front of the knife", "cracks, sparks or debris"],
 }
+
+
+# ท่าที่ตั้งใจค้างท่าง้าง (จิเง็นริว ทมโบะ) → ไม่ใส่ประโยคโมเมนตัม "Never freeze in a held wind-up pose" ที่ขัดกับจังหวะค้าง
+HOLD_STILL = {"bl9"}
 
 
 def frames_for(n):
@@ -204,7 +220,7 @@ def skill_moves(rows):
 		beats = BEATS[r["tech_id"]]
 		if len(beats) % 2:
 			beats = beats + [beats[-1]]
-		out[r["tech_id"]] = {"dir": "west", "attack": True, "frames": len(beats), "seed": 27,
+		out[r["tech_id"]] = {"dir": "west", "attack": r["tech_id"] not in HOLD_STILL, "frames": len(beats), "seed": 27,
 			"held": HELD.get(r["tech_id"], REP[(r["school"], br)]), "beats": beats,
 			"not": ["the held item disappearing in any frame", "a second copy of the held item", "a sword"]
 				+ (ONE_HAND_NOT if ONE_HAND in REP[(r["school"], br)] else [])

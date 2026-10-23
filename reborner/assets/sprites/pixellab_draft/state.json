@@ -763,6 +763,25 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "bl9",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "741376d5-b83e-4941-9c44-4420154b6edb"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "cbf62347-359e-4fc1-aa47-476069cef1a4",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -799,7 +818,8 @@
   "0a6b9784-626f-4561-8671-52d2a24ab073": "completed",
   "eddd8c1c-27bd-48a9-b841-b6f1d468bdbc": "completed",
   "f690078c-1fa1-4d60-afdb-42d80aaab1a3": "completed",
-  "08a437dd-905f-4023-943e-88d611897c0b": "completed"
+  "08a437dd-905f-4023-943e-88d611897c0b": "completed",
+  "741376d5-b83e-4941-9c44-4420154b6edb": "completed"
  },
  "states": {
   "fight_knife": {

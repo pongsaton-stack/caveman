@@ -39,6 +39,7 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_glim_shift", "ท่ากลางประกาย · ง้าง → ย่อ (มีด)", "fight_knife", "glim_shift_v2", "west", None, 90, False),   # รอบแรกเซิร์ฟเวอร์ PixelLab หมดเวลา (ไม่หักเครดิต) · kwan 21 ต.ค. "เจนภาพท่ากลาง": end_frame จาก bl0_v2 เฟรม 4 → bl1_v2 เฟรม 3
 	("pls_bl7", "ตัดเอ็น bl7 (กาลี) · มีด", "fight_knife", "bl7_v", "west", [0, 1, 4, 5], 90, False),   # kwan 21 ต.ค.: ใช้ 0 ตั้งการ์ด · 1 ก้าวเข้ามีดวนขึ้น · 4 มีดวนลงหน้า · 5 ปาด (2–3 มีดชิดหน้า · 6 ประกายวาดติด · 7 มีดหาย · 5–7 เดินหน้าไม่ถอย)
 	("pls_bl7_back", "ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame)", "fight_knife", "bl7_back_v", "west", None, 90, False),
+	("pls_bl9", "จันทร์เสี้ยว bl9 · ท่าทมโบะ (มีด)", "fight_knife", "bl9_v", "west", [0, 1, 2, 3, 4], 90, False),   # kwan 23 ต.ค. เลือก "2" เจนท่าทมโบะ (จิเง็นริว) · 2 gen · เฟรม 5–7 วาดเส้นฟาดใหญ่ + มีดหาย ตัดทิ้ง → ช่วงฟันใช้ pls_atk_bl 5–7
 	("pls_spin_bl", "หมุนตัว 4 มุมจริง · ถือมีด (State)", "fight_knife", "__rot__", "west", None, 60, True),   # ตัดเอ็นแบบ Attack on Titan (kwan 21 ต.ค.): หมุนสว่านผ่านใต้ขามอน
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]

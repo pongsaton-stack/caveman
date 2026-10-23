@@ -1568,6 +1568,113 @@ function wrSound(F) {
 }
 if ((DATA.rion_pack || []).some(c => c.id === 'pls_spin_bl') && (DATA.rion_pack || []).some(c => c.id === 'pls_hop_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'wr_bl2', `เขี้ยวพัน bl2 แบบงูพันเหยื่อ: วิ่งฟันหน้า → ตีลังกาข้ามหัว ฟันหลังตอนแตะพื้น → หมุนสว่านผ่านหลังมอน ฟันหน้า → วงแสง 3 วงรัดจนแตก เลือดไหล → กระโดดถอยกลับ · ${WR.END} เฟรม`,
 	Array.from({ length: WR.END }, (_, F) => wrGeo(F, true).key), WR.SEC, { wr: true, stage: [PKV.W, PKV.H] });
+// ── จันทร์เสี้ยวกลางหาว bl9 แบบจิเง็นริว (kwan 23 ต.ค. "1+2" → "2" เจนท่าทมโบะ · ท่าในข้อมูล: ฟันเดียว พลัง 200 · ศาสตร์อ้างอิง จิเง็นริว "ไม่มีดาบที่สอง")
+//   นิ่ง: ยกมีดท่าทมโบะ (ภาพ PixelLab pls_bl9) ฉากมืดคราม ฉากหลังหยุดนิ่ง พระจันทร์เสี้ยวค่อยขึ้น ตัวสั่น → ตะโกนชื่อท่า →
+//   วิ่ง กระโดดข้ามหัวมอน → จุดสูงสุดเวลาช้า ตัวเป็นเงาดำตัดพระจันทร์ (ขอบแสงจันทร์) → ฟันโค้งลงผ่านตัวมอน รอยเป็นเสี้ยวจันทร์ → ลงอีกฝั่ง หันหลังให้มอน ค้างท่าตามแรง →
+//   เงียบ (ไม่มีเสียงตี มอนยังหายใจ) → พระจันทร์กับรอยเสี้ยววาบพร้อมกัน → ตัวมอนแยกตามแนวเสี้ยว: ดาเมจถึง HP (สูตรเกม) = ครึ่งบนไถลหลุดแล้วสลาย · ไม่ถึง = เปิดแว้บแล้วประกบ เหลือแผลเรือง → วิ่งกลับที่
+//   ฟันลงใช้ pls_atk_bl 5–7 (มือขวา ตรวจแล้ว) · ภาพทมโบะ = pls_bl9 0–4 · ค่าภาพของหน้าเทส ไม่ใช่ค่าเกม
+const JG = { END: 112, RAISE: 8, TONBO: 12, SHOUT: 28, RUN: 34, LEAP: 39, APEX: 45, SLOW: 3, CUT: 48, LAND: 53, SPLIT: 65, TURN: 72, BACK: 74, HOME: 90, MX: 112, SEC: 0.06 };
+function jgGeo(F, reg) {   // ฉาก: มอน · พระจันทร์ · แนวฟัน (เบซิเยร์ 2 จุดปลาย + จุดคุม) · Rion
+	const m = reg ? null : pkMon(), ik = m ? pkRole(m, 'idle') : null, al = ik ? kwAlpha(ik) : null, mim = (ik && IMG[ik]) || { width: 48, height: 48 }, { W, G } = PKV, K = JG;
+	const mw = mim.width, mh = mim.height, mx0 = Math.round(K.MX - mw / 2), home = W - 40, mcx = mx0 + mw / 2;
+	let top0 = Math.round(mh * 0.3); if (al) top0: for (let y = 0; y < mh; y++) for (let x = 0; x < mw; x++) if (al.a(x, y)) { top0 = y; break top0; }
+	const bh = mh - top0, [lt, rt] = al ? wrEdges(al, mw, mh, top0 + 3) : [mw * 0.3, mw * 0.7], [lb] = al ? wrEdges(al, mw, mh, mh - 4) : [mw * 0.1];
+	const moonY = Math.max(22, Math.min(52, G - bh - 30)), moonX = mx0 + mw / 2 + 16, apexL = Math.min(72, G - 44 - moonY), x0 = mx0 + mw + 30, xland = Math.max(30, mx0 - 26);   // ยอดกระโดด: ตัว Rion อยู่ในเว้าของพระจันทร์เสี้ยว (ขอบสว่างโอบด้านซ้าย) · ไม่เกิน 72 (ภาพทมโบะสูง ~80 เหนือเท้า หัวไม่หลุดขอบบน)
+	const P0 = [mx0 + rt + 5, G - bh - 4], P2 = [mx0 + Math.max(lb, mw * 0.12) + 2, G - 2], d = [P2[0] - P0[0], P2[1] - P0[1]], L = Math.hypot(d[0], d[1]);
+	const [lm, rm] = al ? wrEdges(al, mw, mh, Math.round(top0 + bh * 0.5)) : [mw * 0.2, mw * 0.8], mid = [mx0 + (lm + rm) / 2, G - bh * 0.5], P1 = [2 * mid[0] - (P0[0] + P2[0]) / 2 - (rm - lm) * 0.15, 2 * mid[1] - (P0[1] + P2[1]) / 2];   // จุดคุมโป่งไปซ้ายบน → แนวฟันรูป "(" เหมือนพระจันทร์เสี้ยว · จุดคุมคิดให้กลางเส้นผ่ากลางตัวพอดี (โป่งซ้าย 15% ของความกว้าง) → แยกเป็นสองซีกเท่าๆ กัน
+	const cut = u => [(1 - u) * (1 - u) * P0[0] + 2 * u * (1 - u) * P1[0] + u * u * P2[0], (1 - u) * (1 - u) * P0[1] + 2 * u * (1 - u) * P1[1] + u * u * P2[1]];
+	const r = { m, al, ik, mw, mh, mx0, mcx, bh, home, moonY, moonX, apexL, xland, cut, chord: [d[0] / L, d[1] / L], cx: home, lift: 0, key: `rpk/pls_idle_bl_${Math.floor(F / 4) % 4}`, flip: false, rot: 0, sx: 1, sy: 1 };
+	if (F < K.RAISE) return r;
+	if (F < K.RUN) { r.key = F < K.RAISE + 2 ? 'rpk/pls_bl9_0' : F < K.TONBO ? 'rpk/pls_bl9_1' : F < K.TONBO + 2 ? 'rpk/pls_bl9_2' : F < K.SHOUT ? 'rpk/pls_bl9_3' : 'rpk/pls_bl9_4';   // ยก → ทมโบะ → ตะโกน
+		if (F >= K.TONBO) r.sy = 1 - 0.004 * Math.min(8, F - K.TONBO);   // ย่อลงเรื่อยๆ
+		if (F >= K.TONBO + 6) r.cx += (F % 2 ? 1 : -1) * (F >= K.SHOUT ? 1 : 0.5);   // ตัวสั่น (แรงขึ้นหลังตะโกน)
+		return r; }
+	if (F < K.LEAP) { const t = (F - K.RUN + 1) / (K.LEAP - K.RUN + 1); r.cx = home + (x0 - home) * (0.45 * t * t + 0.55 * t); r.key = `rpk/pls_run_bl_${(F - K.RUN) % 6}`; return r; }   // วิ่งเร่ง
+	if (F < K.APEX) { if (F === K.LEAP) { r.cx = x0; r.key = 'rpk/pls_hop_bl_2'; r.sy = 0.94; return r; }   // ถีบ
+		const t = (F - K.LEAP) / (K.APEX - K.LEAP), e = 1 - (1 - t) * (1 - t); r.cx = x0 + (moonX + 6 - x0) * e; r.lift = Math.round(apexL * e); r.key = 'rpk/pls_bl9_3'; return r; }   // ลอยขึ้นในท่าทมโบะ (ชะลอที่ยอด)
+	if (F < K.CUT) { r.cx = moonX + 6 - (F - K.APEX); r.lift = apexL; r.key = 'rpk/pls_bl9_4'; r.sil = true; return r; }   // ยอด: เวลาช้า เงาดำตัดพระจันทร์
+	if (F < K.LAND) { const t = (F - K.CUT + 1) / (K.LAND - K.CUT), e = t * t; r.cx = moonX + 3 + (xland - (moonX + 3)) * t; r.lift = Math.round(apexL * (1 - e)); r.key = F < K.CUT + 2 ? 'rpk/pls_atk_bl_5' : 'rpk/pls_atk_bl_6'; return r; }   // ฟันโค้งลงผ่านตัว (ตกเร่ง)
+	if (F < K.TURN) { const q = F - K.LAND; r.cx = xland - Math.round(7 * (1 - Math.pow(0.6, q + 1))); r.key = 'rpk/pls_atk_bl_7'; if (q < 2) { r.sy = 0.92; r.sx = 1.05; } return r; }   // ลงพื้น ไถลตามแรง ค้างท่า หันหลังให้มอน (เงียบ)
+	const xs = xland - 7;
+	if (F < K.BACK) { r.cx = xs; r.key = F === K.TURN ? aotSpin(3) : aotSpin(2); return r; }   // หันกลับ (หน้า → ขวา)
+	if (F < K.HOME - 2) { const t = (F - K.BACK + 1) / (K.HOME - 2 - K.BACK); r.cx = xs + (home - xs) * t; r.key = `rpk/pls_run_bl_${(F - K.BACK) % 6}`; r.flip = true; r.back = true; return r; }   // วิ่งกลับทางฝั่งไกล (หลังมอน)
+	r.cx = home; if (F < K.HOME) { r.key = F === K.HOME - 2 ? aotSpin(3) : aotSpin(0); return r; } return r;
+}
+function jgPiece(img, x, y, poly, ox, oy, al) {   // ชิ้นมอนตามแนวฟัน (ตัดด้วยรูปหลายเหลี่ยม)
+	ctx.save(); ctx.beginPath(); poly.forEach(([px, py], i) => i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)); ctx.closePath(); ctx.clip(); ctx.globalAlpha = al; ctx.drawImage(img, x + ox, y + oy); ctx.restore();
+}
+function jgMoon(x, y, R, al) {   // พระจันทร์เสี้ยวพิกเซล (วงใหญ่ลบวงเยื้องขวาบน) + แสงฟุ้งรอบ
+	if (al <= 0) return; ctx.save(); ctx.globalAlpha = al * 0.28; const gr = ctx.createRadialGradient(x, y, 2, x, y, R * 2.6); gr.addColorStop(0, '#fff4c8'); gr.addColorStop(1, 'rgba(255,244,200,0)'); ctx.fillStyle = gr; ctx.fillRect(x - R * 3, y - R * 3, R * 6, R * 6); ctx.restore();
+	ctx.save(); ctx.globalAlpha = al; for (let j = -R; j <= R; j++) for (let i = -R; i <= R; i++) { if (i * i + j * j > R * R) continue; const a = i - R * 0.45, b = j + R * 0.3; if (a * a + b * b < R * R * 0.78) continue;
+		fbPx(x + i, y + j, (i * i + j * j > (R - 1.5) * (R - 1.5)) ? '#e8c878' : (i < -R * 0.5 ? '#fffbe6' : '#f6e7b4'), 1, 1); } ctx.restore();
+}
+function jgView(c) {
+	const F = S.frame, K = JG, { W, H, G } = PKV; cv.width = W; cv.height = H; ctx.imageSmoothingEnabled = false;
+	const g = jgGeo(F), { m, mw, mh, mx0, mcx, bh, moonY, moonX, cut, chord } = g, ds = F - K.SPLIT, h = csHit('bl9', m.id), mrow = csMon(m.id), kill = !!(h && mrow && h.v >= +mrow.hp);
+	S.bgStop = F >= K.TONBO && F < K.SPLIT;   // ทั้งโลกกลั้นหายใจ: หิมะ/เถ้า/น้ำตกหยุดตั้งแต่ตั้งท่าจนแยก
+	const shk = F >= K.SHOUT && F < K.SHOUT + 4 ? 2 * (1 - (F - K.SHOUT) / 4) : ds >= 0 && ds < 6 ? 4 * (1 - ds / 6) : 0, rs = vRng(F * 31 + 7);
+	drawBg(); ctx.save(); ctx.translate(Math.round((rs() * 2 - 1) * shk), Math.round((rs() * 2 - 1) * shk)); drawBg();
+	const dim = F < K.TONBO ? 0 : F < K.SHOUT ? 0.45 * (F - K.TONBO) / (K.SHOUT - K.TONBO) : ds < 6 ? 0.45 : Math.max(0, 0.45 * (1 - (ds - 6) / 16));
+	if (dim) { ctx.save(); ctx.globalAlpha = dim; ctx.fillStyle = '#0c1028'; ctx.fillRect(-8, -8, W + 16, H + 16); ctx.restore(); }
+	// พระจันทร์: ขึ้นช่วงตั้งท่า (ลอยขึ้น + ชัดขึ้น) · วาบพร้อมรอยเสี้ยวก่อนแยก · จางหลังแยก
+	const mp = F < K.TONBO ? 0 : Math.min(1, (F - K.TONBO) / (K.SHOUT - K.TONBO)), me = 1 - (1 - mp) * (1 - mp), fadeM = ds < 8 ? 1 : Math.max(0, 1 - (ds - 8) / 14), flash = F === K.SPLIT - 5 || F === K.SPLIT - 4;
+	jgMoon(Math.round(moonX), Math.round(moonY + (1 - me) * 26), 18, me * fadeM * (flash ? 1 : 0.92));
+	if (flash) jgMoon(Math.round(moonX), moonY, 19, 0.6);
+	// Rion ช่วงวิ่งกลับทางฝั่งไกล (ถูกมอนบัง) · มอนตายแล้ว = วาดตามปกติด้านหน้า
+	if (g.back && !kill) aotDraw(g, 1);
+	// มอน: ยังหายใจปกติจนแยก (ไม่รู้ตัว) · แยกตามแนวเสี้ยว
+	const idle = IMG[g.ik], my = G - mh, poly = []; for (let i = 0; i <= 24; i++) poly.push(cut(i / 24));
+	const ext = (p, q, k) => { const dx = p[0] - q[0], dy = p[1] - q[1], l = Math.hypot(dx, dy) || 1; return [p[0] + dx / l * k, p[1] + dy / l * k]; };   // ต่อปลายเส้นเป็นเส้นตรงตามทิศสัมผัส (ไม่ใช้เบซิเยร์นอกช่วง 0–1 ซึ่งม้วนกลับ)
+	const a0 = ext(poly[0], poly[1], 300), a1 = ext(poly[24], poly[23], 300), line = [a0, ...poly, a1];
+	const up = [...line, [a1[0] - 600, a1[1] - 600], [a0[0] - 600, a0[1] - 600]], dn = [...line, [a1[0] + 600, a1[1] + 600], [a0[0] + 600, a0[1] + 600]];   // ซีกบนซ้าย / ซีกล่างขวาของแนวฟัน
+	if (ds < 0) { const mi = IMG[pkRole(m, 'idle', Math.floor(F / (F >= K.LAND ? 6 : 4)) % 3)]; ctx.drawImage(mi, mx0 + Math.round((mw - mi.width) / 2), G - mi.height); }
+	else if (kill) { const q = ds, s = 1.2 * q + 0.16 * q * q, al = q < 8 ? 1 : Math.max(0, 1 - (q - 8) / 8), wf = q < 2 ? pkTint(g.ik, '#fff', 1) : idle;
+		jgPiece(wf, mx0, my, dn, Math.round(0.35 * q), 0, al);   // ซีกล่างขวาทรุดเอนออก
+		jgPiece(wf, mx0, my, up, Math.round(chord[0] * s), Math.round(chord[1] * s + 0.08 * q * q), al);   // ครึ่งบนไถลหลุดตามแนวฟัน
+		if (q >= 6 && q < 22 && g.al) for (let i = 0; i < 60; i++) { const sx0 = Math.round(fbHash(i, 1, 9) * mw), sy0 = Math.round(fbHash(i, 2, 9) * mh); if (!g.al.a(sx0, sy0)) continue; const t = q - 6;   // สลายเป็นผงพิกเซลลอยขึ้น
+			fbPx(mx0 + sx0 + (fbHash(i, 3, 9) - 0.5) * t * 2, my + sy0 - t * (0.8 + fbHash(i, 4, 9)), g.al.rgb(sx0, sy0).replace('rgb', 'rgba').replace(')', `,${1 - t / 16})`), 1, 1); } }
+	else { const q = ds, open = q < 5 ? [0, 2, 3, 2, 1][q] : 0, mk = q < 10 ? pkRole(m, 'hurt') : pkRole(m, 'idle', Math.floor(F / 4) % 3), mi = q < 2 ? pkTint(mk, '#fff', 1) : IMG[mk], kb = q < 8 ? -Math.round(3 * (1 - q / 8)) : 0;
+		if (open && mi.width === mw && mi.height === mh) { jgPiece(mi, mx0, my, dn, 0, 0, 1); jgPiece(mi, mx0, my, up, Math.round(chord[0] * open), Math.round(chord[1] * open), 1); }   // เปิดแว้บตามแนวฟันแล้วประกบ
+		else ctx.drawImage(mi, mx0 + kb + Math.round((mw - mi.width) / 2), G - mi.height);
+		if (g.al && q < 40) for (let i = 0; i <= 80; i++) { const [x, y] = cut(i / 80), px = Math.round(x - mx0), py = Math.round(y - my); if (!g.al.a(px, py)) continue;   // แผลเรืองตามแนวเสี้ยว (เฉพาะบนเนื้อ)
+			fbPx(x + kb, y, `rgba(42,26,20,${0.7 * (1 - q / 40)})`, 2, 1); fbPx(x + kb, y, q < 10 ? '#fff4c8' : `rgba(232,200,120,${1 - q / 40})`, 1, 1); } }
+	// รอยเสี้ยวจันทร์: เผยตามปลายมีดช่วงฟันลง (หนากลาง บางปลาย) · ค้างจาง ๆ ช่วงเงียบ · วาบพร้อมพระจันทร์ · แยก = หาย
+	if (F >= K.CUT && ds < 2) { const p = Math.min(1, (F - K.CUT + 1) / (K.LAND - K.CUT)), u0 = -0.12, n = 90, lit = flash ? 1 : F >= K.LAND ? 0.55 : 1;
+		for (let i = 0; i <= n; i++) { const u = u0 + (1.05 - u0) * i / n; if ((i / n) > p) break; const [x, y] = cut(u), w = Math.max(1, Math.round(1 + 4 * Math.sin(Math.PI * i / n))), head = (i / n) > p - 0.06 && p < 1;
+			if (y > G - 1 || y < 3) continue; fbPx(x - 1, y - w / 2 - 1, `rgba(232,200,120,${0.55 * lit})`, 3, w + 2); fbPx(x, y - w / 2, head ? '#ffffff' : `rgba(255,248,220,${lit})`, 1, Math.max(1, w - 1)); } }
+	// Rion ด้านหน้า: เงาพื้นตอนลอย · ร่างติดตาตอนขึ้น/ฟันลง · เงาดำตัดพระจันทร์ที่ยอด (ขอบแสงจันทร์)
+	if (!(g.back && !kill)) { if (g.lift > 2) for (let i = -9; i <= 9; i++) if (Math.abs(i) < 9 * Math.max(0.35, 1 - g.lift / 90)) fbPx(g.cx + i * 1.6, G - 1, 'rgba(40,30,24,0.4)', 2, 1);
+		if ((F > K.LEAP && F < K.APEX) || (F >= K.CUT && F < K.LAND)) for (let k = 2; k >= 1; k--) aotDraw(jgGeo(F - k), 0.14 * (3 - k), '#fff4c8');
+		if (g.sil) { aotDraw(Object.assign({}, g, { cx: g.cx - 1, lift: g.lift + 1 }), 0.95, '#fff4c8'); aotDraw(g, 1, '#141a33'); } else aotDraw(g, 1); }
+	// นิ่ง: ลมหายใจเป็นไอขาวที่ปาก · ฝุ่น: ถีบ/ลงพื้น
+	if (F >= K.TONBO + 4 && F < K.RUN) { const q = (F - K.TONBO - 4) % 10; if (q < 6) for (let i = 0; i < 3; i++) fbPx(g.cx - 18 - q * 1.2 - i, G - 58 - q * 0.6 + i, `rgba(235,240,255,${0.5 * (1 - q / 6)})`, 2, 1); }
+	for (const [t, fx, dir, sz] of [[K.LEAP, g.xland + (mx0 + mw + 30 - g.xland), 1, 1.2], [K.LAND, g.xland, -1, 1.2], [K.HOME - 2, g.home, 1, 0.6]]) { const q = F - t; if (q < 0 || q >= 10) continue;
+		for (let i = 0; i < 5; i++) { const r = fbHash(t, i, 1), x = fx + dir * (3 + i * 3 + q * (1 + r)), y = G - 1 - (r * 3 + q * 0.6) * sz, s2 = Math.max(1, Math.round((3 - q * 0.25) * sz)); if (fbHash(t, i, q) < q / 12) continue; fbPx(x, y, q < 4 ? '#e2d6c0' : '#cdbfa6', s2, Math.max(1, s2 - 1)); } }
+	if (ds >= 0 && ds < 4) pkStar(cut(0.5)[0], cut(0.5)[1], 10 + ds * 6, '#ffffff', '#ffd27a');
+	if (ds >= 0 && ds < 14) pkText(kill ? 'ขาด!!' : 'ฉับ!!', Math.min(W - 44, mx0 + mw + 4), Math.max(18, G - bh - 4 - Math.min(5, ds)), '#fff4c8');
+	if (F >= K.LAND + 3 && ds < 0) { const k = F - K.LAND - 3; ctx.save(); ctx.globalAlpha = Math.min(1, k / 2); ctx.font = 'bold 9px system-ui, sans-serif'; ctx.fillStyle = '#e8ecff'; ctx.fillText('.'.repeat(1 + Math.min(2, k >> 2)), mcx - 4, G - bh - 6); ctx.restore(); }   // เงียบ
+	ctx.restore();
+	if (S.bubble !== false && F >= K.SHOUT && F < K.RUN + 3) rs3Bubble(glimRow('bl9').name_th + '!', g.cx, Math.max(14, G - g.lift - 74), F - K.SHOUT, F < K.RUN ? 1 : (K.RUN + 3 - F) / 3);
+	if (h) dmgPop(h.v, Math.round(Math.max(30, Math.min(W - 30, mcx))), Math.max(30, G - bh - 14), ds, '#fff4c8', (h.aff > 0 ? 'อ่อนแอ! · ' : h.aff < 0 ? 'ต้านทาน · ' : '') + (kill ? `HP ${mrow.hp} · ฟันเดียวขาด` : `HP ${mrow.hp} รอด`), h.aff > 0 ? '#ffe08a' : '#c8e6ff');
+	sceneCaption(`${m.name} ${m.id} · จันทร์เสี้ยวกลางหาว: ทมโบะนิ่ง พระจันทร์ขึ้น → ตะโกน → กระโดดตัดพระจันทร์ ฟันเดียว → เงียบ → ${kill ? 'ขาด' : 'แผลเรือง (รอด)'}`);
+	if (S.grid) drawGrid();
+}
+function jgSound(F) {
+	if (!S.sound || !AU) return; const K = JG, m = pkMon(), big = m.id === 'B1' ? 0.6 : 1, h = csHit('bl9', m.id), mrow = csMon(m.id), kill = !!(h && mrow && h.v >= +mrow.hp);
+	if (F === K.TONBO) AU_SFX.charge('SL');   // เก็บแรง
+	if (F >= K.TONBO + 4 && F < K.SHOUT && (F - K.TONBO - 4) % 10 === 0) auNoise(0.35, 'bandpass', 500, 300, 0.08, 1);   // ลมหายใจ
+	if (F === K.SHOUT) { auNoise(0.3, 'bandpass', 1800, 900, 0.35, 2); auTone(0.25, 'sawtooth', 220, 160, 0.06, 0, 0.002, { lp: 1500 }); if (typeof bgmDuck === 'function') bgmDuck(); }   // ตะโกน (ไม่ใช้เสียงพูด)
+	if (F >= K.RUN && F < K.LEAP && (F - K.RUN) % 2 === 0) auNoise(0.05, 'lowpass', 900, 200, 0.3, 1);   // ฝีเท้าเร่ง
+	if (F === K.LEAP) { auNoise(0.1, 'lowpass', 600, 120, 0.6, 1); auNoise(0.4, 'bandpass', 500, 1600, 0.2, 2, 0.04); }   // ถีบตัวขึ้น
+	if (F === K.APEX) auNoise(0.6, 'lowpass', 400, 200, 0.12, 1);   // ยอด: ลมว่างเปล่า
+	if (F === K.CUT) AU_SFX.release.SL();   // ฟันลง (ยังไม่มีเสียงโดน)
+	if (F === K.LAND) auNoise(0.25, 'lowpass', 1200, 300, 0.25, 2);   // ไถลเท้า แล้วเงียบ
+	if (F === K.SPLIT) { AU_SFX.hit('SL', false); auNoise(0.06, 'highpass', 3000, 7000, 0.6, 3); auTone(0.15, 'sine', 150, 45, 0.45); auMon(monVoice(m.id), false, big); if (typeof bgmDuck === 'function') bgmDuck(); }   // เสียงโดนมาทีหลังความเงียบ
+	if (kill && F === K.SPLIT + 10) auNoise(0.3, 'lowpass', 500, 80, 0.5, 1);   // ครึ่งบนหล่นกระแทก
+	if (F >= K.BACK && F < K.HOME - 2 && (F - K.BACK) % 3 === 0) auNoise(0.05, 'lowpass', 900, 200, 0.18, 1);
+}
+if ((DATA.rion_pack || []).some(c => c.id === 'pls_bl9') && (DATA.rion_pack || []).some(c => c.id === 'pls_spin_bl')) addClip('★ ฉากต่อสู้ · Rion PixelLab (คม มีด)', 'jg_bl9', `จันทร์เสี้ยวกลางหาว bl9 แบบจิเง็นริว: ท่าทมโบะนิ่ง พระจันทร์เสี้ยวขึ้น → ตะโกน → กระโดดเป็นเงาตัดพระจันทร์ ฟันเดียวเป็นรอยเสี้ยว → เงียบ → มอนแยกตามแนวฟัน (ดาเมจถึง HP = ขาด · ไม่ถึง = แผลเรือง) · ${JG.END} เฟรม`,
+	Array.from({ length: JG.END }, (_, F) => jgGeo(F, true).key), JG.SEC, { jg: true, stage: [PKV.W, PKV.H] });
 // ── ตัวเลขดาเมจ (kwan 21 ต.ค. "มีเปิดปิด damage เป็นตัวเลขด้วย") · สูตรเกม Formulas.damage ค่ากลาง (สุ่ม ±5% = 1.0) · ปุ่ม "🔢 ตัวเลขดาเมจ" (S.dmgNum)
 // Rion ในฉากต่อสู้ = ความชำนาญ 20 + มีดทำครัว 14 (ค่าเดียวกับหน้า UI Kit · อาวุธ W11 = 14 ใน GDD) · ATK/DEF ตามสูตร Formulas.hero_atk / hero_def
 const CS = { PROF: 20, WPN: 14 };
@@ -3252,6 +3359,7 @@ function clipView() {
 	if (c.aot) return aotView(c);
 	if (c.kw) return kwView(c);
 	if (c.wr) return wrView(c);
+	if (c.jg) return jgView(c);
 	if (c.mon) return monAtkView(c);
 	if (c.pkv) return pkvView(c);
 	if (c.fire) return fireView(c);
@@ -4390,7 +4498,7 @@ function playTech(t) {
 let last = performance.now();
 function tick(now) {
 	const raw = Math.min(0.1, (now - last) / 1000); last = now;
-	if (S.playing && !(S.bgStop && CLIPS[S.clip] && CLIPS[S.clip].blc)) S.bgT = (S.bgT || 0) + raw;   // เวลาฉากขยับ (bgAmbient) · หยุดตอนเวลาหยุดของประกาย
+	if (S.playing && !(S.bgStop && CLIPS[S.clip] && (CLIPS[S.clip].blc || CLIPS[S.clip].jg))) S.bgT = (S.bgT || 0) + raw;   // เวลาฉากขยับ (bgAmbient) · หยุดตอนเวลาหยุดของประกาย
 	let dt = raw * S.speed;
 	if (S.hitstop > 0 && S.tab === 'skills' && S.playing) { S.hitstop -= raw; dt *= 0.06; }   // หยุดภาพตอนกระทบ (hit-stop)
 	else if (S.slow && S.slow.left > 0 && S.tab === 'skills' && S.playing) { S.slow.left -= raw; dt *= S.slow.k; }   // สโลว์โมชันหลังหยุดภาพ
@@ -4400,7 +4508,7 @@ function tick(now) {
 			S.acc += dt;
 			while (S.acc >= c.sec) { S.acc -= c.sec;
 				if (c.hold && S.frame === c.frames.length - 1) { S.acc = 0; break; }
-				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.aot) aotSound(S.frame); else if (c.kw) kwSound(S.frame); else if (c.wr) wrSound(S.frame); else if (c.mon) monAtkSound(S.frame, c); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
+				S.frame = (S.frame + 1) % c.frames.length; syncFrame(); if (c.blc) blcSound(S.frame); else if (c.aot) aotSound(S.frame); else if (c.kw) kwSound(S.frame); else if (c.wr) wrSound(S.frame); else if (c.jg) jgSound(S.frame); else if (c.mon) monAtkSound(S.frame, c); else if (c.pkv) pkvSound(S.frame); else if (c.rs3) rs3Sound(c, S.frame); else if (c.fire) fireSound(S.frame, c); else if (c.fireLab) fbLabSound(c, S.frame); else if (c.vfx) { if (c.roll) { const [F, m] = c.combo ? rollPhase(S.frame) : [S.frame, '']; if (m !== 'dance') { vfxSound(c, F - c.atk); rollSound(F, m); } else chachaSound(F); } else vfxSound(c, c.epic ? S.frame - (c.atk ?? RS3.ATK) : S.frame); } }
 		}
 		LOGICAL_H = 0; clipView();
 	} else {

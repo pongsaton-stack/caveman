@@ -806,6 +806,25 @@
         },
         {
           "status": "draft",
+          "date": "2026-10-23",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl9",
+          "name": "จันทร์เสี้ยวกลางหาว bl9 · ท่าทมโบะจิเง็นริว → ฟันดิ่ง (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl9_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl9"
+          },
+          "notes": "kwan 23 ต.ค. เลือก \"1+2\" → \"2\" เจนท่าทมโบะ · ผ่าน (ร่าง) เฟรม 0–4: ยกมีดตั้งตรงหลังหมวก มือซ้ายกุมทับกำปั้นขวา ปากตะโกน · ไม่ผ่าน เฟรม 5–7: วาดเส้นฟาดฟ้าใหญ่ทั้งที่ห้าม + มีดหาย → ช่วงฟันใช้ atk_bl 5–7 · ยอด 1,784 → 1,782 · ฉาก jg_bl9"
+        },
+        {
+          "status": "draft",
           "date": "2026-10-19",
           "gens": 2,
           "seed": 27,

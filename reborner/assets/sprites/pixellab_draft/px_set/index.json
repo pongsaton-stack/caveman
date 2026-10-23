@@ -415,6 +415,25 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bl9",
+   "label": "จันทร์เสี้ยว bl9 · ท่าทมโบะ (มีด) · 5 เฟรม (PixelLab · ลบแสงที่วาดติดมา 19 จุด)",
+   "frames": [
+    "pls_bl9_0",
+    "pls_bl9_1",
+    "pls_bl9_2",
+    "pls_bl9_3",
+    "pls_bl9_4"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl9_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_spin_bl",
    "label": "หมุนตัว 4 มุมจริง · ถือมีด (State) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [
