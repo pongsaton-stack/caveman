@@ -41,6 +41,8 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_bl7_back", "ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame)", "fight_knife", "bl7_back_v", "west", None, 90, False),
 	("pls_bl9", "จันทร์เสี้ยว bl9 · ท่าทมโบะ (มีด)", "fight_knife", "bl9_v", "west", [0, 1, 2, 3, 4], 90, False),   # kwan 23 ต.ค. เลือก "2" เจนท่าทมโบะ (จิเง็นริว) · 2 gen · เฟรม 5–7 วาดเส้นฟาดใหญ่ + มีดหาย ตัดทิ้ง → ช่วงฟันใช้ pls_atk_bl 5–7
 	("pls_spin_bl", "หมุนตัว 4 มุมจริง · ถือมีด (State)", "fight_knife", "__rot__", "west", None, 60, True),   # ตัดเอ็นแบบ Attack on Titan (kwan 21 ต.ค.): หมุนสว่านผ่านใต้ขามอน
+	("pls_bat", "ทุบ bt0 · ไม้เบสบอลสองมือ (State BT_bat_stance)", "BT_bat_stance", "bt0_bat_v", "west", None, 90, False),   # kwan 25 ต.ค. "ทื่อมาก ลองเจน pixellab มาเทียบ" กับภาพ Flow · 18 gen (State 15 + ท่า 3)
+	("pls_bat_idle", "ยืนถือไม้เบสบอล (State)", "BT_bat_stance", "__rot__", "west", [0], 180, True),
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 

@@ -263,7 +263,8 @@ def build_action(move, d):
 	else:
 		parts.append("Front view facing the viewer in every frame.")
 	if m["held"]:
-		parts.append("Held item: " + m["held"] + ". It stays in that same hand in every frame, never disappears, and there is never a second one.")
+		where = "both hands" if "BOTH hands" in m["held"] else "that same hand"   # ไม้เบสบอลจับสองมือ
+		parts.append("Held item: " + m["held"] + ". It stays in " + where + " in every frame, never disappears, and there is never a second one.")
 	else:
 		parts.append("Both hands are empty in every frame.")
 	parts.append(f"The animation is {m['frames']} frames, one beat per frame: "
@@ -478,6 +479,33 @@ try:   # State ท่าตัวของต้นไม้ 17 ท่า × 6 �
 	STATES.update({k: v for k, v in _S17.items() if k != "SL_A_stance"})
 except ImportError:
 	pass
+
+
+# สายทุบ = ไม้เบสบอล (weapons.csv CR-1..5 · ภาพเดิม BT_A_stance ถือค้อนไม่ตรงอาวุธในเกม) · kwan 25 ต.ค. "ทื่อมาก ลองเจน pixellab มาเทียบ" (เทียบกับภาพ Flow ใน tests/lab/flw_bt0)
+BAT = ("an aluminum baseball bat, silver-gray metal with a dark grip tape handle and a small knob at the end, about as long as the character's arm and shoulder together, "
+	"gripped with BOTH hands together on the handle near the knob, the RIGHT hand above the LEFT hand, in every frame; it is never held with one hand, never thrown, never disappears")
+STATES["BT_bat_stance"] = {"seed": 27, "frame": None, "edit": (   # edit_description ≤ 1000 ตัวอักษร (API)
+	"Same character, same design, proportions and colors; only the pose and the held item change. "
+	"Keep the blue cap with brass goggles, brown hair, white shirt, blue necktie, brown belt, brown backpack, blue shorts, white socks, brown boots. "
+	"True side view facing the same direction as the source rotation, never turned toward the camera. "
+	"Held item: an aluminum baseball bat, silver-gray with a dark grip handle, about as long as the arm, gripped with BOTH hands together on the handle. "
+	"Pose: battle-ready stance, knees slightly bent, feet apart; both hands hold the handle at chest height and the bat rests back on the shoulder, "
+	"pointing up and back at 45 degrees behind the head. "
+	"No other weapon, no hammer, no glow, no motion lines, no shadow, no ground, no background, no text.")}
+MOVES["bt0_bat"] = {"dir": "west", "held": BAT, "attack": True, "frames": 10, "seed": 27,
+	"beats": [
+		"ready stance facing left, both hands on the bat handle at chest height, the bat resting back on the shoulder pointing up and back, same as the start image",
+		"small step forward with the front foot while both hands lift the bat off the shoulder, bat pointing straight up behind the head",
+		"wind-up peak: both hands high behind the head, the bat pointing up and back, body leaning back, weight on the back foot",
+		"the swing starts: both arms pull forward over the head, the bat vertical above the cap",
+		"the bat swings down in front of the body, pointing forward and up at 45 degrees, the front foot stepping forward to the left",
+		"impact: both arms extended forward to the left, the bat level and pointing LEFT at waist height, front knee bent, body leaning into the hit",
+		"follow-through: the bat keeps going down, its tip near the ground in front of the front foot, body bent forward from the force",
+		"recover: straighten up, both hands pulling the bat back toward the chest, bat diagonal across the front of the body",
+		"lift the bat back up onto the shoulder with both hands",
+		"ready stance facing left, same as the first frame"],
+	"not": ["a hammer", "a sword or knife", "holding the bat with one hand", "letting go of the bat", "a second bat", "the bat bending or changing length",
+		"swing trails, motion arcs or speed lines", "impact stars or sparks", "an opponent or any second figure"]}
 
 
 def make_state(name):

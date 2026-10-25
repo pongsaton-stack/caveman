@@ -782,6 +782,25 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "bt0_bat",
+   "dir": "west",
+   "seed": 27,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "60223fe9-3e9b-4abb-af65-d446190a2367"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e3f7ed4a-1b7f-49c8-a6c7-38b4ff212b40",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -819,7 +838,8 @@
   "eddd8c1c-27bd-48a9-b841-b6f1d468bdbc": "completed",
   "f690078c-1fa1-4d60-afdb-42d80aaab1a3": "completed",
   "08a437dd-905f-4023-943e-88d611897c0b": "completed",
-  "741376d5-b83e-4941-9c44-4420154b6edb": "completed"
+  "741376d5-b83e-4941-9c44-4420154b6edb": "completed",
+  "60223fe9-3e9b-4abb-af65-d446190a2367": "completed"
  },
  "states": {
   "fight_knife": {
@@ -890,6 +910,15 @@
     "usage": null,
     "background_job_id": "3e1c91c1-9ddf-4683-a4b3-9cec86501e32",
     "character_id": "f89d7732-624b-44d1-898d-d73ee02025f3",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BT_bat_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "79490344-961a-4f2a-be2f-bb6c573edb34",
+    "character_id": "7fc24513-845a-489e-91f9-1ea8cfc0ca33",
     "status": "queued"
    },
    "status": "completed"

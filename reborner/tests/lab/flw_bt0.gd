@@ -13,7 +13,12 @@ const BACK := 33
 const HOP := 38
 const LAND := 50
 const POWER := 100   # techs.csv bt0
-const TIP := {"wind": Vector2(80, 43), "mid": Vector2(17, 46), "hit": Vector2(15, 91)}   # ปลายไม้ในภาพ (วัดจากพิกเซลเทา)
+## ท่า → ภาพ · ปลายไม้ในภาพ (วัดจากพิกเซลเทา) · เลื่อนภาพแนวนอน (ชุดภาพที่จัดวางคนละกรอบ) — ฉาก PixelLab (pl_bt0.gd) แทนที่ฟังก์ชันเหล่านี้
+func keys() -> Dictionary: return {"ready": "flw_bt_ready", "lift": "flw_bt_lift", "wind": "flw_bt_wind", "whip": "flw_bt_mid", "mid": "flw_bt_mid",
+	"hit": "flw_bt_hit", "follow": "flw_bt_follow", "back": "flw_bt_back"}
+func tips() -> Dictionary: return {"wind": Vector2(80, 43), "mid": Vector2(17, 46), "hit": Vector2(15, 91)}
+func shift_x(_pose: String) -> float: return 0.0
+func src_name() -> String: return "ภาพ Flow"
 
 var near := 0.0
 var cell := {}
@@ -22,23 +27,31 @@ var fe := {}
 func tech_id() -> String: return "bt0"
 func end_frame() -> int: return END
 func stops() -> Array: return [[HIT, int(fe.get("hitstop_frames", 2)) * SEC]]
-func caption() -> String: return "ทุบ (ภาพ Flow): กระโดดง้างกลางอากาศ → ฟาดตอนแตะพื้น → ไถลตามแรง · ปฏิกิริยา%s|ทุบ" % body
+func caption() -> String: return "ทุบ (%s): กระโดดง้างกลางอากาศ → ฟาดตอนแตะพื้น → ไถลตามแรง · ปฏิกิริยา%s|ทุบ" % [src_name(), body]
 
 func setup() -> void:
 	place_monster(MX)
 	cell = react("ทุบ")
 	fe = feel(POWER)
-	var row := clampi(mh - (108 - int(TIP.hit.y)), 0, mh - 1)   # ระดับปลายไม้ตอนกระทบบนตัวมอน
+	var tp: Vector2 = tips().hit
+	var row := clampi(mh - (108 - int(tp.y)), 0, mh - 1)   # ระดับปลายไม้ตอนกระทบบนตัวมอน
 	var edge := mx0 + roundf(mw * 0.8)
 	for x in range(mw - 1, -1, -1):
 		if solid(x, row):
 			edge = mx0 + x
 			break
-	near = edge + (60 - TIP.hit.x) - 4   # ไม้จมเข้าเนื้อ 4 จุด
+	near = edge + (60 - tp.x - shift_x("hit")) - 4   # ไม้จมเข้าเนื้อ 4 จุด
 
 func geo(f: float) -> Dictionary:
+	var r := _geo(f)
+	var pose: String = r.key
+	r.key = keys()[pose]
+	r.cx += shift_x(pose)
+	return r
+
+func _geo(f: float) -> Dictionary:
 	var F := int(floor(f))
-	var r := {"cx": float(home), "lift": 0.0, "key": "flw_bt_ready", "sx": 1.0, "sy": 1.0}
+	var r := {"cx": float(home), "lift": 0.0, "key": "ready", "sx": 1.0, "sy": 1.0}
 	if F < CROUCH:   # ยืนหายใจ (ยุบ 1 จุดทุก 4 เฟรม)
 		r.sy = 0.985 if (F / 4) % 2 == 1 else 1.0
 		return r
@@ -50,27 +63,27 @@ func geo(f: float) -> Dictionary:
 		var tt := (f - JUMP + 1) / (HIT - JUMP)
 		r.cx = home + (near - home) * (tt * tt * 0.35 + tt * 0.65)
 		r.lift = roundf(4 * 24 * tt * (1 - tt))
-		r.key = "flw_bt_lift" if F < JUMP + 3 else ("flw_bt_wind" if F < HIT - 2 else "flw_bt_mid")
+		r.key = "lift" if F < JUMP + 3 else ("wind" if F < HIT - 2 else ("whip" if F == HIT - 2 else "mid"))
 		return r
 	var slide := 6.0 * (1 - pow(1 - minf(1.0, (f - HIT) / 10.0), 2))   # ไถลตามแรงส่งหลังกระทบ
 	if F < FOLLOW:
 		r.cx = near - slide
-		r.key = "flw_bt_hit"
+		r.key = "hit"
 		r.sy = 0.94 if F < HIT + 2 else 1.0
 		return r
 	if F < BACK:
 		r.cx = near - slide
-		r.key = "flw_bt_follow"
+		r.key = "follow"
 		return r
 	if F < HOP:
 		r.cx = near - 6
-		r.key = "flw_bt_back"
+		r.key = "back"
 		return r
 	if F < LAND:   # กระโดดถอยกลับที่
 		var tt := (f - HOP + 1) / (LAND - HOP)
 		r.cx = near - 6 + (home - near + 6) * tt
 		r.lift = roundf(4 * 14 * tt * (1 - tt))
-		r.key = "flw_bt_back" if tt < 0.6 else "flw_bt_ready"
+		r.key = "back" if tt < 0.6 else "ready"
 		return r
 	if F < LAND + 2:
 		r.sy = 0.94
@@ -78,7 +91,8 @@ func geo(f: float) -> Dictionary:
 
 ## ตำแหน่งปลายไม้บนเวที
 func tip(g: Dictionary, k: String) -> Vector2:
-	return Vector2(g.cx + TIP[k].x - 60, G - g.lift - (108 - TIP[k].y))
+	var tp: Vector2 = tips()[k]
+	return Vector2(g.cx + tp.x - 60, G - g.lift - (108 - tp.y))
 
 ## ปฏิกิริยามอนตามตาราง: ถอยตามแรงทุบ (shift) ใน cell.frames เฟรม · ร่างนุ่มยุบลึกแล้วเด้ง 3 รอบ · ปีกโดนทุบ = ร่วงลง
 func _kb(F: int) -> float:

@@ -452,6 +452,45 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat",
+   "label": "ทุบ bt0 · ไม้เบสบอลสองมือ (State BT_bat_stance) · 10 เฟรม (PixelLab · ลบแสงที่วาดติดมา 227 จุด)",
+   "frames": [
+    "pls_bat_0",
+    "pls_bat_1",
+    "pls_bat_2",
+    "pls_bat_3",
+    "pls_bat_4",
+    "pls_bat_5",
+    "pls_bat_6",
+    "pls_bat_7",
+    "pls_bat_8",
+    "pls_bat_9"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_stance bt0_bat_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat_idle",
+   "label": "ยืนถือไม้เบสบอล (State) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_bat_idle_0"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_stance __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_walk_s",
    "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
    "frames": [

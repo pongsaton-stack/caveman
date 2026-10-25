@@ -975,6 +975,47 @@
             "key": "bl7_back"
           },
           "notes": "ภาพเริ่ม bl7_v เฟรม 5 (ปาด) → ภาพจบ bl7_v เฟรม 0 · ถอยหันหน้าหาเป้า มีดกลับการ์ดมือขวา · วาดวงขาวติดเฟรม 1–2 (ลบด้วย clean) · ต่ำกว่าภาพต้นทาง 2 จุด (ALIGN_X) · ยอด 1,792 → 1,789 รวมท่า bl7"
+        },
+        {
+          "id": "state_BT_bat_stance",
+          "name": "State · ยืนถือไม้เบสบอลสองมือ (ภาพนิ่ง 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "BT_bat_stance"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "kwan 25 ต.ค. \"ทื่อมาก ลองเจน pixellab มาเทียบ\" (กับภาพ Flow) · สายทุบ = ไม้เบสบอล (BT_A_stance เดิมถือค้อน) · ผ่าน: สองมือจับด้ามที่อก ไม้พาดไหล่ · 15 gen (1,782 → 1,767) · edit_description ต้อง ≤ 1000 ตัวอักษร"
+        },
+        {
+          "id": "bt0_bat",
+          "name": "ทุบ bt0 · หวดไม้เบสบอลสองมือ (10 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 3,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/bt0_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt0_bat"
+          },
+          "notes": "PL_STATE=BT_bat_stance · 3 gen (1,767 → 1,764) · ได้หวดแนวนอนระดับอกแบบนักเบสบอล (สั่งฟาดลงจากบน) · เฟรม 0–5 ไม้ค้างหลังแนวนอน (ทื่อ) · 6 ไม้หลบหลังหัว · 7 วาดเส้นฟ้าทั้งที่ห้าม (clean ลบได้) · 8–9 ตัวหันเฉียงเข้ากล้อง · ฉาก pl_bt0 เทียบกับ flw_bt0"
         }
       ]
     },

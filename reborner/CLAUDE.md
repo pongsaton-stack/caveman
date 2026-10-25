@@ -39,7 +39,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 - ชุดที่ใช้ในฉากต่อสู้ตอนนี้ = PixelLab `px_set` (`assets/sprites/pixellab_draft/px_set/` ผืน 120x112 เท้าแถว 108) · ยังไม่เข้าเกม
 - แนวภาพตัวละครที่ kwan ชอบ (14 ต.ค.): chibi หัวโต เส้นขอบเข้มหนา สีเรียบลงเงาการ์ตูน · เอฟเฟกต์วาดเองใช้เส้นขอบ `#2a1a14`
 
-## PixelLab (Tier 1 · 2,000 gen/เดือน · ยอดล่าสุด **1,782** ณ 23 ต.ค.)
+## PixelLab (Tier 1 · 2,000 gen/เดือน · ยอดล่าสุด **1,764** ณ 25 ต.ค.)
 - สคริปต์ `tools/sprites/pixellab_walk.py` (API v2 · พิมพ์ยอดก่อน/หลังทุกคำสั่งที่เสียเครดิต) · ท่าในต้นไม้ = `tools/sprites/pixellab_skills.py` (BEATS · HELD/HELD_NOT · HOLD_STILL · IN_PLACE)
 - **คำสั่งต้องละเอียดที่สุด** (kwan 18 ต.ค.): ทิศล็อก · ของในมือ (ขนาด/มือไหน/ทุกเฟรม) · จังหวะทีละเฟรม · โมเมนตัม · ส่วนที่คงที่ · สิ่งที่ห้าม · CHARACTER + STYLE
   ใช้ `ONE_HAND` / `KNIFE` เท่านั้น ห้ามคำว่า "front hand" · ดูคำสั่งเต็มก่อนจ่าย: `python3 tools/sprites/pixellab_walk.py prompt <ท่า>` · เจน: `PL_STATE=fight_knife ... anim <ท่า> west`
@@ -74,11 +74,12 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
   `lab_stage.gd` = ฐานใช้ร่วม: ฉากหลัง 3 ฉาก + ของขยับ · เพลง (mp3 อัดจากเว็บ วนซ้ำ หลบตอนกระแทก) · Rion/มอน · บับเบิล/ตัวเลข/คำเสียง/ร่างติดตา (เป็นพูลต่อเฟรม) · อนุภาค · หยุดภาพ · เสียงสังเคราะห์สูตรเดียวกับเว็บ · เมนูเลือกท่า/มอน/ฉาก
   ท่าใหม่ = `extends "res://tests/lab/lab_stage.gd"` + `.tscn` · เขียน tech_id/end_frame/stops/setup/frame/sounds/draw_back/draw_mid/draw_fx · พิกเซลแบบ fbPx = `px()` `star_px()` `slash_line()` `disc()` · ห้าม class_name
   ตารางวิจัยรอบ 2 ของ Muse (25 ต.ค.) = `tests/lab/r2_tables.gd` (สร้างจาก R2SYS ห้ามแก้มือ): `feel(พลัง)` หยุดภาพ/จอสั่น/กระเด็นตามระดับท่า (ใช้กับท่าใหม่ · ฉากเดิมยังใช้ค่าที่ kwan อนุมัติ) · `react(สาย)` ปฏิกิริยาร่าง 9×6 · `debris_at()` เศษตามวัสดุ · ร้าวเฉพาะร่างแข็ง (`HARD_BODIES`)
+  เทียบ PixelLab `pl_bt0` (kwan 25 ต.ค. "Flow ทื่อมาก ลองเจน pixellab มาเทียบ"): State `BT_bat_stance` + ท่า `bt0_bat` → `px_set/pls_bat_*` (18 gen · ยอด **1,764**) · ฉากเดียวกันแทนแค่ภาพ (`keys()/tips()/shift_x()`) · ปุ่มความเร็ว ×0.25–×2 ในเมนู (`lab_speed` · `--speed=`)
   ท่าทุบ bt0 `flw_bt0` (25 ต.ค. kwan "1 ถ้าออกมาไม่ดี กลับไปใช้ pixellab"): ภาพ Rion จาก Flow 7 ท่า `assets/sprites/flow_draft/bt/flw_bt_*` (ready lift wind mid hit follow back · `tx()` อ่าน prefix `flw_` จาก FPX) · ใช้ feel(100) + react("ทุบ") + ล้มสลายเมื่อดาเมจ ≥ HP · DMG ไม้อลูมิเนียม CR-2
   แก้แสงวาบตามตรวจรอบ 2 (kwan 25 ต.ค. "3"): bl8 ตัดวาบตัวมอนตอนตอก + จอวาบ 0.22→0.15 + ร่างไม่แข็งเป็นรอยแผลแทนร้าว · ประกายจอวาบ 0.6→0.3
   สัญลักษณ์บนจอต้องอยู่ใน subset ฟอนต์ (✦ ขึ้นกล่องบนเว็บ → ใช้ ★) · GDScript: `var x := round(...)`/max/min = พังตอน parse → ใช้ roundf/maxf/minf หรือระบุชนิด · ลำดับชั้น: back_fx (หลังมอน) → มอน z1 → mid_fx z2 → Rion z4 → front_fx z5
   ตรวจเร็ว (ไม่กี่วิ): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 [--bg=ash_village] --snap=30,36 --snapdir=<dir>` → เทียบกับเว็บ `websnap.cjs` (scratchpad)
-  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V5) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
+  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V6) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) · **บทเรียนหมวด 11 อ่านก่อนแก้อะไรก็ตาม**

@@ -27,7 +27,7 @@ const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "�
 	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
 	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
-	["bt0", "ทุบ", "res://tests/lab/flw_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
+	["ทุบ", "Flow", "res://tests/lab/flw_bt0.tscn"], ["ทุบ", "PL", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
 ## ฉากหลัง (เหมือน combat_bgs ของ anim_test_build.py): ไฟล์ · ขยายกี่เท่า · เส้นพื้น (สัดส่วนความสูง) → ครอป 300x168 พื้นที่แถว 158
 const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
 	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
@@ -130,6 +130,7 @@ var players: Array[AudioStreamPlayer] = []
 var sfx_cache := {}
 var snaps := {}
 var snap_dir := ""
+var speed := 1.0   # ความเร็วเล่น (ปุ่มในเมนู · เก็บใน Engine meta "lab_speed")
 var debris: Array = []   # [kind, สี, x, y, vx, vy, g, life, เฟรมเกิด]
 
 # ── ส่วนที่ท่าแต่ละท่าเขียนทับ ──────────────────────────
@@ -148,6 +149,7 @@ func caption() -> String: return ""
 func _ready() -> void:
 	foe = str(Engine.get_meta("lab_foe", "M01"))
 	bg_id = str(Engine.get_meta("lab_bg", "frost_volcano"))
+	speed = float(Engine.get_meta("lab_speed", 1.0))
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--foe="):
 			foe = a.substr(6)
@@ -161,6 +163,8 @@ func _ready() -> void:
 				snaps[int(v)] = false
 		elif a.begins_with("--snapdir="):
 			snap_dir = a.substr(10)
+		elif a.begins_with("--speed="):
+			speed = float(a.substr(8))
 	if not BGS.has(bg_id):
 		bg_id = "frost_volcano"
 	playing = recording or bool(Engine.get_meta("lab_auto", false))
@@ -915,7 +919,18 @@ func _build_menu() -> void:
 	mus.pressed.connect(_toggle.bind(mus, "เพลง", "lab_music_off"))
 	var note := label(7, Color("#c8d0e0"), 2, false, menu)
 	note.text = "เสียงสร้างด้วยโค้ด · ดาเมจสูตรเดียวกับหน้าเว็บ · เพลง = ไฟล์อัดจากหน้าเว็บ"
-	note.position = Vector2(6, 132)
+	note.position = Vector2(6, 146)
+	var sp_l := label(7, Color("#f0e4c8"), 2, false, menu)   # ความเร็วเล่น: กดแล้วเล่นท่าเดิมใหม่ทันที (ช้า = ดูทีละจังหวะ)
+	sp_l.text = "ความเร็ว"
+	sp_l.position = Vector2(6, 131)
+	var speeds := [0.25, 0.5, 1.0, 1.5, 2.0]
+	for i in speeds.size():
+		var v: float = speeds[i]
+		var b := _button(("×%s" % v).replace(".0", ""), Vector2(40 + i * 51, 130), Vector2(48, 13), 13)
+		b.modulate = Color(1, 1, 0.6) if is_equal_approx(v, speed) else Color.WHITE
+		b.pressed.connect(func():
+			Engine.set_meta("lab_speed", v)
+			_start(foe, bg_id, scene_file_path))
 	menu.visible = not playing
 
 func _onoff(what: String, key: String) -> String:
@@ -969,9 +984,9 @@ func _process(delta: float) -> void:
 	if not playing:
 		return
 	if hold > 0.0:
-		hold -= delta
+		hold -= delta * speed
 	else:
-		t += delta
+		t += delta * speed
 	for s in stops():
 		if not stops_done.has(s[0]) and t / SEC >= s[0]:
 			stops_done[s[0]] = true
