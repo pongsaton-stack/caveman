@@ -19,13 +19,15 @@ const G := 158
 const SEC := 0.06
 const PX := "res://assets/sprites/pixellab_draft/px_set/"
 const MPX := "res://assets/sprites/monsters_px_draft/"
+const FPX := "res://assets/sprites/flow_draft/bt/"   # ภาพ Rion จาก Flow (Muse เจน · flow_to_px.py) ชื่อ flw_*
 const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพลงต่อสู้แนวรอบ 4 (kwan 5 ต.ค.) อัดจากหน้าเว็บ
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
 const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "เขี้ยวพุ่ง", "res://tests/lab/blc_bl1.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"],
 	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
-	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ
+	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
+	["bt0", "ทุบ", "res://tests/lab/flw_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
 ## ฉากหลัง (เหมือน combat_bgs ของ anim_test_build.py): ไฟล์ · ขยายกี่เท่า · เส้นพื้น (สัดส่วนความสูง) → ครอป 300x168 พื้นที่แถว 158
 const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
 	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
@@ -37,6 +39,7 @@ const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], 
 	"bl5": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
 	"bl2": {"M01": [34, 0, 3], "M03": [10, -1, 3], "M06": [33, 0, 3], "M15": [35, 1, 3], "B1": [19, -1, 3]},
 	"bl7": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
+	"bt0": {"M01": [27, -1, 1], "M03": [90, 1, 1], "M06": [51, -1, 1], "M15": [57, 0, 1], "B1": [56, 1, 1]},   # ไม้เบสบอลอลูมิเนียม CR-2 (ฐาน 28) · prof 20 · ทุบ
 	"bl8": {"M01": [69, 0, 1], "M03": [22, -1, 1], "M06": [67, 0, 1], "M15": [74, 1, 1], "B1": [43, -1, 1]},
 	"bl9": {"M01": [110, 0, 1], "M03": [33, -1, 1], "M06": [106, 0, 1], "M15": [113, 1, 1], "B1": [62, -1, 1]}}
 ## ทางปลายมีดของภาพฟัน pls_atk_bl (วัดอัตโนมัติ blade_tip.py → DATA.swing ของหน้าเว็บ): จุดหมุนไหล่ P · มุม A · รัศมี R · ภาพแรก f0
@@ -181,7 +184,7 @@ func _img(path: String) -> Image:
 
 func tx(key: String) -> Texture2D:
 	if not tex.has(key):
-		var path := (PX + key + ".png") if key.begins_with("pls_") else (MPX + key + ".png")
+		var path := (PX + key + ".png") if key.begins_with("pls_") else ((FPX + key + ".png") if key.begins_with("flw_") else (MPX + key + ".png"))
 		tex[key] = ImageTexture.create_from_image(_img(path))
 	return tex[key]
 
@@ -874,10 +877,11 @@ func _build_menu() -> void:
 	var title := label(9, Color("#fff4c8"), 3, true, menu)
 	title.text = "ห้องทดลองฉากต่อสู้ Godot · เลือกท่า มอน ฉาก"
 	title.position = Vector2(6, 2)
-	for i in TECHS.size():   # แถวท่า: บน 6 ท่า · ล่าง ประกาย 3 + มอนตี 2
+	var step2 := floori(295.0 / (TECHS.size() - 6))
+	for i in TECHS.size():   # แถวท่า: บน 6 ท่า · ล่าง ประกาย 3 + มอนตี 2 + ทุบ
 		var tc: Array = TECHS[i]
 		var row2 := i >= 6
-		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + (i - 6) * 59 if row2 else 4 + i * 49, 31 if row2 else 16), Vector2(57 if row2 else 48, 13), 13)
+		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + (i - 6) * step2 if row2 else 4 + i * 49, 31 if row2 else 16), Vector2(step2 - 2 if row2 else 48, 13), 13)
 		b.modulate = Color(1, 1, 0.6) if tc[2] == scene_file_path else Color.WHITE
 		b.pressed.connect(func(): _start(foe, bg_id, tc[2]))
 	var names := {}
