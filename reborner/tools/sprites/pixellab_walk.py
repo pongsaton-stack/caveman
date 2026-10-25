@@ -507,6 +507,63 @@ MOVES["bt0_bat"] = {"dir": "west", "held": BAT, "attack": True, "frames": 10, "s
 	"not": ["a hammer", "a sword or knife", "holding the bat with one hand", "letting go of the bat", "a second bat", "the bat bending or changing length",
 		"swing trails, motion arcs or speed lines", "impact stars or sparks", "an opponent or any second figure"]}
 
+# รอบ 2 (kwan 25 ต.ค. "ใช้ pixellab ปรับให้ตรงกับรายงาน ... สีหน้ามีอารมณ์มากกว่า flow หลังโจมตีให้ถอยแบบฟัน"): bt0_bat ได้หวดแนวนอนระดับอก + ตัวหันเข้ากล้อง
+# → ตามรายงานวิจัย bt0: load หลังไหล่ขวา ข้อศอกสูง → ก้าวสั้น → ฟาดลงเฉียง 60–70° → กระทบลำตัวตั้งตรงไม่ก้ม → ไม้จมค้าง (ถอยใช้ hop_bat แบบท่าฟัน bl0)
+MOVES["bt0_bat2"] = {"dir": "west", "held": BAT, "attack": True, "frames": 8, "seed": 31,
+	"beats": [
+		"ready stance facing left, both hands on the bat handle at chest height, the bat resting back on the shoulder, same as the start image",
+		"load: weight shifts onto the back foot, both hands lift the bat higher behind the right shoulder, the bat pointing straight UP and slightly back, both elbows raised high, eyes narrowed at the enemy",
+		"load peak: hips coiled, both hands high beside the back of the head, the bat pointing UP behind the head, the front foot lifting a little off the ground, jaw clenched",
+		"stride: the front foot steps forward to the LEFT and lands, the bat still held high above the head, pointing straight up",
+		"the downswing begins: both arms pull forward over the cap, the bat tilting forward, its tip pointing up and to the LEFT at 45 degrees, mouth open shouting",
+		"impact: the bat comes DOWN at a steep diagonal, both arms extended forward and down, the bat barrel pointing DOWN-LEFT about 60 degrees below horizontal toward a target at waist height in front, front foot planted flat, torso upright and tense, not bending forward, mouth open shouting",
+		"hold the impact pose: the bat stays sunk at the same down-left angle, torso upright, teeth gritted, eyes fierce",
+		"same impact pose held, breathing hard, still facing left"],
+	"not": ["a hammer", "a sword or knife", "holding the bat with one hand", "letting go of the bat", "a second bat", "the bat bending or changing length",
+		"a level horizontal swing at chest height", "the torso bending forward", "turning the chest or the necktie toward the camera", "a front view",
+		"swing trails, motion arcs or speed lines", "impact stars or sparks", "an opponent or any second figure"]}
+MOVES["hop_bat"] = {"dir": "west", "held": BAT, "attack": False, "frames": 8, "seed": 33,
+	"beats": [b.replace("knife held at guard in front of the chest", "both hands holding the bat at guard, the bat diagonal in front of the chest pointing up").replace("knife still at guard", "the bat still held at guard with both hands").replace("head and knife still facing LEFT", "head and bat still facing LEFT").replace("knife at guard", "the bat at guard with both hands")
+		for b in MOVES["hop_k"]["beats"]],
+	"not": ["turning toward the camera", "turning the back to the enemy", "a second bat", "holding the bat with one hand", "swinging the bat", "slash trails or motion lines", "dust clouds"]}
+
+# รอบ 3: เริ่มจากภาพ hop_bat เฟรม 6 (ไม้ตั้งเหนือหัว ก้าวเท้าหน้า หันซ้าย · PL_START_IMG) → ฟาดลงอย่างเดียว 4 เฟรม (ท่าสั้นได้ผลกว่าท่าเหวี่ยงยาว)
+# hop_bat2: hop_bat รอบแรกกลายเป็นพุ่งไปหน้า → เน้นตัวเคลื่อนไปทางขวา (ถอยหลัง) เท่านั้น
+MOVES["chop_bat"] = {"dir": "west", "held": BAT, "attack": True, "frames": 4, "seed": 31,
+	"beats": [
+		"same pose as the start image: the bat raised straight up above the head with both hands, front foot forward, facing left",
+		"the bat chops forward and down: both arms swing down in front of the face, the bat pointing forward and up to the LEFT at 45 degrees, mouth open shouting",
+		"impact: both arms extended forward and down, the bat barrel pointing DOWN-LEFT about 60 degrees below horizontal toward a target at waist height in front of the front foot, torso upright and tense, eyes fierce, mouth open shouting",
+		"hold the impact pose: the bat stays at the same down-left angle, torso upright, teeth gritted"],
+	"not": ["a hammer", "holding the bat with one hand", "letting go of the bat", "a second bat", "a level horizontal swing", "the torso bending forward",
+		"turning toward the camera", "facing right", "a front view", "swing trails, motion arcs or speed lines", "impact stars or sparks", "an opponent or any second figure"]}
+MOVES["hop_bat2"] = {"dir": "west", "held": BAT, "attack": False, "frames": 6, "seed": 41,
+	"beats": [
+		"standing facing left, both hands holding the bat resting back on the shoulder, same as the start image",
+		"crouch: knees bend deep, hips drop, body leaning back to the RIGHT, still facing left",
+		"jump BACKWARD: both feet leave the ground and the whole body moves to the RIGHT, away from the enemy, knees tucked, still facing left",
+		"in the air further to the RIGHT, knees tucked, the bat still on the shoulder, still facing left",
+		"landing to the RIGHT of where it started: knees bend deep to absorb the fall, still facing left",
+		"standing facing left, bat on the shoulder, same as the first frame"],
+	"not": ["moving or stepping to the LEFT", "running forward", "lunging", "raising or swinging the bat", "turning toward the camera", "turning the back to the enemy",
+		"a second bat", "holding the bat with one hand", "motion lines", "dust clouds"]}
+
+# รอบ 4: ท่าฟาดลงไม่ผ่าน 3 รอบ (หวดแนวนอน · หันขวา/เข้ากล้อง) แต่ State ผ่านทุกครั้ง → ท่ากระทบเป็น State แล้วเจนท่ากลาง (PL_START_IMG ไม้เหนือหัว → PL_END_IMG กระทบ)
+STATES["BT_bat_impact"] = {"seed": 27, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. Keep the blue cap with brass goggles, brown hair, white shirt, blue necktie, "
+	"brown backpack, blue shorts, white socks, brown boots. True side view facing the same direction as the source rotation, never turned toward the camera. "
+	"Held item: the same aluminum baseball bat gripped with BOTH hands together on the handle. "
+	"Pose: the impact of a downward two-handed chop: both arms extended forward and down, the bat barrel pointing forward and DOWN at a steep 60-degree angle "
+	"toward a target at waist height in front; front foot stepped forward and planted, back leg straight, torso upright and tense, mouth open shouting, fierce eyes. "
+	"No glow, no motion lines, no shadow, no ground, no background, no text.")}
+MOVES["chop_bat2"] = {"dir": "west", "held": BAT, "attack": True, "frames": 4, "seed": 31,
+	"beats": ["the bat raised straight up above the head with both hands, same as the start image",
+		"both arms swing forward over the face, the bat pointing forward and up at 45 degrees",
+		"both arms coming down in front, the bat nearly level pointing forward",
+		"impact, same as the end image: the bat pointing down-forward at 60 degrees, torso upright, shouting"],
+	"not": ["turning toward the camera", "facing right", "a front view", "a level horizontal swing at chest height", "holding the bat with one hand",
+		"a second bat", "swing trails, motion arcs or speed lines", "impact stars or sparks"]}
+
 
 def make_state(name):
 	s = state()

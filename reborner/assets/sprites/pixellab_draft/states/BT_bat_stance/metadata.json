@@ -686,6 +686,48 @@
           "north": "BT_bat_stance/rotations/north.png"
         },
         "animations": {
+          "bt0_bat2_v": {
+            "west": [
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_000.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_001.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_002.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_003.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_004.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_005.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_006.png",
+              "BT_bat_stance/animations/bt0_bat2_v/west/frame_007.png"
+            ]
+          },
+          "chop_bat2_v": {
+            "west": [
+              "BT_bat_stance/animations/chop_bat2_v/west/frame_000.png",
+              "BT_bat_stance/animations/chop_bat2_v/west/frame_001.png",
+              "BT_bat_stance/animations/chop_bat2_v/west/frame_002.png",
+              "BT_bat_stance/animations/chop_bat2_v/west/frame_003.png"
+            ]
+          },
+          "hop_bat_v": {
+            "west": [
+              "BT_bat_stance/animations/hop_bat_v/west/frame_000.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_001.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_002.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_003.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_004.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_005.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_006.png",
+              "BT_bat_stance/animations/hop_bat_v/west/frame_007.png"
+            ]
+          },
+          "hop_bat2_v": {
+            "west": [
+              "BT_bat_stance/animations/hop_bat2_v/west/frame_000.png",
+              "BT_bat_stance/animations/hop_bat2_v/west/frame_001.png",
+              "BT_bat_stance/animations/hop_bat2_v/west/frame_002.png",
+              "BT_bat_stance/animations/hop_bat2_v/west/frame_003.png",
+              "BT_bat_stance/animations/hop_bat2_v/west/frame_004.png",
+              "BT_bat_stance/animations/hop_bat2_v/west/frame_005.png"
+            ]
+          },
           "bt0_bat_v": {
             "west": [
               "BT_bat_stance/animations/bt0_bat_v/west/frame_000.png",
@@ -699,11 +741,44 @@
               "BT_bat_stance/animations/bt0_bat_v/west/frame_008.png",
               "BT_bat_stance/animations/bt0_bat_v/west/frame_009.png"
             ]
+          },
+          "chop_bat_v": {
+            "west": [
+              "BT_bat_stance/animations/chop_bat_v/west/frame_000.png",
+              "BT_bat_stance/animations/chop_bat_v/west/frame_001.png",
+              "BT_bat_stance/animations/chop_bat_v/west/frame_002.png",
+              "BT_bat_stance/animations/chop_bat_v/west/frame_003.png"
+            ]
           }
         }
+      }
+    },
+    {
+      "character": {
+        "id": "468bf137-67b7-4b48-8550-092a47d8767c",
+        "name": "BT_bat_impact",
+        "prompt": "chibi boy hero, blue cap with brass goggles, messy brown hair, white short-sleeve collared shirt, blue necktie, blue knee-length shorts, brown backpack, white socks, brown boots, no wristwatch, 32-bit pixel art",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "low top-down",
+        "created_at": "2026-10-25T17:09:09.437842+00:00"
+      },
+      "folder": "BT_bat_impact",
+      "frames": {
+        "rotations": {
+          "south": "BT_bat_impact/rotations/south.png",
+          "west": "BT_bat_impact/rotations/west.png",
+          "east": "BT_bat_impact/rotations/east.png",
+          "north": "BT_bat_impact/rotations/north.png"
+        },
+        "animations": {}
       }
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-25T16:10:03.046385"
+  "export_date": "2026-10-25T17:12:46.604523"
 }

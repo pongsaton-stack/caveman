@@ -491,6 +491,59 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat2",
+   "label": "ทุบ bt0 รอบ 4 · ง้าง → ฟาดลงเฉียง (ท่ากลาง ไม้หลังไหล่ → State กระทบ) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 89 จุด)",
+   "frames": [
+    "pls_bat2_0",
+    "pls_bat2_1",
+    "pls_bat2_2",
+    "pls_bat2_3"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_stance chop_bat2_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat_imp",
+   "label": "ทุบ · กระทบลงเฉียง ตัวตั้งตรง (State BT_bat_impact) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_bat_imp_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_impact __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat_hop",
+   "label": "กระโดดถอยถือไม้เบสบอล (hop_bat2) · 6 เฟรม (PixelLab · ลบแสงที่วาดติดมา 19 จุด)",
+   "frames": [
+    "pls_bat_hop_0",
+    "pls_bat_hop_1",
+    "pls_bat_hop_2",
+    "pls_bat_hop_3",
+    "pls_bat_hop_4",
+    "pls_bat_hop_5"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_stance hop_bat2_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_walk_s",
    "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
    "frames": [

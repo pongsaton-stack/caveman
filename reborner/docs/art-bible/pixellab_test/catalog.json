@@ -1016,6 +1016,123 @@
             "key": "bt0_bat"
           },
           "notes": "PL_STATE=BT_bat_stance · 3 gen (1,767 → 1,764) · ได้หวดแนวนอนระดับอกแบบนักเบสบอล (สั่งฟาดลงจากบน) · เฟรม 0–5 ไม้ค้างหลังแนวนอน (ทื่อ) · 6 ไม้หลบหลังหัว · 7 วาดเส้นฟ้าทั้งที่ห้าม (clean ลบได้) · 8–9 ตัวหันเฉียงเข้ากล้อง · ฉาก pl_bt0 เทียบกับ flw_bt0"
+        },
+        {
+          "id": "bt0_bat2",
+          "name": "ทุบ bt0 รอบ 2 · ฟาดลงตามรายงาน (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 31,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/bt0_bat2_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt0_bat2"
+          },
+          "notes": "ไม่ผ่าน: 0–4 ไม้พาดไหล่นิ่ง · 5–7 ตัวหันขวา/เข้ากล้อง + วาดเส้น · 1,764 → 1,762"
+        },
+        {
+          "id": "hop_bat",
+          "name": "กระโดดถอยถือไม้ รอบ 1 (8 เฟรม)",
+          "kind": "move",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 33,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/hop_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hop_bat"
+          },
+          "notes": "ไม่ผ่าน: กลายเป็นพุ่งไปหน้า · แต่เฟรม 6 (ไม้ตั้งเหนือหัว ก้าวหน้า หันซ้าย) ใช้เป็นภาพเริ่มของ chop_bat2 · 1,762 → 1,760"
+        },
+        {
+          "id": "chop_bat",
+          "name": "ฟาดลงจากไม้เหนือหัว (PL_START_IMG hop_bat 6 · 4 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 31,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/chop_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "chop_bat"
+          },
+          "notes": "ไม่ผ่าน: ตัวหันเข้ากล้อง/หันขวา · 1,760 → 1,758"
+        },
+        {
+          "id": "hop_bat2",
+          "name": "กระโดดถอยถือไม้ รอบ 2 (6 เฟรม)",
+          "kind": "move",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 41,
+          "ms": 60,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/hop_bat2_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hop_bat2"
+          },
+          "notes": "ผ่าน: ย่อ 1–3 · ลอย 4 (ขาซีดหลัง clean) · ลง 5 → pls_bat_hop · ฉาก pl_bt0 ถอยแบบท่าฟัน · 1,758 → 1,756"
+        },
+        {
+          "id": "state_BT_bat_impact",
+          "name": "State · กระทบไม้ลงเฉียง ตัวตั้งตรง (ภาพนิ่ง 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "BT_bat_impact"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "ผ่านรอบแรก: ไม้ชี้ลงเฉียงหน้า ตัวตั้งตรง ก้าวหน้า ตะโกน (ตามรายงาน bt0) · State แม่นกว่าท่าเหวี่ยง · 1,756 → 1,741"
+        },
+        {
+          "id": "chop_bat2",
+          "name": "ทุบ bt0 รอบ 4 · ท่ากลาง ไม้เหนือหัว → State กระทบ (4 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 31,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/chop_bat2_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "chop_bat2"
+          },
+          "notes": "PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact (วางผืน 96 ลง 128 ที่ +16,+16) · ผ่าน: ง้างขึ้น → ไม้นอนหลัง → ไม้ขึ้นหลังหัว → กระทบ · เฟรม 1–2 วาดขีดเล็ก (clean ลบ) · ฉาก pl_bt0 · 1,741 → 1,739"
         }
       ]
     },

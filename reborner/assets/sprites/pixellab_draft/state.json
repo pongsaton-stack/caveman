@@ -801,6 +801,101 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "bt0_bat2",
+   "dir": "west",
+   "seed": 31,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "f5070387-bf1c-442f-ad34-5e623aa79e43"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "4c24a7a2-00cd-4020-b696-c2aa94f5b109",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "hop_bat",
+   "dir": "west",
+   "seed": 33,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "32a03c9a-16fa-4833-9022-9b51988215fb"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "857886d8-1b55-41b1-8e23-74794a849354",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "chop_bat",
+   "dir": "west",
+   "seed": 31,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "895236be-791d-427a-9d19-1871fd26b2c3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "f9a4873f-eedd-41a0-9fb3-9c34c6c41686",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "hop_bat2",
+   "dir": "west",
+   "seed": 41,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "50768459-37b8-47df-9118-21c182cce4bf"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "bb086afc-1f20-44c4-b416-a7e0035fbd32",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "chop_bat2",
+   "dir": "west",
+   "seed": 31,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "ed4142de-0db2-44eb-9636-affad22b968c"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "6c2967ff-1da4-4b5c-a98f-2f69da1b52e9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -839,7 +934,12 @@
   "f690078c-1fa1-4d60-afdb-42d80aaab1a3": "completed",
   "08a437dd-905f-4023-943e-88d611897c0b": "completed",
   "741376d5-b83e-4941-9c44-4420154b6edb": "completed",
-  "60223fe9-3e9b-4abb-af65-d446190a2367": "completed"
+  "60223fe9-3e9b-4abb-af65-d446190a2367": "completed",
+  "f5070387-bf1c-442f-ad34-5e623aa79e43": "completed",
+  "32a03c9a-16fa-4833-9022-9b51988215fb": "completed",
+  "895236be-791d-427a-9d19-1871fd26b2c3": "completed",
+  "50768459-37b8-47df-9118-21c182cce4bf": "completed",
+  "ed4142de-0db2-44eb-9636-affad22b968c": "completed"
  },
  "states": {
   "fight_knife": {
@@ -919,6 +1019,15 @@
     "usage": null,
     "background_job_id": "79490344-961a-4f2a-be2f-bb6c573edb34",
     "character_id": "7fc24513-845a-489e-91f9-1ea8cfc0ca33",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BT_bat_impact": {
+   "response": {
+    "usage": null,
+    "background_job_id": "911f1137-e911-4972-b04f-dc1f3d293a33",
+    "character_id": "468bf137-67b7-4b48-8550-092a47d8767c",
     "status": "queued"
    },
    "status": "completed"

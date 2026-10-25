@@ -43,6 +43,9 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_spin_bl", "หมุนตัว 4 มุมจริง · ถือมีด (State)", "fight_knife", "__rot__", "west", None, 60, True),   # ตัดเอ็นแบบ Attack on Titan (kwan 21 ต.ค.): หมุนสว่านผ่านใต้ขามอน
 	("pls_bat", "ทุบ bt0 · ไม้เบสบอลสองมือ (State BT_bat_stance)", "BT_bat_stance", "bt0_bat_v", "west", None, 90, False),   # kwan 25 ต.ค. "ทื่อมาก ลองเจน pixellab มาเทียบ" กับภาพ Flow · 18 gen (State 15 + ท่า 3)
 	("pls_bat_idle", "ยืนถือไม้เบสบอล (State)", "BT_bat_stance", "__rot__", "west", [0], 180, True),
+	("pls_bat2", "ทุบ bt0 รอบ 4 · ง้าง → ฟาดลงเฉียง (ท่ากลาง ไม้หลังไหล่ → State กระทบ)", "BT_bat_stance", "chop_bat2_v", "west", None, 90, False),   # kwan 25 ต.ค. "ใช้ pixellab ปรับให้ตรงกับรายงาน" · PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact
+	("pls_bat_imp", "ทุบ · กระทบลงเฉียง ตัวตั้งตรง (State BT_bat_impact)", "BT_bat_impact", "__rot__", "west", [0], 90, False),
+	("pls_bat_hop", "กระโดดถอยถือไม้เบสบอล (hop_bat2)", "BT_bat_stance", "hop_bat2_v", "west", None, 60, False),   # hop_bat รอบแรกพุ่งไปหน้า → hop_bat2 เน้นถอยขวา
 	("pls_walk_s", "เดินลง (หันหน้า)", None, "walk_v-eb599d32", "south", None, 90, True),
 	("pls_walk_n", "เดินขึ้น (หันหลัง)", None, "walk_v", "north", None, 90, True)]
 

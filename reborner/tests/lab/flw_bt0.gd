@@ -1,21 +1,22 @@
 extends "res://tests/lab/lab_stage.gd"
 ## ทุบ bt0 ไม้เบสบอล — ท่าแรกที่ใช้ภาพ Rion จาก Flow (Muse เจน 25 ต.ค. · tools/sprites/flow_to_px.py) + ตาราง feel/ปฏิกิริยารอบ 2
-## ย่อ → กระโดดเข้าพร้อมยกไม้ง้างกลางอากาศ → ฟาดลงตอนเท้าแตะพื้น (ไม่ยืนง้างนิ่ง · รสนิยม 10 ต.ค.) → ไถลตามแรง → ไม้จมค้าง → ดึงกลับ → กระโดดกลับที่
+## จังหวะตามรายงานวิจัย bt0 (โดนเฟรม 22 · ง้าง ~10 เฟรม · ฟาดสั้น 4 เฟรม · ไม้จมค้าง 23–29): ย่อ → กระโดดเข้าพร้อมง้างกลางอากาศ (ไม่ยืนง้างนิ่ง · รสนิยม 10 ต.ค.)
+## → ฟาดลงตอนเท้าแตะพื้น → ไถลนิด → ไม้จมค้าง → กระโดดถอย 2 ครั้ง + ไถลตั้งหลักแบบท่าฟัน bl0 (kwan 25 ต.ค. "หลังโจมตีให้ถอยแบบฟัน")
 ## ภาพ flw_bt_*: ready lift wind mid hit follow back (ผืน 120x112 เท้าแถว 108) · ถ้าภาพ Flow ไม่ผ่าน kwan → กลับไปเจน PixelLab (kwan 25 ต.ค.)
 
 const MX := 74
-const END := 60
-const CROUCH := 8
-const JUMP := 11
+const END := 70
+const CROUCH := 6
+const JUMP := 9
 const HIT := 22
-const FOLLOW := 27
-const BACK := 33
-const HOP := 38
-const LAND := 50
+const FOLLOW := 25
+const RET := 29   # เริ่มถอย
+## กระโดดถอยแบบ HOPS ของ blc_bl0: ระยะ (สัดส่วน) · ย่อ · ลอย · ลง · สูง · skid = ไถลตั้งหลัก
+const HOPS := [{"d": 0.5, "c": 2, "a": 9, "l": 2, "h": 16}, {"d": 0.3, "c": 2, "a": 7, "l": 2, "h": 12}, {"d": 0.2, "skid": 10}]
 const POWER := 100   # techs.csv bt0
 ## ท่า → ภาพ · ปลายไม้ในภาพ (วัดจากพิกเซลเทา) · เลื่อนภาพแนวนอน (ชุดภาพที่จัดวางคนละกรอบ) — ฉาก PixelLab (pl_bt0.gd) แทนที่ฟังก์ชันเหล่านี้
 func keys() -> Dictionary: return {"ready": "flw_bt_ready", "lift": "flw_bt_lift", "wind": "flw_bt_wind", "whip": "flw_bt_mid", "mid": "flw_bt_mid",
-	"hit": "flw_bt_hit", "follow": "flw_bt_follow", "back": "flw_bt_back"}
+	"hit": "flw_bt_hit", "follow": "flw_bt_follow", "crouch": "flw_bt_ready", "air": "flw_bt_back", "fall": "flw_bt_back", "land": "flw_bt_ready"}
 func tips() -> Dictionary: return {"wind": Vector2(80, 43), "mid": Vector2(17, 46), "hit": Vector2(15, 91)}
 func shift_x(_pose: String) -> float: return 0.0
 func src_name() -> String: return "ภาพ Flow"
@@ -63,31 +64,63 @@ func _geo(f: float) -> Dictionary:
 		var tt := (f - JUMP + 1) / (HIT - JUMP)
 		r.cx = home + (near - home) * (tt * tt * 0.35 + tt * 0.65)
 		r.lift = roundf(4 * 24 * tt * (1 - tt))
-		r.key = "lift" if F < JUMP + 3 else ("wind" if F < HIT - 2 else ("whip" if F == HIT - 2 else "mid"))
+		r.key = "lift" if F < JUMP + 3 else ("wind" if F < HIT - 3 else ("whip" if F < HIT - 1 else "mid"))
 		return r
-	var slide := 6.0 * (1 - pow(1 - minf(1.0, (f - HIT) / 10.0), 2))   # ไถลตามแรงส่งหลังกระทบ
+	var slide := 3.0 * (1 - pow(1 - minf(1.0, (f - HIT) / 6.0), 2))   # ไถลนิดตามแรงส่ง (รายงาน: เท้าหน้ายันพื้น ตัวไม่เซ)
 	if F < FOLLOW:
 		r.cx = near - slide
 		r.key = "hit"
 		r.sy = 0.94 if F < HIT + 2 else 1.0
 		return r
-	if F < BACK:
+	if F < RET:   # ไม้จมค้างที่เป้า
 		r.cx = near - slide
 		r.key = "follow"
 		return r
-	if F < HOP:
-		r.cx = near - 6
-		r.key = "back"
-		return r
-	if F < LAND:   # กระโดดถอยกลับที่
-		var tt := (f - HOP + 1) / (LAND - HOP)
-		r.cx = near - 6 + (home - near + 6) * tt
-		r.lift = roundf(4 * 14 * tt * (1 - tt))
-		r.key = "back" if tt < 0.6 else "ready"
-		return r
-	if F < LAND + 2:
-		r.sy = 0.94
+	var x0 := near - 3.0
+	var at := RET
+	var done := 0.0
+	for h in HOPS:
+		var span: int = h.skid if h.has("skid") else h.c + h.a + h.l
+		if F < at + span:
+			var q: float = f - at
+			var xa: float = x0 + (home - x0) * done
+			var xb: float = x0 + (home - x0) * (done + h.d)
+			if h.has("skid"):   # ไถลตั้งหลัก: เร็วแล้วเบรก
+				var u: float = minf(1.0, (q + 1) / (h.skid - 2.0))
+				r.cx = xa + (xb - xa) * (1 - (1 - u) * (1 - u))
+				r.key = "land" if q < 3 else ("crouch" if q < h.skid - 3 else "ready")
+				return r
+			if q < h.c:   # ย่อ
+				r.cx = xa
+				r.key = "crouch"
+				r.sy = 0.96
+				return r
+			if q < h.c + h.a:   # ลอยถอยหลัง
+				var u: float = (q - h.c + 1) / float(h.a)
+				r.cx = xa + (xb - xa) * u
+				r.lift = roundf(4 * float(h.h) * u * (1 - u))
+				r.key = "air" if u < 0.5 else "fall"
+				return r
+			r.cx = xb   # ลง
+			r.key = "land"
+			r.sy = 0.94
+			return r
+		at += span
+		done += h.d
 	return r
+
+## เฟรมที่กระโดดถอยแต่ละครั้งออกตัว / แตะพื้น (ฝุ่น + เสียง)
+func hop_events() -> Dictionary:
+	var ev := {}
+	var at := RET
+	for h in HOPS:
+		if h.has("skid"):
+			ev[at] = "skid"
+			break
+		ev[at + int(h.c)] = "hop"
+		ev[at + int(h.c) + int(h.a)] = "land"
+		at += int(h.c) + int(h.a) + int(h.l)
+	return ev
 
 ## ตำแหน่งปลายไม้บนเวที
 func tip(g: Dictionary, k: String) -> Vector2:
@@ -130,7 +163,7 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	if F >= HIT - 3 and F <= HIT:
 		for k in [2, 1]:
 			ghost(geo(f - k), 0.14 * (3 - k))
-	if F > HOP and F < LAND - 3:
+	if F > RET and F < RET + 22 and geo(f).lift > 2:
 		ghost(geo(f - 1), 0.12)
 	var hp_pt := tip(geo(HIT), "hit")
 	if fresh:
@@ -140,12 +173,11 @@ func frame(f: float, F: int, fresh: bool) -> void:
 			dust_at(near, -1.0, 1.0)
 			burst(hp_pt, F, Color("#ffd27a") if hard_body() else Color("#fff0d0"))
 			debris_at(hp_pt, "ทุบ", F)
-		if F == HOP:
-			dust_at(near - 6, 1.0, 0.8)
+		var ev: String = hop_events().get(F, "")
+		if ev != "":
+			dust_at(g.cx, 1.0, 0.8 if ev == "hop" else 1.0)
 		if kill and F == HIT + int(cell.get("frames", 8)) + 8:
 			puff(Vector2(mcx, G - mh * 0.4))
-		if F == LAND:
-			dust_at(float(home), 1.0, 0.9)
 	if d >= 0 and d < 12:
 		var wy := minf(hp_pt.y - 30, G - roundf(mh * 0.75) - 30)   # เหนือตัวเลขดาเมจ ไม่ทับ
 		word("เปรี้ยง!!" if hard_body() else "ปึ้ก!!", maxf(4, mx0 + mw * 0.5 - 4), maxf(18, wy - mini(4, d)), Color("#ffd24a") if hard_body() else Color.WHITE)
@@ -220,7 +252,10 @@ func sounds(F: int) -> void:
 		play_sfx("thud", [T(0.6, "sine", 120, 28, 1.0, 0, 0.002, {"drive": true})])
 		sfx_mon(kill, 0.6 if big else 1.0)
 		duck()
-	if F == HOP:
-		play_sfx("hop", [N(0.08, "lowpass", 700, 150, 0.3, 1)])
-	if F == LAND:
-		play_sfx("land", [N(0.09, "lowpass", 700, 150, 0.4, 1)])
+	match hop_events().get(F, ""):
+		"hop":
+			play_sfx("hop", [N(0.08, "lowpass", 700, 150, 0.3, 1)])
+		"land":
+			play_sfx("land", [N(0.09, "lowpass", 700, 150, 0.4, 1)])
+		"skid":
+			play_sfx("skid", [N(0.4, "lowpass", 1400, 300, 0.3, 2)])
