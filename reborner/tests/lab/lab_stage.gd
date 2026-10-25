@@ -1,21 +1,40 @@
 extends Node2D
 ## ฐานฉากต่อสู้ในห้องทดลอง Godot (ใช้ร่วมทุกท่า) — ท่าแต่ละท่า = สคริปต์ที่ extends ไฟล์นี้ แล้วเขียนเฉพาะส่วนของท่า:
-##   end_frame() · hit_frame() (หยุดภาพ) · setup() สร้างโหนดของท่า · frame(f, F, fresh) ทุกเฟรมจอ · sounds(F) ทุกเฟรมเต็มใหม่ · caption()
-## ฐานมีให้: ฉาก frost_volcano + บรรยากาศ (หยุดได้) · Rion ผืน 120x112 เท้าแถว 108 · มอน 5 ตัวแรก + ขอบเนื้อ · กล้องสั่น · หยุดภาพ
-##   บับเบิลชื่อท่า · ตัวเลขดาเมจ · คำเสียง · ดาว/ประกาย/ฝุ่น/ไอ · เสียงสังเคราะห์สูตรเดียวกับหน้าเว็บ (บัส LabSfx มีเสียงก้อง + คอมเพรสเซอร์) · เมนูเลือกมอน
-## ไม่ใช่ของในเกม (tests/ ไม่ถูก export กับเกม) · ห้ามมี class_name (กฎ 2) · ภาพร่างอยู่ในโฟลเดอร์ .gdignore → โหลดตรงจากไฟล์ (หน้าเว็บ lab คัดลอกไปที่เดิมแบบ import ได้)
-## อัดวิดีโอ: xvfb-run -a <godot> --path . --rendering-driver opengl3 --write-movie <dir>/f.png --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01
-##   (ระบุ --foe = โหมดอัด: เล่นทันทีแล้วปิดเอง · ได้ภาพ 1152x648 + f.wav)
+##   tech_id() · end_frame() · stops() หยุดภาพ [[เฟรม, วินาที]] · setup() · frame(f, F, fresh) ทุกเฟรมจอ · sounds(F) ทุกเฟรมเต็มใหม่
+##   draw_fx(n) วาดหน้าสุด · draw_mid(n) ระหว่างมอนกับ Rion · draw_back(n) วาดหลังมอน (พิกเซลแบบ fbPx ของหน้าเว็บ) · caption()
+## ฐานมีให้: ฉากหลัง 3 ฉาก + ของขยับในฉาก (หยุดได้) · เพลงต่อสู้ (หลบตอนกระแทก) · Rion ผืน 120x112 เท้าแถว 108 (หมุนรอบแถว 72)
+##   มอน 5 ตัวแรก + ขอบเนื้อ · กล้องสั่น · หยุดภาพ · บับเบิล/ตัวเลข/คำเสียง · ร่างติดตา · ดาว/ประกาย/ฝุ่น/ไอ
+##   เสียงสังเคราะห์สูตรเดียวกับหน้าเว็บ (บัส LabSfx ก้อง + คอมเพรส) · เมนูเลือกท่า/มอน/ฉาก
+## ไม่ใช่ของในเกม (tests/ ไม่ถูก export กับเกม) · ห้ามมี class_name (กฎ 2) · ภาพร่าง/ฉาก/เพลงอยู่ในโฟลเดอร์ .gdignore → โหลดตรงจากไฟล์
+##   (หน้าเว็บ lab คัดลอกไปที่ทางเดิมแบบ import ได้ → โหลดผ่าน load())
+## อัดวิดีโอ: xvfb-run -a <godot> --path . --rendering-driver opengl3 --write-movie <dir>/f.png --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 [--bg=frost_volcano] [--music=0]
+##   (ระบุ --foe = โหมดอัด: เล่นทันทีแล้วปิดเอง · ได้ภาพ 600x336 + f.wav)
+## ถ่ายเฉพาะเฟรม (ตรวจเร็ว ไม่ต้องอัดทั้งเรื่อง): xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 --snap=30,36,40 --snapdir=<dir>
+##   → <dir>/<ท่า>_<มอน>_f030.png ขนาด 300x168
 
 const W := 300
 const H := 168
 const G := 158
 const SEC := 0.06
-const HITSTOP := 0.1
 const PX := "res://assets/sprites/pixellab_draft/px_set/"
 const MPX := "res://assets/sprites/monsters_px_draft/"
-const BG := "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg"
-const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค. "ลองกับมอน 5 ตัวแรกก่อนพอ")
+const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพลงต่อสู้แนวรอบ 4 (kwan 5 ต.ค.) อัดจากหน้าเว็บ
+const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
+## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
+const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"], ["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"],
+	["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"]]
+## ฉากหลัง (เหมือน combat_bgs ของ anim_test_build.py): ไฟล์ · ขยายกี่เท่า · เส้นพื้น (สัดส่วนความสูง) → ครอป 300x168 พื้นที่แถว 158
+const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
+	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
+	"flooded_ruins": ["เมืองน้ำท่วม", "res://docs/art-bible/pixellab_test/bg_flooded_ruins.jpg", 3, 0.80, false]}
+## ดาเมจ [ค่า, +1 อ่อนแอ/−1 ต้านทาน, จำนวนครั้ง] = csHit(ท่า, มอน) ของหน้าเว็บ (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
+const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], "M15": [57, 1, 1], "B1": [31, -1, 1]},
+	"bl2": {"M01": [34, 0, 3], "M03": [10, -1, 3], "M06": [33, 0, 3], "M15": [35, 1, 3], "B1": [19, -1, 3]},
+	"bl7": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
+	"bl8": {"M01": [69, 0, 1], "M03": [22, -1, 1], "M06": [67, 0, 1], "M15": [74, 1, 1], "B1": [43, -1, 1]},
+	"bl9": {"M01": [110, 0, 1], "M03": [33, -1, 1], "M06": [106, 0, 1], "M15": [113, 1, 1], "B1": [62, -1, 1]}}
+## ทางปลายมีดของภาพฟัน pls_atk_bl (วัดอัตโนมัติ blade_tip.py → DATA.swing ของหน้าเว็บ): จุดหมุนไหล่ P · มุม A · รัศมี R · ภาพแรก f0
+const SWING := {"P": [62, 68], "f0": 4, "A": [-14, -200.7, -237.4, -248.2], "R": [24.7, 39.6, 29.7, 26.9], "TAIL": -140}
 const SR := 32000
 
 const FX_SHADER := """
@@ -35,11 +54,14 @@ void fragment() {
 """
 
 var foe := "M01"
+var bg_id := "frost_volcano"
 var recording := false
 var playing := false
 var t := 0.0
+var amb_t := 0.0
+var stopped := false
 var hold := 0.0
-var hit_done := false
+var stops_done := {}
 var last_fi := -1
 var tex := {}
 var mon_img: Image
@@ -56,26 +78,38 @@ var hp := 0
 var body := ""
 var dmg := 0
 var aff := 0
+var hits := 1
 var kill := false
 
 var cam: Camera2D
+var bg_tex: Texture2D
+var amb: Node2D
 var dim: ColorRect
 var mon: Sprite2D
-var snow: CPUParticles2D
+var back_fx: Node2D
+var front_fx: Node2D
+var mid_fx: Node2D
+var flakes: CPUParticles2D
 var embers: CPUParticles2D
 var lamp: Sprite2D
+var mist_tex: Texture2D
 var puff_p: CPUParticles2D
 var dust: CPUParticles2D
 var sparks: CPUParticles2D
 var star: Node2D
 var star_r := 0.0
+var star_c2 := Color("#ffd27a")
 var flash_spr: Sprite2D
 var burst_f := -100
 var burst_pos := Vector2.ZERO
+var rion: Sprite2D
+var ghosts: Array[Sprite2D] = []
+var n_ghost := 0
 var ui: CanvasLayer
-var lbl_word: Label
-var lbl_dmg: Label
-var lbl_tag: Label
+var words: Array[Label] = []
+var n_word := 0
+var pops: Array = []   # [ตัวเลข, ป้าย] หลายชุด
+var n_pop := 0
 var bubble: Node2D
 var bubble_lbl: Label
 var bubble_panel: Panel
@@ -83,37 +117,56 @@ var caption_lbl: Label
 var menu: Control
 var players: Array[AudioStreamPlayer] = []
 var sfx_cache := {}
+var snaps := {}
+var snap_dir := ""
 
 # ── ส่วนที่ท่าแต่ละท่าเขียนทับ ──────────────────────────
+func tech_id() -> String: return "bl0"
 func end_frame() -> int: return 100
-func hit_frame() -> int: return -1
-func tech_dmg() -> Dictionary: return {}
+func stops() -> Array: return []
 func setup() -> void: pass
 func frame(_f: float, _F: int, _fresh: bool) -> void: pass
 func sounds(_F: int) -> void: pass
+func draw_fx(_n: Node2D) -> void: pass
+func draw_back(_n: Node2D) -> void: pass
+func draw_mid(_n: Node2D) -> void: pass
 func caption() -> String: return ""
 
 # ── เริ่ม ─────────────────────────────────────────────
 func _ready() -> void:
 	foe = str(Engine.get_meta("lab_foe", "M01"))
+	bg_id = str(Engine.get_meta("lab_bg", "frost_volcano"))
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--foe="):
 			foe = a.substr(6)
 			recording = true
+		elif a.begins_with("--bg="):
+			bg_id = a.substr(5)
+		elif a == "--music=0":
+			Engine.set_meta("lab_music_off", true)
+		elif a.begins_with("--snap="):
+			for v in a.substr(7).split(","):
+				snaps[int(v)] = false
+		elif a.begins_with("--snapdir="):
+			snap_dir = a.substr(10)
+	if not BGS.has(bg_id):
+		bg_id = "frost_volcano"
 	playing = recording or bool(Engine.get_meta("lab_auto", false))
 	var win := get_window()
 	win.content_scale_size = Vector2i(W, H)
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
 	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	if recording:
+		win.size = Vector2i(W * 2, H * 2) if snaps.is_empty() else Vector2i(W, H)
 	_audio_bus()
 	_load_monster()
 	_build_stage()
 	setup()
 	_build_ui()
-	_step(0.0)
+	_step()
 
 func _img(path: String) -> Image:
-	if ResourceLoader.exists(path):   # หน้าเว็บ lab: ไฟล์ถูก import เป็นเท็กซ์เจอร์
+	if ResourceLoader.exists(path):   # หน้าเว็บ lab: ไฟล์ถูก import แล้ว
 		return (load(path) as Texture2D).get_image()
 	return Image.load_from_file(ProjectSettings.globalize_path(path))
 
@@ -123,10 +176,16 @@ func tx(key: String) -> Texture2D:
 		tex[key] = ImageTexture.create_from_image(_img(path))
 	return tex[key]
 
+## เนื้อมอน (อัลฟา > 100 เหมือน kwAlpha บนเว็บ)
 func solid(x: int, y: int) -> bool:
-	return x >= 0 and y >= 0 and x < mw and y < mh and mon_img.get_pixel(x, y).a > 0.15
+	return x >= 0 and y >= 0 and x < mw and y < mh and mon_img.get_pixel(x, y).a > 0.392
 
-## ขอบซ้าย/ขวาของเนื้อมอนที่แถว row (ไม่มีเนื้อ = หาแถวล่างลงไป) · เหมือน wrEdges บนเว็บ
+func rgb(x: int, y: int) -> Color:
+	var c := mon_img.get_pixel(clampi(x, 0, mw - 1), clampi(y, 0, mh - 1))
+	c.a = 1.0
+	return c
+
+## ขอบซ้าย/ขวาของเนื้อมอนที่แถว row (ไม่มีเนื้อ = หาแถวล่างลงไป) · เหมือน wrEdges
 func edges(row: int) -> Vector2:
 	for r in range(max(0, row), mh):
 		var l := -1
@@ -148,9 +207,10 @@ func _load_monster() -> void:
 	for r in CsvDb.load_csv("res://data/monster_body.csv"):
 		if str(r.monster_id) == foe:
 			body = str(r.body)
-	var d: Array = tech_dmg().get(foe, [0, 0])
+	var d: Array = DMG.get(tech_id(), {}).get(foe, [0, 0, 1])
 	dmg = d[0]
 	aff = d[1]
+	hits = d[2]
 	kill = dmg >= hp
 	mon_img = _img(MPX + foe + "_0.png")
 	mw = mon_img.get_width()
@@ -172,14 +232,40 @@ func place_monster(mx: int) -> void:
 	mx0 = int(round(mx - mw / 2.0))
 	mcx = mx0 + mw / 2.0
 
-## ภาพมอนตามบทบาท (idle 0–2 · hurt 6) วางกลางช่อง เท้าที่พื้น
-func show_mon(key: String, dx := 0.0, white := 0.0) -> void:
+## ภาพมอน (idle 0–2 · hurt 6) วางกลางช่อง เท้าที่พื้น · ย้อมสี tint เท่า amt · ยืด/หด sx sy รอบกลางเท้า
+func show_mon(key: String, dx := 0.0, amt := 0.0, tint := Color.WHITE, sx := 1.0, sy := 1.0) -> void:
 	var mt := tx(key)
 	mon.visible = true
 	mon.texture = mt
-	mon.position = Vector2(mx0 + dx + round((mw - mt.get_width()) / 2.0), G - mt.get_height())
-	mon.material.set_shader_parameter("tint", Color.WHITE)
-	mon.material.set_shader_parameter("amount", white)
+	mon.offset = Vector2(-mt.get_width() / 2.0, -mt.get_height())   # ยืด/หดรอบกลางเท้า · มุมซ้ายบนตรงพิกเซลแบบหน้าเว็บ
+	mon.position = Vector2(mx0 + round(dx) + round((mw - mt.get_width()) / 2.0) + mt.get_width() / 2.0, G)
+	mon.scale = Vector2(sx, sy)
+	mon.material.set_shader_parameter("tint", tint)
+	mon.material.set_shader_parameter("amount", amt)
+
+func idle_key(f: float, slow := 4.0) -> String:
+	return "%s_%d" % [foe, posmod(int(floor(f / slow)), 3)]
+
+func hurt_key() -> String:
+	return foe + "_6"
+
+## ปลายมีดภาพฟัน: มุม (องศา) → จุดในผืน 120x112 (เหมือน blcSwingPt)
+func swing_pt(a: float) -> Vector2:
+	var A: Array = SWING.A
+	var R: Array = SWING.R
+	var k := 0
+	while k < A.size() - 2 and a < A[k + 1]:
+		k += 1
+	var u: float = (a - A[k]) / (A[k + 1] - A[k])
+	var r: float = R[k] + (R[k + 1] - R[k]) * u
+	var q := deg_to_rad(a)
+	return Vector2(SWING.P[0] + cos(q) * r, SWING.P[1] + sin(q) * r)
+
+func fb_hash(a: float, b: float, c: float) -> float:   # fbHash ของหน้าเว็บ
+	return fposmod(sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453, 1.0)
+
+func bg_h(i: float) -> float:   # bgH ของหน้าเว็บ
+	return fposmod(sin(i * 12.9898 + 78.233) * 43758.5453, 1.0)
 
 # ── ของใช้สร้างโหนด ─────────────────────────────────────
 func fx_mat() -> ShaderMaterial:
@@ -229,22 +315,36 @@ func particles(amount: int, life: float, z := 5) -> CPUParticles2D:
 func rion_sprite(z := 4) -> Sprite2D:
 	var s := Sprite2D.new()
 	s.centered = false
-	s.offset = Vector2(-60, -108)
 	s.material = fx_mat()
 	s.z_index = z
 	add_child(s)
 	return s
 
-## วาง Rion ตาม geo ของท่า: {cx, lift, key, flip, sx, sy}
+## วาง Rion ตาม geo ของท่า: {cx, lift, key, flip, sx, sy, rot} · หมุน = รอบแถว 72 ของผืน · ไม่หมุน = ยึดเท้า (แถว 108) เหมือน aotDraw
 func set_rion(s: Sprite2D, g: Dictionary, alpha := 1.0, tint := Color.WHITE, amt := 0.0) -> void:
+	var rot: float = g.get("rot", 0.0)
+	var py := 72.0 if rot != 0.0 else 108.0
+	if g.get("lean", 0.0) != 0.0:   # เอนตัว = หมุนรอบเท้า (blcState lean)
+		rot = g.lean
 	s.texture = tx(g.key)
-	s.flip_h = g.flip
-	s.position = Vector2(g.cx, G - g.lift)
-	s.scale = Vector2(g.sx, g.sy)
+	s.flip_h = g.get("flip", false)
+	s.offset = Vector2(-60, -py)
+	s.position = Vector2(round(g.cx), round(G - g.lift - (108 - py)))
+	s.rotation = rot
+	s.scale = Vector2(g.get("sx", 1.0), g.get("sy", 1.0))
 	s.modulate.a = alpha
 	s.material.set_shader_parameter("tint", tint)
 	s.material.set_shader_parameter("amount", amt)
 	s.visible = alpha > 0.0
+
+## ร่างติดตา (ต่อเฟรม) · behind = หลังมอน
+func ghost(g: Dictionary, alpha: float, tint := Color.WHITE, amt := 0.0, behind := false) -> void:
+	if n_ghost >= ghosts.size():
+		ghosts.append(rion_sprite())
+	var s: Sprite2D = ghosts[n_ghost]
+	n_ghost += 1
+	s.z_index = 0 if behind else 3
+	set_rion(s, g, alpha, tint, amt)
 
 func label(size: int, col: Color, outline: int, bold: bool, parent: Node = null) -> Label:
 	var l := Label.new()
@@ -262,6 +362,45 @@ func label(size: int, col: Color, outline: int, bold: bool, parent: Node = null)
 	(parent if parent else ui).add_child(l)
 	return l
 
+func text_w(text: String, size: int) -> float:
+	return (load("res://assets/fonts/game_font.tres") as Font).get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x
+
+# ── วาดพิกเซล (แบบ fbPx/pkStar/pkSlashLine ของหน้าเว็บ) ───────────
+func px(n: Node2D, x: float, y: float, col: Color, w := 1.0, h := 1.0) -> void:
+	n.draw_rect(Rect2(round(x), round(y), w, h), col)
+
+## ดาวกระแทก 8 แฉก (pkStar)
+func star_px(n: Node2D, x: float, y: float, r: float, c1: Color, c2: Color) -> void:
+	for i in 8:
+		var a := i * PI / 4
+		var L := r * (0.55 if i % 2 else 1.0)
+		for k in int(L) + 1:
+			px(n, x + cos(a) * k, y + sin(a) * k, c1 if k < L * 0.5 else c2, 2, 2)
+	px(n, x - 2, y - 2, c1, 4, 4)
+
+## แผลแสง 3 ชั้น หนากลาง บางปลาย (pkSlashLine)
+func slash_line(n: Node2D, x0: float, y0: float, x1: float, y1: float, th: float, prog: float, al: float) -> void:
+	if al <= 0.0:
+		return
+	var cnt := maxi(8, int(round(Vector2(x1 - x0, y1 - y0).length() / 2)))
+	var m := int(round(cnt * prog))
+	for layer in [[Color("#1a3a9a"), 2.0], [Color("#9ae6ff"), 0.0], [Color.WHITE, -2.0]]:
+		var col: Color = layer[0]
+		col.a = al
+		for i in m + 1:
+			var u := float(i) / cnt
+			var w: float = maxf(0.0, th * pow(sin(PI * u), 0.6) + layer[1])
+			if w < 1.0:
+				continue
+			px(n, x0 + (x1 - x0) * u - w / 2, y0 + (y1 - y0) * u - w / 2, col, ceil(w), ceil(w))
+
+## ก้อนกลม (ไอ/ควัน/เลือด · pxDisc)
+func disc(n: Node2D, x: float, y: float, r: float, col: Color) -> void:
+	var R := maxi(1, int(round(r)))
+	for j in range(-R, R + 1):
+		var w := int(round(sqrt(maxf(0.0, R * R - j * j + R * 0.6))))
+		px(n, x - w, y + j, col, maxi(1, 2 * w), 1)
+
 # ── ฉากหลัง บรรยากาศ อนุภาค ─────────────────────────────
 func _build_stage() -> void:
 	RenderingServer.set_default_clear_color(Color.BLACK)
@@ -271,59 +410,46 @@ func _build_stage() -> void:
 	cam.make_current()
 	ui = CanvasLayer.new()
 	add_child(ui)
-	# ครอปแบบเดียวกับหน้าเว็บ: ย่อกว้าง 300 · เส้นพื้นของภาพ (1250/1376) ที่แถว 158
-	var bimg := _img(BG)
+	var b: Array = BGS[bg_id]
+	var bimg := _img(b[1])
+	if b[2] > 1:
+		bimg.resize(bimg.get_width() / b[2], bimg.get_height() / b[2], Image.INTERPOLATE_NEAREST)
 	var nh := int(round(bimg.get_height() * 300.0 / bimg.get_width()))
-	bimg.resize(300, nh, Image.INTERPOLATE_LANCZOS)
-	var y0 := clampi(int(round(nh * 1250.0 / 1376.0)) - 158, 0, nh - H)
+	bimg.resize(300, nh, Image.INTERPOLATE_LANCZOS if b[4] else Image.INTERPOLATE_NEAREST)
+	var y0 := clampi(int(round(nh * b[3])) - 158, 0, nh - H)
+	bg_tex = ImageTexture.create_from_image(bimg.get_region(Rect2i(0, y0, 300, H)))
 	var bg := Sprite2D.new()
 	bg.centered = false
-	bg.texture = ImageTexture.create_from_image(bimg.get_region(Rect2i(0, y0, 300, H)))
+	bg.texture = bg_tex
 	add_child(bg)
-	lamp = Sprite2D.new()
-	lamp.texture = radial(Color("#ff9a40"), 68)
-	lamp.material = add_mat()
-	lamp.position = Vector2(208, 72)
-	add_child(lamp)
-	embers = particles(6, 1.4, 0)
-	embers.one_shot = false
-	embers.explosiveness = 0.0
-	embers.emitting = true
-	embers.position = Vector2(208, 72)
-	embers.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	embers.emission_rect_extents = Vector2(4, 1)
-	embers.direction = Vector2(0, -1)
-	embers.spread = 15
-	embers.gravity = Vector2.ZERO
-	embers.initial_velocity_min = 14
-	embers.initial_velocity_max = 20
-	embers.color_ramp = ramp([Color("#ffd27a"), Color("#ff7a2a"), Color(1, 0.48, 0.16, 0)])
-	embers.preprocess = 2
-	snow = particles(75, 6.0, 0)
-	snow.one_shot = false
-	snow.explosiveness = 0.0
-	snow.emitting = true
-	snow.position = Vector2(W / 2.0, -4)
-	snow.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	snow.emission_rect_extents = Vector2(W * 0.6, 2)
-	snow.direction = Vector2(-0.3, 1)
-	snow.spread = 10
-	snow.gravity = Vector2(0, 2)
-	snow.initial_velocity_min = 18
-	snow.initial_velocity_max = 30
-	snow.color = Color(0.95, 0.96, 1.0, 0.75)
-	snow.preprocess = 8
+	mist_tex = radial(Color("#e6eef8"), 44)
+	amb = Node2D.new()
+	amb.draw.connect(_draw_amb)
+	add_child(amb)
+	_build_ambient_particles()
 	dim = ColorRect.new()
-	dim.color = Color("#0c1028")
+	dim.color = Color("#10142a")
 	dim.position = Vector2(-8, -8)
 	dim.size = Vector2(W + 16, H + 16)
 	dim.modulate.a = 0.0
 	add_child(dim)
+	back_fx = Node2D.new()
+	back_fx.draw.connect(func(): draw_back(back_fx))
+	add_child(back_fx)
+	rion = rion_sprite()
 	mon = Sprite2D.new()
 	mon.centered = false
 	mon.material = fx_mat()
 	mon.z_index = 1
 	add_child(mon)
+	mid_fx = Node2D.new()
+	mid_fx.z_index = 2
+	mid_fx.draw.connect(func(): draw_mid(mid_fx))
+	add_child(mid_fx)
+	front_fx = Node2D.new()
+	front_fx.z_index = 5
+	front_fx.draw.connect(func(): draw_fx(front_fx))
+	add_child(front_fx)
 	puff_p = particles(4, 0.4)
 	puff_p.direction = Vector2(-1, -0.4)
 	puff_p.spread = 12
@@ -373,15 +499,140 @@ func _build_stage() -> void:
 	env.environment = e
 	add_child(env)
 
-## ทั้งโลกกลั้นหายใจ: หิมะ/ถ่าน/ไฟตะเกียงหยุดนิ่ง
+func _build_ambient_particles() -> void:
+	if bg_id == "frost_volcano" or bg_id == "ash_village":   # หิมะ / เถ้าร่วง
+		flakes = particles(75 if bg_id == "frost_volcano" else 55, 7.0, 0)
+		flakes.one_shot = false
+		flakes.explosiveness = 0.0
+		flakes.emitting = true
+		flakes.position = Vector2(W / 2.0 + 20, -4)
+		flakes.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		flakes.emission_rect_extents = Vector2(W * 0.6, 2)
+		flakes.direction = Vector2(-0.3, 1) if bg_id == "frost_volcano" else Vector2(-0.8, 1)
+		flakes.spread = 10
+		flakes.gravity = Vector2(0, 2)
+		flakes.initial_velocity_min = 18 if bg_id == "frost_volcano" else 10
+		flakes.initial_velocity_max = 30 if bg_id == "frost_volcano" else 18
+		flakes.color = Color(0.95, 0.96, 1.0, 0.75) if bg_id == "frost_volcano" else Color(0.84, 0.8, 0.75, 0.6)
+		flakes.preprocess = 10
+	if bg_id == "frost_volcano":   # ไฟตะเกียง: แสงวูบ (บวกแสง) + ถ่านลอย
+		lamp = Sprite2D.new()
+		lamp.texture = radial(Color("#ff9a40"), 68)
+		lamp.material = add_mat()
+		lamp.position = Vector2(208, 72)
+		add_child(lamp)
+		embers = _embers(Vector2(208, 70), Vector2(4, 1), 6, 1.4, 14, 20)
+	elif bg_id == "ash_village":   # ถ่านไฟลอยจากหมู่บ้าน
+		embers = _embers(Vector2(240, 100), Vector2(60, 2), 14, 5.0, 14, 24)
+		embers.direction = Vector2(-0.1, -1)
+
+func _embers(pos: Vector2, ext: Vector2, amount: int, life: float, v0: float, v1: float) -> CPUParticles2D:
+	var p := particles(amount, life, 0)
+	p.one_shot = false
+	p.explosiveness = 0.0
+	p.emitting = true
+	p.position = pos
+	p.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	p.emission_rect_extents = ext
+	p.direction = Vector2(0, -1)
+	p.spread = 15
+	p.gravity = Vector2.ZERO
+	p.initial_velocity_min = v0
+	p.initial_velocity_max = v1
+	p.color_ramp = ramp([Color("#ffd27a"), Color("#ff7a2a"), Color(1, 0.48, 0.16, 0)])
+	p.preprocess = life
+	return p
+
+## ของขยับในฉาก (แบบ bgAmbient ของหน้าเว็บ) · เวลาฉาก amb_t หยุดได้
+func _draw_amb() -> void:
+	var tt := amb_t
+	if bg_id == "frost_volcano":
+		_fall(168, 186, 0, 52, tt, 26, 11, 55)
+		_fall(223, 242, 0, 26, tt, 18, 31, 55)   # น้ำตกน้ำแข็ง 2 สาย
+		for i in 3:   # หมอกในหุบเหว ลอยช้า
+			var x := 70 + fposmod(tt * (3 + i) + i * 40, 110.0)
+			var y := 52 + i * 12 + sin(tt * 0.4 + i) * 3
+			amb.draw_texture(mist_tex, Vector2(x - 22, y - 22), Color(1, 1, 1, 0.10))
+		for dx in range(-4, 5):   # เปลวไฟพิกเซล
+			var h := maxi(0, 9 - absi(dx) * 2 + int(round(sin(tt * 14 + dx * 1.7) * 1.5 + sin(tt * 23 + dx))))
+			for k in h:
+				var c := Color("#d8401c") if k > h * 0.7 else Color("#ff9a30") if k > h * 0.35 else Color("#ffe68a")
+				c.a = 0.85
+				px(amb, 208 + dx, 79 - k, c)
+	elif bg_id == "ash_village":
+		for y in range(125, 168):   # ธงขาดบนเสา: แถวผ้าเหลื่อมตามคลื่นลม
+			var k := (y - 125) / 43.0
+			var off := int(round(sin(tt * 2.4 - y * 0.22) * 1.6 * k))
+			if off != 0:
+				amb.draw_texture_rect_region(bg_tex, Rect2(207 + off, y, 26, 1), Rect2(207, y, 26, 1))
+		for c in [[232, 7, 0], [290, 11, 9]]:   # ควันปล่อง
+			for i in 5:
+				var ph := fposmod(tt * 0.25 + i / 5.0 + bg_h(c[2]), 1.0)
+				var col := Color("#5d544d") if i % 2 else Color("#7a7068")
+				col.a = 0.4 * (1 - ph) * minf(1.0, ph * 6)
+				amb.draw_circle(Vector2(c[0] - ph * 18 + sin(tt + i) * 1.5, c[1] - ph * 14), 2 + ph * 7, col)
+	elif bg_id == "flooded_ruins":
+		_fall(83, 92, 33, 56, tt, 14, 3, 40)
+		_fall(117, 123, 34, 56, tt, 9, 13, 40)
+		_fall(96, 101, 6, 18, tt, 6, 23, 35)
+		_fall(273, 287, 62, 80, tt, 12, 43, 40)   # น้ำตก 4 สาย
+		_foam(88, 57, 10, tt, 5)
+		_foam(120, 57, 7, tt, 15)
+		_foam(280, 81, 12, tt, 25)
+		for i in 14:   # ประกายบนแอ่งน้ำ
+			var ph := fposmod(tt * 0.9 + bg_h(500 + i), 1.0)
+			var a := pow(maxf(0.0, sin(ph * PI)), 3)
+			var q: Array = [27, 112, 72, 16] if i % 2 else [202, 102, 76, 15]
+			var x: float = q[0] + bg_h(520 + i) * q[2]
+			var y: float = q[1] + bg_h(540 + i) * q[3]
+			px(amb, x, y, Color(1, 1, 1, a))
+			if a > 0.6:
+				px(amb, x - 1, y, Color(0.85, 0.96, 1, a * 0.5), 3, 1)
+				px(amb, x, y - 1, Color(0.85, 0.96, 1, a * 0.5), 1, 3)
+		for j in 3:   # วงน้ำหยด
+			var ph := fposmod(tt / 1.6 + j / 3.0, 1.0)
+			var n := floorf(tt / 1.6 + j / 3.0)
+			var q: Array = [32, 114, 64, 12] if j % 2 else [206, 104, 68, 12]
+			var x: float = q[0] + bg_h(n * 7 + j) * q[2]
+			var y: float = q[1] + bg_h(n * 7 + j + 3) * q[3]
+			var r := 1 + ph * 7
+			amb.draw_set_transform(Vector2(round(x) + 0.5, round(y) + 0.5), 0, Vector2(1, 0.4))
+			amb.draw_arc(Vector2.ZERO, r, 0, TAU, 24, Color(0.89, 0.97, 1, 0.5 * (1 - ph)), 1.0)
+			amb.draw_set_transform(Vector2.ZERO)
+		for i in 10:   # ระลอกคลองบน
+			var ph := fposmod(tt * 0.5 + bg_h(700 + i), 1.0)
+			px(amb, 105 + bg_h(710 + i) * 60 + ph * 6, 2 + bg_h(720 + i) * 14, Color(0.81, 0.94, 0.96, 0.35 * sin(ph * PI)), 2, 1)
+
+func _fall(x0: int, x1: int, y0: int, y1: int, tt: float, n: int, seed: int, sp: float) -> void:   # น้ำตก (bgFall)
+	var hh := y1 - y0
+	for i in n:
+		var x := x0 + floorf(bg_h(seed + i) * (x1 - x0 + 1))
+		var len := 2 + floorf(bg_h(seed + i + 50) * 4)
+		var y := y0 + fposmod(bg_h(seed + i + 90) * hh + tt * sp * (0.8 + bg_h(seed + i + 7) * 0.5), float(hh))
+		var e := minf(1.0, minf((y - y0) / 4.0, (y1 - y) / 4.0))
+		var c := Color("#cfefff") if i % 3 else Color.WHITE
+		c.a = 0.55 * maxf(0.0, e)
+		px(amb, x, y, c, 1, len)
+
+func _foam(cx: float, cy: float, w: float, tt: float, seed: int) -> void:   # ฟองน้ำตก (bgFoam)
+	for i in 7:
+		var ph := fposmod(tt * 3 + bg_h(seed + i), 1.0)
+		var x := cx + (bg_h(seed + i + 20) - 0.5) * w + (ph - 0.5) * 2 * (1 if i % 2 else -1)
+		px(amb, x, cy - ph * 4, Color(1, 1, 1, 0.7 * (1 - ph)))
+
+## ทั้งโลกกลั้นหายใจ: ของขยับในฉาก + อนุภาคหยุดนิ่ง
 func world_stop(stop: bool) -> void:
-	snow.speed_scale = 0.0 if stop else 1.0
-	embers.speed_scale = 0.0 if stop else 1.0
-	if not stop:
-		lamp.modulate.a = 0.48 * (0.75 + 0.25 * sin(t * 9) * sin(t * 5.3 + 1))
+	stopped = stop
+	for p in [flakes, embers]:
+		if p:
+			p.speed_scale = 0.0 if stop else 1.0
+
+func dim_to(a: float, col := Color("#10142a")) -> void:
+	dim.color = col
+	dim.modulate.a = a
 
 func shake(F: int, amount: float) -> void:
-	cam.offset = Vector2(round((_hash(F, 1) * 2 - 1) * amount), round((_hash(F, 2) * 2 - 1) * amount))
+	cam.offset = Vector2(round((fb_hash(F, 1, 0) * 2 - 1) * amount), round((fb_hash(F, 2, 0) * 2 - 1) * amount))
 
 func puff(pos: Vector2) -> void:
 	puff_p.position = pos
@@ -393,23 +644,17 @@ func dust_at(x: float, dir: float, size := 1.0) -> void:
 	dust.scale_amount_max = 3.0 * size
 	dust.restart()
 
-## จุดโดน: ประกายกระเด็น + ดาว 8 แฉก (เหมือน pkStar) + แสงวาบ 4 เฟรม
-func burst(pos: Vector2, F: int) -> void:
+## จุดโดน: ประกายกระเด็น (อนุภาค) + ดาว 8 แฉก + แสงวาบ 4 เฟรม
+func burst(pos: Vector2, F: int, c2 := Color("#ffd27a")) -> void:
 	burst_f = F
 	burst_pos = pos
+	star_c2 = c2
 	sparks.position = pos
 	sparks.restart()
 
 func _draw_star() -> void:
-	if star_r <= 0.0:
-		return
-	for i in 8:
-		var a := i * PI / 4
-		var L := star_r * (0.55 if i % 2 else 1.0)
-		var d := Vector2(cos(a), sin(a))
-		star.draw_line(Vector2.ZERO, d * L * 0.5, Color.WHITE, 2.0)
-		star.draw_line(d * L * 0.5, d * L, Color("#ffd27a"), 2.0)
-	star.draw_rect(Rect2(-2, -2, 4, 4), Color.WHITE)
+	if star_r > 0.0:
+		star_px(star, 0, 0, star_r, Color.WHITE, star_c2)
 
 func _burst_step(f: float, F: int) -> void:
 	var d := F - burst_f
@@ -422,9 +667,6 @@ func _burst_step(f: float, F: int) -> void:
 		flash_spr.position = burst_pos
 		flash_spr.scale = Vector2.ONE * (0.6 + q * 0.35)
 		flash_spr.modulate.a = 0.6 * (1 - q / 4.0)
-
-func _hash(a: int, b: int) -> float:
-	return fposmod(sin(a * 127.1 + b * 311.7) * 43758.5453, 1.0)
 
 # ── ตัวหนังสือ: บับเบิลชื่อท่า · ตัวเลขดาเมจ · คำเสียง ──────────
 func _build_ui() -> void:
@@ -457,18 +699,6 @@ func _build_ui() -> void:
 	bubble_lbl.label_settings.font.variation_embolden = 1.0
 	bubble_lbl.position = Vector2(8, -1)
 	bubble.visible = false
-	lbl_word = label(12, Color("#fff4c8"), 3, true)
-	lbl_dmg = label(14, Color("#fff4c8"), 4, true)
-	lbl_dmg.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl_dmg.size = Vector2(160, 20)
-	lbl_dmg.pivot_offset = Vector2(80, 12)
-	lbl_tag = label(8, Color("#ffe08a") if aff > 0 else Color("#c8e6ff"), 3, true)
-	lbl_tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl_tag.size = Vector2(160, 12)
-	lbl_tag.text = ("อ่อนแอ! · " if aff > 0 else "ต้านทาน · " if aff < 0 else "") + ("HP %d · ฟันเดียวขาด" % hp if kill else "HP %d รอด" % hp)
-	lbl_word.visible = false
-	lbl_dmg.visible = false
-	lbl_tag.visible = false
 	var bar := ColorRect.new()
 	bar.color = Color(16 / 255.0, 12 / 255.0, 8 / 255.0, 0.62)
 	bar.position = Vector2(0, H - 10)
@@ -476,10 +706,10 @@ func _build_ui() -> void:
 	ui.add_child(bar)
 	caption_lbl = label(7, Color("#f0e4c8"), 0, false)
 	caption_lbl.position = Vector2(4, H - 11)
-	caption_lbl.text = caption()
+	caption_lbl.text = "GODOT · %s %s · %s" % [mon_name, foe, caption()]
 	_build_menu()
 
-## บับเบิลชื่อท่า (เหมือน rs3Bubble): เด้ง 2 เฟรมแรก · ไม่ล้นจอ · หางชี้ผู้พูด
+## บับเบิลชื่อท่า (rs3Bubble): เด้ง 2 เฟรมแรก · ไม่ล้นจอ · หางชี้ผู้พูด
 func show_bubble(text: String, x: float, y: float, d: int, alpha: float) -> void:
 	bubble.visible = alpha > 0.0
 	if not bubble.visible:
@@ -496,82 +726,114 @@ func show_bubble(text: String, x: float, y: float, d: int, alpha: float) -> void
 	bubble.get_node("tail").position.x = tl
 	bubble.get_node("tail_line").position.x = tl
 
-## ตัวเลขดาเมจ (เหมือน dmgPop): เด้ง แล้วลอยช้า ค้าง ~1.3 วิ แล้วจาง · d = เฟรมหลังโดน
-func dmg_pop(d: int, y: float) -> void:
-	lbl_dmg.visible = d >= 0 and d < 22
-	lbl_tag.visible = lbl_dmg.visible
-	if not lbl_dmg.visible:
+## คำเสียง (pkText 12px) ต่อเฟรม · x, y = จุดเริ่ม/เส้นฐานแบบหน้าเว็บ
+func word(text: String, x: float, y: float, col := Color.WHITE, size := 12) -> void:
+	if n_word >= words.size():
+		words.append(label(12, Color.WHITE, 3, true))
+	var l: Label = words[n_word]
+	n_word += 1
+	l.visible = true
+	l.text = text
+	l.label_settings.font_size = size
+	l.label_settings.font_color = col
+	l.position = Vector2(round(x), round(y) - size - 2)
+
+## ตัวเลขดาเมจ (dmgPop): เด้ง แล้วลอยช้า ค้าง ~1.3 วิ แล้วจาง · d = เฟรมหลังโดน
+func pop(val: int, x: float, y: float, d: int, col := Color.WHITE, tag := "", tag_col := Color("#ffe08a")) -> void:
+	if d < 0 or d >= 22:
 		return
-	var pop: float = [-6, -10, -8][d] if d < 3 else -8 - minf(6.0, (d - 3) * 0.5)
-	var x := dmg_x()
-	var yy: float = max(18.0, round(y + pop))
-	lbl_dmg.text = str(dmg)
-	lbl_dmg.scale = Vector2.ONE * (1.4 if d == 0 else 1.15 if d == 1 else 1.0)
-	lbl_dmg.position = Vector2(x - 80, yy - 19)
-	lbl_dmg.modulate.a = 1.0 if d < 16 else 1 - (d - 16) / 6.0
-	lbl_tag.position = Vector2(x - 80, yy + 1)
-	lbl_tag.modulate.a = lbl_dmg.modulate.a
+	if n_pop >= pops.size():
+		var a := label(14, Color.WHITE, 4, true)
+		a.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		a.size = Vector2(160, 20)
+		a.pivot_offset = Vector2(80, 12)
+		var b := label(8, Color.WHITE, 3, true)
+		b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.size = Vector2(160, 12)
+		pops.append([a, b])
+	var l: Label = pops[n_pop][0]
+	var tl: Label = pops[n_pop][1]
+	n_pop += 1
+	var dy: float = [-6, -10, -8][d] if d < 3 else -8 - minf(6.0, (d - 3) * 0.5)
+	var yy: float = max(18.0, round(y + dy))
+	var al := 1.0 if d < 16 else 1 - (d - 16) / 6.0
+	l.visible = true
+	l.text = str(val)
+	l.label_settings.font_color = col
+	l.scale = Vector2.ONE * (1.4 if d == 0 else 1.15 if d == 1 else 1.0)
+	l.position = Vector2(round(x) - 80, yy - 19)
+	l.modulate.a = al
+	tl.visible = tag != ""
+	tl.text = tag
+	tl.label_settings.font_color = tag_col
+	tl.position = Vector2(round(x) - 80, yy + 1)
+	tl.modulate.a = al
 
-func dmg_x() -> float:
-	return roundf(clampf(mcx, 30.0, W - 30.0))
+func aff_tag() -> String:
+	return "อ่อนแอ!" if aff > 0 else "ต้านทาน" if aff < 0 else ""
 
-## คำเสียง (ฉับ!! / ขาด!!) ข้างมอน · มอนตัวเล็กที่บรรทัด HP ยาวเกินตัว → เลื่อนไปขวาพ้นบรรทัด
-func show_word(text: String, y: float, visible_now: bool) -> void:
-	lbl_word.visible = visible_now
-	if not visible_now:
-		return
-	lbl_word.text = text
-	var tag_r := dmg_x() + lbl_tag.label_settings.font.get_string_size(lbl_tag.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x / 2
-	lbl_word.position = Vector2(minf(W - 44, maxf(mx0 + mw + 4, roundf(tag_r) + 4)), y - 14)
+func aff_col() -> Color:
+	return Color("#ffe08a") if aff > 0 else Color("#c8c8c8")
 
-# ── เมนู (หน้าเว็บ): เลือกมอน · เล่นซ้ำ · เปิด/ปิดเสียง ─────────────
+# ── เมนู (หน้าเว็บ): ท่า · มอน · ฉาก · เล่นซ้ำ · เสียง · เพลง ─────────────
 func _build_menu() -> void:
 	menu = Control.new()
 	menu.size = Vector2(W, H)
 	ui.add_child(menu)
 	var shade := ColorRect.new()
-	shade.color = Color(0.03, 0.04, 0.09, 0.82)
+	shade.color = Color(0.03, 0.04, 0.09, 0.84)
 	shade.size = Vector2(W, H - 10)
 	menu.add_child(shade)
-	var title := label(10, Color("#fff4c8"), 3, true, menu)
-	title.text = "จันทร์เสี้ยวกลางหาว · ทำใน Godot"
-	title.position = Vector2(8, 6)
-	var hint := label(8, Color("#e8ecff"), 2, false, menu)
-	hint.text = "เลือกมอนที่จะโดน แล้วฉากเล่นทันที"
-	hint.position = Vector2(8, 22)
+	var title := label(9, Color("#fff4c8"), 3, true, menu)
+	title.text = "ห้องทดลองฉากต่อสู้ Godot · เลือกท่า มอน ฉาก"
+	title.position = Vector2(6, 2)
+	for i in TECHS.size():   # แถวท่า
+		var tc: Array = TECHS[i]
+		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + i * 59, 18), Vector2(57, 14), 14)
+		b.modulate = Color(1, 1, 0.6) if tc[0] == tech_id() else Color.WHITE
+		b.pressed.connect(func(): _start(foe, bg_id, tc[2]))
 	var names := {}
 	for r in CsvDb.load_csv("res://data/monsters.csv"):
 		names[str(r.monster_id)] = str(r.name_th)
-	for i in FOES.size():   # ปุ่มมอน: ชื่อบน รูปล่าง ในกรอบเดียว
+	for i in FOES.size():   # แถวมอน: ชื่อบน รูปล่าง (กดแล้วเล่นทันที)
 		var id: String = FOES[i]
-		var b := _button("%s\n%s" % [id, names.get(id, "")], Vector2(6 + i * 58, 38), Vector2(56, 62), 22)
-		b.modulate = Color(1, 1, 0.7) if id == foe else Color.WHITE
-		b.pressed.connect(func(): _start(id))
+		var b := _button("%s\n%s" % [id, names.get(id, "")], Vector2(4 + i * 59, 35), Vector2(57, 56), 20)
+		b.modulate = Color(1, 1, 0.6) if id == foe else Color.WHITE
+		b.pressed.connect(func(): _start(id, bg_id, scene_file_path))
 		var ic := TextureRect.new()
 		ic.texture = tx(id + "_0")
 		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		ic.position = Vector2(4, 24)
-		ic.size = Vector2(48, 35)
+		ic.position = Vector2(4, 21)
+		ic.size = Vector2(49, 33)
 		b.add_child(ic)
-	var again := _button("เล่นซ้ำ (%s)" % foe, Vector2(6, 106), Vector2(112, 16), 16)
-	again.pressed.connect(func(): _start(foe))
-	var snd := _button(_sound_text(), Vector2(124, 106), Vector2(90, 16), 16)
-	snd.pressed.connect(_toggle_sound.bind(snd))
+	var keys := BGS.keys()
+	for i in keys.size():   # แถวฉาก
+		var id: String = keys[i]
+		var b := _button("ฉาก: " + BGS[id][0], Vector2(4 + i * 98, 94), Vector2(95, 14), 14)
+		b.modulate = Color(1, 1, 0.6) if id == bg_id else Color.WHITE
+		b.pressed.connect(func(): _start(foe, id, scene_file_path))
+	var again := _button("เล่นซ้ำ (%s)" % foe, Vector2(4, 111), Vector2(95, 16), 16)
+	again.pressed.connect(func(): _start(foe, bg_id, scene_file_path))
+	var snd := _button(_onoff("เสียง", "lab_mute"), Vector2(102, 111), Vector2(95, 16), 16)
+	snd.pressed.connect(_toggle.bind(snd, "เสียง", "lab_mute"))
+	var mus := _button(_onoff("เพลง", "lab_music_off"), Vector2(200, 111), Vector2(96, 16), 16)
+	mus.pressed.connect(_toggle.bind(mus, "เพลง", "lab_music_off"))
 	var note := label(7, Color("#c8d0e0"), 2, false, menu)
-	note.text = "เสียงสร้างด้วยโค้ด · ดาเมจสูตรเดียวกับหน้าเว็บ"
-	note.position = Vector2(8, 128)
+	note.text = "เสียงสร้างด้วยโค้ด · ดาเมจสูตรเดียวกับหน้าเว็บ · เพลง = ไฟล์อัดจากหน้าเว็บ"
+	note.position = Vector2(6, 132)
 	menu.visible = not playing
 
-func _toggle_sound(b: Button) -> void:
-	Engine.set_meta("lab_mute", not bool(Engine.get_meta("lab_mute", false)))
-	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabSfx"), bool(Engine.get_meta("lab_mute", false)))
-	(b.get_meta("lbl") as Label).text = _sound_text()
+func _onoff(what: String, key: String) -> String:
+	return what + (": ปิด" if bool(Engine.get_meta(key, false)) else ": เปิด")
 
-func _sound_text() -> String:
-	return "เสียง: ปิด" if bool(Engine.get_meta("lab_mute", false)) else "เสียง: เปิด"
+func _toggle(b: Button, what: String, key: String) -> void:
+	Engine.set_meta(key, not bool(Engine.get_meta(key, false)))
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabSfx"), bool(Engine.get_meta("lab_mute", false)))
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabMusic"), bool(Engine.get_meta("lab_music_off", false)))
+	(b.get_meta("lbl") as Label).text = _onoff(what, key)
 
 ## ปุ่มกรอบเปล่า + ป้ายข้างใน (ตัวหนังสือในปุ่มเองทำให้ปุ่มยืดเกินขนาดที่ตั้ง)
 func _button(text: String, pos: Vector2, size: Vector2, text_h: float) -> Button:
@@ -594,45 +856,71 @@ func _button(text: String, pos: Vector2, size: Vector2, text_h: float) -> Button
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.label_settings.line_spacing = -3
-	l.position = Vector2(0, 0)
 	l.size = Vector2(size.x, text_h)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.set_meta("lbl", l)
 	return b
 
-func _start(id: String) -> void:
+func _start(id: String, bg: String, scene: String) -> void:
 	Engine.set_meta("lab_foe", id)
+	Engine.set_meta("lab_bg", bg)
 	Engine.set_meta("lab_auto", true)
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file(scene)
 
 # ── เดินเวลา ─────────────────────────────────────────
 func _process(delta: float) -> void:
+	if not stopped:
+		amb_t += delta
+		if lamp:
+			lamp.modulate.a = 0.48 * (0.75 + 0.25 * sin(amb_t * 9) * sin(amb_t * 5.3 + 1))
+	amb.queue_redraw()
 	if not playing:
 		return
 	if hold > 0.0:
 		hold -= delta
 	else:
 		t += delta
-	var hf := hit_frame()
-	if hf >= 0 and not hit_done and t / SEC >= hf:
-		hit_done = true
-		t = hf * SEC
-		hold = HITSTOP
-	_step(delta)
+	for s in stops():
+		if not stops_done.has(s[0]) and t / SEC >= s[0]:
+			stops_done[s[0]] = true
+			t = s[0] * SEC
+			hold = s[1]
+	_step()
+	var Fn := int(floor(t / SEC))
+	if snaps.has(Fn) and not snaps[Fn]:
+		snaps[Fn] = true
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s_%s_f%03d.png" % [snap_dir, scene_file_path.get_file().get_basename(), foe, Fn])
+	if not snaps.is_empty() and snaps.values().all(func(v): return v):
+		get_tree().quit()
 	if t > end_frame() * SEC + 0.5:
 		if recording:
 			get_tree().quit()
 		else:
 			playing = false
+			ui.move_child(menu, -1)   # เมนูอยู่บนสุด (ป้ายที่สร้างทีหลังไม่ทับ)
 			menu.visible = true
 
-func _step(_delta: float) -> void:
+func _step() -> void:
 	var f := t / SEC
 	var F := int(floor(f))
 	var fresh := F != last_fi
 	last_fi = F
+	n_ghost = 0
+	n_word = 0
+	n_pop = 0
 	frame(f, F, fresh)
+	for i in range(n_ghost, ghosts.size()):
+		ghosts[i].visible = false
+	for i in range(n_word, words.size()):
+		words[i].visible = false
+	for i in range(n_pop, pops.size()):
+		pops[i][0].visible = false
+		pops[i][1].visible = false
 	_burst_step(f, F)
+	back_fx.queue_redraw()
+	mid_fx.queue_redraw()
+	front_fx.queue_redraw()
 	if fresh and playing:
 		sounds(F)
 
@@ -672,12 +960,46 @@ func _audio_bus() -> void:
 		cp.release_ms = 200
 		AudioServer.add_bus_effect(i, cp)
 		AudioServer.set_bus_volume_db(i, linear_to_db(0.85))
+	if AudioServer.get_bus_index("LabMusic") < 0:   # เพลง: เบากว่าเสียงสกิล (บนเว็บ 0.28 ของเสียงสกิล)
+		AudioServer.add_bus()
+		AudioServer.set_bus_name(AudioServer.bus_count - 1, "LabMusic")
+		AudioServer.set_bus_volume_db(AudioServer.bus_count - 1, linear_to_db(0.28 * 0.85))
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabSfx"), bool(Engine.get_meta("lab_mute", false)))
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabMusic"), bool(Engine.get_meta("lab_music_off", false)))
+	_music()
 	for k in 12:
 		var p := AudioStreamPlayer.new()
 		p.bus = "LabSfx"
 		add_child(p)
 		players.append(p)
+
+## เพลงต่อสู้: ผู้เล่นอยู่ที่ราก (ไม่ถูกลบตอนเปลี่ยนท่า → เพลงเล่นต่อเนื่อง) · วนซ้ำ
+func _music() -> void:
+	var root := get_tree().root
+	if root.has_node("LabMusic"):
+		return
+	var st: AudioStream = null
+	if ResourceLoader.exists(MUSIC):
+		st = load(MUSIC)
+	else:
+		var mp := AudioStreamMP3.new()
+		mp.data = FileAccess.get_file_as_bytes(ProjectSettings.globalize_path(MUSIC))
+		st = mp
+	st.set("loop", true)
+	var p := AudioStreamPlayer.new()
+	p.name = "LabMusic"
+	p.bus = "LabMusic"
+	p.stream = st
+	root.add_child.call_deferred(p)
+	p.play.call_deferred()
+
+## เพลงหลบลงแวบหนึ่งตอนกระแทก (bgmDuck: 0.28 → 0.1 ใน 0.02 วิ แล้วคืนใน 0.45 วิ)
+func duck() -> void:
+	var i := AudioServer.get_bus_index("LabMusic")
+	var base := linear_to_db(0.28 * 0.85)
+	var tw := get_tree().create_tween()
+	tw.tween_method(func(v: float): AudioServer.set_bus_volume_db(i, v), base, base + linear_to_db(0.1 / 0.28), 0.02)
+	tw.tween_method(func(v: float): AudioServer.set_bus_volume_db(i, v), base + linear_to_db(0.1 / 0.28), base, 0.43)
 
 func _render(voices: Array) -> AudioStreamWAV:
 	var total := 0.0
@@ -765,6 +1087,8 @@ func _voice(buf: PackedFloat32Array, v: Dictionary, seed: int) -> int:
 					s = sin(TAU * ph)
 				"square":
 					s = 1.0 if ph < 0.5 else -1.0
+				"triangle":
+					s = 4.0 * absf(ph - 0.5) - 1.0
 				_:
 					s = 2.0 * ph - 1.0
 		if ftype != "":

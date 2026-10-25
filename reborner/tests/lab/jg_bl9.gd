@@ -17,8 +17,6 @@ const SPLIT := 65
 const TURN := 72
 const BACK := 74
 const HOME := 90
-## ดาเมจ [ค่า, +1 อ่อนแอ / −1 ต้านทาน] = csHit('bl9', มอน) ของหน้าเว็บ (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
-const DMG := {"M01": [110, 0], "M03": [33, -1], "M06": [106, 0], "M15": [113, 1], "B1": [62, -1]}
 
 var moon_y := 0.0
 var moon_x := 0.0
@@ -40,18 +38,15 @@ var trail: Node2D
 var trail_glow: Node2D
 var trail_p := 0.0
 var trail_lit := 1.0
-var rion: Sprite2D
-var rim: Sprite2D
-var ghosts: Array[Sprite2D] = []
 var shadow: ColorRect
 var ash_up: CPUParticles2D
 var ash_dn: CPUParticles2D
 var lbl_dots: Label
 
+func tech_id() -> String: return "bl9"
 func end_frame() -> int: return END
-func hit_frame() -> int: return SPLIT
-func tech_dmg() -> Dictionary: return DMG
-func caption() -> String: return "GODOT · %s %s · จันทร์เสี้ยวกลางหาว → %s" % [mon_name, foe, "ขาด" if kill else "แผลเรือง (รอด)"]
+func stops() -> Array: return [[SPLIT, 0.1]]
+func caption() -> String: return "จันทร์เสี้ยวกลางหาว → %s" % ("ขาด" if kill else "แผลเรือง (รอด)")
 
 func cut(u: float) -> Vector2:
 	return (1 - u) * (1 - u) * p0 + 2 * u * (1 - u) * p1 + u * u * p2
@@ -152,10 +147,6 @@ func setup() -> void:
 	shadow.color = Color(40 / 255.0, 30 / 255.0, 24 / 255.0, 0.4)
 	shadow.z_index = 4
 	add_child(shadow)
-	rim = rion_sprite()
-	for i in 2:
-		ghosts.append(rion_sprite())
-	rion = rion_sprite()
 	# ชิ้นมอนสองซีกตามแนวฟัน (เส้นโค้ง + ปลายต่อเป็นเส้นตรงตามทิศสัมผัส)
 	var poly: Array[Vector2] = []
 	for i in 25:
@@ -314,7 +305,7 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	var g := geo(f)
 	shake(F, 2.0 * (1 - (F - SHOUT) / 4.0) if F >= SHOUT and F < SHOUT + 4 else (4.0 * (1 - ds / 6.0) if ds >= 0 and ds < 6 else 0.0))
 	world_stop(F >= TONBO and F < SPLIT)
-	dim.modulate.a = 0.0 if f < TONBO else (0.45 * (f - TONBO) / (SHOUT - TONBO) if f < SHOUT else (0.45 if ds < 6 else maxf(0.0, 0.45 * (1 - (q - 6) / 16.0))))
+	dim_to(0.0 if f < TONBO else (0.45 * (f - TONBO) / (SHOUT - TONBO) if f < SHOUT else (0.45 if ds < 6 else maxf(0.0, 0.45 * (1 - (q - 6) / 16.0)))), Color("#0c1028"))
 	# พระจันทร์: ขึ้นช่วงตั้งท่า · วาบพร้อมรอยเสี้ยวก่อนแยก · จางหลังแยก
 	var mp := 0.0 if f < TONBO else minf(1.0, (f - TONBO) / (SHOUT - TONBO))
 	var me := 1 - (1 - mp) * (1 - mp)
@@ -333,17 +324,13 @@ func frame(f: float, F: int, fresh: bool) -> void:
 		var gr := g.duplicate()
 		gr.cx -= 1
 		gr.lift += 1
-		set_rion(rim, gr, 0.95, Color("#fff4c8"), 1.0)
+		ghost(gr, 0.95, Color("#fff4c8"), 1.0)   # ขอบแสงจันทร์
 		set_rion(rion, g, 1.0, Color("#141a33"), 1.0)
 	else:
-		rim.visible = false
 		set_rion(rion, g)
-	var trailing := (F > LEAP and F < APEX) or (F >= CUT and F < LAND)
-	for k in 2:
-		if trailing and not behind:
-			set_rion(ghosts[k], geo(f - (k + 1)), 0.14 * (2 - k), Color("#fff4c8"), 1.0)
-		else:
-			ghosts[k].visible = false
+	if ((F > LEAP and F < APEX) or (F >= CUT and F < LAND)) and not behind:
+		for k in 2:
+			ghost(geo(f - (k + 1)), 0.14 * (2 - k), Color("#fff4c8"), 1.0)
 	var sw: float = 18.0 * 1.6 * maxf(0.35, 1 - g.lift / 90.0)
 	shadow.visible = g.lift > 2 and not behind
 	shadow.position = Vector2(g.cx - sw / 2, G - 1)
@@ -413,7 +400,10 @@ func frame(f: float, F: int, fresh: bool) -> void:
 		if ds == 0:
 			burst(cut(0.5), F)
 	# ตัวหนังสือ
-	show_word("ขาด!!" if kill else "ฉับ!!", max(18, G - bh - 4 - min(5, ds)), ds >= 0 and ds < 14)
+	var tag := ("อ่อนแอ! · " if aff > 0 else "ต้านทาน · " if aff < 0 else "") + ("HP %d · ฟันเดียวขาด" % hp if kill else "HP %d รอด" % hp)
+	var dx := roundf(clampf(mcx, 30.0, W - 30.0))
+	if ds >= 0 and ds < 14:   # มอนตัวเล็ก: บรรทัด HP ยาวเกินตัว → เลื่อนคำเสียงไปขวาพ้นบรรทัด
+		word("ขาด!!" if kill else "ฉับ!!", minf(W - 44, maxf(mx0 + mw + 4, roundf(dx + text_w(tag, 8) / 2) + 4)), max(18, G - bh - 4 - min(5, ds)), Color("#fff4c8"))
 	lbl_dots.visible = F >= LAND + 3 and ds < 0   # เงียบ
 	if lbl_dots.visible:
 		var k := F - LAND - 3
@@ -421,7 +411,7 @@ func frame(f: float, F: int, fresh: bool) -> void:
 		lbl_dots.text = ".".repeat(1 + mini(2, k >> 2))
 		lbl_dots.position = Vector2(mcx - 4, G - bh - 6 - 12)
 	show_bubble("จันทร์เสี้ยวกลางหาว!", g.cx, max(14.0, G - g.lift - 74), F - SHOUT, (1.0 if F < RUN else (RUN + 3 - f) / 3.0) if F >= SHOUT and F < RUN + 3 else 0.0)
-	dmg_pop(ds, max(30, G - bh - 14))
+	pop(dmg, dx, max(30, G - bh - 14), ds, Color("#fff4c8"), tag, Color("#ffe08a") if aff > 0 else Color("#c8e6ff"))
 
 # ── เสียง (เหมือน jgSound บนหน้าเว็บ) ───────────────────────
 func sounds(F: int) -> void:
@@ -431,6 +421,7 @@ func sounds(F: int) -> void:
 		play_sfx("breath", [N(0.35, "bandpass", 500, 300, 0.08, 1)])   # ลมหายใจ
 	if F == SHOUT:
 		play_sfx("shout", [N(0.3, "bandpass", 1800, 900, 0.35, 2), T(0.25, "sawtooth", 220, 160, 0.06, 0, 0.002, {"lp": 1500})])   # ตะโกน (ไม่ใช้เสียงพูด)
+		duck()
 	if (F >= RUN and F < LEAP and (F - RUN) % 2 == 0) or (F >= BACK and F < HOME - 2 and (F - BACK) % 3 == 0):
 		var pk := 0.3 if F < LEAP else 0.18
 		play_sfx("step%s" % pk, [N(0.05, "lowpass", 900, 200, pk, 1)])   # ฝีเท้า (วิ่งไป / วิ่งกลับเบากว่า)
@@ -446,5 +437,6 @@ func sounds(F: int) -> void:
 		sfx_hit(false)
 		play_sfx("split", [N(0.06, "highpass", 3000, 7000, 0.6, 3), T(0.15, "sine", 150, 45, 0.45)])
 		sfx_mon(false, 0.6 if foe == "B1" else 1.0)
+		duck()
 	if kill and F == SPLIT + 10:
 		play_sfx("fall", [N(0.3, "lowpass", 500, 80, 0.5, 1)])   # ครึ่งบนหล่นกระแทก

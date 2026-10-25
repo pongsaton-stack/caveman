@@ -49,8 +49,8 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 | หน้า | ลิงก์ | สร้าง |
 |---|---|---|
 | เกมบนเว็บ | https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan | `tools/export_web.sh <out>` (ดู "เล่นผ่านเว็บ") |
-| animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V152) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
-| ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V11) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
+| animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V153) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
+| ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V12) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
 | มาสเตอร์ PixelLab | https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y (V16) | `python3 tools/web/pixellab_test_build.py <out.html>` · ใส่**เฉพาะภาพที่ PixelLab เจน** |
 | สมุดรวม | https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 | `python3 tools/web/codex_build.py <out.html>` |
 | UI Kit | https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz | `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` |
@@ -65,11 +65,12 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 - **กับดักที่เกิดซ้ำ 3 ครั้งแล้ว: คอมเมนต์ `//` ท้ายบรรทัดกลืนโค้ดที่ตามมาในบรรทัดเดียวกัน** → ทุกครั้งที่แก้ด้วยสคริปต์: ดึง `<script>` ใหญ่สุดออกมาแล้ว `node --check`
 - เครื่องมือตรวจใน scratchpad (`at/`): `kw.cjs <เฟรม> <มอน> <ชื่อ>` ภาพ 2 เท่า · `snd.cjs <คลิป>` เปิดเสียงเล่นวน · `swap.cjs` จอ 400px · `err2.cjs` error ตอนโหลด · `dmg.cjs` ปุ่มตัวเลข (หายเมื่อเครื่องใหม่ → เขียนใหม่ได้จาก playwright)
 - ⚠ **ข้อสังเกต 24 ต.ค. (ยังไม่ตัดสิน)**: ฉากเหล่านี้ต้องเขียนใหม่เป็น GDScript ตอนเข้าเกม · ทางเลือกที่เสนอ = ทำฉากใน Godot (AnimationPlayer/Tween/Particles) แล้ว export เว็บให้ดู
-- **ฉากต่อสู้ใน Godot (kwan 25 ต.ค. เลือกไปทาง Godot · ท่าใหม่ทำที่นี่)**: `tests/lab/` (ไม่ถูก export กับเกม)
-  `lab_stage.gd` = ฐานใช้ร่วม (ฉากหลัง+บรรยากาศ · Rion/มอน · บับเบิล/ตัวเลข/คำเสียง · อนุภาค · หยุดภาพ · เสียงสังเคราะห์สูตรเดียวกับเว็บ ผ่านบัส LabSfx ก้อง+คอมเพรส · เมนูเลือกมอน 5 ตัว)
-  ท่าใหม่ = `extends "res://tests/lab/lab_stage.gd"` + `.tscn` เขียนแค่ end_frame/hit_frame/setup/frame/sounds · ตัวอย่าง `jg_bl9.gd` · ห้าม class_name
-  อัดวิดีโอ (ภาพ 1152x648 + เสียง f.wav): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --write-movie <dir>/f.png --fixed-fps 60 res://tests/lab/jg_bl9.tscn -- --foe=M01` (~3.5 นาที/มอน · ~370 MB/มอน)
-  หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` (ต้องมี template เว็บ) → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V1) · ดาเมจในไฟล์ท่า = ค่าจาก csHit ของหน้าเว็บ (ยังไม่ต่อสูตรเกมตรง)
+- **ฉากต่อสู้ใน Godot (kwan 25 ต.ค. เลือกไปทาง Godot · ท่าใหม่ทำที่นี่)**: `tests/lab/` (ไม่ถูก export กับเกม) · ย้ายแล้ว 5 ท่า: bl0 `blc_bl0` · bl2 `wr_bl2` · bl7 `aot_bl7` · bl8 `kw_bl8` · bl9 `jg_bl9`
+  `lab_stage.gd` = ฐานใช้ร่วม: ฉากหลัง 3 ฉาก + ของขยับ · เพลง (mp3 อัดจากเว็บ วนซ้ำ หลบตอนกระแทก) · Rion/มอน · บับเบิล/ตัวเลข/คำเสียง/ร่างติดตา (เป็นพูลต่อเฟรม) · อนุภาค · หยุดภาพ · เสียงสังเคราะห์สูตรเดียวกับเว็บ · เมนูเลือกท่า/มอน/ฉาก
+  ท่าใหม่ = `extends "res://tests/lab/lab_stage.gd"` + `.tscn` · เขียน tech_id/end_frame/stops/setup/frame/sounds/draw_back/draw_mid/draw_fx · พิกเซลแบบ fbPx = `px()` `star_px()` `slash_line()` `disc()` · ห้าม class_name
+  GDScript: `var x := round(...)`/max/min = พังตอน parse → ใช้ roundf/maxf/minf หรือระบุชนิด · ลำดับชั้น: back_fx (หลังมอน) → มอน z1 → mid_fx z2 → Rion z4 → front_fx z5
+  ตรวจเร็ว (ไม่กี่วิ): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 [--bg=ash_village] --snap=30,36 --snapdir=<dir>` → เทียบกับเว็บ `websnap.cjs` (scratchpad)
+  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V2) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) · **บทเรียนหมวด 11 อ่านก่อนแก้อะไรก็ตาม**
