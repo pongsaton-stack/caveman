@@ -97,6 +97,8 @@ var lamp: Sprite2D
 var breath: CPUParticles2D
 var dust: CPUParticles2D
 var sparks: CPUParticles2D
+var star: Node2D
+var star_r := 0.0
 var flash_spr: Sprite2D
 var ash_up: CPUParticles2D
 var ash_dn: CPUParticles2D
@@ -493,9 +495,14 @@ func _build() -> void:
 	sparks.damping_max = 120
 	sparks.scale_amount_min = 1
 	sparks.scale_amount_max = 2
+	sparks.scale_amount_min = 1.5
+	sparks.scale_amount_max = 2.5
 	sparks.color_ramp = _ramp([Color.WHITE, Color("#ffd27a"), Color(1, 0.6, 0.2, 0)])
-	sparks.material = _add_mat()
 	sparks.z_index = 6
+	star = Node2D.new()
+	star.z_index = 6
+	star.draw.connect(_draw_star)
+	add_child(star)
 	# ตัวหนังสือ (ไม่สั่นตามกล้อง)
 	ui = CanvasLayer.new()
 	add_child(ui)
@@ -669,6 +676,18 @@ func _draw_trail(glow: bool) -> void:
 		if trail_p < 1.0:
 			node.draw_rect(Rect2(head - Vector2(1, 1), Vector2(3, 3)), Color.WHITE)
 
+## ดาวกระแทก 8 แฉก (เหมือน pkStar บนเว็บ)
+func _draw_star() -> void:
+	if star_r <= 0.0:
+		return
+	for i in 8:
+		var a := i * PI / 4
+		var L := star_r * (0.55 if i % 2 else 1.0)
+		var d := Vector2(cos(a), sin(a))
+		star.draw_line(Vector2.ZERO, d * L * 0.5, Color.WHITE, 2.0)
+		star.draw_line(d * L * 0.5, d * L, Color("#ffd27a"), 2.0)
+	star.draw_rect(Rect2(-2, -2, 4, 4), Color.WHITE)
+
 # ── เดินเวลา ─────────────────────────────────────────
 
 func _process(delta: float) -> void:
@@ -825,11 +844,14 @@ func _tick(_delta: float) -> void:
 		if ds == 0:
 			sparks.position = cut(0.5)
 			sparks.restart()
+	star.position = cut(0.5)
+	star_r = 10 + ds * 6 if ds >= 0 and ds < 4 else 0.0
+	star.queue_redraw()
 	flash_spr.visible = ds >= 0 and ds < 4
 	if flash_spr.visible:
 		flash_spr.position = cut(0.5)
 		flash_spr.scale = Vector2.ONE * (0.6 + q * 0.35)
-		flash_spr.modulate.a = 1 - q / 4.0
+		flash_spr.modulate.a = 0.6 * (1 - q / 4.0)
 	# ตัวหนังสือ
 	lbl_hit.visible = ds >= 0 and ds < 14
 	lbl_hit.text = "ขาด!!" if kill else "ฉับ!!"
@@ -860,8 +882,8 @@ func _tick(_delta: float) -> void:
 		var yy: float = max(18.0, round(max(30.0, G - bh - 14) + pop))
 		lbl_dmg.text = str(dmg)
 		lbl_dmg.scale = Vector2.ONE * (1.4 if ds == 0 else 1.15 if ds == 1 else 1.0)
-		lbl_dmg.position = Vector2(x - 80, yy - 14)
+		lbl_dmg.position = Vector2(x - 80, yy - 19)
 		lbl_dmg.modulate.a = 1.0 if ds < 16 else 1 - (ds - 16) / 6.0
 		lbl_tag.text = ("อ่อนแอ! · " if aff > 0 else "ต้านทาน · " if aff < 0 else "") + ("HP %d · ฟันเดียวขาด" % hp if kill else "HP %d รอด" % hp)
-		lbl_tag.position = Vector2(x - 80, yy - 2)
+		lbl_tag.position = Vector2(x - 80, yy + 1)
 		lbl_tag.modulate.a = lbl_dmg.modulate.a
