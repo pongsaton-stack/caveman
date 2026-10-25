@@ -28,7 +28,7 @@ const PX := "res://assets/sprites/pixellab_draft/px_set/"
 const MPX := "res://assets/sprites/monsters_px_draft/"
 const BG := "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg"
 ## ดาเมจ [ค่า, ธาตุ/ร่างกาย +1 อ่อนแอ -1 ต้านทาน] = ค่าเดียวกับหน้าเว็บ csHit('bl9', มอน) (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
-const DMG := {"M01": [110, 0], "M15": [113, 1], "B1": [62, -1]}
+const DMG := {"M01": [110, 0], "M03": [33, -1], "M06": [106, 0], "M15": [113, 1], "B1": [62, -1]}
 
 const FX_SHADER := """
 shader_type canvas_item;
