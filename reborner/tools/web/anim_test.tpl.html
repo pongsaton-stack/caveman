@@ -308,7 +308,7 @@ const DIRS = [['south', 'ลง'], ['north', 'ขึ้น'], ['west', 'ซ้�
 const CLIPS = {};
 const GROUPS = [];
 // ฉากต่อสู้ที่ย้ายไป Godot แล้ว (kwan 25 ต.ค. เลือก "1"): หยุดแก้บนเว็บ · ติดป้ายเวอร์ชันเก่า · ฉบับปัจจุบัน = tests/lab/ ใน Godot
-const GODOT_PORTED = new Set(['blc_bl0', 'wr_bl2', 'aot_bl7', 'kw_bl8', 'jg_bl9']), GODOT_LAB = 'https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp';
+const GODOT_PORTED = new Set(['blc_bl0', 'blc_bl1', 'blc_glim', 'blc_glim_bl3', 'blc_glim_bl5', 'wr_bl2', 'aot_bl7', 'kw_bl8', 'jg_bl9', 'mon_M01_hit', 'mon_M01_guard']), GODOT_LAB = 'https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp';
 function addClip(group, id, label, frames, sec, opt = {}) {
 	if (GODOT_PORTED.has(id)) label = '⚠ เวอร์ชันเก่า (ฉบับปัจจุบันอยู่ใน Godot · ลิงก์ใต้หัวหน้า) · ' + label;
 	if (DATA.mode === 'combat' && !/^★ (ฉากต่อสู้|การเกิดประกาย)/.test(group)) return;   // หน้า "ฉากต่อสู้" (anim_test_build.py --combat) มีแค่ฉากต่อสู้ + ประกาย

@@ -21,14 +21,19 @@ const MPX := "res://assets/sprites/monsters_px_draft/"
 const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพลงต่อสู้แนวรอบ 4 (kwan 5 ต.ค.) อัดจากหน้าเว็บ
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
-const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"], ["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"],
-	["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"]]
+const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "เขี้ยวพุ่ง", "res://tests/lab/blc_bl1.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"],
+	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"],
+	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
+	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ
 ## ฉากหลัง (เหมือน combat_bgs ของ anim_test_build.py): ไฟล์ · ขยายกี่เท่า · เส้นพื้น (สัดส่วนความสูง) → ครอป 300x168 พื้นที่แถว 158
 const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
 	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
 	"flooded_ruins": ["เมืองน้ำท่วม", "res://docs/art-bible/pixellab_test/bg_flooded_ruins.jpg", 3, 0.80, false]}
 ## ดาเมจ [ค่า, +1 อ่อนแอ/−1 ต้านทาน, จำนวนครั้ง] = csHit(ท่า, มอน) ของหน้าเว็บ (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
 const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], "M15": [57, 1, 1], "B1": [31, -1, 1]},
+	"bl1": {"M01": [80, 0, 1], "M03": [24, -1, 1], "M06": [77, 0, 1], "M15": [82, 1, 1], "B1": [45, -1, 1]},
+	"bl3": {"M01": [50, 0, 1], "M03": [15, -1, 1], "M06": [48, 0, 1], "M15": [51, 1, 1], "B1": [28, -1, 1]},
+	"bl5": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
 	"bl2": {"M01": [34, 0, 3], "M03": [10, -1, 3], "M06": [33, 0, 3], "M15": [35, 1, 3], "B1": [19, -1, 3]},
 	"bl7": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
 	"bl8": {"M01": [69, 0, 1], "M03": [22, -1, 1], "M06": [67, 0, 1], "M15": [74, 1, 1], "B1": [43, -1, 1]},
@@ -727,7 +732,7 @@ func show_bubble(text: String, x: float, y: float, d: int, alpha: float) -> void
 	bubble.get_node("tail_line").position.x = tl
 
 ## คำเสียง (pkText 12px) ต่อเฟรม · x, y = จุดเริ่ม/เส้นฐานแบบหน้าเว็บ
-func word(text: String, x: float, y: float, col := Color.WHITE, size := 12) -> void:
+func word(text: String, x: float, y: float, col := Color.WHITE, size := 12, outline := 3) -> void:
 	if n_word >= words.size():
 		words.append(label(12, Color.WHITE, 3, true))
 	var l: Label = words[n_word]
@@ -736,6 +741,7 @@ func word(text: String, x: float, y: float, col := Color.WHITE, size := 12) -> v
 	l.text = text
 	l.label_settings.font_size = size
 	l.label_settings.font_color = col
+	l.label_settings.outline_size = outline
 	l.position = Vector2(round(x), round(y) - size - 2)
 
 ## ตัวเลขดาเมจ (dmgPop): เด้ง แล้วลอยช้า ค้าง ~1.3 วิ แล้วจาง · d = เฟรมหลังโดน
@@ -787,17 +793,18 @@ func _build_menu() -> void:
 	var title := label(9, Color("#fff4c8"), 3, true, menu)
 	title.text = "ห้องทดลองฉากต่อสู้ Godot · เลือกท่า มอน ฉาก"
 	title.position = Vector2(6, 2)
-	for i in TECHS.size():   # แถวท่า
+	for i in TECHS.size():   # แถวท่า: บน 6 ท่า · ล่าง ประกาย 3 + มอนตี 2
 		var tc: Array = TECHS[i]
-		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + i * 59, 18), Vector2(57, 14), 14)
-		b.modulate = Color(1, 1, 0.6) if tc[0] == tech_id() else Color.WHITE
+		var row2 := i >= 6
+		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + (i - 6) * 59 if row2 else 4 + i * 49, 31 if row2 else 16), Vector2(57 if row2 else 48, 13), 13)
+		b.modulate = Color(1, 1, 0.6) if tc[2] == scene_file_path else Color.WHITE
 		b.pressed.connect(func(): _start(foe, bg_id, tc[2]))
 	var names := {}
 	for r in CsvDb.load_csv("res://data/monsters.csv"):
 		names[str(r.monster_id)] = str(r.name_th)
 	for i in FOES.size():   # แถวมอน: ชื่อบน รูปล่าง (กดแล้วเล่นทันที)
 		var id: String = FOES[i]
-		var b := _button("%s\n%s" % [id, names.get(id, "")], Vector2(4 + i * 59, 35), Vector2(57, 56), 20)
+		var b := _button("%s\n%s" % [id, names.get(id, "")], Vector2(4 + i * 59, 46), Vector2(57, 45), 20)
 		b.modulate = Color(1, 1, 0.6) if id == foe else Color.WHITE
 		b.pressed.connect(func(): _start(id, bg_id, scene_file_path))
 		var ic := TextureRect.new()
@@ -806,8 +813,8 @@ func _build_menu() -> void:
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		ic.position = Vector2(4, 21)
-		ic.size = Vector2(49, 33)
+		ic.position = Vector2(4, 19)
+		ic.size = Vector2(49, 25)
 		b.add_child(ic)
 	var keys := BGS.keys()
 	for i in keys.size():   # แถวฉาก
@@ -899,6 +906,13 @@ func _process(delta: float) -> void:
 		else:
 			playing = false
 			ui.move_child(menu, -1)   # เมนูอยู่บนสุด (ป้ายที่สร้างทีหลังไม่ทับ)
+			front_fx.visible = false   # ซ่อนป้าย/เอฟเฟกต์ค้างของท่า (เช่น ป้ายได้ท่าใหม่) ไม่ให้โผล่จางใต้เมนู
+			bubble.visible = false
+			for l in words:
+				l.visible = false
+			for pp in pops:
+				pp[0].visible = false
+				pp[1].visible = false
 			menu.visible = true
 
 func _step() -> void:
@@ -1117,12 +1131,14 @@ func sfx_charge() -> void:
 func sfx_release() -> void:
 	play_sfx("release", [N(0.28, "bandpass", 500, 3800, 1.0, 1.8), N(0.22, "highpass", 3200, 9000, 0.6, 9, 0.03), T(0.18, "sawtooth", 2200, 700, 0.18, 0.02, 0.004, {"lp": 5000})])
 
-func sfx_hit(big: bool) -> void:
+func sfx_hit(big: bool, fam := "SL") -> void:
 	var v := [T(0.95 if big else 0.6, "sine", 95 if big else 120, 28, 1.0, 0, 0.002, {"drive": true}), N(0.9 if big else 0.5, "lowpass", 5200, 160, 1.0, 0.8, 0, {"drive": true}),
-		N(0.05, "highpass", 3500, 3500, 0.9, 1), N(0.35, "bandpass", 4200, 2600, 0.5, 14, 0.01)]
+		N(0.05, "highpass", 3500, 3500, 0.9, 1)]
+	if fam == "SL" or fam == "PC":   # โลหะสะท้าน (กรองแคบ ไม่ใช่เสียงระฆัง)
+		v.append(N(0.35, "bandpass", 4200, 2600, 0.5, 14, 0.01))
 	if big:
 		v.append(N(1.4, "lowpass", 600, 50, 0.6, 0.7, 0.05))
-	play_sfx("hit%s" % big, v)
+	play_sfx("hit%s%s" % [big, fam], v)
 
 ## เสียงมอนโดน ตามร่างกาย (เหมือน auMon + monVoice) · p = คูณความถี่ (ตัวใหญ่ต่ำลง)
 func sfx_mon(last: bool, p := 1.0) -> void:
