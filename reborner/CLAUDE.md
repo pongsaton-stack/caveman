@@ -65,8 +65,11 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 - **กับดักที่เกิดซ้ำ 3 ครั้งแล้ว: คอมเมนต์ `//` ท้ายบรรทัดกลืนโค้ดที่ตามมาในบรรทัดเดียวกัน** → ทุกครั้งที่แก้ด้วยสคริปต์: ดึง `<script>` ใหญ่สุดออกมาแล้ว `node --check`
 - เครื่องมือตรวจใน scratchpad (`at/`): `kw.cjs <เฟรม> <มอน> <ชื่อ>` ภาพ 2 เท่า · `snd.cjs <คลิป>` เปิดเสียงเล่นวน · `swap.cjs` จอ 400px · `err2.cjs` error ตอนโหลด · `dmg.cjs` ปุ่มตัวเลข (หายเมื่อเครื่องใหม่ → เขียนใหม่ได้จาก playwright)
 - ⚠ **ข้อสังเกต 24 ต.ค. (ยังไม่ตัดสิน)**: ฉากเหล่านี้ต้องเขียนใหม่เป็น GDScript ตอนเข้าเกม · ทางเลือกที่เสนอ = ทำฉากใน Godot (AnimationPlayer/Tween/Particles) แล้ว export เว็บให้ดู
-- **ทดลองย้ายเข้า Godot (25 ต.ค. · รอ kwan ดู)**: `tests/lab/jg_bl9.gd` (+ `.tscn`) = จันทร์เสี้ยว bl9 ใน Godot จังหวะเท่าเว็บ + อนุภาค/แสงบวก/หยุดภาพ/ซีกขาดหมุนแล้วสลาย · ยังไม่มีเสียง น้ำตก หมอก
-  อัดวิดีโอ: `xvfb-run -a <godot> --path . --rendering-driver opengl3 --write-movie <dir>/f.png --fixed-fps 60 res://tests/lab/jg_bl9.tscn -- --foe=M01` (ได้ภาพ 1152x648) · ดาเมจในไฟล์ = ค่าจาก csHit ของหน้าเว็บ
+- **ฉากต่อสู้ใน Godot (kwan 25 ต.ค. เลือกไปทาง Godot · ท่าใหม่ทำที่นี่)**: `tests/lab/` (ไม่ถูก export กับเกม)
+  `lab_stage.gd` = ฐานใช้ร่วม (ฉากหลัง+บรรยากาศ · Rion/มอน · บับเบิล/ตัวเลข/คำเสียง · อนุภาค · หยุดภาพ · เสียงสังเคราะห์สูตรเดียวกับเว็บ ผ่านบัส LabSfx ก้อง+คอมเพรส · เมนูเลือกมอน 5 ตัว)
+  ท่าใหม่ = `extends "res://tests/lab/lab_stage.gd"` + `.tscn` เขียนแค่ end_frame/hit_frame/setup/frame/sounds · ตัวอย่าง `jg_bl9.gd` · ห้าม class_name
+  อัดวิดีโอ (ภาพ 1152x648 + เสียง f.wav): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --write-movie <dir>/f.png --fixed-fps 60 res://tests/lab/jg_bl9.tscn -- --foe=M01` (~3.5 นาที/มอน · ~370 MB/มอน)
+  หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` (ต้องมี template เว็บ) → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V1) · ดาเมจในไฟล์ท่า = ค่าจาก csHit ของหน้าเว็บ (ยังไม่ต่อสูตรเกมตรง)
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) · **บทเรียนหมวด 11 อ่านก่อนแก้อะไรก็ตาม**
