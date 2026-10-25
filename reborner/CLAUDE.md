@@ -12,7 +12,9 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 - **เทสต์แล้วเจออะไรไม่ถูกต้อง → แก้ให้ถูกได้เลย ไม่ต้องถาม** แล้วรายงานว่าเจออะไร แก้อย่างไร · ถามเฉพาะเรื่องที่โค้ดแก้ไม่ได้
 - **หลักเหล็ก: งานที่พิสูจน์ไม่ได้ยังไม่นับว่าเสร็จ** — แนบหลักฐาน (ผลเทสต์ · Sim ก่อน/หลัง · seed md5 · ภาพ · ลิงก์หน้าเทส) และบอกตรงๆ ว่าอะไรยังไม่ได้ทำ/ไม่ได้ตรวจ
 - **ประกาย + ท่าต่อสู้ = ไฮไลต์หลักของเกม** (kwan 21 ต.ค.) → ตรวจละเอียดที่สุด: ซูมทุกเฟรม · ลองทุกมอน (อย่างน้อย B1 M01 M15) · เปิดเสียงเล่นจริง · แก้จนเนียนก่อนส่ง
-- **ท่า/เอฟเฟกต์/อนิเมชันใหม่ต้องลองได้ในหน้า animation test ก่อนเสมอ** · เข้าเกมเมื่อ kwan อนุมัติเท่านั้น · ของร่างอยู่ในโฟลเดอร์ `*_draft/` (มี `.gdignore`)
+- **ฉากต่อสู้/ท่าใหม่ทำใน Godot ที่เดียว (kwan 25 ต.ค. เลือก "1")**: ห้องทดลอง `tests/lab/` + หน้าเว็บ lab · **ไม่แก้ฉากต่อสู้บนเว็บอีก** (ฉากที่ย้ายแล้วติดป้าย "เวอร์ชันเก่า" · `GODOT_PORTED` ใน anim_test.tpl.html) · ไม่ต้องถ่ายเทียบกับเว็บสำหรับท่าใหม่
+  หน้า animation test ยังใช้ดูภาพ PixelLab ที่เจนใหม่/ท่าเดิน/มอน ก่อนเอาเข้าฉาก Godot
+- **ท่า/เอฟเฟกต์/อนิเมชันใหม่ต้องลองได้ในหน้าเทสก่อนเสมอ** (ฉากต่อสู้ = หน้าเว็บ lab Godot) · เข้าเกมเมื่อ kwan อนุมัติเท่านั้น · ของร่างอยู่ในโฟลเดอร์ `*_draft/` (มี `.gdignore`)
 - kwan = ผู้ตัดสินคนเดียว · ไม่ใช้ชื่อคน/บริษัทจริงเป็นบทบาท · เกมอื่น (RS3 = Romancing SaGa 3 ฯลฯ) = แรงบันดาลใจ ไม่ใช่เกณฑ์ให้เหมือน
 - **Google Drive: อัปโหลดเฉพาะเมื่อ kwan สั่งเป็นครั้งๆ** (ยกเลิกซิงก์อัตโนมัติ 4 ต.ค.) · id โฟลเดอร์และวิธีอัปอยู่ในไฟล์ประวัติ หัวข้อ "สำเนาใน Google Drive"
 - **คีย์ลับห้ามอยู่ใน repo/แชท**: PixelLab = env `PIXELLAB_API_KEY` · night-forge = env `NIGHTFORGE_API_KEY` · Claude แก้ `.mcp.json` เองไม่ได้ (kwan แก้บน GitHub)
@@ -49,8 +51,8 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 | หน้า | ลิงก์ | สร้าง |
 |---|---|---|
 | เกมบนเว็บ | https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan | `tools/export_web.sh <out>` (ดู "เล่นผ่านเว็บ") |
-| animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V153) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
-| ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V12) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
+| animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V154) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
+| ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V13) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
 | มาสเตอร์ PixelLab | https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y (V16) | `python3 tools/web/pixellab_test_build.py <out.html>` · ใส่**เฉพาะภาพที่ PixelLab เจน** |
 | สมุดรวม | https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 | `python3 tools/web/codex_build.py <out.html>` |
 | UI Kit | https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz | `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` |

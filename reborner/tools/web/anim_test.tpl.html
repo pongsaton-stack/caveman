@@ -106,6 +106,7 @@ footer code{font-family:ui-monospace,Menlo,monospace;font-size:11px}
 	<header>
 		<h1>animation test</h1>
 		<p>ท่าขยับและสกิลจากเกม REBORNER ปัจจุบัน · สไปรต์ ท่า ค่ามอน และสูตรดาเมจอ่านจากไฟล์เกมตอนสร้างหน้า</p>
+		<p>⚠ ฉากต่อสู้ที่ติดป้าย "เวอร์ชันเก่า" ย้ายไป Godot แล้ว · หยุดแก้บนเว็บตั้งแต่ 25 ต.ค. · ฉบับปัจจุบัน: <a href="https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp" target="_blank" rel="noopener">ห้องทดลองฉากต่อสู้ Godot</a></p>
 	</header>
 
 	<div class="stagecol">
@@ -306,7 +307,10 @@ const WALK_SEC = K.MOVE_TIME / 2;          // Overworld: WALK_FPS = 2 / MOVE_TIM
 const DIRS = [['south', 'ลง'], ['north', 'ขึ้น'], ['west', 'ซ้าย'], ['east', 'ขวา']];
 const CLIPS = {};
 const GROUPS = [];
+// ฉากต่อสู้ที่ย้ายไป Godot แล้ว (kwan 25 ต.ค. เลือก "1"): หยุดแก้บนเว็บ · ติดป้ายเวอร์ชันเก่า · ฉบับปัจจุบัน = tests/lab/ ใน Godot
+const GODOT_PORTED = new Set(['blc_bl0', 'wr_bl2', 'aot_bl7', 'kw_bl8', 'jg_bl9']), GODOT_LAB = 'https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp';
 function addClip(group, id, label, frames, sec, opt = {}) {
+	if (GODOT_PORTED.has(id)) label = '⚠ เวอร์ชันเก่า (ฉบับปัจจุบันอยู่ใน Godot · ลิงก์ใต้หัวหน้า) · ' + label;
 	if (DATA.mode === 'combat' && !/^★ (ฉากต่อสู้|การเกิดประกาย)/.test(group)) return;   // หน้า "ฉากต่อสู้" (anim_test_build.py --combat) มีแค่ฉากต่อสู้ + ประกาย
 	if (['clips', 'arms', 'vxsheet'].includes(opt.tab || 'clips') && [...frames, ...(opt.panels || []).flatMap(p => p.keys || [])].some(k => typeof k === 'string' && /^(rion\/|held\/|rig\/|cut\/|spl\/|p64\/rion_|npc\/)/.test(k))) return;   // kwan 16 ต.ค.: Rion แบบเก่าออกจากทุกหน้า
 	CLIPS[id] = Object.assign({ id, label, frames, sec, loop: true }, opt);
@@ -1234,6 +1238,7 @@ function aotDraw(g, al = 1, tint) {   // Rion · หมุนรอบกลา�
 	if (g.rot) ctx.rotate(g.rot); ctx.scale(g.sx, g.sy); ctx.drawImage(src, -60, -py); ctx.restore();
 }
 function sceneCaption(t) {   // ป้ายท้ายเวทีฉากต่อสู้ · บนภาพฉาก (หน้า "ฉากต่อสู้") มีแถบเข้มรองให้อ่านออก
+	if (GODOT_PORTED.has(S.clip)) t = 'เวอร์ชันเก่า · ฉบับปัจจุบันอยู่ใน Godot · ' + t;
 	const { W, H } = PKV, img = S.bg.startsWith('bg:');
 	if (img) { ctx.fillStyle = 'rgba(16,12,8,0.62)'; ctx.fillRect(0, H - 10, W, 10); }
 	ctx.fillStyle = img ? '#f0e4c8' : '#1c1a16'; ctx.font = '7px system-ui, sans-serif'; ctx.fillText(t, 4, H - 2);
