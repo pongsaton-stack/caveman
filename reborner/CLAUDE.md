@@ -49,8 +49,8 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 | หน้า | ลิงก์ | สร้าง |
 |---|---|---|
 | เกมบนเว็บ | https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan | `tools/export_web.sh <out>` (ดู "เล่นผ่านเว็บ") |
-| animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V151) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
-| ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V10) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
+| animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V152) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
+| ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V11) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
 | มาสเตอร์ PixelLab | https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y (V16) | `python3 tools/web/pixellab_test_build.py <out.html>` · ใส่**เฉพาะภาพที่ PixelLab เจน** |
 | สมุดรวม | https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 | `python3 tools/web/codex_build.py <out.html>` |
 | UI Kit | https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz | `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` |

@@ -562,6 +562,7 @@ func _build() -> void:
 	ui.add_child(bar)
 	caption = _label(7, Color("#f0e4c8"), 0, false)
 	caption.position = Vector2(4, H - 11)
+	lbl_tag.text = ("อ่อนแอ! · " if aff > 0 else "ต้านทาน · " if aff < 0 else "") + ("HP %d · ฟันเดียวขาด" % hp if kill else "HP %d รอด" % hp)
 	caption.text = "GODOT · %s %s · จันทร์เสี้ยวกลางหาว → %s" % [mon_name, foe, "ขาด" if kill else "แผลเรือง (รอด)"]
 	var env := WorldEnvironment.new()
 	var e := Environment.new()
@@ -855,7 +856,9 @@ func _tick(_delta: float) -> void:
 	# ตัวหนังสือ
 	lbl_hit.visible = ds >= 0 and ds < 14
 	lbl_hit.text = "ขาด!!" if kill else "ฉับ!!"
-	lbl_hit.position = Vector2(min(W - 44, mx0 + mw + 4), max(18, G - bh - 4 - min(5, ds)) - 14)
+	# มอนตัวเล็ก: บรรทัด HP ยาวเกินตัว → เลื่อนคำเสียงไปขวาพ้นบรรทัด
+	var tag_r := roundf(clampf(mcx, 30.0, W - 30.0)) + lbl_tag.label_settings.font.get_string_size(lbl_tag.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x / 2
+	lbl_hit.position = Vector2(minf(W - 44, maxf(mx0 + mw + 4, roundf(tag_r) + 4)), max(18, G - bh - 4 - min(5, ds)) - 14)
 	lbl_dots.visible = F >= LAND + 3 and ds < 0
 	if lbl_dots.visible:
 		var k := F - LAND - 3

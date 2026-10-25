@@ -1651,11 +1651,13 @@ function jgView(c) {
 	for (const [t, fx, dir, sz] of [[K.LEAP, g.xland + (mx0 + mw + 30 - g.xland), 1, 1.2], [K.LAND, g.xland, -1, 1.2], [K.HOME - 2, g.home, 1, 0.6]]) { const q = F - t; if (q < 0 || q >= 10) continue;
 		for (let i = 0; i < 5; i++) { const r = fbHash(t, i, 1), x = fx + dir * (3 + i * 3 + q * (1 + r)), y = G - 1 - (r * 3 + q * 0.6) * sz, s2 = Math.max(1, Math.round((3 - q * 0.25) * sz)); if (fbHash(t, i, q) < q / 12) continue; fbPx(x, y, q < 4 ? '#e2d6c0' : '#cdbfa6', s2, Math.max(1, s2 - 1)); } }
 	if (ds >= 0 && ds < 4) pkStar(cut(0.5)[0], cut(0.5)[1], 10 + ds * 6, '#ffffff', '#ffd27a');
-	if (ds >= 0 && ds < 14) pkText(kill ? 'ขาด!!' : 'ฉับ!!', Math.min(W - 44, mx0 + mw + 4), Math.max(18, G - bh - 4 - Math.min(5, ds)), '#fff4c8');
+	const jgTag = h ? (h.aff > 0 ? 'อ่อนแอ! · ' : h.aff < 0 ? 'ต้านทาน · ' : '') + (kill ? `HP ${mrow.hp} · ฟันเดียวขาด` : `HP ${mrow.hp} รอด`) : '';
+	if (ds >= 0 && ds < 14) { ctx.font = 'bold 8px system-ui, sans-serif'; const tagR = Math.round(Math.max(30, Math.min(W - 30, mcx))) + ctx.measureText(jgTag).width / 2;   // มอนตัวเล็ก: บรรทัด HP ยาวเกินตัว → เลื่อนคำเสียงไปขวาพ้นบรรทัด (ไม่ทับกัน)
+		pkText(kill ? 'ขาด!!' : 'ฉับ!!', Math.min(W - 44, Math.max(mx0 + mw + 4, Math.round(tagR) + 4)), Math.max(18, G - bh - 4 - Math.min(5, ds)), '#fff4c8'); }
 	if (F >= K.LAND + 3 && ds < 0) { const k = F - K.LAND - 3; ctx.save(); ctx.globalAlpha = Math.min(1, k / 2); ctx.font = 'bold 9px system-ui, sans-serif'; ctx.fillStyle = '#e8ecff'; ctx.fillText('.'.repeat(1 + Math.min(2, k >> 2)), mcx - 4, G - bh - 6); ctx.restore(); }   // เงียบ
 	ctx.restore();
 	if (S.bubble !== false && F >= K.SHOUT && F < K.RUN + 3) rs3Bubble(glimRow('bl9').name_th + '!', g.cx, Math.max(14, G - g.lift - 74), F - K.SHOUT, F < K.RUN ? 1 : (K.RUN + 3 - F) / 3);
-	if (h) dmgPop(h.v, Math.round(Math.max(30, Math.min(W - 30, mcx))), Math.max(30, G - bh - 14), ds, '#fff4c8', (h.aff > 0 ? 'อ่อนแอ! · ' : h.aff < 0 ? 'ต้านทาน · ' : '') + (kill ? `HP ${mrow.hp} · ฟันเดียวขาด` : `HP ${mrow.hp} รอด`), h.aff > 0 ? '#ffe08a' : '#c8e6ff');
+	if (h) dmgPop(h.v, Math.round(Math.max(30, Math.min(W - 30, mcx))), Math.max(30, G - bh - 14), ds, '#fff4c8', jgTag, h.aff > 0 ? '#ffe08a' : '#c8e6ff');
 	sceneCaption(`${m.name} ${m.id} · จันทร์เสี้ยวกลางหาว: ทมโบะนิ่ง พระจันทร์ขึ้น → ตะโกน → กระโดดตัดพระจันทร์ ฟันเดียว → เงียบ → ${kill ? 'ขาด' : 'แผลเรือง (รอด)'}`);
 	if (S.grid) drawGrid();
 }
