@@ -73,9 +73,11 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 - **ฉากต่อสู้ใน Godot (kwan 25 ต.ค. เลือกไปทาง Godot · ท่าใหม่ทำที่นี่)**: `tests/lab/` (ไม่ถูก export กับเกม) · ย้ายครบทุกฉากแล้ว 11 ฉาก: bl0 `blc_bl0` · bl1 `blc_bl1` · bl2 `wr_bl2` · bl7 `aot_bl7` · bl8 `kw_bl8` · bl9 `jg_bl9` · ประกาย `glim_bl1/bl3/bl5` (เครื่อง blc · mv()) · มอนตีกลับ `ma_hit` `ma_guard` (เลือกมอนได้ 5 ตัว · ดาเมจคิดจาก ATK ใน monsters.csv)
   `lab_stage.gd` = ฐานใช้ร่วม: ฉากหลัง 3 ฉาก + ของขยับ · เพลง (mp3 อัดจากเว็บ วนซ้ำ หลบตอนกระแทก) · Rion/มอน · บับเบิล/ตัวเลข/คำเสียง/ร่างติดตา (เป็นพูลต่อเฟรม) · อนุภาค · หยุดภาพ · เสียงสังเคราะห์สูตรเดียวกับเว็บ · เมนูเลือกท่า/มอน/ฉาก
   ท่าใหม่ = `extends "res://tests/lab/lab_stage.gd"` + `.tscn` · เขียน tech_id/end_frame/stops/setup/frame/sounds/draw_back/draw_mid/draw_fx · พิกเซลแบบ fbPx = `px()` `star_px()` `slash_line()` `disc()` · ห้าม class_name
+  ตารางวิจัยรอบ 2 ของ Muse (25 ต.ค.) = `tests/lab/r2_tables.gd` (สร้างจาก R2SYS ห้ามแก้มือ): `feel(พลัง)` หยุดภาพ/จอสั่น/กระเด็นตามระดับท่า (ใช้กับท่าใหม่ · ฉากเดิมยังใช้ค่าที่ kwan อนุมัติ) · `react(สาย)` ปฏิกิริยาร่าง 9×6 · `debris_at()` เศษตามวัสดุ · ร้าวเฉพาะร่างแข็ง (`HARD_BODIES`)
+  แก้แสงวาบตามตรวจรอบ 2 (kwan 25 ต.ค. "3"): bl8 ตัดวาบตัวมอนตอนตอก + จอวาบ 0.22→0.15 + ร่างไม่แข็งเป็นรอยแผลแทนร้าว · ประกายจอวาบ 0.6→0.3
   สัญลักษณ์บนจอต้องอยู่ใน subset ฟอนต์ (✦ ขึ้นกล่องบนเว็บ → ใช้ ★) · GDScript: `var x := round(...)`/max/min = พังตอน parse → ใช้ roundf/maxf/minf หรือระบุชนิด · ลำดับชั้น: back_fx (หลังมอน) → มอน z1 → mid_fx z2 → Rion z4 → front_fx z5
   ตรวจเร็ว (ไม่กี่วิ): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 [--bg=ash_village] --snap=30,36 --snapdir=<dir>` → เทียบกับเว็บ `websnap.cjs` (scratchpad)
-  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V3) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
+  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V4) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) · **บทเรียนหมวด 11 อ่านก่อนแก้อะไรก็ตาม**

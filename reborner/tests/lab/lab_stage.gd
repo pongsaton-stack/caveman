@@ -11,6 +11,7 @@ extends Node2D
 ##   (ระบุ --foe = โหมดอัด: เล่นทันทีแล้วปิดเอง · ได้ภาพ 600x336 + f.wav)
 ## ถ่ายเฉพาะเฟรม (ตรวจเร็ว ไม่ต้องอัดทั้งเรื่อง): xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 --snap=30,36,40 --snapdir=<dir>
 ##   → <dir>/<ท่า>_<มอน>_f030.png ขนาด 300x168
+## ตารางวิจัยรอบ 2 (r2_tables.gd): feel(พลัง) = หยุดภาพ/จอสั่น/กระเด็นตามระดับท่า · react(สาย) = ปฏิกิริยาร่างมอนตัวนี้ · debris_at() = เศษตามวัสดุ (เลือด/เจล/ขนนก/เปลือก...)
 
 const W := 300
 const H := 168
@@ -41,6 +42,8 @@ const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], 
 ## ทางปลายมีดของภาพฟัน pls_atk_bl (วัดอัตโนมัติ blade_tip.py → DATA.swing ของหน้าเว็บ): จุดหมุนไหล่ P · มุม A · รัศมี R · ภาพแรก f0
 const SWING := {"P": [62, 68], "f0": 4, "A": [-14, -200.7, -237.4, -248.2], "R": [24.7, 39.6, 29.7, 26.9], "TAIL": -140}
 const SR := 32000
+const R2 := preload("res://tests/lab/r2_tables.gd")
+const HARD_BODIES := ["เกราะ", "หิน", "กระดูก", "กลไก"]   # ร้าวได้ (ตารางปฏิกิริยา: ร้าวเฉพาะวัสดุเปราะ · ไม้ = แตกตามเสี้ยน)
 
 const FX_SHADER := """
 shader_type canvas_item;
@@ -124,6 +127,7 @@ var players: Array[AudioStreamPlayer] = []
 var sfx_cache := {}
 var snaps := {}
 var snap_dir := ""
+var debris: Array = []   # [kind, สี, x, y, vx, vy, g, life, เฟรมเกิด]
 
 # ── ส่วนที่ท่าแต่ละท่าเขียนทับ ──────────────────────────
 func tech_id() -> String: return "bl0"
@@ -453,7 +457,9 @@ func _build_stage() -> void:
 	add_child(mid_fx)
 	front_fx = Node2D.new()
 	front_fx.z_index = 5
-	front_fx.draw.connect(func(): draw_fx(front_fx))
+	front_fx.draw.connect(func():
+		_draw_debris(front_fx)
+		draw_fx(front_fx))
 	add_child(front_fx)
 	puff_p = particles(4, 0.4)
 	puff_p.direction = Vector2(-1, -0.4)
@@ -672,6 +678,81 @@ func _burst_step(f: float, F: int) -> void:
 		flash_spr.position = burst_pos
 		flash_spr.scale = Vector2.ONE * (0.6 + q * 0.35)
 		flash_spr.modulate.a = 0.6 * (1 - q / 4.0)
+
+# ── ตารางวิจัยรอบ 2: feel ตามพลังท่า · ปฏิกิริยาตามร่าง · เศษตามวัสดุ ──────────
+## ระดับ feel ของท่าพลัง power (ต้นสาย ≤90 · กลาง ≤130 · ปลาย ≤170 · ไม้ตาย) · finisher = จังหวะสังหาร/เกราะแตก (หยุดภาพ 4 เฟรม)
+## คืน {hitstop_frames, shake_px, shake_frames, knockback_px, flash_frames} · หยุดภาพเป็นวินาที = hitstop_frames * SEC
+func feel(power: int, finisher := false) -> Dictionary:
+	if finisher:
+		return R2.FEEL[R2.FEEL.size() - 1]
+	for row in R2.FEEL:
+		if power <= int(row.power_max):
+			return row
+	return R2.FEEL[R2.FEEL.size() - 2]
+
+## ฮิตกลางทางของท่าหลายฮิต: หยุดภาพครึ่งค่าฐาน (ปัดขึ้น)
+func feel_mid(power: int) -> int:
+	return ceili(int(feel(power).hitstop_frames) * 0.5)
+
+## ปฏิกิริยาของมอนตัวนี้ต่อการโจมตีสาย atk (คม ทุบ แทง ยิง กล มือเปล่า): {motion, shift, frames, mark, mark_life, ko, debris}
+func react(atk: String) -> Dictionary:
+	return R2.REACT.get(body + "|" + atk, R2.REACT.get("เนื้อ|" + atk, {}))
+
+func hard_body() -> bool:
+	return body in HARD_BODIES
+
+## โปรยเศษตามตารางปฏิกิริยาที่จุดโดน (ทิศ 0° = พุ่งออกจากผิวมอนกลับฝั่ง Rion ทางขวา ให้เห็นบนฉากหลัง ไม่จมในตัวมอน · บวก = ลงล่าง) · ใช้สีตารางเว้นแต่ use_body = สีตัวมอนตรงจุดนั้น (เจล/เปลือก)
+func debris_at(pos: Vector2, atk: String, F: int, mul := 1.0) -> void:
+	var r := react(atk)
+	var big := foe.begins_with("B")   # บอส: เศษ x1.5 ความเร็ว x0.7 (ตาราง boss_scale)
+	var i := 0
+	for d in r.get("debris", []):
+		var n := int(roundf(int(d.n) * mul * (1.5 if big else 1.0)))
+		for k in n:
+			i += 1
+			var a := deg_to_rad(lerpf(float(d.deg[0]), float(d.deg[1]), fb_hash(i, F, 11)))
+			var v := lerpf(float(d.v[0]), float(d.v[1]), fb_hash(i, F, 12)) * (0.7 if big else 1.0)
+			var col := Color(d.col)
+			if d.kind in ["gel_drop", "gel_bubble", "shell_chip", "stone_chip", "bone_chip"]:
+				var sx := int(pos.x - mx0)
+				var sy := int(pos.y - (G - mh))
+				if solid(sx, sy):
+					col = rgb(sx, sy)
+			debris.append([d.kind, col, pos.x, pos.y, cos(a) * v, sin(a) * v, float(d.g), int(d.life), F])
+
+func _draw_debris(n: Node2D) -> void:
+	var f := t / SEC
+	for e in debris:
+		var q: float = f - e[8]
+		if q < 0 or q > e[7]:
+			continue
+		var x: float = e[2] + e[4] * q
+		var y: float = e[3] + e[5] * q + 0.5 * e[6] * q * q
+		var col: Color = e[1]
+		var life: float = e[7]
+		var al: float = 1.0 - maxf(0.0, q - life * 0.6) / (life * 0.4)
+		match e[0]:
+			"feather":   # ขนนก: ร่วงช้า ส่ายซ้ายขวา
+				x += sin(q * 0.5 + e[3]) * 2
+				y = minf(y, G - 2)
+				px(n, x, y, Color(col, al), 2, 1)
+			"dust", "stone_dust", "bone_dust", "sawdust", "smoke_wisp", "ectoplasm_wisp":   # ฝุ่น/ไอ: ขยายแล้วจาง
+				disc(n, x, minf(y, G - 2), 1 + q * 0.15, Color(col, 0.5 * al))
+			"spark", "spark_pale", "arc_spark", "light_mote":   # ประกาย: สว่าง + หางสั้น
+				px(n, x, y, Color(1, 1, 1, al))
+				px(n, x - e[4], y - e[5], Color(col, 0.6 * al))
+			"shell_chip", "stone_chip", "bone_chip", "metal_panel", "wood_splinter", "gear_small", "ricochet_stone":   # เศษแข็ง: กระดอนพื้น ขอบเข้ม
+				if y > G - 2:
+					y = G - 2
+				px(n, x, y, Color(42 / 255.0, 26 / 255.0, 20 / 255.0, al), 3, 3)
+				px(n, x, y, Color(col, al), 2, 2)
+			"gel_drop", "gel_bubble", "oil_drop":   # เจล: หยดกลม แตะพื้นแล้วแผ่
+				if y > G - 2:
+					px(n, x - 1, G - 1, Color(col, al), 3, 1)
+				else:
+					disc(n, x, y, 1.2, Color(col, al))
+			_:   # หยดเลือด: 1 จุด แตะพื้นแล้วค้าง
+				px(n, x, minf(y, G - 1), Color(col, al))
 
 # ── ตัวหนังสือ: บับเบิลชื่อท่า · ตัวเลขดาเมจ · คำเสียง ──────────
 func _build_ui() -> void:

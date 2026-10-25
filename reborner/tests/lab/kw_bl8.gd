@@ -164,8 +164,10 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	dim_to(0.2 if dd >= 0 and db < 4 else (0.1 if F >= UP and dd < 0 else 0.0))
 	# มอน: ผงะตอนจาม · ตอนตอกยุบรับแรง · เกราะแตกกระเด็นถอย
 	var hurt := (dc >= 0 and dc < 6) or (dd >= 0 and dd < 4) or (db >= 0 and db < 10)
-	var fl := 1.0 if (dc >= 0 and dc < 2) or (dd >= 0 and dd < 2) or db == 0 else 0.0
-	show_mon(hurt_key() if hurt else idle_key(f), _kb(F), fl, Color.WHITE, 1.0, 0.94 if dd >= 0 and dd < 3 else 1.0)
+	# วาบขาวตัวมอน 2 ครั้ง (จาม/แตก) · ตอนตอกไม่วาบ ใช้ยุบตัว+จอสั่นแทน (ตรวจแสงวาบรอบ 2: เดิม 3 ครั้งใน 17 เฟรม = แตะเพดาน)
+	var fl := 1.0 if (dc >= 0 and dc < 2) or db == 0 else 0.0
+	var squash := (0.88 if body == "นุ่ม" else 0.94) if dd >= 0 and dd < 3 else 1.0   # ร่างนุ่มยุบลึกกว่า (ตารางปฏิกิริยา)
+	show_mon(hurt_key() if hurt else idle_key(f), _kb(F), fl, Color.WHITE, 1.0, squash)
 	var g := geo(f)
 	set_rion(rion, g)
 	if F >= DROP and F <= DRIVE:
@@ -180,6 +182,8 @@ func frame(f: float, F: int, fresh: bool) -> void:
 				dust_at(e[1], e[2], e[3])
 		if F >= RUN + 2 and F < JUMP and (F - RUN - 2) % 3 == 0:
 			dust_at(g.cx + 4, 1.0, 0.5 + 0.4 * (F - RUN) / 12.0)
+		if F == CHOP:   # เศษตามวัสดุ: เกราะ = ประกาย+เปลือก · นุ่ม = เจล · ปีก = ขนนก · เนื้อ = เลือดหยด
+			debris_at(Vector2(bx, by), "คม", F)
 		if F == DRIVE:
 			burst(Vector2(bx + _kb(F) - u.x * 10, by - u.y * 10), F)
 		if F == BREAK:
@@ -194,7 +198,7 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	var tag := ("อ่อนแอ! · " if aff > 0 else "ต้านทาน · " if aff < 0 else "") + "เจาะเกราะ 30%"
 	pop(dmg, maxf(52, mx0 + 8), G - roundf(mh * 0.75), db, Color.WHITE, tag, Color("#ffe08a") if aff > 0 else Color("#c8e6ff"))
 
-## ชั้นกลาง (ทับมอน ใต้ Rion): รอยร้าวเฉพาะบนเนื้อ · มีดฝัง
+## ชั้นกลาง (ทับมอน ใต้ Rion): รอยร้าว (เฉพาะร่างแข็ง) / รอยแผลตามแนวมีด (ร่างอื่น) · มีดฝัง
 func draw_mid(n: Node2D) -> void:
 	var F := int(floor(t / SEC))
 	var dc := F - CHOP
@@ -203,7 +207,18 @@ func draw_mid(n: Node2D) -> void:
 	var kb := _kb(F)
 	var grow := 0.0 if dc < 0 else (0.12 if dd < 0 else (0.12 + 0.88 * minf(1.0, (dd + 1) / 6.0) if db < 0 else 1.0))
 	var fade := 1.0 if db < 6 else maxf(0.0, 1 - (db - 6) / 24.0)
-	if grow > 0 and fade > 0:
+	if grow > 0 and fade > 0 and not hard:   # ร่างนุ่ม/เนื้อ/ปีก ไม่ร้าว: แผลเปิดตามแนวมีด ยาวขึ้นตอนตอก แล้วประกบจาง
+		for k in int(roundf(3 + 9 * grow)):
+			var p := Vector2(bx + kb, by) + u * k
+			var sx := int(roundf(p.x - kb - mx0))
+			var sy := int(roundf(p.y - (G - mh)))
+			if not solid(sx, sy):
+				continue
+			var c := rgb(sx, sy).darkened(0.6)
+			c.a = 0.9 * fade
+			px(n, p.x, p.y, c)
+			px(n, p.x, p.y + 1, Color(c, 0.5 * fade))
+	if grow > 0 and fade > 0 and hard:
 		var ox := bx - mx0
 		var oy := by - (G - mh)
 		for br in cracks:
@@ -287,8 +302,8 @@ func draw_fx(n: Node2D) -> void:
 				px(n, x, y, Color(1, 240 / 255.0, 210 / 255.0, 0.8 * al))
 			else:
 				disc(n, x, y, s * 0.7, col)
-	if db >= 0 and db < 2:   # จอวาบ
-		px(n, -8, -8, Color(1, 1, 1, (1 - db / 2.0) * 0.22), W + 16, H + 16)
+	if db >= 0 and db < 2:   # จอวาบ (ลดจาก 0.22 → 0.15 ตามตรวจแสงวาบรอบ 2)
+		px(n, -8, -8, Color(1, 1, 1, (1 - db / 2.0) * 0.15), W + 16, H + 16)
 
 func sounds(F: int) -> void:
 	var big := 0.6 if foe == "B1" else 1.0
