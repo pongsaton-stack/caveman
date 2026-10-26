@@ -6,7 +6,7 @@
 #    sell_base = round(tier × MATERIAL_INCOME_SHARE × 100 ÷ drop_rate) → ค่าคาดหวังต่อตัว = tier × share = share ของเงินชนะศึก
 #    แถวที่ status ไม่ใช่ "เสนอ" (kwan ยืนยัน/แก้แล้ว) เก็บไว้ตามเดิม
 # 2) docs/art-bible/weapons/weapons_full.json — ใส่ "price" ให้อาวุธที่ยังไม่มี (price_status "เสนอ")
-#    price = ค่าอาวุธ × WEAPON_PRICE_PER_VALUE · ไม่มี weapon_base ใช้กลางช่วง value_range ของ tier
+#    price = ค่าอาวุธ × WEAPON_PRICE_PER_VALUE · ไม่มี weapon_base ใช้ base_draft (ร่าง) · ไม่มีทั้งคู่ใช้กลางช่วง value_range ของ tier
 #    แทรกเป็นข้อความในบรรทัดเดิม (ไม่จัดรูปแบบไฟล์ใหม่) · มี price แล้วไม่แตะ
 # ค่าตั้งต้นทั้งสองอยู่ใน data/economy.csv
 import csv, json, os, re
@@ -58,7 +58,10 @@ def weapon_prices(k):
 			if 'price' in w:
 				continue
 			base = w.get('weapon_base')
-			if base is None:
+			if base is None and w.get('base_draft') is not None:   # ร่างค่าอาวุธ (รอ kwan อนุมัติ)
+				base = w['base_draft']
+				how = 'ร่างค่า %d' % base
+			elif base is None:
 				lo, hi = d['tiers'][str(w['tier'])]['value_range']
 				base, how = (lo + hi) / 2, 'กลางช่วง %d–%d' % (lo, hi)
 			else:
