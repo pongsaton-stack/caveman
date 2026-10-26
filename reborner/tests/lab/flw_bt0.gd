@@ -1,13 +1,14 @@
 extends "res://tests/lab/lab_stage.gd"
 ## ทุบ bt0 ไม้เบสบอล — ท่าแรกที่ใช้ภาพ Rion จาก Flow (Muse เจน 25 ต.ค. · tools/sprites/flow_to_px.py) + ตาราง feel/ปฏิกิริยารอบ 2
-## จังหวะตามรายงานวิจัย bt0 (โดนเฟรม 22 · ง้าง ~10 เฟรม · ฟาดสั้น 4 เฟรม · ไม้จมค้าง 23–29): ย่อ → กระโดดเข้าพร้อมง้างกลางอากาศ (ไม่ยืนง้างนิ่ง · รสนิยม 10 ต.ค.)
-## → ฟาดลงตอนเท้าแตะพื้น → ไถลนิด → ไม้จมค้าง → กระโดดถอย 2 ครั้ง + ไถลตั้งหลักแบบท่าฟัน bl0 (kwan 25 ต.ค. "หลังโจมตีให้ถอยแบบฟัน")
+## จังหวะตามรายงานวิจัย bt0 (โดนเฟรม 22 · ง้าง ~10 เฟรม · ฟาดสั้น 4 เฟรม · ไม้จมค้าง 23–29): วิ่งเข้าแบกไม้บนไหล่แบบท่าฟัน bl0 (RUN 18 เฟรม = ช่วง load)
+## → ฟาดต่อเนื่องตอนถึงตัว (ไม่ยืนง้างนิ่ง · รสนิยม 10 ต.ค.) → ไถลนิด → ไม้จมค้าง → กระโดดถอย 2 ครั้ง + ไถลแบบท่าฟัน → ยืนหายใจ
+## (kwan 25 ต.ค. "หลังโจมตีให้ถอยแบบฟัน" · 26 ต.ค. "วิ่งไปโจมตีแบบฟัน เสร็จแล้วทำท่ายืนหายใจ")
 ## ภาพ flw_bt_*: ready lift wind mid hit follow back (ผืน 120x112 เท้าแถว 108) · ถ้าภาพ Flow ไม่ผ่าน kwan → กลับไปเจน PixelLab (kwan 25 ต.ค.)
 
 const MX := 74
-const END := 70
-const CROUCH := 6
-const JUMP := 9
+const END := 80
+const IDLE := 4
+const RUN := 18   # = HIT - IDLE (เท่า blc_bl0)
 const HIT := 22
 const FOLLOW := 25
 const RET := 29   # เริ่มถอย
@@ -15,7 +16,8 @@ const RET := 29   # เริ่มถอย
 const HOPS := [{"d": 0.5, "c": 2, "a": 9, "l": 2, "h": 16}, {"d": 0.3, "c": 2, "a": 7, "l": 2, "h": 12}, {"d": 0.2, "skid": 10}]
 const POWER := 100   # techs.csv bt0
 ## ท่า → ภาพ · ปลายไม้ในภาพ (วัดจากพิกเซลเทา) · เลื่อนภาพแนวนอน (ชุดภาพที่จัดวางคนละกรอบ) — ฉาก PixelLab (pl_bt0.gd) แทนที่ฟังก์ชันเหล่านี้
-func keys() -> Dictionary: return {"ready": "flw_bt_ready", "lift": "flw_bt_lift", "wind": "flw_bt_wind", "whip": "flw_bt_mid", "mid": "flw_bt_mid",
+## ค่าเป็นรายการ = วนตาม idx (วิ่ง: ทีละเฟรม · หายใจ: ทุก 4 เฟรม)
+func keys() -> Dictionary: return {"ready": ["flw_bt_ready"], "run": ["flw_bt_ready"], "lift": "flw_bt_lift", "wind": "flw_bt_wind", "whip": "flw_bt_mid", "mid": "flw_bt_mid",
 	"hit": "flw_bt_hit", "follow": "flw_bt_follow", "crouch": "flw_bt_ready", "air": "flw_bt_back", "fall": "flw_bt_back", "land": "flw_bt_ready"}
 func tips() -> Dictionary: return {"wind": Vector2(80, 43), "mid": Vector2(17, 46), "hit": Vector2(15, 91)}
 func shift_x(_pose: String) -> float: return 0.0
@@ -28,7 +30,7 @@ var fe := {}
 func tech_id() -> String: return "bt0"
 func end_frame() -> int: return END
 func stops() -> Array: return [[HIT, int(fe.get("hitstop_frames", 2)) * SEC]]
-func caption() -> String: return "ทุบ (%s): กระโดดง้างกลางอากาศ → ฟาดตอนแตะพื้น → ไถลตามแรง · ปฏิกิริยา%s|ทุบ" % [src_name(), body]
+func caption() -> String: return "ทุบ (%s): วิ่ง → ฟาด → ถอย" % src_name()
 
 func setup() -> void:
 	place_monster(MX)
@@ -46,25 +48,23 @@ func setup() -> void:
 func geo(f: float) -> Dictionary:
 	var r := _geo(f)
 	var pose: String = r.key
-	r.key = keys()[pose]
+	var k: Variant = keys()[pose]
+	r.key = k[int(r.get("idx", 0)) % k.size()] if k is Array else k
 	r.cx += shift_x(pose)
 	return r
 
 func _geo(f: float) -> Dictionary:
 	var F := int(floor(f))
 	var r := {"cx": float(home), "lift": 0.0, "key": "ready", "sx": 1.0, "sy": 1.0}
-	if F < CROUCH:   # ยืนหายใจ (ยุบ 1 จุดทุก 4 เฟรม)
-		r.sy = 0.985 if (F / 4) % 2 == 1 else 1.0
+	if F < IDLE:   # ยืนหายใจ
+		r.idx = F / 4
 		return r
-	if F < JUMP:   # ย่อสะสมแรง
-		r.sy = 0.92
-		r.sx = 1.04
-		return r
-	if F < HIT:   # กระโดดโค้งเข้า ยกไม้ → ง้างที่ยอด → เริ่มฟาดขาลง
-		var tt := (f - JUMP + 1) / (HIT - JUMP)
-		r.cx = home + (near - home) * (tt * tt * 0.35 + tt * 0.65)
-		r.lift = roundf(4 * 24 * tt * (1 - tt))
-		r.key = "lift" if F < JUMP + 3 else ("wind" if F < HIT - 3 else ("whip" if F < HIT - 1 else "mid"))
+	if F < HIT:   # วิ่งเร่งเข้าแบบ blc_bl0 แบกไม้ (load) → ถึงตัวแล้วฟาดต่อเนื่องไม่หยุด
+		var u := (f - IDLE) / RUN
+		r.cx = home + (near - home) * (u * u * 0.4 + u * 0.6)
+		r.lean = -0.04 * minf(1.0, u * 3)
+		r.key = "run" if F < HIT - 4 else ("wind" if F < HIT - 3 else ("whip" if F < HIT - 1 else "mid"))
+		r.idx = F - IDLE
 		return r
 	var slide := 3.0 * (1 - pow(1 - minf(1.0, (f - HIT) / 6.0), 2))   # ไถลนิดตามแรงส่ง (รายงาน: เท้าหน้ายันพื้น ตัวไม่เซ)
 	if F < FOLLOW:
@@ -107,6 +107,7 @@ func _geo(f: float) -> Dictionary:
 			return r
 		at += span
 		done += h.d
+	r.idx = F / 4   # กลับที่แล้วยืนหายใจ
 	return r
 
 ## เฟรมที่กระโดดถอยแต่ละครั้งออกตัว / แตะพื้น (ฝุ่น + เสียง)
@@ -167,8 +168,8 @@ func frame(f: float, F: int, fresh: bool) -> void:
 		ghost(geo(f - 1), 0.12)
 	var hp_pt := tip(geo(HIT), "hit")
 	if fresh:
-		if F == JUMP:
-			dust_at(home - 4, 1.0, 1.1)
+		if F >= IDLE + 2 and F < HIT - 4 and (F - IDLE - 2) % 3 == 0:   # ฝุ่นเท้าวิ่ง (แบบ blc_bl0)
+			dust_at(g.cx + 6, 1.0, 0.45 + 0.4 * (F - IDLE) / RUN)
 		if F == HIT:
 			dust_at(near, -1.0, 1.0)
 			burst(hp_pt, F, Color("#ffd27a") if hard_body() else Color("#fff0d0"))
@@ -181,7 +182,7 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	if d >= 0 and d < 12:
 		var wy := minf(hp_pt.y - 30, G - roundf(mh * 0.75) - 30)   # เหนือตัวเลขดาเมจ ไม่ทับ
 		word("เปรี้ยง!!" if hard_body() else "ปึ้ก!!", maxf(4, mx0 + mw * 0.5 - 4), maxf(18, wy - mini(4, d)), Color("#ffd24a") if hard_body() else Color.WHITE)
-	show_bubble("ทุบ!", g.cx, maxf(14, G - g.lift - 74), F - JUMP, (1.0 if F < HIT else (HIT + 3 - f) / 3.0) if F >= JUMP and F < HIT + 3 else 0.0)
+	show_bubble("ทุบ!", g.cx, maxf(14, G - g.lift - 74), F - (HIT - 8), (1.0 if F < HIT else (HIT + 3 - f) / 3.0) if F >= HIT - 8 and F < HIT + 3 else 0.0)
 	pop(dmg, maxf(52, mx0 + 8), G - roundf(mh * 0.75), d, Color.WHITE, aff_tag(), aff_col())
 
 ## ชั้นกลาง: รอยตามวัสดุตรงจุดทุบ — ร้าวใยแมงมุม (ร่างแข็ง) · รอยช้ำ (เนื้อ/ปีก) · ร่างนุ่มไม่มีรอย
@@ -241,10 +242,9 @@ func draw_fx(n: Node2D) -> void:
 
 func sounds(F: int) -> void:
 	var big := foe == "B1"
-	if F == CROUCH:
-		play_sfx("crouch", [N(0.06, "lowpass", 700, 150, 0.2, 1)])
-	if F == JUMP:
-		play_sfx("jump", [N(0.08, "lowpass", 700, 150, 0.35, 1)])
+	if F >= IDLE and F < HIT - 4 and (F - IDLE) % 3 == 0:   # ฝีเท้าวิ่ง ดังขึ้นตามความเร็ว (แบบ blc_bl0)
+		var pk := snappedf(0.35 + 0.25 * (F - IDLE) / RUN, 0.05)
+		play_sfx("step%s" % pk, [N(0.07, "lowpass", 900, 200, pk, 1)])
 	if F == HIT - 3:   # ไม้หวดลม (ทื่อ ต่ำกว่าเสียงมีด)
 		play_sfx("whoosh", [N(0.22, "bandpass", 380, 1100, 0.4, 2)])
 	if F == HIT:   # ทุบ: กระแทกต่ำ (ไม่มีกริ๊ง) + เสียงมอนตามร่าง

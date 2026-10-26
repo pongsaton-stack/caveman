@@ -544,6 +544,44 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat_run",
+   "label": "วิ่งแบกไม้เบสบอล (run_bat) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_bat_run_0",
+    "pls_bat_run_1",
+    "pls_bat_run_2",
+    "pls_bat_run_3",
+    "pls_bat_run_4",
+    "pls_bat_run_5",
+    "pls_bat_run_6",
+    "pls_bat_run_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_stance run_bat_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_bat_breath",
+   "label": "ยืนหายใจถือไม้เบสบอล (idle_bat 0–1) · 2 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_bat_breath_0",
+    "pls_bat_breath_1"
+   ],
+   "ms": 180,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BT_bat_stance idle_bat_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_walk_s",
    "label": "เดินลง (หันหน้า) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 748 จุด)",
    "frames": [

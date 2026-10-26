@@ -19,7 +19,12 @@ const G := 158
 const SEC := 0.06
 const PX := "res://assets/sprites/pixellab_draft/px_set/"
 const MPX := "res://assets/sprites/monsters_px_draft/"
-const FPX := "res://assets/sprites/flow_draft/bt/"   # ภาพ Rion จาก Flow (Muse เจน · flow_to_px.py) ชื่อ flw_*
+const FPX := "res://assets/sprites/flow_draft/bt/"
+const WSK := "res://assets/sprites/pixellab_draft/weapon_skin/"   # ไม้เบสบอลระดับอื่นบนภาพ pls_bat* (tools/sprites/bat_tiers.py)
+## ปุ่มเลือกอาวุธ (kwan 26 ต.ค.): สายของท่า → อาวุธ 5 ระดับใน weapons.csv · ชื่อสั้นบนปุ่ม · ภาพเปลี่ยนได้เฉพาะไม้เบสบอล (WSK) · มีดยังเป็นภาพมีดครัว
+const SCHOOL := {"bl": "คม", "bt": "ทุบ", "pt": "แทง", "rg": "ยิง", "dv": "กล", "fs": "มือเปล่า"}
+const WSHORT := {"SL-1": "มีดครัว", "SL-2": "อีโต้", "SL-3": "พร้าเลื่อย", "SL-4": "ใบพัดลม", "SL-5": "มีดเชฟ",
+	"CR-1": "ไม้ร้าว", "CR-2": "อลูมิเนียม", "CR-3": "ตอกตะปู", "CR-4": "หัวเฟือง", "CR-5": "โฮมรัน"}   # ภาพ Rion จาก Flow (Muse เจน · flow_to_px.py) ชื่อ flw_*
 const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพลงต่อสู้แนวรอบ 4 (kwan 5 ต.ค.) อัดจากหน้าเว็บ
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
@@ -130,6 +135,8 @@ var players: Array[AudioStreamPlayer] = []
 var sfx_cache := {}
 var snaps := {}
 var snap_dir := ""
+var weapons: Array = []   # [รหัส, ชื่อ, weapon_base หรือ -1] ของสายท่านี้
+var weapon_id := ""
 var speed := 1.0   # ความเร็วเล่น (ปุ่มในเมนู · เก็บใน Engine meta "lab_speed")
 var debris: Array = []   # [kind, สี, x, y, vx, vy, g, life, เฟรมเกิด]
 
@@ -165,6 +172,8 @@ func _ready() -> void:
 			snap_dir = a.substr(10)
 		elif a.begins_with("--speed="):
 			speed = float(a.substr(8))
+		elif a.begins_with("--weapon="):   # ทดสอบอาวุธจากบรรทัดคำสั่ง เช่น --weapon=CR-4
+			Engine.set_meta("lab_weapon_" + tech_id().substr(0, 2), a.substr(9))
 	if not BGS.has(bg_id):
 		bg_id = "frost_volcano"
 	playing = recording or bool(Engine.get_meta("lab_auto", false))
@@ -189,6 +198,8 @@ func _img(path: String) -> Image:
 func tx(key: String) -> Texture2D:
 	if not tex.has(key):
 		var path := (PX + key + ".png") if key.begins_with("pls_") else ((FPX + key + ".png") if key.begins_with("flw_") else (MPX + key + ".png"))
+		if key.begins_with("pls_bat") and weapon_id.begins_with("CR-") and weapon_id != "CR-2":
+			path = WSK + "wsk_%s__%s.png" % [key, weapon_id]
 		tex[key] = ImageTexture.create_from_image(_img(path))
 	return tex[key]
 
@@ -225,6 +236,7 @@ func _load_monster() -> void:
 			body = str(r.body)
 	var d: Array = DMG.get(tech_id(), {}).get(foe, [0, 0, 1])
 	dmg = d[0]
+	_load_weapons()
 	aff = d[1]
 	hits = d[2]
 	kill = dmg >= hp
@@ -243,6 +255,39 @@ func _load_monster() -> void:
 		if found:
 			break
 	bh = mh - top0
+
+func school() -> String:
+	return SCHOOL.get(tech_id().substr(0, 2), "")
+
+## อาวุธของสายท่า + ที่เลือกไว้ (Engine meta lab_weapon_<bl/bt…> · ชื่อ meta ต้องเป็นอักษรอังกฤษ · ค่าเริ่ม = ชิ้นที่มี weapon_base = ชิ้นที่ตาราง DMG ใช้)
+## ดาเมจคิดใหม่เฉพาะเมื่อทั้งสองชิ้นมี weapon_base (ATK = 20 + prof 20 × 1.6 + ฐาน) · ชิ้นที่ kwan ยังไม่กำหนดฐาน = ดาเมจเท่าเดิม
+func _load_weapons() -> void:
+	var sc := school()
+	if sc == "":
+		return
+	var base_id := ""
+	for r in CsvDb.load_csv("res://data/weapons.csv"):
+		if str(r.school) == sc:
+			var b := int(r.weapon_base) if str(r.weapon_base) != "" else -1
+			weapons.append([str(r.weapon_id), str(r.name), b])
+			if b >= 0 and base_id == "":
+				base_id = str(r.weapon_id)
+	weapon_id = str(Engine.get_meta("lab_weapon_" + tech_id().substr(0, 2), base_id))
+	var wb := -1
+	var db := -1
+	for w in weapons:
+		if w[0] == weapon_id:
+			wb = w[2]
+		if w[0] == base_id:
+			db = w[2]
+	if wb >= 0 and db >= 0 and wb != db:
+		dmg = int(roundf(dmg * (52.0 + wb) / (52.0 + db)))
+
+func weapon_name() -> String:
+	for w in weapons:
+		if w[0] == weapon_id:
+			return w[1] + ("" if w[2] >= 0 else " (ยังไม่มีค่าพลัง)")
+	return ""
 
 func place_monster(mx: int) -> void:
 	mx0 = int(round(mx - mw / 2.0))
@@ -799,7 +844,7 @@ func _build_ui() -> void:
 	ui.add_child(bar)
 	caption_lbl = label(7, Color("#f0e4c8"), 0, false)
 	caption_lbl.position = Vector2(4, H - 11)
-	caption_lbl.text = "GODOT · %s %s · %s" % [mon_name, foe, caption()]
+	caption_lbl.text = "GODOT · %s %s · %s%s" % [mon_name, foe, caption(), (" · อาวุธ: " + weapon_name()) if weapon_id != "" else ""]
 	_build_menu()
 
 ## บับเบิลชื่อท่า (rs3Bubble): เด้ง 2 เฟรมแรก · ไม่ล้นจอ · หางชี้ผู้พูด
@@ -917,9 +962,17 @@ func _build_menu() -> void:
 	snd.pressed.connect(_toggle.bind(snd, "เสียง", "lab_mute"))
 	var mus := _button(_onoff("เพลง", "lab_music_off"), Vector2(200, 111), Vector2(96, 16), 16)
 	mus.pressed.connect(_toggle.bind(mus, "เพลง", "lab_music_off"))
-	var note := label(7, Color("#c8d0e0"), 2, false, menu)
-	note.text = "เสียงสร้างด้วยโค้ด · ดาเมจสูตรเดียวกับหน้าเว็บ · เพลง = ไฟล์อัดจากหน้าเว็บ"
-	note.position = Vector2(6, 146)
+	if not weapons.is_empty():   # อาวุธของสายท่านี้ 5 ระดับ: กดแล้วเล่นท่าเดิมใหม่ด้วยอาวุธนั้น
+		var w_l := label(7, Color("#f0e4c8"), 2, false, menu)
+		w_l.text = "อาวุธ"
+		w_l.position = Vector2(6, 146)
+		for i in weapons.size():
+			var w: Array = weapons[i]
+			var b := _button(WSHORT.get(w[0], w[1]), Vector2(40 + i * 51, 145), Vector2(48, 13), 13)
+			b.modulate = Color(1, 1, 0.6) if w[0] == weapon_id else Color.WHITE
+			b.pressed.connect(func():
+				Engine.set_meta("lab_weapon_" + tech_id().substr(0, 2), w[0])
+				_start(foe, bg_id, scene_file_path))
 	var sp_l := label(7, Color("#f0e4c8"), 2, false, menu)   # ความเร็วเล่น: กดแล้วเล่นท่าเดิมใหม่ทันที (ช้า = ดูทีละจังหวะ)
 	sp_l.text = "ความเร็ว"
 	sp_l.position = Vector2(6, 131)

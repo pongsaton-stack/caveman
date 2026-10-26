@@ -686,6 +686,18 @@
           "north": "BT_bat_stance/rotations/north.png"
         },
         "animations": {
+          "run_bat_v": {
+            "west": [
+              "BT_bat_stance/animations/run_bat_v/west/frame_000.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_001.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_002.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_003.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_004.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_005.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_006.png",
+              "BT_bat_stance/animations/run_bat_v/west/frame_007.png"
+            ]
+          },
           "bt0_bat2_v": {
             "west": [
               "BT_bat_stance/animations/bt0_bat2_v/west/frame_000.png",
@@ -696,6 +708,14 @@
               "BT_bat_stance/animations/bt0_bat2_v/west/frame_005.png",
               "BT_bat_stance/animations/bt0_bat2_v/west/frame_006.png",
               "BT_bat_stance/animations/bt0_bat2_v/west/frame_007.png"
+            ]
+          },
+          "idle_bat_v": {
+            "west": [
+              "BT_bat_stance/animations/idle_bat_v/west/frame_000.png",
+              "BT_bat_stance/animations/idle_bat_v/west/frame_001.png",
+              "BT_bat_stance/animations/idle_bat_v/west/frame_002.png",
+              "BT_bat_stance/animations/idle_bat_v/west/frame_003.png"
             ]
           },
           "chop_bat2_v": {
@@ -780,5 +800,5 @@
     }
   ],
   "export_version": "3.1",
-  "export_date": "2026-10-25T17:12:46.604523"
+  "export_date": "2026-10-26T00:59:39.795090"
 }

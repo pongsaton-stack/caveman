@@ -1133,6 +1133,44 @@
             "key": "chop_bat2"
           },
           "notes": "PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact (วางผืน 96 ลง 128 ที่ +16,+16) · ผ่าน: ง้างขึ้น → ไม้นอนหลัง → ไม้ขึ้นหลังหัว → กระทบ · เฟรม 1–2 วาดขีดเล็ก (clean ลบ) · ฉาก pl_bt0 · 1,741 → 1,739"
+        },
+        {
+          "id": "run_bat",
+          "name": "วิ่งแบกไม้เบสบอล (8 เฟรม)",
+          "kind": "move",
+          "status": "draft",
+          "date": "2026-10-26",
+          "gens": 2,
+          "seed": 33,
+          "ms": 60,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/run_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "run_bat"
+          },
+          "notes": "kwan 26 ต.ค. \"วิ่งไปโจมตีแบบฟัน\" · ผ่านทั้ง 8 เฟรม (ไม้บนไหล่ = ช่วง load ของรายงาน) · 1,739 → 1,737 · ฉาก pl_bt0"
+        },
+        {
+          "id": "idle_bat",
+          "name": "ยืนหายใจถือไม้เบสบอล (4 เฟรม)",
+          "kind": "idle",
+          "status": "draft",
+          "date": "2026-10-26",
+          "gens": 1,
+          "seed": 33,
+          "ms": 180,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/idle_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_bat"
+          },
+          "notes": "ผ่าน 0–1 · 2–3 ยกไม้ขึ้น + วาดแสง → ใช้ 0–1 วนสลับ (pls_bat_breath) · 1,737 → 1,736"
         }
       ]
     },

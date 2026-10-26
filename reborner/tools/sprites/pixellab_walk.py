@@ -564,6 +564,18 @@ MOVES["chop_bat2"] = {"dir": "west", "held": BAT, "attack": True, "frames": 4, "
 	"not": ["turning toward the camera", "facing right", "a front view", "a level horizontal swing at chest height", "holding the bat with one hand",
 		"a second bat", "swing trails, motion arcs or speed lines", "impact stars or sparks"]}
 
+# วิ่งเข้า + ยืนหายใจถือไม้ (kwan 26 ต.ค. "วิ่งไปโจมตีแบบฟัน เสร็จแล้วทำท่ายืนหายใจ") · วิ่งแบกไม้บนไหล่ = ช่วง load ของรายงาน bt0
+MOVES["run_bat"] = {"dir": "west", "held": BAT, "attack": False, "frames": 8, "seed": 33,
+	"beats": [b.replace("knife held low at guard in front of the chest", "the bat resting back on the shoulder with both hands on the handle at the chest")
+		.replace("knife still at guard", "the bat still on the shoulder").replace("knife steady", "the bat steady on the shoulder") for b in MOVES["run_k"]["beats"]],
+	"not": ["turning toward the camera", "a second bat", "holding the bat with one hand", "swinging or raising the bat", "slash trails or motion lines", "dust clouds"]}
+MOVES["idle_bat"] = {"dir": "west", "held": BAT, "attack": False, "frames": 4, "seed": 33,
+	"beats": ["battle-ready stance facing left, the bat resting back on the shoulder with both hands on the handle, same as the start image",
+		"breathe in: chest rises one pixel, shoulders lift slightly, the bat bobs up one pixel",
+		"breathe out: chest and shoulders come back down",
+		"same stance as the first frame (ready to loop)"],
+	"not": ["stepping", "turning", "swinging or raising the bat", "holding the bat with one hand", "motion lines"]}
+
 
 def make_state(name):
 	s = state()

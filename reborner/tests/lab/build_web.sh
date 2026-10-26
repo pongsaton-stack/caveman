@@ -23,11 +23,12 @@ e = re.sub(r'exclude_filter=".*?"', 'exclude_filter=""', e, count=1)
 open(p + '/export_presets.cfg', 'w', encoding='utf-8').write(e)
 EOF
 cp -r assets/fonts "$P/assets/"
-cp data/monsters.csv data/monster_body.csv "$P/data/"
-cp data/monsters.csv.import data/monster_body.csv.import "$P/data/" 2>/dev/null || true
+cp data/monsters.csv data/monster_body.csv data/weapons.csv "$P/data/"
+cp data/monsters.csv.import data/monster_body.csv.import data/weapons.csv.import "$P/data/" 2>/dev/null || true
 cp core/CsvDb.gd "$P/core/"
 cp tests/lab/*.gd tests/lab/*.tscn "$P/tests/lab/"
 cp assets/sprites/pixellab_draft/px_set/pls_*.png "$P/assets/sprites/pixellab_draft/px_set/"
+mkdir -p "$P/assets/sprites/pixellab_draft/weapon_skin"; cp assets/sprites/pixellab_draft/weapon_skin/wsk_*.png "$P/assets/sprites/pixellab_draft/weapon_skin/"
 mkdir -p "$P/assets/sprites/flow_draft/bt"; cp assets/sprites/flow_draft/bt/flw_*.png "$P/assets/sprites/flow_draft/bt/"
 for f in M01 M03 M06 M15 B1; do cp assets/sprites/monsters_px_draft/${f}_*.png "$P/assets/sprites/monsters_px_draft/"; done
 cp docs/art-bible/pixellab_test/bg_frost_volcano.jpg docs/art-bible/pixellab_test/bg_ash_village.jpg docs/art-bible/pixellab_test/bg_flooded_ruins.jpg "$P/docs/art-bible/pixellab_test/"
