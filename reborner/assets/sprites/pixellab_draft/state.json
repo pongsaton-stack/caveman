@@ -1,0 +1,1202 @@
+{
+ "character_id": "c378a9f5-65e8-44a9-99aa-a65c6238e5ce",
+ "character_job": "44db973d-ee44-472e-8b0d-4789fdf9bed0",
+ "character_usage": null,
+ "character_status": "completed",
+ "walk": [
+  {
+   "background_job_ids": [
+    "1e14aa3f-c3bb-42d9-b6bf-0c6f15cf3707"
+   ],
+   "directions": [
+    "east"
+   ],
+   "animation_group_id": "d2f93e21-7151-4f87-81f8-77dbc0b24cf1",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  }
+ ],
+ "walk_jobs": {
+  "1e14aa3f-c3bb-42d9-b6bf-0c6f15cf3707": "completed"
+ },
+ "slash": [
+  {
+   "background_job_ids": [
+    "4d0ab50d-9387-40d0-8983-9f9a7eb1ec6a"
+   ],
+   "directions": [
+    "west"
+   ],
+   "animation_group_id": "e6f0fcad-ff1c-4238-add6-439e01ad21e7",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  }
+ ],
+ "slash_jobs": {
+  "4d0ab50d-9387-40d0-8983-9f9a7eb1ec6a": "completed"
+ },
+ "slash2": [
+  {
+   "background_job_ids": [
+    "fedc4e9e-2c81-42e6-9028-bef99fdd85a8"
+   ],
+   "directions": [
+    "west"
+   ],
+   "animation_group_id": "cae114df-461b-49ce-8ff2-af1c5f9fcee6",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  }
+ ],
+ "slash2_jobs": {
+  "fedc4e9e-2c81-42e6-9028-bef99fdd85a8": "completed"
+ },
+ "vfx": [
+  {
+   "name": "slash2_trail",
+   "response": {
+    "usage": null,
+    "background_job_id": "4bf73f19-ff07-489a-b480-b7b33662f5fb",
+    "status": "processing",
+    "quoted_generations": 2
+   },
+   "status": "completed",
+   "result": {
+    "fps": 9,
+    "kind": "new",
+    "loop": false,
+    "name": "Rion slash2_trail",
+    "files": {
+     "rion-slash2-trail.gif": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail.gif",
+     "rion-slash2-trail.png": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail.png",
+     "rion-slash2-trail.json": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail.json",
+     "rion-slash2-trail-game.zip": "https://api.pixellab.ai/mcp/pixel-tools/70ce23be-e368-4ab4-93b2-ac019cc7d4a7/rion-slash2-trail-game.zip"
+    },
+    "parts": [],
+    "anchor": {
+     "x": 62,
+     "y": 106,
+     "kind": "feet"
+    },
+    "artist": "lite",
+    "canvas": {
+     "h": 124,
+     "w": 124
+    },
+    "frames": 8,
+    "message": "The knife slash is a one-shot on the sprite, which is left unchanged: a 1-pixel glint on the blade at frame 4, a 3-pixel navy-to-white crescent arc from above the cap down to knee height on frames 5-6, small sparks flying left at frame 6, then fragments drifting left and down on frame 7, with frame 8 empty for looping. Try the timing or the fragment count if you want a different feel.",
+    "edit_url": "https://pixellab.ai/create-vfx?effect=cf10706e-e148-47a9-aac0-dd378f040f3c",
+    "effect_id": "cf10706e-e148-47a9-aac0-dd378f040f3c",
+    "gif_exact": true,
+    "result_id": "70ce23be-e368-4ab4-93b2-ac019cc7d4a7",
+    "billing_usage": {
+     "usd": 0.0,
+     "type": "generations",
+     "generations": 2.0
+    },
+    "generation_id": "bd72d688-e4af-474e-b17b-0d920978ba51",
+    "billing_charged": true,
+    "generation_mode": "vfx",
+    "pixel_tools_image": true,
+    "quoted_generations": 2
+   },
+   "conversation": "2NzsOyFsaXJ2a5VXik333g.72dd58a53f451dfc102b80b49b8350778d936a3684c4b9442fcb05847962ff80"
+  }
+ ],
+ "anim": [
+  {
+   "move": "bl15",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "fbdfa0a7-4f8c-4977-8f84-14b5d0910761"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5842b53d-5ba8-4ebc-a67b-e8de4d844ce0",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bt5",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "1d8cc9bc-ab18-42dd-858d-4127402b7cf2"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "8e192c62-2f72-49cf-b459-af3afabb93ed",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl15",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "99e2334d-5506-4e1d-98cc-f4c117c851b5"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "faeace62-5b6a-4a4b-aa4a-c6cf9d34c551",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl16",
+   "dir": "west",
+   "seed": 27,
+   "response": {
+    "background_job_ids": [
+     "0f7e54ef-fd1b-46c3-8545-903eafbfeb16"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "d1dbbe49-67c5-4747-8308-3b138b7bee09",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "fs10_s",
+   "dir": "west",
+   "seed": 31,
+   "state": "FS_B_throw",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "74917eaa-0985-4dcc-af17-14f526578650"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "d52edf08-cb15-4dbf-b6c2-5d3dae7c0b03",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "fs12_s",
+   "dir": "west",
+   "seed": 31,
+   "state": "FS_B_spinkick",
+   "start": "FS_B_throw",
+   "response": {
+    "background_job_ids": [
+     "f31fe6f4-6081-4ff9-a59d-793f3179e368"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "b12d164e-29a8-4094-96e0-debf9549f3a2",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "walk",
+   "dir": "north",
+   "seed": 18,
+   "state": null,
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "60d0ca3d-4543-4287-bc4e-95332f555e8c"
+    ],
+    "directions": [
+     "north"
+    ],
+    "animation_group_id": "36c35f48-eaf9-4066-a498-df345735efe8",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "walk",
+   "dir": "south",
+   "seed": 18,
+   "state": null,
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "b4f47ed2-5100-4317-9e8f-7ad6e34aea56"
+    ],
+    "directions": [
+     "south"
+    ],
+    "animation_group_id": "eb599d32-dfc2-4bab-90d6-75cf984adad9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl0",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "c4d9b5f9-ae95-475a-bf86-19162d62aa66"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "ca403e81-7877-4159-9389-7f9cd35bfb2d",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_bl",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "139e094b-7d42-43a8-8989-4bd3d63ddf13"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "cc20fcb8-6133-4f03-9916-d7062ae2fb46",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bt0",
+   "dir": "west",
+   "seed": 27,
+   "state": "BT_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "5352dff6-3eb6-4307-880a-d6325f427353"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "1f4ddcf9-5e7c-47ff-a397-53769b88b4bc",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_bt",
+   "dir": "west",
+   "seed": 33,
+   "state": "BT_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "a2ded448-c450-4441-a285-f65db003a8fc"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "199dbb14-0937-4fdc-b6cf-6b9e07ed0fe5",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "pt0",
+   "dir": "west",
+   "seed": 27,
+   "state": "PT_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "25002d09-22cd-450e-9209-2e2ecd505536"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "220626da-488b-48b1-9399-f3fc68f1549f",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_pt",
+   "dir": "west",
+   "seed": 33,
+   "state": "PT_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "0b209834-4fb8-4e0a-a174-93874fa2fafc"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "71475c46-9e10-4bd3-9e37-4b169ab8bb3d",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "rg0",
+   "dir": "west",
+   "seed": 27,
+   "state": "RG_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "4d18add2-59b6-49af-a85b-529ecd7ceaa5"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "85c28000-2177-4db9-ba16-884ceadc7dcc",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_rg",
+   "dir": "west",
+   "seed": 33,
+   "state": "RG_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "7d8a3108-1806-492e-a537-0c382c16d191"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "6960ae6d-8fa3-48e8-9078-f9f4d4133b99",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "dv0",
+   "dir": "west",
+   "seed": 27,
+   "state": "DV_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "5ed24a0d-b2d7-4bc9-ae4c-6714d67fd8a2"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "01b4d7c5-7d35-4191-af24-647b82109c3a",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_dv",
+   "dir": "west",
+   "seed": 33,
+   "state": "DV_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "786ee2ec-1e27-4ad7-a55f-896d313d66f2"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "83b25ec6-f26a-420b-91d2-884bb6667ade",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "fs0",
+   "dir": "west",
+   "seed": 27,
+   "state": "FS_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "b329294d-0d51-4495-b61c-d190329443be"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e8faada4-3017-4844-a325-891d2d7027db",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_fs",
+   "dir": "west",
+   "seed": 33,
+   "state": "FS_A_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "506c86a9-9e9b-4651-9a0c-7316207be185"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "3aa47723-8f9a-4d83-aacd-3942bf33698d",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "hurt_k",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "d0097aa8-e0f8-45df-8bcd-d6e4930f00a7"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "9bfdd003-c23c-4da7-a75b-75cc07ed9d9f",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "ko_k",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "13a679a7-d840-4e47-830e-7fb3d255487a"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "f830320e-a042-43f7-8bc1-1e195cadff41",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "run_k",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "e810cfda-6bb3-491a-b1ce-06fb3a9b8cba"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "bac027ec-8711-4053-93c9-e6d315fedd6c",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "hop_k",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "2b41aece-4422-4c9c-a8b8-19b291aa9de3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "4bfc7ff7-46a6-43c4-b8b2-ae149ed15d1e",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl0",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "3be80c9d-6106-433a-b7cf-14afbeed0cc3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "4746d02f-7561-4dca-9522-cb1d0ec94a15",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl1",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "baa14db9-31fc-49e7-982c-514e26317312"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5a4c8280-33ef-4f57-847c-618249260885",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl1",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "a2ee25ef-48ed-4e62-bc10-a14f16a76b06"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "ce4f28e9-e529-4fab-8b43-33cb1ef5179a",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "slash_fist",
+   "dir": "west",
+   "seed": 27,
+   "state": null,
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "5a085bcd-9219-4fc3-a76e-d921f778eff3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5ab5b4cb-3eb7-4d5b-9590-27bc5b0d2784",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "glim_shift",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "e9cd49f0-b7d5-4721-8cbd-adec9c1a123b"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "590f3257-3add-4fd4-939c-88963c819792",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "glim_shift",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "d3b04e01-a3c0-487a-9481-8a43c08b7daf"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "17d35371-4a48-43d0-a434-b0357fd1643c",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl7",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "4a942bd4-5fc6-468c-a5e3-fb63f614a746"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "6b399e94-3ec4-45f1-9133-c1bf47c8995c",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl7_back",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "0a6b9784-626f-4561-8671-52d2a24ab073"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "42f7d75b-bbbd-496e-8041-1be3d63c0a92",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "guard_k",
+   "dir": "west",
+   "seed": 33,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "eddd8c1c-27bd-48a9-b841-b6f1d468bdbc"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "5421728e-6259-429a-93ca-78fed34ebdea",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "guard2_k",
+   "dir": "west",
+   "seed": 41,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "f690078c-1fa1-4d60-afdb-42d80aaab1a3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e666ad6f-2649-49ba-8262-ec727f593248",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl8",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "08a437dd-905f-4023-943e-88d611897c0b"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e4a25b2b-fd16-40e8-9929-57b7b780869c",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl9",
+   "dir": "west",
+   "seed": 27,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "741376d5-b83e-4941-9c44-4420154b6edb"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "cbf62347-359e-4fc1-aa47-476069cef1a4",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bt0_bat",
+   "dir": "west",
+   "seed": 27,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "60223fe9-3e9b-4abb-af65-d446190a2367"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e3f7ed4a-1b7f-49c8-a6c7-38b4ff212b40",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bt0_bat2",
+   "dir": "west",
+   "seed": 31,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "f5070387-bf1c-442f-ad34-5e623aa79e43"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "4c24a7a2-00cd-4020-b696-c2aa94f5b109",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "hop_bat",
+   "dir": "west",
+   "seed": 33,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "32a03c9a-16fa-4833-9022-9b51988215fb"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "857886d8-1b55-41b1-8e23-74794a849354",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "chop_bat",
+   "dir": "west",
+   "seed": 31,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "895236be-791d-427a-9d19-1871fd26b2c3"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "f9a4873f-eedd-41a0-9fb3-9c34c6c41686",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "hop_bat2",
+   "dir": "west",
+   "seed": 41,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "50768459-37b8-47df-9118-21c182cce4bf"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "bb086afc-1f20-44c4-b416-a7e0035fbd32",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "chop_bat2",
+   "dir": "west",
+   "seed": 31,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "ed4142de-0db2-44eb-9636-affad22b968c"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "6c2967ff-1da4-4b5c-a98f-2f69da1b52e9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "run_bat",
+   "dir": "west",
+   "seed": 33,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "075a4b67-70dd-4174-908e-438640704071"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "036fa503-5d01-4298-a608-5825c26868c0",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "idle_bat",
+   "dir": "west",
+   "seed": 33,
+   "state": "BT_bat_stance",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "a8edbb09-07b2-4ed8-892e-6a0fd125632c"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "60bfe64f-59e9-4152-8e0f-cd458ddae292",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  }
+ ],
+ "anim_jobs": {
+  "fbdfa0a7-4f8c-4977-8f84-14b5d0910761": "completed",
+  "1d8cc9bc-ab18-42dd-858d-4127402b7cf2": "completed",
+  "99e2334d-5506-4e1d-98cc-f4c117c851b5": "completed",
+  "0f7e54ef-fd1b-46c3-8545-903eafbfeb16": "completed",
+  "74917eaa-0985-4dcc-af17-14f526578650": "completed",
+  "f31fe6f4-6081-4ff9-a59d-793f3179e368": "completed",
+  "60d0ca3d-4543-4287-bc4e-95332f555e8c": "completed",
+  "b4f47ed2-5100-4317-9e8f-7ad6e34aea56": "completed",
+  "c4d9b5f9-ae95-475a-bf86-19162d62aa66": "completed",
+  "139e094b-7d42-43a8-8989-4bd3d63ddf13": "completed",
+  "5352dff6-3eb6-4307-880a-d6325f427353": "completed",
+  "a2ded448-c450-4441-a285-f65db003a8fc": "completed",
+  "25002d09-22cd-450e-9209-2e2ecd505536": "completed",
+  "0b209834-4fb8-4e0a-a174-93874fa2fafc": "completed",
+  "4d18add2-59b6-49af-a85b-529ecd7ceaa5": "completed",
+  "7d8a3108-1806-492e-a537-0c382c16d191": "completed",
+  "5ed24a0d-b2d7-4bc9-ae4c-6714d67fd8a2": "completed",
+  "786ee2ec-1e27-4ad7-a55f-896d313d66f2": "completed",
+  "b329294d-0d51-4495-b61c-d190329443be": "completed",
+  "506c86a9-9e9b-4651-9a0c-7316207be185": "completed",
+  "d0097aa8-e0f8-45df-8bcd-d6e4930f00a7": "completed",
+  "13a679a7-d840-4e47-830e-7fb3d255487a": "completed",
+  "e810cfda-6bb3-491a-b1ce-06fb3a9b8cba": "completed",
+  "2b41aece-4422-4c9c-a8b8-19b291aa9de3": "completed",
+  "3be80c9d-6106-433a-b7cf-14afbeed0cc3": "completed",
+  "baa14db9-31fc-49e7-982c-514e26317312": "completed",
+  "a2ee25ef-48ed-4e62-bc10-a14f16a76b06": "completed",
+  "5a085bcd-9219-4fc3-a76e-d921f778eff3": "completed",
+  "d3b04e01-a3c0-487a-9481-8a43c08b7daf": "completed",
+  "4a942bd4-5fc6-468c-a5e3-fb63f614a746": "completed",
+  "0a6b9784-626f-4561-8671-52d2a24ab073": "completed",
+  "eddd8c1c-27bd-48a9-b841-b6f1d468bdbc": "completed",
+  "f690078c-1fa1-4d60-afdb-42d80aaab1a3": "completed",
+  "08a437dd-905f-4023-943e-88d611897c0b": "completed",
+  "741376d5-b83e-4941-9c44-4420154b6edb": "completed",
+  "60223fe9-3e9b-4abb-af65-d446190a2367": "completed",
+  "f5070387-bf1c-442f-ad34-5e623aa79e43": "completed",
+  "32a03c9a-16fa-4833-9022-9b51988215fb": "completed",
+  "895236be-791d-427a-9d19-1871fd26b2c3": "completed",
+  "50768459-37b8-47df-9118-21c182cce4bf": "completed",
+  "ed4142de-0db2-44eb-9636-affad22b968c": "completed",
+  "075a4b67-70dd-4174-908e-438640704071": "completed",
+  "a8edbb09-07b2-4ed8-892e-6a0fd125632c": "completed"
+ },
+ "states": {
+  "fight_knife": {
+   "response": {
+    "usage": null,
+    "background_job_id": "57380f2f-39bd-4f52-887f-aeb38b85a68a",
+    "character_id": "3b7b1d28-24ee-4f3c-b181-9752d2bbbdb0",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "FS_B_throw": {
+   "response": {
+    "usage": null,
+    "background_job_id": "81824d68-18e7-47b4-a6ea-997aafd8df90",
+    "character_id": "8d6cd16b-15ab-4c7a-843d-677730911484",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "FS_B_spinkick": {
+   "response": {
+    "usage": null,
+    "background_job_id": "c70e8959-ed4f-409c-ac7e-6170c8025b47",
+    "character_id": "d3d3b69f-fed6-4db5-9d70-31eeeeacdafe",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BT_A_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "ea34a27b-6efa-40cc-8102-a011bf54d63d",
+    "character_id": "54e82133-ff2c-41cd-b5fe-921c7b5a885e",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "PT_A_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "b33404cc-74a8-42e0-944d-9ea8ccf83d7d",
+    "character_id": "e4095099-ed09-440f-b53b-599a55c9d2fe",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "RG_A_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "224e0db4-557d-45cc-ac81-1203653f55d5",
+    "character_id": "99e7f5b7-e460-4148-89e9-8b5a0ec1f6d7",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "DV_A_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "ecc3d548-7431-4307-a96d-e3ebe5e58c07",
+    "character_id": "97c3301f-4846-4b01-978b-b3aee1d44601",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "FS_A_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "3e1c91c1-9ddf-4683-a4b3-9cec86501e32",
+    "character_id": "f89d7732-624b-44d1-898d-d73ee02025f3",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BT_bat_stance": {
+   "response": {
+    "usage": null,
+    "background_job_id": "79490344-961a-4f2a-be2f-bb6c573edb34",
+    "character_id": "7fc24513-845a-489e-91f9-1ea8cfc0ca33",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BT_bat_impact": {
+   "response": {
+    "usage": null,
+    "background_job_id": "911f1137-e911-4972-b04f-dc1f3d293a33",
+    "character_id": "468bf137-67b7-4b48-8550-092a47d8767c",
+    "status": "queued"
+   },
+   "status": "completed"
+  }
+ },
+ "monsters": {
+  "M07": {
+   "character_id": "6764861d-f43e-4d2a-869a-3c0d4b399bb1",
+   "create": {
+    "usage": null,
+    "background_job_id": "a7cf8b6d-e953-4b1e-86db-99f44a341c01",
+    "character_id": "6764861d-f43e-4d2a-869a-3c0d4b399bb1",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "77c98884-ec91-49c2-ae79-88cb3493c00a"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "2f41e949-7797-4ab3-aca6-d448a3a1deff",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   },
+   "hurt_status": "completed"
+  },
+  "M08": {
+   "character_id": "4ab20576-d170-4009-be11-94d90644897f",
+   "create": {
+    "usage": null,
+    "background_job_id": "6adab8ce-6f9c-4f1e-927f-15b340bed38a",
+    "character_id": "4ab20576-d170-4009-be11-94d90644897f",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "7017b2f9-ba2c-49a4-a1c1-f6c634b5f92c"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "a274b272-670d-4b14-8814-3d3b2b794b6f",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   },
+   "hurt_status": "completed"
+  },
+  "M09": {
+   "character_id": "46b8229b-4ac7-4a5b-9e5e-b7d6ee1f5869",
+   "create": {
+    "usage": null,
+    "background_job_id": "cd159e6d-63a9-40c3-ad79-02b6f36fff58",
+    "character_id": "46b8229b-4ac7-4a5b-9e5e-b7d6ee1f5869",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "1514845d-65e7-4eeb-8f5e-3ef3e49569b9"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "84f1a27a-cce8-4c5c-895c-194a16c6c9b9",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   },
+   "hurt_status": "completed"
+  },
+  "M17": {
+   "character_id": "bc474fe0-ebb1-4070-8219-a5a850eeabce",
+   "create": {
+    "usage": null,
+    "background_job_id": "2aef5c78-da73-477e-ae04-a89502d10d1b",
+    "character_id": "bc474fe0-ebb1-4070-8219-a5a850eeabce",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "088f9391-ff7e-45d4-92ef-8bc6416ffa04"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "4b4fb178-7a60-42c8-92a4-5f3329e0f948",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   },
+   "hurt_status": "completed"
+  },
+  "M29": {
+   "character_id": "309d22a9-ed42-4b2f-a43c-b2e797d0f4fb",
+   "create": {
+    "usage": null,
+    "background_job_id": "0c05a339-f0b8-4d4e-adad-4c9a09cf0060",
+    "character_id": "309d22a9-ed42-4b2f-a43c-b2e797d0f4fb",
+    "status": "processing",
+    "estimated_generations": 7,
+    "first_direction_generated": true
+   },
+   "status": "completed",
+   "hurt": {
+    "background_job_ids": [
+     "325b88d9-389a-4b45-89a2-00f2a0f787bd"
+    ],
+    "directions": [
+     "east"
+    ],
+    "animation_group_id": "2f47ca35-d4b5-43de-82c7-043f1f93ad82",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  }
+ }
+}

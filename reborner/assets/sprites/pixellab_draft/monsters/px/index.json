@@ -1,0 +1,80 @@
+{
+ "_doc": "มอนเทสร่างกาย 9 แบบ จาก PixelLab (tools/sprites/pixellab_monsters.py · ร่าง ยังไม่เข้าเกม)",
+ "monsters": [
+  {
+   "id": "M07p",
+   "name": "ผีไฟป่า (PixelLab)",
+   "body": "วิญญาณ",
+   "n": 2,
+   "roles": [
+    "idle",
+    "hurt"
+   ],
+   "size": [
+    52,
+    70
+   ],
+   "src": "pixellab"
+  },
+  {
+   "id": "M08p",
+   "name": "โครงกระดูกเดินเวร (PixelLab)",
+   "body": "กระดูก",
+   "n": 2,
+   "roles": [
+    "idle",
+    "hurt"
+   ],
+   "size": [
+    43,
+    57
+   ],
+   "src": "pixellab"
+  },
+  {
+   "id": "M09p",
+   "name": "ตุ๊กตาไม้ (PixelLab)",
+   "body": "ไม้",
+   "n": 2,
+   "roles": [
+    "idle",
+    "hurt"
+   ],
+   "size": [
+    50,
+    58
+   ],
+   "src": "pixellab"
+  },
+  {
+   "id": "M17p",
+   "name": "ทหารกลไก (PixelLab)",
+   "body": "กลไก",
+   "n": 2,
+   "roles": [
+    "idle",
+    "hurt"
+   ],
+   "size": [
+    55,
+    72
+   ],
+   "src": "pixellab"
+  },
+  {
+   "id": "M29p",
+   "name": "โกลเลมสลัก (PixelLab)",
+   "body": "หิน",
+   "n": 2,
+   "roles": [
+    "idle",
+    "hurt"
+   ],
+   "size": [
+    67,
+    88
+   ],
+   "src": "pixellab"
+  }
+ ]
+}

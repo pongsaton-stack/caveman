@@ -1,0 +1,30 @@
+{
+ "_doc": "NPC ชาวบ้านฉบับร่าง (Claude ร่าง 5 ต.ค. 2026 ตามที่ kwan สั่ง) · ปิ่น/ยายขี้เถ้ามาจาก STORY_DRAFT 5 (ชื่อใช้ไปก่อน) · ที่เหลือเป็นชาวบ้านทั่วไปที่ระบบใน GDD ต้องมีคนประจำ (ร้านค้า จุดพัก อาวุธ เควส) · ยังไม่มีบทพูด ไม่มีตัวเลข",
+ "status": "ร่าง รอ kwan อนุมัติ",
+ "npcs": [
+  {"id": "NP-pin", "name": "ปิ่น", "role": "เด็กกำพร้า นักสะสมของเก่า · ร้านค้า/แลกของ", "source": "STORY_DRAFT 5 (NPC ร่วมทาง)", "where": "หมู่บ้านเริ่มต้น → ร่วมทาง",
+   "pal": {"cap": "hair", "hair": "#3a2a24", "shirt": "#c06a4a", "pants": "#5a6a50", "pack": "#8a6a40", "shoes": "#5a4030"}, "acc": [["scarf_head", "#d8b048"], "sack"], "scale": 0.8},
+  {"id": "NP-ashgran", "name": "ยายขี้เถ้า", "role": "คนเฝ้าเตาเถ้าที่แก่ที่สุด · อ่านตำราที่จุดพัก", "source": "STORY_DRAFT 5 (NPC ร่วมทาง) · GDD 7.4", "where": "เตาเถ้า หมู่บ้าน",
+   "pal": {"cap": "hair", "hair": "#c8c4bc", "shirt": "#6a5a6a", "pants": "#4a4048", "pack": "#5a4a40", "shoes": "#3a3030", "skin": "#c8a07c"}, "acc": [["shawl", "#8a4a3a"], "cane"], "hunch": true},
+  {"id": "NP-merchant", "name": "พ่อค้าเร่", "role": "ขายยา/ตำราพื้นฐาน (GDD 7.3 ร้านค้า · 9.2 ยาเติม LP)", "source": "GDD 7.3 · 9.2", "where": "ทุกภูมิภาค (เดินตามเส้นทาง)",
+   "pal": {"cap": "#7a5a3a", "hair": "#4a3020", "shirt": "#5a7a6a", "pants": "#4a4a3a", "pack": "#7a5a3a", "shoes": "#4a3020"}, "acc": ["straw_hat", "big_pack"]},
+  {"id": "NP-smith", "name": "ช่างตีเหล็ก", "role": "ตีอาวุธจากเศษซาก (ช่องอุปกรณ์ GDD 13)", "source": "GDD 13 (ระบบที่ต้องมี: ช่องอุปกรณ์)", "where": "หมู่บ้าน",
+   "pal": {"cap": "hair", "hair": "#2a2020", "shirt": "#4a4a48", "pants": "#3a3a40", "pack": "#5a3a2a", "shoes": "#2a2020", "skin": "#b88a64"}, "acc": [["headband", "#a03a30"], ["apron", "#6a4a30"], "hammer", "beard"]},
+  {"id": "NP-guard", "name": "ยามหมู่บ้าน", "role": "เฝ้าทางเข้า · บอกข่าวเควสหมดเวลา (ec_max)", "source": "GDD 12 (เควส ec_max)", "where": "ทางเข้าหมู่บ้าน",
+   "pal": {"cap": "#7a7e78", "hair": "#3a2a20", "shirt": "#6a6a50", "pants": "#4a4a3a", "pack": "#5a4a3a", "shoes": "#3a3028"}, "acc": ["helmet", "spear"]},
+  {"id": "NP-farmer", "name": "ชาวนาเถ้า", "role": "ปลูกผักบนดินเถ้า · เควสส่งของ", "source": "ข้อเสนอ (ฉากที่ราบเถ้า)", "where": "แปลงผัก ที่ราบเถ้า",
+   "pal": {"cap": "#c8a060", "hair": "#4a3020", "shirt": "#8a9a6a", "pants": "#5a5040", "pack": "#7a5a3a", "shoes": "#4a3020", "skin": "#c09068"}, "acc": ["straw_hat", "hoe"]},
+  {"id": "NP-herbalist", "name": "หมอยาสมุนไพร", "role": "ทำยาสมุนไพร (I01) · ล้างสถานะ", "source": "data/items.csv I01", "where": "หมู่บ้าน",
+   "pal": {"cap": "hair", "hair": "#5a3a2a", "shirt": "#4a7a5a", "pants": "#3a5a48", "pack": "#6a5a3a", "shoes": "#3a3028"}, "acc": [["scarf_head", "#4a6a4a"], "basket", "glasses"]},
+  {"id": "NP-scavenger", "name": "คนเก็บของเก่า", "role": "ขายเศษซากโลกเก่า · บอกทางซากเมือง", "source": "GDD 3 (ฉากหลัง: เศษซากสมัยใหม่)", "where": "เมืองใต้ซาก",
+   "pal": {"cap": "#6a6050", "hair": "#2a2420", "shirt": "#7a6a4a", "pants": "#4a5048", "pack": "#5a4a30", "shoes": "#2a2420"}, "acc": [["hood", "#6a5a48"], "goggles", "sack"]},
+  {"id": "NP-cook", "name": "แม่ครัวโรงทาน", "role": "ทำอาหาร (ระบบทำอาหาร v2) · ชวน Rion ช่วยครัว", "source": "GDD 7.4 (ทำอาหาร v2) · STORY (Rion ทำครัว)", "where": "หมู่บ้าน",
+   "pal": {"cap": "hair", "hair": "#3a2a24", "shirt": "#b05a50", "pants": "#5a4a48", "pack": "#6a4a3a", "shoes": "#3a2a24"}, "acc": [["scarf_head", "#e8e4d8"], ["apron", "#e8e4d8"], "ladle"]},
+  {"id": "NP-kid", "name": "เด็กชาวบ้าน", "role": "วิ่งเล่น · ทักเรื่องมอนร่วมทาง", "source": "ข้อเสนอ", "where": "หมู่บ้าน",
+   "pal": {"cap": "#c84a3a", "hair": "#2a2020", "shirt": "#e0c060", "pants": "#4a6a8a", "pack": "#8a5a3a", "shoes": "#5a3a2a"}, "acc": [], "scale": 0.75},
+  {"id": "NP-chief", "name": "ผู้ใหญ่บ้าน", "role": "ให้เควสหลัก · ตัดสินใจเรื่องหมู่บ้าน (ผลของ ec_max)", "source": "GDD 12 (เควส)", "where": "บ้านกลางหมู่บ้าน",
+   "pal": {"cap": "hair", "hair": "#a8a4a0", "shirt": "#d8d0b8", "pants": "#4a4a50", "pack": "#5a4a40", "shoes": "#3a3030", "skin": "#c8a07c"}, "acc": [["vest", "#6a3a3a"], "beard", "cane"]},
+  {"id": "NP-traveler", "name": "นักเดินทางคลุมผ้า", "role": "ข่าวลือเรื่องผู้ที่นับ · ปรากฏตามช่วง EC", "source": "STORY_DRAFT (ปูเรื่องผู้ที่นับ)", "where": "ทางระหว่างภูมิภาค",
+   "pal": {"cap": "#3a3a44", "hair": "#1a1a20", "shirt": "#4a4a5a", "pants": "#3a3a44", "pack": "#3a3030", "shoes": "#2a2424"}, "acc": [["hood", "#3a3a4a"], "book"]}
+ ]
+}

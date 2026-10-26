@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>pixellab animation test</title>
+<style>
+:root {
+	--bg: #f4f1ea; --panel: #ffffff; --ink: #1f1a16; --muted: #6b625a; --line: #ddd5c8; --accent: #2a70be; --accent-ink: #ffffff;
+	--chk-a: #e9e4da; --chk-b: #d9d2c4; --pass: #2f8a4a; --fail: #c0392b; --draft: #b7791f; --game: #2a70be;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+	--bg: #16130f; --panel: #211d18; --ink: #efe9df; --muted: #a59b8f; --line: #3a332b; --accent: #5b9be0; --accent-ink: #0d0b09;
+	--chk-a: #2a251f; --chk-b: #332d26; --pass: #5cc27a; --fail: #ef6b5b; --draft: #e0a548; --game: #5b9be0;
+} }
+:root[data-theme="dark"] {
+	--bg: #16130f; --panel: #211d18; --ink: #efe9df; --muted: #a59b8f; --line: #3a332b; --accent: #5b9be0; --accent-ink: #0d0b09;
+	--chk-a: #2a251f; --chk-b: #332d26; --pass: #5cc27a; --fail: #ef6b5b; --draft: #e0a548; --game: #5b9be0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif; }
+body { padding: 12px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left)); }
+h1 { font-size: 18px; margin: 0; }
+header { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 12px; }
+header .sub { color: var(--muted); font-size: 13px; }
+.layout { display: grid; grid-template-columns: 220px minmax(0, 1fr) 300px; gap: 12px; align-items: start; }
+@media (max-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; min-width: 0; }
+.cat { margin-bottom: 10px; }
+.cat h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 4px; }
+.cat .empty { font-size: 12px; color: var(--muted); padding: 2px 6px; }
+.ent { font-weight: 600; padding: 2px 6px; }
+button { font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.anim { display: flex; width: 100%; text-align: left; gap: 6px; align-items: center; border: 0; padding: 4px 6px 4px 14px; border-radius: 6px; }
+.anim.on { background: var(--accent); color: var(--accent-ink); }
+.anim .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.s-pass { background: var(--pass); } .s-fail { background: var(--fail); } .s-draft { background: var(--draft); } .s-game { background: var(--game); }
+.chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; color: #fff; }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0; }
+.row .lbl { color: var(--muted); font-size: 12px; min-width: 52px; }
+.stagewrap { display: flex; justify-content: center; }
+#stage { display: block; max-width: 100%; max-height: 74vh; height: auto; image-rendering: pixelated; border-radius: 6px; background: #000; }
+#strip { display: flex; gap: 4px; overflow-x: auto; padding: 4px 0; }
+#strip canvas { flex: none; height: 104px; width: auto; border: 2px solid transparent; border-radius: 4px; image-rendering: pixelated; cursor: pointer;
+	background: repeating-conic-gradient(var(--chk-a) 0 25%, var(--chk-b) 0 50%) 0 0 / 12px 12px; }
+#strip canvas.on { border-color: var(--accent); }
+dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; margin: 0; font-size: 13px; }
+dt { color: var(--muted); } dd { margin: 0; overflow-wrap: anywhere; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; max-height: 320px; overflow: auto; }
+details summary { cursor: pointer; color: var(--accent); margin-top: 8px; }
+input[type=range] { width: 140px; }
+.note { font-size: 12px; color: var(--muted); }
+#fr { font-variant-numeric: tabular-nums; min-width: 52px; display: inline-block; }
+</style>
+</head>
+<body>
+<header>
+	<h1>pixellab animation test</h1>
+	<span class="sub">มาสเตอร์อนิเมชันของเกม · เฉพาะภาพที่ PixelLab เจน</span>
+	<span class="sub" id="totals"></span>
+	<button id="theme" style="margin-left:auto">ธีม</button>
+</header>
+<div class="layout">
+	<nav class="card" id="nav"></nav>
+	<main class="card">
+		<div class="row"><span class="lbl">ฉาก</span><span id="bgs"></span></div>
+		<div class="stagewrap"><canvas id="stage"></canvas></div>
+		<div class="row">
+			<button id="play">หยุด</button><button id="prev">◀ เฟรม</button><button id="next">เฟรม ▶</button>
+			<span id="fr"></span>
+			<span class="lbl">ความเร็ว</span><span id="speeds"></span>
+		</div>
+		<div class="row"><span class="lbl">ทิศ</span><span id="dirs"></span></div>
+		<div class="row">
+			<span class="lbl">มุมมอง</span><button id="vFull">ทั้งฉาก</button><button id="vZoom">ซูมตัวละคร</button>
+			<span class="lbl">ขนาด</span><span id="scales"></span>
+		</div>
+		<div class="row">
+			<label><input type="checkbox" id="onion"> เงาเฟรมก่อน</label>
+			<label><input type="checkbox" id="travel"> เดินข้ามฉาก</label>
+			<label><input type="checkbox" id="gline"> เส้นพื้น</label>
+			<span class="lbl">พื้น</span><input type="range" id="ground" min="0.30" max="0.98" step="0.005">
+		</div>
+		<div id="strip"></div>
+	</main>
+	<aside class="card" id="info"></aside>
+</div>
+<script>
+const DATA = /*DATA*/null;
+const STATUS = { pass: 'ผ่าน', fail: 'ไม่ผ่าน', draft: 'ร่าง', game: 'ในเกม' };
+const DIR_TH = { south: 'หน้า', 'south-east': 'หน้า-ขวา', east: 'ขวา', 'north-east': 'หลัง-ขวา', north: 'หลัง', 'north-west': 'หลัง-ซ้าย', west: 'ซ้าย', 'south-west': 'หน้า-ซ้าย' };
+const store = {
+	get(k, d) { try { const v = localStorage.getItem('plt.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+	set(k, v) { try { localStorage.setItem('plt.' + k, JSON.stringify(v)); } catch (e) {} },
+};
+const $ = id => document.getElementById(id);
+const cv = $('stage'), ctx = cv.getContext('2d');
+const S = { ent: null, anim: null, dir: null, f: 0, playing: true, mult: 1, base: 'ms', view: store.get('view', 'zoom'), scale: null,
+	bg: null, x: null, last: 0, acc: 0, cycle: 0 };
+const imgs = new Map();
+function img(src) { let i = imgs.get(src); if (!i) { i = new Image(); i.src = src; i.onload = draw; imgs.set(src, i); } return i; }
+
+// ---- ธีม ----
+(function () {
+	const t = store.get('theme', null); if (t) document.documentElement.dataset.theme = t;
+	$('theme').onclick = () => {
+		const dark = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() === '#16130f';
+		document.documentElement.dataset.theme = dark ? 'light' : 'dark'; store.set('theme', document.documentElement.dataset.theme);
+	};
+})();
+
+// ---- รายการ: หมวด → ตัวละคร → ท่า (หมวดว่างแสดงไว้ให้รู้ว่าที่ไหนยังไม่มี) ----
+function buildNav() {
+	const nav = $('nav'); nav.innerHTML = '';
+	let tot = {}, n = 0;
+	for (const c of DATA.categories) {
+		const box = document.createElement('div'); box.className = 'cat';
+		box.innerHTML = `<h3>${c.name}</h3>`;
+		const ents = DATA.entities.filter(e => e.cat === c.id);
+		if (!ents.length) box.insertAdjacentHTML('beforeend', '<div class="empty">ยังไม่มี</div>');
+		for (const e of ents) {
+			box.insertAdjacentHTML('beforeend', `<div class="ent">${e.name}</div>`);
+			for (const a of e.anims) {
+				n++; tot[a.status] = (tot[a.status] || 0) + 1;
+				const b = document.createElement('button'); b.className = 'anim'; b.dataset.k = e.id + '/' + a.id;
+				b.innerHTML = `<span class="dot s-${a.status}"></span><span class="nm">${a.name}</span><span class="note">${Object.keys(a.dirs).length}</span>`;
+				b.onclick = () => select(e.id, a.id);
+				box.appendChild(b);
+			}
+		}
+		nav.appendChild(box);
+	}
+	$('totals').textContent = `${n} ท่า · ` + Object.entries(tot).map(([k, v]) => `${STATUS[k] || k} ${v}`).join(' · ');
+}
+
+function buildBgs() {
+	const el = $('bgs'); el.innerHTML = '';
+	for (const b of DATA.backgrounds) {
+		const btn = document.createElement('button'); btn.textContent = b.name; btn.dataset.id = b.id;
+		btn.onclick = () => { setBg(b.id); };
+		el.appendChild(btn);
+	}
+}
+function setBg(id) {
+	S.bg = DATA.backgrounds.find(b => b.id === id) || DATA.backgrounds[0];
+	store.set('bg', S.bg.id);
+	S.ground = store.get('ground.' + S.bg.id, S.bg.ground);
+	$('ground').value = S.ground;
+	if (S.scale == null) S.scale = S.bg.scale;
+	S.x = null;
+	for (const b of $('bgs').children) b.classList.toggle('on', b.dataset.id === S.bg.id);
+	buildScales(); draw();
+}
+
+function cur() { return S.anim.dirs[S.dir]; }
+function frameMs() {
+	const ms = S.base === 'game' && S.anim.game_ms ? S.anim.game_ms : S.anim.ms;
+	return ms / S.mult;
+}
+
+function select(entId, animId, dir) {
+	S.ent = DATA.entities.find(e => e.id === entId);
+	S.anim = S.ent.anims.find(a => a.id === animId);
+	S.dir = dir && S.anim.dirs[dir] ? dir : (S.anim.dirs[S.dir] ? S.dir : Object.keys(S.anim.dirs)[0]);
+	if (S.base === 'game' && !S.anim.game_ms) S.base = 'ms';
+	S.f = 0; S.acc = 0; S.x = null; S.cycle = 0;
+	for (const b of document.querySelectorAll('.anim')) b.classList.toggle('on', b.dataset.k === entId + '/' + animId);
+	try { history.replaceState(null, '', `#${entId}/${animId}/${S.dir}`); } catch (e) {}
+	store.set('sel', [entId, animId, S.dir]);
+	$('travel').disabled = !S.anim.travel;
+	buildDirs(); buildSpeeds(); buildStrip(); buildInfo(); draw();
+}
+
+function buildDirs() {
+	const el = $('dirs'); el.innerHTML = '';
+	for (const [d, v] of Object.entries(S.anim.dirs)) {
+		const b = document.createElement('button');
+		b.textContent = DIR_TH[d] + (v.mirror ? ' (พลิก)' : '');
+		b.title = v.mirror ? `พลิกจากทิศ${DIR_TH[v.mirror]}ด้วยโค้ด — ไม่ได้เจน` : 'เจนจาก PixelLab';
+		b.className = d === S.dir ? 'on' : '';
+		b.onclick = () => select(S.ent.id, S.anim.id, d);
+		el.appendChild(b);
+	}
+}
+function buildSpeeds() {
+	const el = $('speeds'); el.innerHTML = '';
+	const opts = [['ms', `ดู ${S.anim.ms} ms`]];
+	if (S.anim.game_ms) opts.push(['game', `ในเกม ${S.anim.game_ms} ms`]);
+	for (const [k, t] of opts) {
+		const b = document.createElement('button'); b.textContent = t; b.className = S.base === k ? 'on' : '';
+		b.onclick = () => { S.base = k; buildSpeeds(); }; el.appendChild(b);
+	}
+	for (const m of [0.25, 0.5, 1, 2]) {
+		const b = document.createElement('button'); b.textContent = '×' + m; b.className = S.mult === m ? 'on' : '';
+		b.onclick = () => { S.mult = m; buildSpeeds(); }; el.appendChild(b);
+	}
+}
+function buildScales() {
+	const el = $('scales'); el.innerHTML = '';
+	for (const s of [1, 2, 3, 4, 5, 6]) {
+		const b = document.createElement('button'); b.textContent = '×' + s; b.className = S.scale === s ? 'on' : '';
+		b.onclick = () => { S.scale = s; store.set('scale', s); buildScales(); draw(); }; el.appendChild(b);
+	}
+}
+function buildStrip() {
+	const el = $('strip'); el.innerHTML = '';
+	const d = cur();
+	d.frames.forEach((src, i) => {
+		const c = document.createElement('canvas'); c.width = d.w * 2; c.height = d.h * 2;
+		const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+		const im = img(src);
+		const paint = () => { g.clearRect(0, 0, c.width, c.height); g.save(); if (d.mirror) { g.translate(c.width, 0); g.scale(-1, 1); } g.drawImage(im, 0, 0, c.width, c.height); g.restore(); };
+		if (im.complete) paint(); else im.addEventListener('load', paint);
+		c.title = 'เฟรม ' + i; c.onclick = () => { S.f = i; S.playing = false; syncPlay(); draw(); };
+		el.appendChild(c);
+	});
+}
+function esc(s) { return String(s ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+function buildInfo() {
+	const a = S.anim, d = cur();
+	const color = { pass: 'var(--pass)', fail: 'var(--fail)', draft: 'var(--draft)', game: 'var(--game)' }[a.status];
+	$('info').innerHTML = `
+		<div class="row"><b style="font-size:16px">${esc(S.ent.name)} · ${esc(a.name)}</b></div>
+		<div class="row"><span class="chip" style="background:${color}">${STATUS[a.status] || a.status}</span>
+			${a.status === 'game' ? '' : '<span class="note">ยังไม่เข้าเกม</span>'}</div>
+		<dl>
+			<dt>ทิศนี้</dt><dd>${DIR_TH[S.dir]}${d.mirror ? ` · พลิกจาก${DIR_TH[d.mirror]} (โค้ด)` : ' · เจน'}</dd>
+			<dt>เฟรม</dt><dd>${d.frames.length} · ผืน ${d.w}×${d.h}</dd>
+			<dt>ความเร็ว</dt><dd>ดู ${a.ms} ms${a.game_ms ? ` · ในเกม ${a.game_ms} ms` : ' · ในเกม ยังไม่กำหนด'}</dd>
+			<dt>seed</dt><dd>${a.seed ?? '-'}</dd>
+			<dt>เครดิต</dt><dd>${a.gens ?? '-'} gen</dd>
+			<dt>วันที่</dt><dd>${esc(a.date)}</dd>
+			<dt>ทิศที่เจน</dt><dd>${Object.entries(a.dirs).filter(([, v]) => !v.mirror).map(([k]) => DIR_TH[k]).join(' · ')}</dd>
+			<dt>ไฟล์</dt><dd>${esc(d.src)}</dd>
+			<dt>character</dt><dd>${esc(S.ent.character_id)}</dd>
+		</dl>
+		<p class="note">${esc(a.notes)}</p>
+		<details><summary>คำสั่งที่ส่ง PixelLab · ${esc(a.prompt.label)}</summary><pre>${esc(a.prompt.text)}</pre></details>`;
+}
+
+// ---- เวที ----
+function geom() {
+	const b = S.bg, s = S.scale, d = cur();
+	const gy = Math.round(b.h * S.ground);
+	if (S.x == null) S.x = Math.round(b.w / 2);
+	let vw = b.w, vh = b.h, vx = 0, vy = 0;
+	if (S.view === 'zoom') {
+		vw = Math.min(b.w, Math.max(d.w * s * 2.2, 240)); vh = Math.min(b.h, Math.round(vw * 0.75));
+		vx = Math.max(0, Math.min(b.w - vw, S.x - vw / 2)); vy = Math.max(0, Math.min(b.h - vh, gy - vh * 0.72));
+	}
+	return { gy, vw: Math.round(vw), vh: Math.round(vh), vx: Math.round(vx), vy: Math.round(vy) };
+}
+function drawSprite(i, alpha) {
+	const d = cur(), s = S.scale, G = geom();
+	const im = img(d.frames[i]); if (!im.complete) return;
+	const left = d.mirror ? Math.round(S.x - (d.w - d.cx) * s) : Math.round(S.x - d.cx * s);
+	const top = G.gy - d.foot * s;
+	ctx.save(); ctx.globalAlpha = alpha;
+	if (d.mirror) { ctx.translate(left + d.w * s, top); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0, d.w * s, d.h * s); }
+	else ctx.drawImage(im, left, top, d.w * s, d.h * s);
+	ctx.restore();
+}
+function draw() {
+	if (!S.anim || !S.bg) return;
+	const G = geom(), bgImg = img(S.bg.src);
+	const k = S.view === 'zoom' ? Math.max(1, Math.floor(768 / G.vw)) : 1;
+	if (cv.width !== G.vw * k || cv.height !== G.vh * k) { cv.width = G.vw * k; cv.height = G.vh * k; }
+	ctx.setTransform(k, 0, 0, k, -G.vx * k, -G.vy * k);
+	ctx.imageSmoothingEnabled = false;
+	if (bgImg.complete) ctx.drawImage(bgImg, 0, 0);
+	if ($('gline').checked) { ctx.fillStyle = 'rgba(255,60,60,.8)'; ctx.fillRect(0, G.gy, S.bg.w, 1 / k * 2); }
+	const n = cur().frames.length;
+	if ($('onion').checked && n > 1) drawSprite((S.f - 1 + n) % n, 0.3);
+	drawSprite(S.f, 1);
+	$('fr').textContent = `${S.f + 1} / ${n}`;
+	for (const [i, c] of [...$('strip').children].entries()) c.classList.toggle('on', i === S.f);
+}
+function step(dt) {
+	const n = cur().frames.length;
+	S.acc += dt;
+	const ms = frameMs();
+	while (S.acc >= ms) {
+		S.acc -= ms; S.f = (S.f + 1) % n;
+		if ($('travel').checked && S.anim.travel) {
+			const dirX = /east/.test(S.dir) ? 1 : /west/.test(S.dir) ? -1 : 0;
+			S.x += dirX * S.anim.travel * S.scale / n;
+			if (S.x > S.bg.w + 60) S.x = -60; if (S.x < -60) S.x = S.bg.w + 60;
+		}
+	}
+}
+function loop(t) {
+	if (S.last && S.playing && S.anim) { step(Math.min(250, t - S.last)); draw(); }
+	S.last = t; requestAnimationFrame(loop);
+}
+function syncPlay() { $('play').textContent = S.playing ? 'หยุด' : 'เล่น'; }
+$('play').onclick = () => { S.playing = !S.playing; syncPlay(); };
+$('prev').onclick = () => { S.playing = false; syncPlay(); const n = cur().frames.length; S.f = (S.f - 1 + n) % n; draw(); };
+$('next').onclick = () => { S.playing = false; syncPlay(); S.f = (S.f + 1) % cur().frames.length; draw(); };
+function setView(v) { S.view = v; store.set('view', v); $('vFull').classList.toggle('on', v === 'full'); $('vZoom').classList.toggle('on', v === 'zoom'); draw(); }
+$('vFull').onclick = () => setView('full'); $('vZoom').onclick = () => setView('zoom');
+$('ground').oninput = e => { S.ground = +e.target.value; store.set('ground.' + S.bg.id, S.ground); draw(); };
+for (const id of ['onion', 'gline']) $(id).onchange = draw;
+$('travel').onchange = () => { S.x = null; draw(); };
+document.addEventListener('keydown', e => {
+	if (e.target.tagName === 'INPUT') return;
+	if (e.key === ' ') { e.preventDefault(); $('play').click(); } else if (e.key === 'ArrowLeft') $('prev').click(); else if (e.key === 'ArrowRight') $('next').click();
+});
+
+buildNav(); buildBgs();
+S.scale = store.get('scale', null);
+setBg(store.get('bg', DATA.backgrounds[0].id));
+setView(S.view);
+const h = decodeURIComponent(location.hash.slice(1)).split('/');
+const sel = h[0] ? h : store.get('sel', []);
+const e0 = DATA.entities.find(e => e.id === sel[0]) || DATA.entities[0];
+const a0 = e0.anims.find(a => a.id === sel[1]) || e0.anims.find(a => a.status !== 'fail') || e0.anims[0];
+select(e0.id, a0.id, sel[2]);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "group_id": "362314ab-a27b-4a22-b27b-e99fe822ca59",
+  "states": [
+    {
+      "character": {
+        "id": "6764861d-f43e-4d2a-869a-3c0d4b399bb1",
+        "name": "Idle",
+        "prompt": "A single monster for a turn-based JRPG battle, full body, centered. Cute and warm Ghibli-like creature design, readable chunky silhouette, thick dark outline. No background, no ground, no shadow, no text, no extra characters, no weapons other than those described. A small floating forest will-o'-the-wisp spirit. Its body is a teardrop-shaped flame that hovers above the ground with the pointed tip up, warm orange-brown flame shading from a darker brown-orange core to pale tan at the soft wavy edges. A tiny cute face in the middle of the flame: two round glowing eyes and a tiny mouth. A few small ember sparks float around it. No arms, no legs. Warm and mysterious, not scary. Palette: #92552D, #B37A55, #D4B08A, outline #2F1B10. 2D pixel art, classic 32-bit era style (16/32-bit JRPG, SNES and PlayStation 1 look), crisp square pixels, limited palette, flat shading with hard edges, no anti-aliasing, no smooth gradients, no 3D rendering.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "custom",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-19T01:02:12.346720+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "hurt": {
+            "east": [
+              "Idle/animations/hurt/east/frame_000.png",
+              "Idle/animations/hurt/east/frame_001.png",
+              "Idle/animations/hurt/east/frame_002.png",
+              "Idle/animations/hurt/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-19T01:19:39.247157"
+}

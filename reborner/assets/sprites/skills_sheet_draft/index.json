@@ -1,0 +1,3762 @@
+{
+ "_doc": "ตัดจาก docs/art-bible/compendium/skill_sprite_sheet.jpg ด้วย tools/sprites/skill_sheet_cut.py · ร่าง ยังไม่เข้าเกม · รหัส = ลำดับตำแหน่งในแผง (ป้ายในชีตบางช่องผิด) · หน้าเทสวาดตาม timeline/poses/stage ชุดนี้",
+ "vfx_samples": [
+  "SL01",
+  "PC06",
+  "CR04",
+  "BD10",
+  "ST05",
+  "DV08"
+ ],
+ "ms": 70,
+ "timeline": [
+  {
+   "pose": 0,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  },
+  {
+   "pose": 1,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  },
+  {
+   "pose": 1,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  },
+  {
+   "pose": 2,
+   "reveal": 0.3,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 2,
+   "reveal": 0.6,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 3,
+   "reveal": 0.9,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 3,
+   "reveal": 1,
+   "alpha": 1,
+   "flash": 0.6
+  },
+  {
+   "pose": 3,
+   "reveal": 1,
+   "alpha": 1,
+   "flash": 0.25
+  },
+  {
+   "pose": 3,
+   "reveal": 1,
+   "alpha": 1,
+   "flash": 0
+  },
+  {
+   "pose": 4,
+   "reveal": 1,
+   "alpha": 0.66,
+   "flash": 0
+  },
+  {
+   "pose": 4,
+   "reveal": 1,
+   "alpha": 0.33,
+   "flash": 0
+  },
+  {
+   "pose": 0,
+   "reveal": 0,
+   "alpha": 0,
+   "flash": 0
+  }
+ ],
+ "poses": {
+  "SL": [
+   "west",
+   "west_a0",
+   "west_a1",
+   "west_a2",
+   "west_a3"
+  ],
+  "PC": [
+   "west",
+   "west_a0",
+   "west_a1",
+   "west_a1",
+   "west_a3"
+  ],
+  "CR": [
+   "grips/twohand_0",
+   "grips/twohand_1",
+   "grips/twohand_2",
+   "grips/twohand_3",
+   "grips/twohand_4"
+  ],
+  "BD": [
+   "grips/punch_0",
+   "grips/punch_1",
+   "grips/punch_2",
+   "grips/punch_3",
+   "grips/punch_4"
+  ],
+  "ST": [
+   "grips/aim_0",
+   "grips/aim_1",
+   "grips/aim_2",
+   "grips/aim_3",
+   "grips/aim_4"
+  ],
+  "DV": [
+   "grips/cast_fwd_0",
+   "grips/cast_fwd_1",
+   "grips/cast_fwd_3",
+   "grips/cast_fwd_4",
+   "grips/cast_fwd_5"
+  ]
+ },
+ "stage": [
+  256,
+  96
+ ],
+ "rion_at": [
+  192,
+  30
+ ],
+ "hand": [
+  210,
+  70
+ ],
+ "items": [
+  {
+   "code": "SL01",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    287,
+    202,
+    372
+   ],
+   "fx_size": [
+    130,
+    42
+   ],
+   "hero_px_removed": 803,
+   "colors": [
+    "#f59d8d",
+    "#f03039",
+    "#ef071a"
+   ],
+   "name_th": "ฟันเฉือน",
+   "name_status": "อ่านจากภาพ"
+  },
+  {
+   "code": "SL02",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    210,
+    287,
+    370,
+    372
+   ],
+   "fx_size": [
+    122,
+    53
+   ],
+   "hero_px_removed": 2678,
+   "colors": [
+    "#f7c984",
+    "#ef8e5e",
+    "#ec3022"
+   ]
+  },
+  {
+   "code": "SL03",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    379,
+    287,
+    503,
+    372
+   ],
+   "fx_size": [
+    83,
+    54
+   ],
+   "hero_px_removed": 1072,
+   "colors": [
+    "#ffe271",
+    "#ffa84b",
+    "#ff5119"
+   ]
+  },
+  {
+   "code": "SL04",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    510,
+    287,
+    665,
+    372
+   ],
+   "fx_size": [
+    138,
+    54
+   ],
+   "hero_px_removed": 599,
+   "colors": [
+    "#fb9949",
+    "#fa5327",
+    "#fc1512"
+   ]
+  },
+  {
+   "code": "SL05",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    287,
+    832,
+    372
+   ],
+   "fx_size": [
+    144,
+    46
+   ],
+   "hero_px_removed": 863,
+   "colors": [
+    "#fde0a0",
+    "#f11e2b",
+    "#f3061a"
+   ]
+  },
+  {
+   "code": "SL06",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    380,
+    202,
+    468
+   ],
+   "fx_size": [
+    128,
+    51
+   ],
+   "hero_px_removed": 1126,
+   "colors": [
+    "#fbae8d",
+    "#f85253",
+    "#fc132a"
+   ]
+  },
+  {
+   "code": "SL07",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    211,
+    380,
+    369,
+    468
+   ],
+   "fx_size": [
+    115,
+    43
+   ],
+   "hero_px_removed": 963,
+   "colors": [
+    "#ffe8d1",
+    "#f78c7e",
+    "#f50e22"
+   ]
+  },
+  {
+   "code": "SL08",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    380,
+    509,
+    468
+   ],
+   "fx_size": [
+    104,
+    52
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffcc7c",
+    "#ff9050",
+    "#ff4a22"
+   ]
+  },
+  {
+   "code": "SL09",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    518,
+    380,
+    665,
+    468
+   ],
+   "fx_size": [
+    123,
+    45
+   ],
+   "hero_px_removed": 1071,
+   "colors": [
+    "#f3d0f0",
+    "#d19cd9",
+    "#ad5ee3"
+   ]
+  },
+  {
+   "code": "SL10",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    380,
+    831,
+    468
+   ],
+   "fx_size": [
+    138,
+    42
+   ],
+   "hero_px_removed": 820,
+   "colors": [
+    "#fdc096",
+    "#f84f3f",
+    "#f90415"
+   ]
+  },
+  {
+   "code": "SL11",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    476,
+    201,
+    565
+   ],
+   "fx_size": [
+    154,
+    46
+   ],
+   "hero_px_removed": 874,
+   "colors": [
+    "#f7a19d",
+    "#f36563",
+    "#f72522"
+   ]
+  },
+  {
+   "code": "SL12",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    210,
+    476,
+    369,
+    565
+   ],
+   "fx_size": [
+    143,
+    47
+   ],
+   "hero_px_removed": 774,
+   "colors": [
+    "#fdb380",
+    "#fc7553",
+    "#fd2b24"
+   ]
+  },
+  {
+   "code": "SL13",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    476,
+    517,
+    565
+   ],
+   "fx_size": [
+    84,
+    48
+   ],
+   "hero_px_removed": 1021,
+   "colors": [
+    "#fec3a8",
+    "#ef4642",
+    "#f1030c"
+   ]
+  },
+  {
+   "code": "SL14",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    525,
+    476,
+    665,
+    565
+   ],
+   "fx_size": [
+    96,
+    50
+   ],
+   "hero_px_removed": 1057,
+   "colors": [
+    "#ffc77e",
+    "#ff8047",
+    "#ff3111"
+   ]
+  },
+  {
+   "code": "SL15",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    476,
+    831,
+    565
+   ],
+   "fx_size": [
+    140,
+    42
+   ],
+   "hero_px_removed": 1536,
+   "colors": [
+    "#f1788a",
+    "#e92650",
+    "#e90433"
+   ]
+  },
+  {
+   "code": "SL16",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    27,
+    573,
+    201,
+    663
+   ],
+   "fx_size": [
+    157,
+    53
+   ],
+   "hero_px_removed": 620,
+   "colors": [
+    "#fc91a0",
+    "#fc4865",
+    "#fc143a"
+   ]
+  },
+  {
+   "code": "SL17",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    210,
+    573,
+    369,
+    663
+   ],
+   "fx_size": [
+    142,
+    51
+   ],
+   "hero_px_removed": 643,
+   "colors": [
+    "#facebc",
+    "#f39dae",
+    "#f65442"
+   ]
+  },
+  {
+   "code": "SL18",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    573,
+    515,
+    663
+   ],
+   "fx_size": [
+    91,
+    58
+   ],
+   "hero_px_removed": 1359,
+   "colors": [
+    "#fdbe9b",
+    "#f94346",
+    "#fc040e"
+   ]
+  },
+  {
+   "code": "SL19",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    523,
+    573,
+    665,
+    663
+   ],
+   "fx_size": [
+    125,
+    49
+   ],
+   "hero_px_removed": 1157,
+   "colors": [
+    "#b0ddfb",
+    "#84a6ea",
+    "#417fef"
+   ]
+  },
+  {
+   "code": "SL20",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    573,
+    831,
+    663
+   ],
+   "fx_size": [
+    100,
+    51
+   ],
+   "hero_px_removed": 1296,
+   "colors": [
+    "#e7c3c0",
+    "#d39cac",
+    "#d55755"
+   ]
+  },
+  {
+   "code": "SL21",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    28,
+    672,
+    200,
+    765
+   ],
+   "fx_size": [
+    129,
+    54
+   ],
+   "hero_px_removed": 971,
+   "colors": [
+    "#f88451",
+    "#f83a28",
+    "#fa0c1a"
+   ]
+  },
+  {
+   "code": "SL22",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    208,
+    672,
+    369,
+    765
+   ],
+   "fx_size": [
+    147,
+    51
+   ],
+   "hero_px_removed": 1014,
+   "colors": [
+    "#fa8e7b",
+    "#f73c4b",
+    "#f90b32"
+   ]
+  },
+  {
+   "code": "SL23",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    378,
+    672,
+    514,
+    765
+   ],
+   "fx_size": [
+    125,
+    50
+   ],
+   "hero_px_removed": 639,
+   "colors": [
+    "#fcb680",
+    "#fb854e",
+    "#fd4117"
+   ]
+  },
+  {
+   "code": "SL24",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    523,
+    672,
+    664,
+    765
+   ],
+   "fx_size": [
+    126,
+    54
+   ],
+   "hero_px_removed": 1274,
+   "colors": [
+    "#ffcb79",
+    "#ffa253",
+    "#ff682a"
+   ]
+  },
+  {
+   "code": "SL25",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    674,
+    672,
+    830,
+    765
+   ],
+   "fx_size": [
+    108,
+    53
+   ],
+   "hero_px_removed": 1233,
+   "colors": [
+    "#fff4a6",
+    "#ff9052",
+    "#ff0617"
+   ]
+  },
+  {
+   "code": "SL26",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    28,
+    772,
+    198,
+    876
+   ],
+   "fx_size": [
+    129,
+    62
+   ],
+   "hero_px_removed": 1279,
+   "colors": [
+    "#fdb98b",
+    "#fc725b",
+    "#fd212c"
+   ]
+  },
+  {
+   "code": "SL27",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    208,
+    772,
+    359,
+    876
+   ],
+   "fx_size": [
+    138,
+    57
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#f6a1bd",
+    "#ef60a4",
+    "#ee1a6a"
+   ]
+  },
+  {
+   "code": "SL28",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    369,
+    772,
+    507,
+    876
+   ],
+   "fx_size": [
+    124,
+    47
+   ],
+   "hero_px_removed": 789,
+   "colors": [
+    "#f6b179",
+    "#ed824d",
+    "#ef4722"
+   ]
+  },
+  {
+   "code": "SL29",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    516,
+    772,
+    638,
+    876
+   ],
+   "fx_size": [
+    105,
+    51
+   ],
+   "hero_px_removed": 656,
+   "colors": [
+    "#ee7568",
+    "#e73236",
+    "#e80c16"
+   ]
+  },
+  {
+   "code": "SL30",
+   "family": "SL",
+   "school": "คม",
+   "box": [
+    646,
+    772,
+    829,
+    876
+   ],
+   "fx_size": [
+    154,
+    66
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffd08c",
+    "#ff6b59",
+    "#ff212c"
+   ]
+  },
+  {
+   "code": "PC01",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    286,
+    1028,
+    373
+   ],
+   "fx_size": [
+    50,
+    22
+   ],
+   "hero_px_removed": 2183,
+   "colors": [
+    "#f7fdff",
+    "#68a3f3",
+    "#3070f6"
+   ]
+  },
+  {
+   "code": "PC02",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    286,
+    1200,
+    373
+   ],
+   "fx_size": [
+    61,
+    43
+   ],
+   "hero_px_removed": 2510,
+   "colors": [
+    "#eedde0",
+    "#b8daf6",
+    "#afa7d1"
+   ]
+  },
+  {
+   "code": "PC03",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    286,
+    1362,
+    373
+   ],
+   "fx_size": [
+    39,
+    35
+   ],
+   "hero_px_removed": 3016,
+   "colors": [
+    "#c1e8fe",
+    "#8cbaf5",
+    "#4d8ef3"
+   ]
+  },
+  {
+   "code": "PC04",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    286,
+    1526,
+    373
+   ],
+   "fx_size": [
+    58,
+    43
+   ],
+   "hero_px_removed": 2216,
+   "colors": [
+    "#f6fffe",
+    "#76b7f4",
+    "#227ff5"
+   ]
+  },
+  {
+   "code": "PC05",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1534,
+    286,
+    1684,
+    373
+   ],
+   "fx_size": [
+    76,
+    45
+   ],
+   "hero_px_removed": 2577,
+   "colors": [
+    "#a4d6fb",
+    "#549ef7",
+    "#1264f8"
+   ]
+  },
+  {
+   "code": "PC06",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    380,
+    1028,
+    474
+   ],
+   "fx_size": [
+    90,
+    36
+   ],
+   "hero_px_removed": 1882,
+   "colors": [
+    "#a6ccfb",
+    "#6a9bf6",
+    "#1b4df9"
+   ],
+   "name_th": "พุ่งแทง",
+   "name_status": "อ่านจากภาพ"
+  },
+  {
+   "code": "PC07",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1038,
+    380,
+    1201,
+    474
+   ],
+   "fx_size": [
+    90,
+    54
+   ],
+   "hero_px_removed": 1336,
+   "colors": [
+    "#e2f9fe",
+    "#a9dcfa",
+    "#49aaf4"
+   ]
+  },
+  {
+   "code": "PC08",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    380,
+    1361,
+    474
+   ],
+   "fx_size": [
+    95,
+    44
+   ],
+   "hero_px_removed": 1226,
+   "colors": [
+    "#f4feff",
+    "#aac5f0",
+    "#4584f3"
+   ]
+  },
+  {
+   "code": "PC09",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    380,
+    1524,
+    474
+   ],
+   "fx_size": [
+    62,
+    33
+   ],
+   "hero_px_removed": 2194,
+   "colors": [
+    "#add0f9",
+    "#6f9ff4",
+    "#2d66fa"
+   ]
+  },
+  {
+   "code": "PC10",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1534,
+    380,
+    1684,
+    474
+   ],
+   "fx_size": [
+    92,
+    57
+   ],
+   "hero_px_removed": 1369,
+   "colors": [
+    "#4cbcfc",
+    "#1a8dfc",
+    "#0b72fe"
+   ]
+  },
+  {
+   "code": "PC11",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    483,
+    1028,
+    573
+   ],
+   "fx_size": [
+    63,
+    44
+   ],
+   "hero_px_removed": 2250,
+   "colors": [
+    "#d7e0f9",
+    "#b9c8f4",
+    "#6f99f9"
+   ]
+  },
+  {
+   "code": "PC12",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1038,
+    483,
+    1200,
+    573
+   ],
+   "fx_size": [
+    103,
+    52
+   ],
+   "hero_px_removed": 2685,
+   "colors": [
+    "#d6f5fe",
+    "#9bd8f8",
+    "#76bbf3"
+   ]
+  },
+  {
+   "code": "PC13",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    483,
+    1360,
+    573
+   ],
+   "fx_size": [
+    58,
+    31
+   ],
+   "hero_px_removed": 1759,
+   "colors": [
+    "#fffaf7",
+    "#e5eaed",
+    "#efa47b"
+   ]
+  },
+  {
+   "code": "PC14",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    483,
+    1523,
+    573
+   ],
+   "fx_size": [
+    72,
+    53
+   ],
+   "hero_px_removed": 1935,
+   "colors": [
+    "#a4aaf8",
+    "#5c69f4",
+    "#2d3cf9"
+   ]
+  },
+  {
+   "code": "PC15",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1533,
+    483,
+    1684,
+    573
+   ],
+   "fx_size": [
+    87,
+    45
+   ],
+   "hero_px_removed": 1793,
+   "colors": [
+    "#f8fdfc",
+    "#daf0fc",
+    "#2a71f4"
+   ]
+  },
+  {
+   "code": "PC16",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    876,
+    581,
+    1028,
+    671
+   ],
+   "fx_size": [
+    43,
+    20
+   ],
+   "hero_px_removed": 2566,
+   "colors": [
+    "#b9d4fb",
+    "#84a6f2",
+    "#4c77f5"
+   ]
+  },
+  {
+   "code": "PC17",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    581,
+    1200,
+    671
+   ],
+   "fx_size": [
+    59,
+    35
+   ],
+   "hero_px_removed": 1886,
+   "colors": [
+    "#f5fefc",
+    "#98b9ed",
+    "#3c83f5"
+   ]
+  },
+  {
+   "code": "PC18",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    581,
+    1360,
+    671
+   ],
+   "fx_size": [
+    78,
+    44
+   ],
+   "hero_px_removed": 1301,
+   "colors": [
+    "#e9f5fb",
+    "#a0bcf4",
+    "#2357f8"
+   ]
+  },
+  {
+   "code": "PC19",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    581,
+    1523,
+    671
+   ],
+   "fx_size": [
+    85,
+    46
+   ],
+   "hero_px_removed": 1295,
+   "colors": [
+    "#ace4fd",
+    "#53a3f7",
+    "#196bf8"
+   ]
+  },
+  {
+   "code": "PC20",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1533,
+    581,
+    1683,
+    671
+   ],
+   "fx_size": [
+    85,
+    39
+   ],
+   "hero_px_removed": 1639,
+   "colors": [
+    "#bfe4fd",
+    "#89b7f4",
+    "#3d7af7"
+   ]
+  },
+  {
+   "code": "PC21",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    877,
+    680,
+    1028,
+    773
+   ],
+   "fx_size": [
+    83,
+    45
+   ],
+   "hero_px_removed": 1416,
+   "colors": [
+    "#bbccf4",
+    "#7798f7",
+    "#385ef9"
+   ]
+  },
+  {
+   "code": "PC22",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    680,
+    1200,
+    773
+   ],
+   "fx_size": [
+    96,
+    42
+   ],
+   "hero_px_removed": 1326,
+   "colors": [
+    "#f1dfe3",
+    "#efbcc1",
+    "#f77e82"
+   ]
+  },
+  {
+   "code": "PC23",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    680,
+    1361,
+    773
+   ],
+   "fx_size": [
+    89,
+    39
+   ],
+   "hero_px_removed": 1883,
+   "colors": [
+    "#d1e1f7",
+    "#a8c4f2",
+    "#f6b4a9"
+   ]
+  },
+  {
+   "code": "PC24",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    680,
+    1524,
+    773
+   ],
+   "fx_size": [
+    89,
+    43
+   ],
+   "hero_px_removed": 1367,
+   "colors": [
+    "#7bd3fb",
+    "#3498f8",
+    "#0d65fa"
+   ]
+  },
+  {
+   "code": "PC25",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1534,
+    680,
+    1684,
+    773
+   ],
+   "fx_size": [
+    81,
+    39
+   ],
+   "hero_px_removed": 1256,
+   "colors": [
+    "#d8e2f5",
+    "#a0b7f6",
+    "#4668f9"
+   ]
+  },
+  {
+   "code": "PC26",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    877,
+    780,
+    1029,
+    878
+   ],
+   "fx_size": [
+    38,
+    22
+   ],
+   "hero_px_removed": 2722,
+   "colors": [
+    "#c9ddfc",
+    "#9cb7f3",
+    "#6b8ff3"
+   ]
+  },
+  {
+   "code": "PC27",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1039,
+    780,
+    1201,
+    878
+   ],
+   "fx_size": [
+    104,
+    49
+   ],
+   "hero_px_removed": 1183,
+   "colors": [
+    "#aee1fd",
+    "#81bdfa",
+    "#5d94fd"
+   ]
+  },
+  {
+   "code": "PC28",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1211,
+    780,
+    1361,
+    878
+   ],
+   "fx_size": [
+    90,
+    25
+   ],
+   "hero_px_removed": 1334,
+   "colors": [
+    "#f0dfee",
+    "#e6cbe6",
+    "#f1a7b4"
+   ]
+  },
+  {
+   "code": "PC29",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1372,
+    780,
+    1524,
+    878
+   ],
+   "fx_size": [
+    90,
+    37
+   ],
+   "hero_px_removed": 1381,
+   "colors": [
+    "#c1ddfb",
+    "#7ca7f7",
+    "#3064f9"
+   ]
+  },
+  {
+   "code": "PC30",
+   "family": "PC",
+   "school": "แทง",
+   "box": [
+    1533,
+    780,
+    1683,
+    878
+   ],
+   "fx_size": [
+    134,
+    62
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffffff"
+   ]
+  },
+  {
+   "code": "CR01",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    287,
+    1893,
+    374
+   ],
+   "fx_size": [
+    132,
+    48
+   ],
+   "hero_px_removed": 2234,
+   "colors": [
+    "#fee7a7",
+    "#eeb76c",
+    "#e35617"
+   ]
+  },
+  {
+   "code": "CR02",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1902,
+    287,
+    2069,
+    374
+   ],
+   "fx_size": [
+    143,
+    38
+   ],
+   "hero_px_removed": 2054,
+   "colors": [
+    "#fce1af",
+    "#eeb480",
+    "#e0661a"
+   ]
+  },
+  {
+   "code": "CR03",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2080,
+    287,
+    2230,
+    374
+   ],
+   "fx_size": [
+    130,
+    45
+   ],
+   "hero_px_removed": 311,
+   "colors": [
+    "#f4ba7e",
+    "#e89b5b",
+    "#eb7425"
+   ]
+  },
+  {
+   "code": "CR04",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2239,
+    287,
+    2400,
+    374
+   ],
+   "fx_size": [
+    111,
+    52
+   ],
+   "hero_px_removed": 1473,
+   "colors": [
+    "#feebc2",
+    "#f6bf89",
+    "#f57e3f"
+   ],
+   "name_th": "ค้อนหนัก",
+   "name_status": "อ่านจากภาพ"
+  },
+  {
+   "code": "CR05",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2410,
+    287,
+    2545,
+    374
+   ],
+   "fx_size": [
+    119,
+    50
+   ],
+   "hero_px_removed": 1103,
+   "colors": [
+    "#fff3ba",
+    "#b2d7d3",
+    "#fed271"
+   ]
+  },
+  {
+   "code": "CR06",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    381,
+    1893,
+    475
+   ],
+   "fx_size": [
+    76,
+    58
+   ],
+   "hero_px_removed": 1836,
+   "colors": [
+    "#fcd9b8",
+    "#eca97c",
+    "#ea743c"
+   ]
+  },
+  {
+   "code": "CR07",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1903,
+    381,
+    2069,
+    475
+   ],
+   "fx_size": [
+    138,
+    55
+   ],
+   "hero_px_removed": 1812,
+   "colors": [
+    "#fbdba9",
+    "#f5b475",
+    "#f07b35"
+   ]
+  },
+  {
+   "code": "CR08",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2080,
+    381,
+    2230,
+    475
+   ],
+   "fx_size": [
+    124,
+    56
+   ],
+   "hero_px_removed": 1875,
+   "colors": [
+    "#d4c3ab",
+    "#d0aa88",
+    "#de823e"
+   ]
+  },
+  {
+   "code": "CR09",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2240,
+    381,
+    2400,
+    475
+   ],
+   "fx_size": [
+    126,
+    56
+   ],
+   "hero_px_removed": 3382,
+   "colors": [
+    "#fcdc86",
+    "#fabd5d",
+    "#fb8f28"
+   ]
+  },
+  {
+   "code": "CR10",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2410,
+    381,
+    2545,
+    475
+   ],
+   "fx_size": [
+    120,
+    51
+   ],
+   "hero_px_removed": 3498,
+   "colors": [
+    "#fed19e",
+    "#fec080",
+    "#fea85f"
+   ]
+  },
+  {
+   "code": "CR11",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    483,
+    1893,
+    577
+   ],
+   "fx_size": [
+    144,
+    55
+   ],
+   "hero_px_removed": 1644,
+   "colors": [
+    "#f7b578",
+    "#f49854",
+    "#f57329"
+   ]
+  },
+  {
+   "code": "CR12",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1903,
+    483,
+    2072,
+    577
+   ],
+   "fx_size": [
+    152,
+    53
+   ],
+   "hero_px_removed": 891,
+   "colors": [
+    "#f7bd7a",
+    "#ec9650",
+    "#ed7022"
+   ]
+  },
+  {
+   "code": "CR13",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2082,
+    483,
+    2230,
+    577
+   ],
+   "fx_size": [
+    133,
+    54
+   ],
+   "hero_px_removed": 1100,
+   "colors": [
+    "#ffeebb",
+    "#fdcb83",
+    "#fc943b"
+   ]
+  },
+  {
+   "code": "CR14",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2240,
+    483,
+    2382,
+    577
+   ],
+   "fx_size": [
+    119,
+    53
+   ],
+   "hero_px_removed": 2006,
+   "colors": [
+    "#facd73",
+    "#f1a349",
+    "#f0741c"
+   ]
+  },
+  {
+   "code": "CR15",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2391,
+    483,
+    2545,
+    577
+   ],
+   "fx_size": [
+    139,
+    59
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#fee8bb",
+    "#fbc489",
+    "#fb8d3a"
+   ]
+  },
+  {
+   "code": "CR16",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    585,
+    1894,
+    680
+   ],
+   "fx_size": [
+    140,
+    59
+   ],
+   "hero_px_removed": 630,
+   "colors": [
+    "#f4b174",
+    "#ee9451",
+    "#f0752d"
+   ]
+  },
+  {
+   "code": "CR17",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1904,
+    585,
+    2071,
+    680
+   ],
+   "fx_size": [
+    139,
+    62
+   ],
+   "hero_px_removed": 1625,
+   "colors": [
+    "#ebb280",
+    "#e6985a",
+    "#e67a39"
+   ]
+  },
+  {
+   "code": "CR18",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2081,
+    585,
+    2231,
+    680
+   ],
+   "fx_size": [
+    114,
+    52
+   ],
+   "hero_px_removed": 1209,
+   "colors": [
+    "#fdddb8",
+    "#f7c097",
+    "#f28e5c"
+   ]
+  },
+  {
+   "code": "CR19",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2241,
+    585,
+    2382,
+    680
+   ],
+   "fx_size": [
+    73,
+    57
+   ],
+   "hero_px_removed": 2890,
+   "colors": [
+    "#e8a97f",
+    "#e09266",
+    "#e37a51"
+   ]
+  },
+  {
+   "code": "CR20",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2392,
+    585,
+    2545,
+    680
+   ],
+   "fx_size": [
+    134,
+    57
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#fabf80",
+    "#f99c4e",
+    "#fa7a24"
+   ]
+  },
+  {
+   "code": "CR21",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    689,
+    1893,
+    781
+   ],
+   "fx_size": [
+    144,
+    54
+   ],
+   "hero_px_removed": 825,
+   "colors": [
+    "#fabf7f",
+    "#f7a159",
+    "#f87b2b"
+   ]
+  },
+  {
+   "code": "CR22",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1903,
+    689,
+    2072,
+    781
+   ],
+   "fx_size": [
+    152,
+    54
+   ],
+   "hero_px_removed": 2943,
+   "colors": [
+    "#f4b26e",
+    "#eb904b",
+    "#eb6d21"
+   ]
+  },
+  {
+   "code": "CR23",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2082,
+    689,
+    2231,
+    781
+   ],
+   "fx_size": [
+    129,
+    43
+   ],
+   "hero_px_removed": 2250,
+   "colors": [
+    "#f6c075",
+    "#e49148",
+    "#e35f13"
+   ]
+  },
+  {
+   "code": "CR24",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2241,
+    689,
+    2383,
+    781
+   ],
+   "fx_size": [
+    79,
+    50
+   ],
+   "hero_px_removed": 1206,
+   "colors": [
+    "#f6c285",
+    "#efa05b",
+    "#f07c2f"
+   ]
+  },
+  {
+   "code": "CR25",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2393,
+    689,
+    2545,
+    781
+   ],
+   "fx_size": [
+    132,
+    54
+   ],
+   "hero_px_removed": 2745,
+   "colors": [
+    "#fac489",
+    "#f9aa64",
+    "#fa8539"
+   ]
+  },
+  {
+   "code": "CR26",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1730,
+    789,
+    1892,
+    882
+   ],
+   "fx_size": [
+    136,
+    54
+   ],
+   "hero_px_removed": 418,
+   "colors": [
+    "#f9c17b",
+    "#f39c4f",
+    "#f67423"
+   ]
+  },
+  {
+   "code": "CR27",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    1902,
+    789,
+    2069,
+    882
+   ],
+   "fx_size": [
+    126,
+    53
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffc36b",
+    "#ffa94b",
+    "#ff8625"
+   ]
+  },
+  {
+   "code": "CR28",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2079,
+    789,
+    2230,
+    882
+   ],
+   "fx_size": [
+    128,
+    57
+   ],
+   "hero_px_removed": 726,
+   "colors": [
+    "#f8bb79",
+    "#f6a662",
+    "#f88f43"
+   ]
+  },
+  {
+   "code": "CR29",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2240,
+    789,
+    2366,
+    882
+   ],
+   "fx_size": [
+    108,
+    55
+   ],
+   "hero_px_removed": 1940,
+   "colors": [
+    "#e9a77f",
+    "#e29369",
+    "#e57e49"
+   ]
+  },
+  {
+   "code": "CR30",
+   "family": "CR",
+   "school": "ทุบ",
+   "box": [
+    2375,
+    789,
+    2543,
+    882
+   ],
+   "fx_size": [
+    152,
+    61
+   ],
+   "hero_px_removed": 0,
+   "colors": [
+    "#ffffff"
+   ]
+  },
+  {
+   "code": "BD01",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1019,
+    202,
+    1105
+   ],
+   "fx_size": [
+    31,
+    34
+   ],
+   "hero_px_removed": 3331,
+   "colors": [
+    "#e5ffff",
+    "#89e5e4",
+    "#54e5e1"
+   ]
+  },
+  {
+   "code": "BD02",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    212,
+    1019,
+    366,
+    1105
+   ],
+   "fx_size": [
+    85,
+    35
+   ],
+   "hero_px_removed": 2267,
+   "colors": [
+    "#a7f3f3",
+    "#78e5e1",
+    "#4fe7dc"
+   ]
+  },
+  {
+   "code": "BD03",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1019,
+    523,
+    1105
+   ],
+   "fx_size": [
+    89,
+    53
+   ],
+   "hero_px_removed": 2575,
+   "colors": [
+    "#e4f8fa",
+    "#9adcdd",
+    "#7dede5"
+   ]
+  },
+  {
+   "code": "BD04",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    532,
+    1019,
+    667,
+    1105
+   ],
+   "fx_size": [
+    23,
+    29
+   ],
+   "hero_px_removed": 1977,
+   "colors": [
+    "#e5ffff",
+    "#a3e7e6",
+    "#6be5df"
+   ]
+  },
+  {
+   "code": "BD05",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    676,
+    1019,
+    829,
+    1105
+   ],
+   "fx_size": [
+    40,
+    37
+   ],
+   "hero_px_removed": 2739,
+   "colors": [
+    "#e4fffe",
+    "#a5ecec",
+    "#66ebe1"
+   ]
+  },
+  {
+   "code": "BD06",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    30,
+    1114,
+    202,
+    1196
+   ],
+   "fx_size": [
+    37,
+    36
+   ],
+   "hero_px_removed": 2604,
+   "colors": [
+    "#9df1ed",
+    "#67e2d9",
+    "#3ce7d5"
+   ]
+  },
+  {
+   "code": "BD07",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    212,
+    1114,
+    366,
+    1196
+   ],
+   "fx_size": [
+    62,
+    50
+   ],
+   "hero_px_removed": 2235,
+   "colors": [
+    "#b9dde4",
+    "#9bebe8",
+    "#9addde"
+   ]
+  },
+  {
+   "code": "BD08",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1114,
+    523,
+    1196
+   ],
+   "fx_size": [
+    81,
+    38
+   ],
+   "hero_px_removed": 1645,
+   "colors": [
+    "#fdfce4",
+    "#fcf1cd",
+    "#c7f0d7"
+   ]
+  },
+  {
+   "code": "BD09",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    533,
+    1114,
+    667,
+    1196
+   ],
+   "fx_size": [
+    80,
+    42
+   ],
+   "hero_px_removed": 1193,
+   "colors": [
+    "#fbcb7c",
+    "#e4974f",
+    "#e56c24"
+   ]
+  },
+  {
+   "code": "BD10",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    676,
+    1114,
+    829,
+    1196
+   ],
+   "fx_size": [
+    39,
+    38
+   ],
+   "hero_px_removed": 2244,
+   "colors": [
+    "#d7feff",
+    "#7ee3e3",
+    "#5fe7e1"
+   ],
+   "name_th": "กวาดขา",
+   "name_status": "อ่านจากภาพ"
+  },
+  {
+   "code": "BD11",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1205,
+    200,
+    1289
+   ],
+   "fx_size": [
+    26,
+    32
+   ],
+   "hero_px_removed": 3040,
+   "colors": [
+    "#dffefe",
+    "#62ded5",
+    "#3ae6d9"
+   ]
+  },
+  {
+   "code": "BD12",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    210,
+    1205,
+    366,
+    1289
+   ],
+   "fx_size": [
+    49,
+    36
+   ],
+   "hero_px_removed": 2330,
+   "colors": [
+    "#fbc67b",
+    "#e9874c",
+    "#f04c1a"
+   ]
+  },
+  {
+   "code": "BD13",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1205,
+    522,
+    1289
+   ],
+   "fx_size": [
+    33,
+    29
+   ],
+   "hero_px_removed": 2315,
+   "colors": [
+    "#fbc27d",
+    "#e88347",
+    "#f15019"
+   ]
+  },
+  {
+   "code": "BD14",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    532,
+    1205,
+    667,
+    1289
+   ],
+   "fx_size": [
+    27,
+    28
+   ],
+   "hero_px_removed": 1975,
+   "colors": [
+    "#adfafa",
+    "#78e8e4",
+    "#47ebdb"
+   ]
+  },
+  {
+   "code": "BD15",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    677,
+    1205,
+    829,
+    1289
+   ],
+   "fx_size": [
+    38,
+    35
+   ],
+   "hero_px_removed": 1914,
+   "colors": [
+    "#b6f9f8",
+    "#74ebe3",
+    "#42ebdc"
+   ]
+  },
+  {
+   "code": "BD16",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1298,
+    201,
+    1381
+   ],
+   "fx_size": [
+    67,
+    40
+   ],
+   "hero_px_removed": 2591,
+   "colors": [
+    "#e9e5d8",
+    "#edcbaa",
+    "#eb9b65"
+   ]
+  },
+  {
+   "code": "BD17",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    211,
+    1298,
+    366,
+    1381
+   ],
+   "fx_size": [
+    72,
+    37
+   ],
+   "hero_px_removed": 2516,
+   "colors": [
+    "#f7e5c8",
+    "#c2ecdd",
+    "#eeb893"
+   ]
+  },
+  {
+   "code": "BD18",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1298,
+    522,
+    1381
+   ],
+   "fx_size": [
+    57,
+    31
+   ],
+   "hero_px_removed": 2874,
+   "colors": [
+    "#cffefc",
+    "#9dfbf6",
+    "#48e7dd"
+   ]
+  },
+  {
+   "code": "BD19",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    532,
+    1298,
+    667,
+    1381
+   ],
+   "fx_size": [
+    28,
+    32
+   ],
+   "hero_px_removed": 2179,
+   "colors": [
+    "#a9f7f4",
+    "#78eae1",
+    "#47ead7"
+   ]
+  },
+  {
+   "code": "BD20",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    677,
+    1298,
+    829,
+    1381
+   ],
+   "fx_size": [
+    58,
+    44
+   ],
+   "hero_px_removed": 1963,
+   "colors": [
+    "#defdfb",
+    "#88f4f0",
+    "#22edd7"
+   ]
+  },
+  {
+   "code": "BD21",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1389,
+    202,
+    1469
+   ],
+   "fx_size": [
+    112,
+    38
+   ],
+   "hero_px_removed": 1485,
+   "colors": [
+    "#92d9f9",
+    "#62b3ef",
+    "#298bf0"
+   ]
+  },
+  {
+   "code": "BD22",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    212,
+    1389,
+    366,
+    1469
+   ],
+   "fx_size": [
+    93,
+    36
+   ],
+   "hero_px_removed": 1009,
+   "colors": [
+    "#dffbfe",
+    "#8ee4fa",
+    "#2388f0"
+   ]
+  },
+  {
+   "code": "BD23",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    376,
+    1389,
+    523,
+    1469
+   ],
+   "fx_size": [
+    98,
+    31
+   ],
+   "hero_px_removed": 2404,
+   "colors": [
+    "#f6bc8e",
+    "#efa67b",
+    "#eb8755"
+   ]
+  },
+  {
+   "code": "BD24",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    533,
+    1389,
+    668,
+    1469
+   ],
+   "fx_size": [
+    36,
+    37
+   ],
+   "hero_px_removed": 1579,
+   "colors": [
+    "#adf6f2",
+    "#7ae7dc",
+    "#42e8ce"
+   ]
+  },
+  {
+   "code": "BD25",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    677,
+    1389,
+    829,
+    1469
+   ],
+   "fx_size": [
+    44,
+    41
+   ],
+   "hero_px_removed": 1894,
+   "colors": [
+    "#94f5f3",
+    "#5ae7e1",
+    "#25ebde"
+   ]
+  },
+  {
+   "code": "BD26",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    31,
+    1476,
+    201,
+    1548
+   ],
+   "fx_size": [
+    113,
+    35
+   ],
+   "hero_px_removed": 2233,
+   "colors": [
+    "#c9feff",
+    "#7ef9f7",
+    "#5ae9e9"
+   ]
+  },
+  {
+   "code": "BD27",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    211,
+    1476,
+    364,
+    1548
+   ],
+   "fx_size": [
+    83,
+    35
+   ],
+   "hero_px_removed": 840,
+   "colors": [
+    "#f9fffe",
+    "#bdeceb",
+    "#87ece0"
+   ]
+  },
+  {
+   "code": "BD28",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    374,
+    1476,
+    513,
+    1548
+   ],
+   "fx_size": [
+    54,
+    32
+   ],
+   "hero_px_removed": 1468,
+   "colors": [
+    "#f8c274",
+    "#ea934f",
+    "#ee6824"
+   ]
+  },
+  {
+   "code": "BD29",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    522,
+    1476,
+    662,
+    1548
+   ],
+   "fx_size": [
+    29,
+    34
+   ],
+   "hero_px_removed": 2098,
+   "colors": [
+    "#fcd685",
+    "#eba55c",
+    "#f07934"
+   ]
+  },
+  {
+   "code": "BD30",
+   "family": "BD",
+   "school": "มือเปล่า",
+   "box": [
+    671,
+    1476,
+    830,
+    1548
+   ],
+   "fx_size": [
+    141,
+    46
+   ],
+   "hero_px_removed": 830,
+   "colors": [
+    "#ffffff",
+    "#adefff",
+    "#85c6ff"
+   ]
+  },
+  {
+   "code": "ST01",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1020,
+    1036,
+    1103
+   ],
+   "fx_size": [
+    71,
+    37
+   ],
+   "hero_px_removed": 1860,
+   "colors": [
+    "#f8b390",
+    "#ee745d",
+    "#f03537"
+   ]
+  },
+  {
+   "code": "ST02",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1020,
+    1202,
+    1103
+   ],
+   "fx_size": [
+    99,
+    44
+   ],
+   "hero_px_removed": 1448,
+   "colors": [
+    "#d89cd9",
+    "#ae5fd1",
+    "#7d2ced"
+   ]
+  },
+  {
+   "code": "ST03",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1020,
+    1370,
+    1103
+   ],
+   "fx_size": [
+    136,
+    42
+   ],
+   "hero_px_removed": 2205,
+   "colors": [
+    "#f9ae81",
+    "#ee7053",
+    "#f33223"
+   ]
+  },
+  {
+   "code": "ST04",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1020,
+    1536,
+    1103
+   ],
+   "fx_size": [
+    98,
+    43
+   ],
+   "hero_px_removed": 861,
+   "colors": [
+    "#f8a567",
+    "#eb623f",
+    "#ee301b"
+   ]
+  },
+  {
+   "code": "ST05",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1020,
+    1683,
+    1103
+   ],
+   "fx_size": [
+    118,
+    39
+   ],
+   "hero_px_removed": 793,
+   "colors": [
+    "#bfb1f3",
+    "#816ef8",
+    "#4b31fc"
+   ],
+   "name_th": "ลูกศรทะลุ",
+   "name_status": "อ่านจากภาพ (ตัวอักษรเพี้ยนมาก)"
+  },
+  {
+   "code": "ST06",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1110,
+    1035,
+    1193
+   ],
+   "fx_size": [
+    86,
+    40
+   ],
+   "hero_px_removed": 960,
+   "colors": [
+    "#fdcaeb",
+    "#f46cab",
+    "#f5166a"
+   ]
+  },
+  {
+   "code": "ST07",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1110,
+    1202,
+    1193
+   ],
+   "fx_size": [
+    134,
+    36
+   ],
+   "hero_px_removed": 1190,
+   "colors": [
+    "#f7948f",
+    "#ed4957",
+    "#ef132f"
+   ]
+  },
+  {
+   "code": "ST08",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1110,
+    1370,
+    1193
+   ],
+   "fx_size": [
+    105,
+    35
+   ],
+   "hero_px_removed": 1665,
+   "colors": [
+    "#fcc8c3",
+    "#f05a74",
+    "#f50624"
+   ]
+  },
+  {
+   "code": "ST09",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1110,
+    1536,
+    1193
+   ],
+   "fx_size": [
+    93,
+    39
+   ],
+   "hero_px_removed": 1206,
+   "colors": [
+    "#cbfeff",
+    "#5ae3f2",
+    "#3ab7f3"
+   ]
+  },
+  {
+   "code": "ST10",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1110,
+    1683,
+    1193
+   ],
+   "fx_size": [
+    91,
+    48
+   ],
+   "hero_px_removed": 1215,
+   "colors": [
+    "#f9a962",
+    "#f16539",
+    "#f52819"
+   ]
+  },
+  {
+   "code": "ST11",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1201,
+    1035,
+    1283
+   ],
+   "fx_size": [
+    91,
+    44
+   ],
+   "hero_px_removed": 872,
+   "colors": [
+    "#bdaffa",
+    "#8b75f8",
+    "#5e3afa"
+   ]
+  },
+  {
+   "code": "ST12",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1201,
+    1202,
+    1283
+   ],
+   "fx_size": [
+    113,
+    39
+   ],
+   "hero_px_removed": 1369,
+   "colors": [
+    "#c686f6",
+    "#9b45f4",
+    "#8217f6"
+   ]
+  },
+  {
+   "code": "ST13",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1201,
+    1370,
+    1283
+   ],
+   "fx_size": [
+    80,
+    53
+   ],
+   "hero_px_removed": 1608,
+   "colors": [
+    "#efe3fe",
+    "#a17bf6",
+    "#591af8"
+   ]
+  },
+  {
+   "code": "ST14",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1201,
+    1536,
+    1283
+   ],
+   "fx_size": [
+    92,
+    38
+   ],
+   "hero_px_removed": 1471,
+   "colors": [
+    "#f8b07c",
+    "#ef6844",
+    "#f5221b"
+   ]
+  },
+  {
+   "code": "ST15",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1201,
+    1683,
+    1283
+   ],
+   "fx_size": [
+    42,
+    44
+   ],
+   "hero_px_removed": 1672,
+   "colors": [
+    "#cd62f5",
+    "#b83df0",
+    "#a412f8"
+   ]
+  },
+  {
+   "code": "ST16",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1290,
+    1036,
+    1372
+   ],
+   "fx_size": [
+    108,
+    46
+   ],
+   "hero_px_removed": 840,
+   "colors": [
+    "#fca475",
+    "#fc7356",
+    "#fe3b3b"
+   ]
+  },
+  {
+   "code": "ST17",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1290,
+    1202,
+    1372
+   ],
+   "fx_size": [
+    89,
+    40
+   ],
+   "hero_px_removed": 892,
+   "colors": [
+    "#fdd8fe",
+    "#f28cf9",
+    "#d826f9"
+   ]
+  },
+  {
+   "code": "ST18",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1290,
+    1370,
+    1372
+   ],
+   "fx_size": [
+    102,
+    38
+   ],
+   "hero_px_removed": 887,
+   "colors": [
+    "#ffebcd",
+    "#ee73b4",
+    "#f5377d"
+   ]
+  },
+  {
+   "code": "ST19",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1290,
+    1536,
+    1372
+   ],
+   "fx_size": [
+    126,
+    43
+   ],
+   "hero_px_removed": 1129,
+   "colors": [
+    "#ed7648",
+    "#e93228",
+    "#ee0a25"
+   ]
+  },
+  {
+   "code": "ST20",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1290,
+    1683,
+    1372
+   ],
+   "fx_size": [
+    46,
+    44
+   ],
+   "hero_px_removed": 1788,
+   "colors": [
+    "#fcc471",
+    "#f17848",
+    "#f43527"
+   ]
+  },
+  {
+   "code": "ST21",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    878,
+    1379,
+    1035,
+    1461
+   ],
+   "fx_size": [
+    97,
+    41
+   ],
+   "hero_px_removed": 1103,
+   "colors": [
+    "#c29ef6",
+    "#8868fb",
+    "#5936fe"
+   ]
+  },
+  {
+   "code": "ST22",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1379,
+    1202,
+    1461
+   ],
+   "fx_size": [
+    31,
+    32
+   ],
+   "hero_px_removed": 2342,
+   "colors": [
+    "#ebfcfe",
+    "#76a6f2",
+    "#337bf9"
+   ]
+  },
+  {
+   "code": "ST23",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1379,
+    1370,
+    1461
+   ],
+   "fx_size": [
+    137,
+    38
+   ],
+   "hero_px_removed": 374,
+   "colors": [
+    "#f9c7a1",
+    "#f09075",
+    "#f14832"
+   ]
+  },
+  {
+   "code": "ST24",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1380,
+    1379,
+    1536,
+    1461
+   ],
+   "fx_size": [
+    59,
+    36
+   ],
+   "hero_px_removed": 2118,
+   "colors": [
+    "#f8ae9c",
+    "#f05d66",
+    "#f91e43"
+   ]
+  },
+  {
+   "code": "ST25",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1546,
+    1379,
+    1682,
+    1461
+   ],
+   "fx_size": [
+    71,
+    42
+   ],
+   "hero_px_removed": 1074,
+   "colors": [
+    "#f9a55a",
+    "#ef6f42",
+    "#f23d1f"
+   ]
+  },
+  {
+   "code": "ST26",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    877,
+    1467,
+    1036,
+    1547
+   ],
+   "fx_size": [
+    78,
+    51
+   ],
+   "hero_px_removed": 1371,
+   "colors": [
+    "#9688fa",
+    "#6257f9",
+    "#4b39fc"
+   ]
+  },
+  {
+   "code": "ST27",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1046,
+    1467,
+    1202,
+    1547
+   ],
+   "fx_size": [
+    100,
+    44
+   ],
+   "hero_px_removed": 870,
+   "colors": [
+    "#fcffff",
+    "#8fbbff",
+    "#4c88ff"
+   ]
+  },
+  {
+   "code": "ST28",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1212,
+    1467,
+    1371,
+    1547
+   ],
+   "fx_size": [
+    104,
+    51
+   ],
+   "hero_px_removed": 766,
+   "colors": [
+    "#f4ccf1",
+    "#cda0fc",
+    "#925fff"
+   ]
+  },
+  {
+   "code": "ST30",
+   "family": "ST",
+   "school": "ยิง",
+   "box": [
+    1382,
+    1467,
+    1682,
+    1547
+   ],
+   "fx_size": [
+    176,
+    42
+   ],
+   "hero_px_removed": 369,
+   "colors": [
+    "#ffffff"
+   ]
+  },
+  {
+   "code": "DV07",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1019,
+    1892,
+    1107
+   ],
+   "fx_size": [
+    25,
+    40
+   ],
+   "hero_px_removed": 2597,
+   "colors": [
+    "#f9c588",
+    "#f2a55d",
+    "#fa7f2b"
+   ]
+  },
+  {
+   "code": "DV08",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1903,
+    1019,
+    2068,
+    1107
+   ],
+   "fx_size": [
+    39,
+    47
+   ],
+   "hero_px_removed": 2743,
+   "colors": [
+    "#fee681",
+    "#f7bc4d",
+    "#f37f23"
+   ],
+   "name_th": "เฟืองกระแทก",
+   "name_status": "อ่านจากภาพ"
+  },
+  {
+   "code": "DV09",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2078,
+    1019,
+    2231,
+    1107
+   ],
+   "fx_size": [
+    82,
+    26
+   ],
+   "hero_px_removed": 2357,
+   "colors": [
+    "#ecd2d7",
+    "#cbc0d0",
+    "#cfa3bf"
+   ]
+  },
+  {
+   "code": "DV10",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1019,
+    2395,
+    1107
+   ],
+   "fx_size": [
+    87,
+    43
+   ],
+   "hero_px_removed": 1385,
+   "colors": [
+    "#fdf8dc",
+    "#f5c87f",
+    "#f59c40"
+   ]
+  },
+  {
+   "code": "DV11",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2407,
+    1019,
+    2543,
+    1107
+   ],
+   "fx_size": [
+    76,
+    12
+   ],
+   "hero_px_removed": 2410,
+   "colors": [
+    "#ddf5ff",
+    "#d9d1f2",
+    "#89b3f0"
+   ]
+  },
+  {
+   "code": "DV12",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1115,
+    1892,
+    1201
+   ],
+   "fx_size": [
+    77,
+    56
+   ],
+   "hero_px_removed": 1946,
+   "colors": [
+    "#ffe094",
+    "#f2b666",
+    "#f6812d"
+   ]
+  },
+  {
+   "code": "DV13",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1903,
+    1115,
+    2068,
+    1201
+   ],
+   "fx_size": [
+    81,
+    44
+   ],
+   "hero_px_removed": 1343,
+   "colors": [
+    "#ebfffc",
+    "#a2e6fd",
+    "#2395f4"
+   ]
+  },
+  {
+   "code": "DV14",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2079,
+    1115,
+    2231,
+    1201
+   ],
+   "fx_size": [
+    57,
+    39
+   ],
+   "hero_px_removed": 2158,
+   "colors": [
+    "#fcf5f2",
+    "#f2e1d2",
+    "#fac999"
+   ]
+  },
+  {
+   "code": "DV15",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1115,
+    2395,
+    1201
+   ],
+   "fx_size": [
+    51,
+    35
+   ],
+   "hero_px_removed": 2076,
+   "colors": [
+    "#90d3f8",
+    "#59adf0",
+    "#288ef6"
+   ]
+  },
+  {
+   "code": "DV16",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2406,
+    1115,
+    2544,
+    1201
+   ],
+   "fx_size": [
+    56,
+    42
+   ],
+   "hero_px_removed": 1408,
+   "colors": [
+    "#c2a0f9",
+    "#9b69f2",
+    "#6d24f5"
+   ]
+  },
+  {
+   "code": "DV17",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1210,
+    1891,
+    1295
+   ],
+   "fx_size": [
+    56,
+    31
+   ],
+   "hero_px_removed": 2589,
+   "colors": [
+    "#f7d7a5",
+    "#f4b57e",
+    "#f99042"
+   ]
+  },
+  {
+   "code": "DV18",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1904,
+    1210,
+    2068,
+    1295
+   ],
+   "fx_size": [
+    38,
+    48
+   ],
+   "hero_px_removed": 2784,
+   "colors": [
+    "#fcd26e",
+    "#f2933c",
+    "#f56121"
+   ]
+  },
+  {
+   "code": "DV19",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2080,
+    1210,
+    2231,
+    1295
+   ],
+   "fx_size": [
+    82,
+    40
+   ],
+   "hero_px_removed": 1571,
+   "colors": [
+    "#ecf5fb",
+    "#e5e4df",
+    "#f6bd6b"
+   ]
+  },
+  {
+   "code": "DV20",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1210,
+    2395,
+    1295
+   ],
+   "fx_size": [
+    84,
+    41
+   ],
+   "hero_px_removed": 1037,
+   "colors": [
+    "#fff3d7",
+    "#ffdaa7",
+    "#f6c07f"
+   ]
+  },
+  {
+   "code": "DV21",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2406,
+    1210,
+    2544,
+    1295
+   ],
+   "fx_size": [
+    35,
+    29
+   ],
+   "hero_px_removed": 2156,
+   "colors": [
+    "#f1fefc",
+    "#abedfd",
+    "#5bc0f3"
+   ]
+  },
+  {
+   "code": "DV22",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1303,
+    1891,
+    1385
+   ],
+   "fx_size": [
+    87,
+    42
+   ],
+   "hero_px_removed": 1247,
+   "colors": [
+    "#fcfefd",
+    "#b8e6ee",
+    "#fdd4ac"
+   ]
+  },
+  {
+   "code": "DV23",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1904,
+    1303,
+    2068,
+    1385
+   ],
+   "fx_size": [
+    89,
+    35
+   ],
+   "hero_px_removed": 1093,
+   "colors": [
+    "#afdcf1",
+    "#edad9e",
+    "#f67254"
+   ]
+  },
+  {
+   "code": "DV24",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2080,
+    1303,
+    2230,
+    1385
+   ],
+   "fx_size": [
+    92,
+    42
+   ],
+   "hero_px_removed": 1982,
+   "colors": [
+    "#fef3ef",
+    "#e9e9ef",
+    "#f7d6d0"
+   ]
+  },
+  {
+   "code": "DV25",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2242,
+    1303,
+    2395,
+    1385
+   ],
+   "fx_size": [
+    61,
+    38
+   ],
+   "hero_px_removed": 2155,
+   "colors": [
+    "#ebdcd2",
+    "#f1b394",
+    "#f48a5e"
+   ]
+  },
+  {
+   "code": "DV26",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2406,
+    1303,
+    2544,
+    1385
+   ],
+   "fx_size": [
+    66,
+    38
+   ],
+   "hero_px_removed": 1858,
+   "colors": [
+    "#f3f3eb",
+    "#e8ceb0",
+    "#f3a458"
+   ]
+  },
+  {
+   "code": "DV27",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1729,
+    1393,
+    1891,
+    1546
+   ],
+   "fx_size": [
+    42,
+    72
+   ],
+   "hero_px_removed": 7069,
+   "colors": [
+    "#faebc7",
+    "#f3b479",
+    "#f18654"
+   ]
+  },
+  {
+   "code": "DV28",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    1904,
+    1393,
+    2092,
+    1546
+   ],
+   "fx_size": [
+    56,
+    72
+   ],
+   "hero_px_removed": 8867,
+   "colors": [
+    "#f9d892",
+    "#f8bd74",
+    "#f98c59"
+   ]
+  },
+  {
+   "code": "DV29",
+   "family": "DV",
+   "school": "กล",
+   "box": [
+    2105,
+    1393,
+    2543,
+    1546
+   ],
+   "fx_size": [
+    176,
+    50
+   ],
+   "hero_px_removed": 25233,
+   "colors": [
+    "#fefad4",
+    "#5cecfd",
+    "#fc8c46"
+   ]
+  }
+ ]
+}

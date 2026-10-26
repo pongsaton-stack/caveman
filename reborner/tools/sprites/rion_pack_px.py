@@ -1,0 +1,311 @@
+"""ชุดท่า Rion ครบจาก prompt pack → พิกเซล 32-bit (kwan 16 ต.ค. เลือก "1": ครบแล้วย่อพิกเซล/ทำคลิป/ลงหน้าเทสทีเดียวทั้งชุด)
+อ่าน rion_pack_draft/<ชีต>/<แถว>_<ช่อง>.png (rion_pack_cut.py) + rion_pack_draft/fix/ (rion_pack_fix.py)
+→ assets/sprites/rion_pack_px/<คลิป>_<i>.png + index.json · ร่าง ยังไม่เข้าเกม (.gdignore)
+
+ย่อ: ทุกชีตย่อให้ "ตัวยืน" (REF) สูง PX_H = 72 เท่าตัวในเกม · BOX premultiplied · ทึบ > 0.5 · ขอบ 1 จุดผสม #2a1a14 · สีร่วม 40 สีทั้งชุด ไม่ dither (สูตรเดียวกับ rion_flow_cut.build_pixel)
+วาง: ผืนสูง CANVAS_H เท้าแถว FEET · กลางหัว (แถวบน 30% ของตัว) ตรงกลางผืนทุกเฟรม (หัวไม่ส่าย) ·
+  เฟรมที่ลอยในชีต (กระโดด ล้ม) คงระยะเหนือพื้นตามกรอบในชีต เทียบกับเฟรมที่ต่ำสุดของแถวเดียวกัน
+"""
+import json
+import os
+import shutil
+
+import numpy as np
+from PIL import Image
+from scipy import ndimage
+
+ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+SRC = os.path.join(ROOT, "assets/sprites/rion_pack_draft")
+OUT = os.path.join(ROOT, "assets/sprites/rion_pack_px")
+PX_H, PX_COLORS, PORTRAIT_H = 72, 40, 64
+CANVAS_H, FEET = 112, 108
+
+# ตัวยืนตรงของแต่ละชีต (เฟรม, สัดส่วนของความสูงยืน) · ชีตที่ไม่มีท่ายืน ใช้ท่าวิ่งหารสัดส่วนที่วัดจาก 17-3 (วิ่ง 290 / ยืนหน้า 17-3 แถว 6)
+REF = {"14-1": ("0_0", 1), "15-6": ("0_0", 1), "15-2": ("0_0", 1), "15-3": ("0_0", 1), "15-4": ("0_0", 1), "15-5": ("0_0", 1),
+	"16-1": ("0_0", 1), "16-1b": ("2_0", 1), "16-2": ("0_0", 1), "16-3": ("0_0", 1), "16-4": ("0_0", 1),
+	"17-1b": ("0_0", 1), "17-2": ("0_5", 1), "M-walkA": ("0_0", 1), "M-walkB": ("0_0", 1), "MU-walkL": ("0_0", 1), "MU-walkR": ("0_0", 1), "M2-walkA": ("0_0", 1), "M2-walkB": ("0_0", 1), "M3-walkA": ("0_0", 1), "M3-walkB": ("0_0", 1), "17-3b": ("0_0", None), "18-1": ("0_0", 1)}
+# 16-1b วาดแถววิ่งหลังเล็กกว่าแถวกระโดด (ตัวยืนหน้า 2_0) → แถว 0 ใช้อัตราของตัวเอง: วิ่งหลัง ÷ สัดส่วนวิ่ง/ยืนแบบ 17-3b
+ROW_REF = {("16-1b", "0"): "0_0",
+	**{("MU-walkL", str(r)): f"{r}_0" for r in range(4)}, **{("MU-walkR", str(r)): f"{r}_0" for r in range(3)}}   # ชีต Muse แต่ละแถวขนาดตัวไม่เท่ากัน → ย่อทีละแถว
+# ไฟล์ fix/ ใช้อัตราย่อของชีตที่เป็นฐาน
+# เศษของเฟรมข้างเคียงที่ติดมาในกรอบ (ตัวในชีตชิดกัน) · (x0, y0, x1, y1) พิกัดภาพที่ตัดแล้วใน rion_pack_draft · วัดจากภาพตาราง 50 จุด
+ERASE = {("M-walkB", "0_0"): [(238, 330, 252, 420)], ("M-walkB", "0_1"): [(0, 550, 28, 620)], ("M-walkB", "0_3"): [(0, 50, 30, 140)],
+	("M-walkB", "0_4"): [(0, 0, 35, 80), (0, 550, 40, 620), (222, 240, 234, 340)], ("M-walkB", "0_5"): [(0, 140, 14, 220)]}
+FIX_BASE = {"fan": "15-4", "hurt": "17-2", "cheer": "17-2", "18-1": "18-1"}
+
+ATK, RUN, IDLE, EMO = 110, 90, 220, 160   # ms ต่อเฟรม (ค่าภาพของหน้าเทส ไม่ใช่ค่าเกม)
+
+# ท่าเดินชีต B แก้สมจริงด้วยโค้ด (kwan 18 ต.ค. "แก้ด้วยโค้ด ให้เดินซ้ายขวาสมจริง")
+# · ใช้แถวบน 4 ภาพ วน 2 รอบ: แถวล่างหัวเล็กกว่าแถวบน ~6% (พื้นที่หมวก 5,130 vs 5,830) แต่ตัวสูงเท่ากัน → สลับแถวแล้วหัวกระพริบทุกครึ่งรอบ · ขาสองแถววาดข้างเดียวกันอยู่แล้ว
+# · ตัวยุบ/ยืด: ชีตวาดตัวขึ้นลง 7 จุด (ที่ 72) = เด้งเหมือนกระโดด · คนเดินจริงขึ้นลงราว 3% ของความสูง → ยืด/หดเฉพาะช่วงขา (ใต้ขอบกางเกง) ให้สูงตาม LEG_FIT
+#   แตะพื้น 0.985 · ยุบรับน้ำหนัก 0.970 · ขาผ่านกัน 1.000 · เขย่งส่งตัว 1.010 (เทียบตัวยืน REF) → ขึ้นลงรวม ~3 จุด
+# · ความเร็วในเกม: เดิน 1 รอบ = 2 ช่อง (Overworld WALK_FPS) = 2 × MOVE_TIME 0.15 วิ → 8 ภาพ = 37.5 ms/ภาพ · พื้นเลื่อน 48 จุด/รอบ (TILE 24 × 2)
+#   ก้าวในภาพวัดได้ ~111 จุดชีต × 0.202 = 22 จุด/ก้าว ≈ 45 จุด/รอบ → เท้าไถลบนพื้นไม่ถึง 1 จุดต่อภาพ
+WALK_B = [("M3-walkB", f"0_{c}") for c in range(4)] * 2
+LEG_FIT = {("M3-walkB", "0_0"): .985, ("M3-walkB", "0_1"): .970, ("M3-walkB", "0_2"): 1.0, ("M3-walkB", "0_3"): 1.01}
+WALK_GAME_MS = 37.5
+TRAVEL = {"walk_right_m3b": 48, "walk_left_m3b": -48, "walk_right_m3b_game": 48, "walk_left_m3b_game": -48}   # จุดที่พื้นเลื่อนต่อรอบ (บวก = เดินไปขวา)
+
+
+def R(sheet, row, cols):
+	return [(sheet, f"{row}_{c}") for c in cols]
+
+
+def F(name, n):
+	return [("fix", f"{name}_{i}") for i in range(n)]
+
+
+G_BATTLE, G_MAGIC, G_FIELD, G_GESTURE, G_MOOD, G_EXTRA = (
+	"Rion พิกเซล · ชุดครบ · ท่าศึก", "Rion พิกเซล · ชุดครบ · ร่ายเวทย์", "Rion พิกเซล · ชุดครบ · ยืน/วิ่ง",
+	"Rion พิกเซล · ชุดครบ · ท่าทาง", "Rion พิกเซล · ชุดครบ · พัก/อารมณ์", "Rion พิกเซล · ชุดครบ · ศึกเสริม")
+G_WALK = "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)"
+FAM = [("SL", "คม"), ("CR", "ทุบ"), ("PC", "แทง"), ("ST", "ยิง"), ("DV", "กล"), ("BD", "มือเปล่า")]
+# ถืออาวุธระดับ 2–5: แถวในชีต 15-x ตามลำดับ FAM · แถวที่ Flow วาดผิดแทนด้วย 17-1b / fix (ผลตรวจรอบ 3 ใน PROMPT_PACK.md)
+WEAPON = {
+	2: {"PC": R("17-1b", 0, range(5))},
+	3: {"ST": R("17-1b", 1, range(5)), "BD": R("17-1b", 2, range(5))},
+	4: {"SL": F("fan", 5), "ST": R("17-1b", 4, range(5)), "DV": R("17-1b", 5, range(5)), "BD": R("17-1b", 6, [0, 1, 2, 4, 5])},
+	5: {},
+}
+
+# (กลุ่ม, id, ชื่อ, เฟรม, ms, วน, พลิก)
+CLIPS = [
+	(G_WALK, "walk_right_m3b", "เดินขวา · ชีต B แก้สมจริง · ความเร็วดู", WALK_B, RUN, True, False),
+	(G_WALK, "walk_left_m3b", "เดินซ้าย · ชีต B แก้สมจริง (พลิก) · ความเร็วดู", WALK_B, RUN, True, True),
+	(G_WALK, "walk_right_m3b_game", "เดินขวา · ชีต B แก้สมจริง · ความเร็วในเกม", WALK_B, WALK_GAME_MS, True, False),
+	(G_WALK, "walk_left_m3b_game", "เดินซ้าย · ชีต B แก้สมจริง (พลิก) · ความเร็วในเกม", WALK_B, WALK_GAME_MS, True, True),
+	(G_WALK, "walk_right_m3b_raw", "เดินขวา · ชีต B ดิบ (ก่อนแก้ · เทียบ)", R("M3-walkB", 0, range(4)) + R("M3-walkB", 1, range(4)), RUN, True, False),
+	(G_BATTLE, "idle", "ยืนศึกถือมีด", R("14-1", 0, range(6)), IDLE, True, False),
+	(G_BATTLE, "attack", "ฟันมีด (วิ่งเข้า → ฟาด)", R("14-1", 1, range(6)), ATK, False, False),
+	(G_BATTLE, "hurt", "โดนตี (มีดแปะด้วยโค้ดช่อง 2–5)", F("hurt", 6), ATK, False, False),
+	(G_BATTLE, "down", "ล้ม (17-2 · มีดหลุดมือตอนล้ม)", R("17-2", 1, range(5)), ATK, False, False),
+	(G_BATTLE, "run", "วิ่งถือมีด (ตัดช่อง 5 มือว่าง)", R("14-1", 4, [0, 1, 2, 3, 5]), RUN, True, False),
+	(G_BATTLE, "cast", "ร่าย พนมมือ → ผลักฝ่ามือ", R("14-1", 5, range(6)), ATK, False, False),
+	(G_BATTLE, "kneel", "คุกเข่า", R("14-1", 6, range(6)), ATK, False, False),
+	(G_BATTLE, "guard", "ตั้งรับ", R("14-1", 7, range(6)), ATK, False, False),
+	(G_MAGIC, "white", "เวทย์ขาว", R("15-6", 0, range(4)), ATK, False, False),
+	(G_MAGIC, "black", "เวทย์ดำ (แถวบนต่อขาด้วยโค้ด)", R("15-6", 1, range(4)) + R("15-6", 2, range(4)), ATK, False, False),
+	(G_MAGIC, "red", "เวทย์แดง", R("15-6", 3, range(4)), ATK, False, False),
+	(G_MAGIC, "summon", "อัญเชิญ", R("15-6", 4, range(4)) + R("15-6", 5, range(4)), ATK, False, False),
+	(G_FIELD, "idle_front", "ยืนหายใจ · หน้า", R("16-1", 0, range(6)), IDLE, True, False),
+	(G_FIELD, "idle_back", "ยืนหายใจ · หลัง", R("16-1", 1, range(6)), IDLE, True, False),
+	(G_FIELD, "run_front", "วิ่ง · หน้า", R("16-1", 2, range(6)), RUN, True, False),
+	(G_FIELD, "run_back", "วิ่ง · หลัง (16-1b)", R("16-1b", 0, range(6)), RUN, True, False),
+	(G_FIELD, "run_right", "วิ่ง · ขวา (17-3b)", R("17-3b", 0, range(6)), RUN, True, False),
+	(G_FIELD, "walk_left_m", "เดินซ้าย · แบบ master (พลิกจากภาพที่ Flow วาดหันขวา)", R("M-walkA", 0, range(6)), RUN, True, True),
+	(G_FIELD, "walk_right_m", "เดินขวา · แบบ master", R("M-walkB", 0, range(6)), RUN, True, False),
+	(G_FIELD, "walk_right_m2", "เดินขวา · master ไม่มีนาฬิกา (prompt รอบ 2 · 8 ภาพ)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_m2", "เดินซ้าย · master ไม่มีนาฬิกา (พลิกจากเดินขวา)", R("M2-walkB", 0, range(4)) + R("M2-walkB", 1, range(4)), RUN, True, True),
+	(G_FIELD, "walk_right_m3a", "เดินขวา · master v2 ชีต A (8 ภาพ)", R("M3-walkA", 0, range(4)) + R("M3-walkA", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_m3a", "เดินซ้าย · master v2 ชีต A (พลิก)", R("M3-walkA", 0, range(4)) + R("M3-walkA", 1, range(4)), RUN, True, True),
+	(G_FIELD, "walk_left_mu", "เดินซ้าย · prompt Muse (แถว 1–2 = 8 ภาพ)", R("MU-walkL", 0, range(4)) + R("MU-walkL", 1, range(4)), RUN, True, False),
+	(G_FIELD, "walk_left_mu_all", "เดินซ้าย · prompt Muse ทั้ง 16 ภาพ (แถว 3 หัวโตกว่าแถวอื่น)", [("MU-walkL", f"{r}_{c}") for r in range(4) for c in range(4)], RUN, True, False),
+	(G_FIELD, "walk_right_mu", "เดินขวา · prompt Muse (3+3+4 = 10 ภาพ · นาฬิกาสลับข้าง)", R("MU-walkR", 0, range(3)) + R("MU-walkR", 1, range(3)) + R("MU-walkR", 2, range(4)), RUN, True, False),
+	(G_FIELD, "jump", "กระโดด (16-1b)", R("16-1b", 2, range(4)) + R("16-1b", 3, range(2)), RUN, False, False),
+	(G_GESTURE, "wave", "โบกมือ", R("16-2", 0, range(5)), EMO, False, False),
+	(G_GESTURE, "nod", "พยักหน้า", R("16-2", 1, range(6)), EMO, False, False),
+	(G_GESTURE, "shake", "ส่ายหน้า", R("16-2", 2, range(6)), EMO, False, False),
+	(G_GESTURE, "look", "มองหา", R("16-2", 3, range(6)), EMO, False, False),
+	(G_GESTURE, "pickup", "เก็บของ", R("16-2", 4, range(6)), EMO, False, False),
+	(G_GESTURE, "push", "ผลักลัง (17-3b)", R("17-3b", 1, range(6)), EMO, True, False),
+	(G_MOOD, "sit", "นั่ง", R("16-3", 0, range(5)), EMO, False, False),
+	(G_MOOD, "sleep", "หลับ (พลิกให้หันขวา)", R("16-3", 1, range(5)), IDLE, False, True),
+	(G_MOOD, "surprised", "ตกใจ", R("16-3", 2, range(5)), EMO, False, False),
+	(G_MOOD, "confused", "งง", R("16-3", 3, range(5)), EMO, False, False),
+	(G_MOOD, "happy", "ดีใจ", R("16-3", 4, range(5)), EMO, False, False),
+	(G_MOOD, "angry", "โกรธ", R("16-3", 5, range(5)), EMO, False, False),
+	(G_EXTRA, "item", "ใช้ไอเท็ม (ช่อง 2–4 มีดหาย · ยังไม่แก้)", R("16-4", 0, range(5)), EMO, False, False),
+	(G_EXTRA, "lowhp", "HP ต่ำ", R("16-4", 1, range(6)), IDLE, True, False),
+	(G_EXTRA, "revive", "ฟื้น", R("16-4", 2, range(6)), EMO, False, False),
+	(G_EXTRA, "cheer", "เชียร์ (มีดแปะด้วยโค้ดช่อง 2 4 5)", F("cheer", 5), EMO, False, False),
+	(G_EXTRA, "insight", "ประกาย (คิดท่าออก)", R("16-4", 4, range(6)), EMO, False, False),
+]
+# ท่าสายคม 7 ท่า (ชีต 18-1 · techs.csv ตามลำดับ) · ช่องที่ Flow ลืมมีด/ถือสองเล่ม ใช้ภาพที่แก้แล้วใน fix/18-1_<แถว>_<ช่อง>
+SL_TECH = [("bl0", "ฟัน"), ("bl1", "เขี้ยวพุ่ง"), ("bl2", "★ เขี้ยวพัน"), ("bl3", "กวาด"), ("bl4", "★ วงล้อ"), ("bl5", "ปาดไว"), ("bl6", "★ เงาสองคม")]
+FIXED_18 = {"0_1", "1_1", "4_3", "5_4", "6_1", "6_4"}
+for r, (tid, th) in enumerate(SL_TECH):
+	fr = [("fix", f"18-1_{r}_{c}") if f"{r}_{c}" in FIXED_18 else ("18-1", f"{r}_{c}") for c in range(6)]
+	CLIPS.append(("Rion พิกเซล · ชุดครบ · ท่าสายคม (18-1)", "sl_" + tid, f"{tid} {th}", fr, ATK, False, False))
+for lv in (2, 3, 4, 5):
+	for ri, (fam, th) in enumerate(FAM):
+		frames = WEAPON[lv].get(fam) or R(f"15-{lv}", ri, range(5))
+		CLIPS.append((f"Rion พิกเซล · ชุดครบ · ถืออาวุธ ระดับ {lv}", f"w{lv}_{fam}", f"สาย{th} ระดับ {lv} ({'15-4 + ใบพัดแปะด้วยโค้ด' if frames[0][0] == 'fix' else frames[0][0]})", frames, ATK, False, False))
+
+
+def key_of(sheet, f):
+	r = f.split("_")[0]
+	return sheet + "/" + r if (sheet, r) in ROW_REF else sheet
+
+
+def load(sheet, f):
+	return np.array(Image.open(os.path.join(SRC, sheet, f + ".png")).convert("RGBA")).astype(float)
+
+
+def height(a):
+	ys = np.nonzero(a[..., 3].max(1) > 128)[0]
+	return ys.max() - ys.min() + 1
+
+
+def run_frac():   # วิ่ง/ยืน วัดจาก 17-3 (มีทั้งวิ่งขวาแถว 1 และยืนหน้าแถว 6 ในชีตเดียว)
+	return height(load("17-3", "0_0")) / height(load("17-3", "5_0"))
+
+
+def scale_of(sheet):
+	if "/" in sheet:   # sheet/row จาก ROW_REF
+		s, r = sheet.split("/")
+		if s.startswith("MU-"):   # ชีต Muse: ภาพที่สูงสุดของแถว (ท่ายืดตัวตอนเท้าผ่านกัน) = สูงเท่าตัวยืน
+			hs = [height(load(s, f[:-4])) for f in os.listdir(os.path.join(SRC, s)) if f.startswith(r + "_") and f.endswith(".png")]
+			return PX_H / max(hs)
+		return PX_H * run_frac() / height(load(s, ROW_REF[(s, r)]))
+	sheet = FIX_BASE.get(sheet, sheet)
+	if sheet == "17-3b":   # ไม่มีท่ายืน
+		return PX_H * run_frac() / height(load("17-3b", "0_0"))
+	f, _ = REF[sheet]
+	return PX_H / height(load(sheet, f))
+
+
+def boxes(sheet):
+	p = os.path.join(SRC, sheet, "index.json")
+	if not os.path.isfile(p):
+		return {}
+	return {f"{e['row']}_{e['col']}": e["box"] for e in json.load(open(p))["frames"]}
+
+
+# ชีตที่ Flow วาดนาฬิกาสลับแขน → ลบนาฬิกา (kwan 18 ต.ค. เลือก Rion ไม่มีนาฬิกา)
+NOWATCH = {"M2-walkA", "M2-walkB"}
+
+
+def no_watch(a):
+	"""นาฬิกา = ก้อนสีน้ำเงินเล็ก (ไม่ใช่หมวก/กางเกง/เนคไท/เลนส์) ที่แตะผิว ระดับข้อมือ → ทาสีผิวทับ รวมหน้าปัดสีเขียวอ่อน"""
+	r, g, b, al = (a[..., i] for i in range(4))
+	solid = al > 127
+	skin = solid & (r > 180) & (g > 120) & (r > b + 30) & (r >= g)
+	blue = solid & (b > r + 40) & (b >= g)
+	face = solid & (g > r + 30) & (g > b)
+	lab, n = ndimage.label(blue | face)
+	h, w = a.shape[:2]
+	tone = np.median(a[skin][:, :3], 0) if skin.any() else np.array([250, 205, 170])
+	out = a.copy()
+	for i, sl in enumerate(ndimage.find_objects(lab)):
+		comp = lab == i + 1
+		cy = (sl[0].start + sl[0].stop) / 2 / h
+		touch = (ndimage.binary_dilation(comp, iterations=4) & skin).sum()
+		# ข้อมือแกว่งไปหน้าเลยเนคไท (เนคไทอยู่กลางตัว x < 0.62 ของกรอบ ชีตหันขวา)
+		if comp.sum() < 300 and .45 < cy < .72 and sl[1].start > .62 * w and touch >= 8:
+			out[ndimage.binary_dilation(comp, iterations=2) & solid & ~skin, :3] = tone
+	return out
+
+
+def leg_fit(a, ratio, ref_h):
+	"""ยืด/หดเฉพาะช่วงขา (ใต้ขอบบนกางเกง) ให้ตัวทั้งตัวสูง ratio × ref_h · หัวและลำตัวไม่เปลี่ยน · เท้ายังอยู่แถวล่าง"""
+	al = a[..., 3] > 127
+	r, g, b = a[..., 0], a[..., 1], a[..., 2]
+	blue = al & (b > r + 50) & (b > g + 20)
+	h = a.shape[0]
+	hip = h // 2 + int(np.nonzero(blue[h // 2:].any(1))[0].min())
+	ys = np.nonzero(al.any(1))[0]
+	top, bot = ys.min(), ys.max() + 1
+	legs = a[hip:bot]
+	new_leg = int(round(ratio * ref_h)) - (hip - top)
+	if new_leg <= 0 or new_leg == legs.shape[0]:
+		return a
+	rs = np.array(Image.fromarray(legs.astype(np.uint8), "RGBA").resize((legs.shape[1], new_leg), Image.NEAREST)).astype(float)
+	return np.concatenate([a[:hip], rs], 0)
+
+
+def shrink(a, k):
+	al = a[..., 3:] / 255
+	pre = a.copy()
+	pre[..., :3] *= al
+	w, h = max(1, round(a.shape[1] * k)), max(1, round(a.shape[0] * k))
+	sm = np.array(Image.fromarray(pre.astype(np.uint8), "RGBA").resize((w, h), Image.BOX)).astype(float)
+	A = sm[..., 3] / 255
+	rgb = np.where(A[..., None] > 0, sm[..., :3] / np.maximum(A[..., None], 1e-6), 0).clip(0, 255)
+	m = A > .5
+	e = m & ~ndimage.binary_erosion(m)
+	rgb[e] = rgb[e] * .35 + np.array([42, 26, 20]) * .65
+	return rgb.astype(np.uint8), m
+
+
+def head_cx(m):
+	ys, xs = np.nonzero(m)
+	top = ys.min() + 0.3 * (ys.max() - ys.min())
+	return xs[ys <= top].mean()
+
+
+def build():
+	shutil.rmtree(OUT, ignore_errors=True)
+	os.makedirs(OUT)
+	open(os.path.join(OUT, ".gdignore"), "w").close()
+	ks = {}
+	items, clips = [], []
+	for group, cid, label, frames, ms, loop, flip in CLIPS:
+		shr = []
+		for sheet, f in frames:
+			key = (f.split("_")[0] if f.startswith("18-1_") else f.rsplit("_", 1)[0]) if sheet == "fix" else sheet
+			if (sheet, f.split("_")[0]) in ROW_REF:
+				key = sheet + "/" + f.split("_")[0]
+			if key not in ks:
+				ks[key] = scale_of(key)
+			a = load(sheet, f)
+			if sheet in NOWATCH:
+				a = no_watch(a)
+			for x0, y0, x1, y1 in ERASE.get((sheet, f), []):
+				a[y0:y1, x0:x1, 3] = 0
+			if (sheet, f) in LEG_FIT and not cid.endswith("_raw"):
+				a = leg_fit(a, LEG_FIT[(sheet, f)], height(load(sheet, REF[sheet][0])))
+			if flip:
+				a = a[:, ::-1]
+			rgb, m = shrink(a, ks[key])
+			# ลอยเหนือพื้น: ระยะจากขอบล่างกรอบ ถึงขอบล่างต่ำสุดของเฟรมแถวเดียวกันในคลิป
+			bx = boxes(sheet).get(f)
+			shr.append([rgb, m, sheet, f, bx])
+		lows = {}
+		for _, _, sheet, f, bx in shr:
+			if bx:
+				r = (sheet, f.split("_")[0])
+				lows[r] = max(lows.get(r, 0), bx[3])
+		W = max(s[1].shape[1] for s in shr) + 24
+		names = []
+		for i, (rgb, m, sheet, f, bx) in enumerate(shr):
+			lift = 0
+			if bx:
+				lift = round((lows[(sheet, f.split("_")[0])] - bx[3]) * ks[key_of(sheet, f)])
+			ys = np.nonzero(m.any(1))[0]
+			oy = FEET - (ys.max() + 1) - lift
+			ox = round(W / 2 - head_cx(m))
+			n = f"{cid}_{i}"
+			items.append((n, rgb, m, ox, oy, W))
+			names.append(n)
+		clips.append({"group": group, "id": cid, "label": label, "frames": names, "ms": ms, "loop": loop, "w": W, "travel": TRAVEL.get(cid, 0),
+			"src": ["%s/%s" % x for x in frames]})
+	# ภาพหน้า 16-5 (ครึ่งตัว) สูง PORTRAIT_H
+	por = []
+	for i in range(8):
+		f = f"{i // 2}_{i % 2}"
+		a = load("16-5", f)
+		rgb, m = shrink(a, PORTRAIT_H / height(a))
+		items.append((f"face_{i}", rgb, m, 0, 0, None))
+		por.append(f"face_{i}")
+	clips.append({"group": "Rion พิกเซล · ชุดครบ · ภาพหน้า", "id": "faces", "label": "ภาพหน้า 8 อารมณ์ (16-5)", "frames": por, "ms": 600, "loop": True, "w": None,
+		"src": ["16-5"]})
+	pal = Image.fromarray(np.concatenate([r[m] for _, r, m, *_ in items])[None]).quantize(PX_COLORS, method=Image.MEDIANCUT)
+	for n, rgb, m, ox, oy, W in items:
+		q = np.array(Image.fromarray(rgb).quantize(palette=pal, dither=Image.NONE).convert("RGB"))
+		o = np.zeros(rgb.shape[:2] + (4,), np.uint8)
+		o[..., :3] = q
+		o[..., 3] = m * 255
+		im = Image.fromarray(o, "RGBA")
+		if W:
+			c = Image.new("RGBA", (W, CANVAS_H))
+			c.alpha_composite(im, (max(0, ox), max(0, oy)))
+			im = c
+		im.save(os.path.join(OUT, n + ".png"))
+	json.dump({"_doc": "Rion ชุดท่าครบจาก prompt pack (Flow 14-1…17-4b) → พิกเซล · tools/sprites/rion_pack_px.py · ร่าง ยังไม่เข้าเกม",
+		"px_h": PX_H, "colors": PX_COLORS, "canvas_h": CANVAS_H, "feet": FEET, "scale": {k: round(v, 4) for k, v in ks.items()}, "clips": clips},
+		open(os.path.join(OUT, "index.json"), "w"), ensure_ascii=False, indent=1)
+	print(f"คลิป {len(clips)} · เฟรม {len(items)} · สี {PX_COLORS} · อัตราย่อ", {k: round(v, 3) for k, v in ks.items()})
+
+
+if __name__ == "__main__":
+	build()

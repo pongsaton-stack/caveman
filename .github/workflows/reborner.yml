@@ -1,0 +1,35 @@
+name: REBORNER
+
+# Godot game in reborner/: test suite + fixed-seed battle fingerprint on every change.
+# Same command a session runs locally (reborner/tools/run_tests.sh); see .claude/skills/reborner-verify.
+on:
+  push:
+    paths: ["reborner/**", ".github/workflows/reborner.yml"]
+  pull_request:
+    paths: ["reborner/**", ".github/workflows/reborner.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: reborner
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      # xvfb + Mesa: some tests open real scenes and need a (virtual) screen with OpenGL.
+      - name: Virtual screen
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1-mesa-dri >/dev/null
+      - name: Godot 4.7.1
+        run: echo "GODOT=$(tools/get_godot.sh | tail -1)" >> "$GITHUB_ENV"
+      - name: Test suite + seed
+        run: tools/run_tests.sh
+      - name: Logs on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: reborner-test-logs
+          path: reborner/tests/out/

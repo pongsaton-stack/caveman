@@ -1,0 +1,1622 @@
+{
+  "_doc": [
+    "แหล่งความจริงของหน้า 'pixellab animation test' (kwan 18 ต.ค. 2026: แยกเวปเทสใหม่ มีแต่ที่เจนจาก PixelLab · เวปนี้จะเป็นมาสเตอร์ของอะนิเมชั่นทั้งหมดของเกม)",
+    "สร้างหน้า: python3 tools/web/pixellab_test_build.py <out.html> · ใส่เฉพาะภาพที่ PixelLab เจน (ห้ามใส่ภาพจาก Flow/GPT/วาดด้วยโค้ด)",
+    "เพิ่มท่าใหม่: เพิ่มแถวใน entities[].anims — dirs = {ทิศ: โฟลเดอร์เฟรม frame_*.png} · mirror = {ทิศที่พลิกด้วยโค้ด: ทิศต้นทาง}",
+    "prompt: {type: 'legacy', key} = ACTIONS ใน pixellab_walk.py · {type: 'moves', key} = MOVES + build_action() (คำสั่ง 8 ส่วน)",
+    "status: pass ผ่าน · fail ไม่ผ่าน (เก็บไว้เป็นบันทึก) · draft ร่างรอ kwan ดู · game เข้าเกมแล้ว",
+    "ms = ความเร็วดูต่อเฟรม · game_ms = ความเร็วในเกม (null = ยังไม่กำหนด) · travel = ระยะที่ตัวเคลื่อนต่อรอบ (จุดของสไปรต์) ใช้กับปุ่มเดินข้ามฉาก",
+    "prompt {type: 'vfx', key} = VFX_SPECS ใน pixellab_walk.py (/vfx · เอฟเฟกต์) · เฟรมแยกด้วย pixellab_walk.py vfx_frames <ชื่อ>"
+  ],
+  "categories": [
+    {
+      "id": "hero",
+      "name": "ตัวเอก"
+    },
+    {
+      "id": "companion",
+      "name": "คู่หู"
+    },
+    {
+      "id": "monster",
+      "name": "มอนสเตอร์"
+    },
+    {
+      "id": "boss",
+      "name": "บอส"
+    },
+    {
+      "id": "npc",
+      "name": "NPC"
+    },
+    {
+      "id": "vfx",
+      "name": "เอฟเฟกต์"
+    },
+    {
+      "id": "prop",
+      "name": "ของในฉาก"
+    }
+  ],
+  "backgrounds": [
+    {
+      "id": "ash_village",
+      "name": "หมู่บ้านเถ้า · ถ้ำหนอน",
+      "file": "docs/art-bible/pixellab_test/bg_ash_village.jpg",
+      "ground": 0.69,
+      "scale": 3
+    },
+    {
+      "id": "flooded_ruins",
+      "name": "ซากเมืองน้ำท่วม · หอนาฬิกา",
+      "file": "docs/art-bible/pixellab_test/bg_flooded_ruins.jpg",
+      "ground": 0.8,
+      "scale": 3
+    }
+  ],
+  "entities": [
+    {
+      "id": "rion",
+      "cat": "hero",
+      "name": "Rion",
+      "state": "assets/sprites/pixellab_draft/state.json",
+      "master": "docs/art-bible/rion_hires/RION_MASTER.md",
+      "anims": [
+        {
+          "id": "idle",
+          "name": "ยืน (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 18,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/zip/Idle/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/zip/Idle/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/zip/Idle/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/zip/Idle/rotations/west.png"
+          },
+          "prompt": {
+            "type": "description"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "/create-character-v3 จากภาพอ้างอิงหันหน้า (ref_south.png) · ภาพนิ่งทิศละ 1 ภาพ ผืน 96"
+        },
+        {
+          "id": "state_fight_knife",
+          "name": "State · ท่าสู้ถือมีด (ภาพนิ่ง 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "fight_knife"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "/create-character-state ผืน 96 · 15 gen (2000 → 1985 · ผืน 96 ปฏิเสธที่ 'อย่างน้อย 10' แต่หักจริง 15) · 131 วิ · ได้: ตัวเดิมหน้าตา/สีเดิม ครบ 4 ทิศ · ย่อเข่า ขากาง · มีดทำครัวเล่มเดียวในมือหน้า ชี้ขึ้นหน้า · หันข้างจริงไม่หันเข้ากล้อง · ไว้เป็นภาพเริ่มของท่าโจมตี (keep_first_frame)"
+        },
+        {
+          "id": "walk",
+          "name": "เดิน",
+          "kind": "loop",
+          "status": "pass",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 18,
+          "dirs": {
+            "east": "assets/sprites/pixellab_draft/zip/Idle/animations/walk/east"
+          },
+          "mirror": {
+            "west": "east"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "walk"
+          },
+          "ms": 90,
+          "game_ms": 37.5,
+          "travel": 48,
+          "notes": "หันข้างจริง ขาผ่านกันจริง · หัวเล็กกว่า master · แว่นบนหมวกเห็นน้อย · game_ms = 2 × MOVE_TIME ÷ 8 · ทิศซ้าย = พลิกด้วยโค้ด"
+        },
+        {
+          "id": "slash2",
+          "name": "ฟันมีด (รอบ 2)",
+          "kind": "attack",
+          "status": "pass",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash2/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "slash2"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "หันซ้ายครบ 8 เฟรม · มีดในมือทุกเฟรม · ฟันเป็นวง · ใบมีดยังยาวกว่ามีดทำครัว · เฟรม 1 มีดตั้งเหนือหมวก · ท่าในศึกหันซ้าย (ขวา = พลิก)"
+        },
+        {
+          "id": "slash",
+          "name": "ฟันมีด (รอบ 1)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 18,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash/west"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "slash"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "เก็บเป็นบันทึก · คำสั่งสั้นประโยคเดียว → เฟรม 5–7 หมุนหันเข้ากล้อง · แทงตรงแทนฟันเป็นวง · ใบมีดยาว"
+        },
+        {
+          "id": "bt5",
+          "name": "ทุบถ่วง · กระทะ (สายทุบ C1)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/bt5_v/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt5"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "คำสั่ง 8 ส่วน (pixellab_skills.py) · ผ่าน: หันซ้ายครบ 8 เฟรม · กระทะอยู่ในมือทุกเฟรม · ง้างข้ามไหล่ → ฟาดมาหน้า → ค้างถือหน้า · ไม่ดี: มีเส้นวาบขาวเล็กๆ ที่ขอบกระทะ (สั่งห้ามแค่แสงใหญ่) · กระทะใหญ่กว่าหัว · จังหวะตีสั้น ไม่เห็นก้าวเท้า"
+        },
+        {
+          "id": "bl15_r2",
+          "name": "คมสวน รอบ 2 · คัตเตอร์ (คำสั่งแก้)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/bl15_v2/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl15"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "แก้คำสั่ง: ทุกจังหวะขึ้นต้น 'same side view' · เปลี่ยนท่ารอเป็นย่อตัวถือคัตเตอร์หน้าอก · ห้ามวงแสง/เส้นพุ่ง/ท่าตั้งรับหันหน้า (COUNTER_NOT) · ผ่าน: ไม่หันเข้ากล้องแล้ว (เฟรม 4–8 เอียงเล็กน้อยแต่ยังหันซ้าย) · ลำดับ รอ→ปัด→ฟัน→ตาม ชัดขึ้น · ไม่ผ่าน: ยังวาดวงแสงขาว-ฟ้าเฟรม 3/5/6 (ลบด้วยโค้ดได้: เก็บก้อนใหญ่สุด) · ใบมีดเฟรม 1–3 และ 6–8 เป็นแสงขาวยาวแทนคัตเตอร์เหลือง · 2 gen (หักทีหลัง 13 → 11)"
+        },
+        {
+          "id": "bl15",
+          "name": "คมสวน · คัตเตอร์ (สายคม C5)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/bl15_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl15"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "ไม่ผ่าน: เฟรม 2, 4, 6 หมุนหันหน้าเข้ากล้อง (ท่า 'ตั้งรับรอ' ทำให้ตัวหันตรง) · วาดวงแสงฟ้าใหญ่ + รอยพุ่งที่เฟรม 5–6 ทั้งที่ห้าม · ไม่เห็นจังหวะปัดแล้วฟันกลับชัด · ได้: คัตเตอร์ด้ามเหลืองตรงคำสั่ง"
+        },
+        {
+          "id": "bl16",
+          "name": "พันคมดับเถ้า · ไม้ตายสายคม (ฟันอยู่กับที่ 12 เฟรม)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-18",
+          "gens": 3,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/bl16_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl16"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ไม่ผ่าน: แผน = PixelLab ทำแค่ฟันอยู่กับที่ 12 จังหวะ (IN_PLACE_NOT ห้ามพุ่ง/หมุนตัว) โค้ดทำพุ่ง/พลิก/ร่างติดตา · เฟรม 4–5 และ 7–8 หันเข้ากล้อง · มีดหายเฟรม 7–9 · เฟรม 10 วาดส่วนโค้งแสงทั้งที่ห้าม · 12 เฟรมยาวเกิน ทิศ/ของในมือหลุด · 3 gen (11 → 8) · ทางแทน: ประกอบไม้ตายด้วยโค้ดจากคลิปที่ผ่าน (ฟันมีดรอบ 2) ดู ult_bl16_compose.gif (ไม่อยู่ในหน้านี้เพราะประกอบด้วยโค้ด)"
+        },
+        {
+          "id": "state_fs_throw",
+          "name": "State · ทุ่มข้ามไหล่ (FS_B_throw)",
+          "kind": "still",
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "FS_B_throw"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "ไม่ผ่านในฐานะท่าทุ่ม: ได้ท่ายืนสู้ย่อต่ำมือพันผ้าขาว (ไม่หันหลังให้เป้า · ไม่จับไหล่) — ขัดกับประโยค 'stay in a true side view facing the same direction' ในคำสั่งเดียวกัน · ใช้ได้เป็นท่ายืนสู้สายมือเปล่า · 15 gen (1985 → 1970)"
+        },
+        {
+          "id": "state_fs_spinkick",
+          "name": "State · เตะกลางอากาศ (FS_B_spinkick)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "FS_B_spinkick"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "ผ่านบางส่วน: ลอยกลางอากาศ เตะเหยียดขาตรงไปข้างหน้าครบ 4 ทิศ หน้าตาเดิม · แต่เป็นเตะกระโดด ไม่ใช่เตะหมุน (ตัวไม่บิด) · ขาเตะระดับเอว ไม่ถึงหัว · 15 gen (1970 → 1955)"
+        },
+        {
+          "id": "fs10_s",
+          "name": "ทุ่มข้ามไหล่ fs10 · จาก State (10 เฟรม)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 3,
+          "seed": 31,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_B_throw/FS_B_throw/animations/fs10_s_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "fs10_s"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ไม่ผ่าน: ตัว State ทุ่ม · ภาพเริ่ม = ท่ายืนสู้ของ State · เฟรม 1–6 ยื่นสองมือจับไปหน้าซ้ายถูก (ใช้ได้) · ไม่มีหมุนหลัง/ย่อ/เหวี่ยงข้ามไหล่เลย · เฟรม 7 หันหน้าเข้ากล้อง · เฟรม 8–10 หันขวาตั้งท่า (หมุนกลับตัวแทนการทุ่ม) · มือพันผ้าครบทุกเฟรม · 3 gen (1955 → 1952)"
+        },
+        {
+          "id": "fs12_s",
+          "name": "เตะหมุนกลางอากาศ fs12 · จาก State (12 เฟรม)",
+          "kind": "attack",
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 3,
+          "seed": 31,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_B_spinkick/FS_B_spinkick/animations/fs12_s_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "fs12_s"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ไม่ผ่าน (ใช้ได้บางช่วง): ตัว State เตะ · ภาพเริ่ม = ท่ายืนสู้ของ State ทุ่ม (custom_start_frame) · เฟรม 1–5 ย่อ→กระโดดลอยถูก · เฟรม 6–8 หันหลังให้กล้องเห็นเป้ = หมุนจริง · แต่ขาเตะต่ำระดับเอว ไม่เหยียดถึงหัว · เฟรม 9–11 หันหน้าเข้ากล้อง เฟรม 10 เป้ย้ายมาอยู่หน้าอก · เฟรม 12 กลับหันซ้าย · 3 gen (1952 → 1949)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_BT_A_stance",
+          "name": "State ท่ายืนสู้ ทุบ · ค้อน (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "BT_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_PT_A_stance",
+          "name": "State ท่ายืนสู้ แทง · ไขควง (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "PT_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_RG_A_stance",
+          "name": "State ท่ายืนสู้ ยิง · ธนู (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "RG_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_DV_A_stance",
+          "name": "State ท่ายืนสู้ กล · รีโมต (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "DV_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "state_FS_A_stance",
+          "name": "State ท่ายืนสู้ มือเปล่า · นวม (ภาพหมุน 4 ทิศ)",
+          "kind": "still",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "FS_A_stance"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_bl",
+          "name": "ยืนในศึก คม · มีด (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/idle_bl_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_bl"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl0_set",
+          "name": "โจมตีพื้นฐาน bl0 · คม · มีด (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_bt",
+          "name": "ยืนในศึก ทุบ · ค้อน (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/animations/idle_bt_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_bt"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bt0_set",
+          "name": "โจมตีพื้นฐาน bt0 · ทุบ · ค้อน (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/animations/bt0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · เส้นฟาดฟ้าเฟรม 2/4/5 ลบแล้ว เหลือเศษเล็กน้อยเฟรม 4"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_pt",
+          "name": "ยืนในศึก แทง · ไขควง (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/animations/idle_pt_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_pt"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "pt0_set",
+          "name": "โจมตีพื้นฐาน pt0 · แทง · ไขควง (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/animations/pt0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "pt0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · ตัดเฟรม 5 (วงลมขาวพันรอบตัว)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_rg",
+          "name": "ยืนในศึก ยิง · ธนู (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/animations/idle_rg_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_rg"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "rg0_set",
+          "name": "โจมตีพื้นฐาน rg0 · ยิง · ธนู (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/animations/rg0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "rg0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_dv",
+          "name": "ยืนในศึก กล · รีโมต (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/animations/idle_dv_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_dv"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "dv0_set",
+          "name": "โจมตีพื้นฐาน dv0 · กล · รีโมต (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/DV_A_stance/DV_A_stance/animations/dv0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "dv0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 180,
+          "game_ms": null,
+          "id": "idle_fs",
+          "name": "ยืนในศึก มือเปล่า · นวม (4 เฟรม)",
+          "kind": "loop",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/animations/idle_fs_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_fs"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "fs0_set",
+          "name": "โจมตีพื้นฐาน fs0 · มือเปล่า · นวม (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/animations/fs0_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "fs0"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · ตัดเฟรม 1–2 (เส้นลมขาวพาดทับอก ลบแล้วหัวขาด)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "hurt_k",
+          "name": "โดนตี ถือมีด (6 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/hurt_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hurt_k"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · ลบเปลวขาวที่วาดติดมา"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 110,
+          "game_ms": null,
+          "id": "ko_k",
+          "name": "ล้ม มีดหลุดมือ (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/ko_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "ko_k"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 2,
+          "seed": 33,
+          "ms": 60,
+          "game_ms": null,
+          "id": "run_k",
+          "name": "วิ่งถือมีด (8 เฟรม · ใช้ 6)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/run_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "run_k"
+          },
+          "notes": "ฉากต่อสู้ blc_bl0 ช่วงวิ่ง (kwan 19 ต.ค. เลือก \"1\") · จาก State fight_knife · ราว 2 gen (ยอดหักทีหลัง ตอนจบยังเห็น 1,805) · เฟรม 6–7 ซีดขาว+ประกายวาดติด ไม่ใช้ · ภาพจัดแล้ว px_set/pls_run_bl_0–5"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 2,
+          "seed": 33,
+          "ms": 60,
+          "game_ms": null,
+          "id": "hop_k",
+          "name": "กระโดดถอยถือมีด (8 เฟรม · ใช้ 5)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/hop_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hop_k"
+          },
+          "notes": "ฉากต่อสู้ blc_bl0 ช่วงกระโดดถอย (kwan 19 ต.ค. \"1+2\") · ยอด 1,805 → 1,801 หลังเจน (รวม run_k ที่หักทีหลัง) · เฟรม 5–7 กลายเป็นพุ่งไปหน้า + ประกาย/เส้นลม ไม่ใช้ · ภาพจัดแล้ว px_set/pls_hop_bl_0–4 · ลงพื้นใช้ภาพย่อ (1)"
+        },
+        {
+          "status": "fail",
+          "date": "2026-10-21",
+          "gens": 2,
+          "seed": 33,
+          "ms": 90,
+          "game_ms": null,
+          "id": "guard_k",
+          "name": "ตั้งรับถือมีด รอบ 1 (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/guard_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "guard_k"
+          },
+          "notes": "มอนโจมตีกลับ (kwan 21 ต.ค.) · ไม่ผ่าน: เฟรม 2–3 วาดประกาย · เฟรม 4–7 หันขวาและมีดหาย · เฟรม 1 แทบไม่ต่างจากท่ายืน"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 1,
+          "seed": 41,
+          "ms": 90,
+          "game_ms": null,
+          "id": "guard2_k",
+          "name": "ตั้งรับถือมีด รอบ 2 (4 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/guard2_k_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "guard2_k"
+          },
+          "notes": "ฉากต่อสู้ mon_M01_guard · ไม่มีจังหวะกระทบในคำสั่ง (แรงกระแทก/ถอยทำด้วยโค้ด) · หันซ้ายครบ มีดในมือเดียวกับภาพ State ทุกเฟรม · ยอดเหลือ 1,786 หลังเจน 2 รอบ · ภาพจัดแล้ว px_set/pls_guard_0–3"
+        },
+        {
+          "status": "fail",
+          "date": "2026-10-22",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl8",
+          "name": "เขี้ยวผ่าเกราะ bl8 · จามแล้วตบสันมีดเป็นลิ่ม (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl8_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl8"
+          },
+          "notes": "kwan 22 ต.ค. ส่งข้อมูลคาบูโตะวาริ (ขวานจามเกราะแล้วค้อนตอกหลังขวานเป็นลิ่ม) · ไม่ผ่าน: ไม่มีจังหวะมือซ้ายตบสันมีด · เฟรม 3–6 วาดเส้นฟาดใหญ่ทั้งที่ห้าม · เฟรม 4–7 หันเข้ากล้อง · ยอด 1,786 → 1,784 · ฉากจริงประกอบด้วยโค้ดจากภาพที่ผ่าน (kw_bl8)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-23",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl9",
+          "name": "จันทร์เสี้ยวกลางหาว bl9 · ท่าทมโบะจิเง็นริว → ฟันดิ่ง (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl9_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl9"
+          },
+          "notes": "kwan 23 ต.ค. เลือก \"1+2\" → \"2\" เจนท่าทมโบะ · ผ่าน (ร่าง) เฟรม 0–4: ยกมีดตั้งตรงหลังหมวก มือซ้ายกุมทับกำปั้นขวา ปากตะโกน · ไม่ผ่าน เฟรม 5–7: วาดเส้นฟาดฟ้าใหญ่ทั้งที่ห้าม + มีดหาย → ช่วงฟันใช้ atk_bl 5–7 · ยอด 1,784 → 1,782 · ฉาก jg_bl9"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl0_v2",
+          "name": "ฟันมีดพื้นฐาน bl0 รอบ 2 · มือขวาทุกเฟรม (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl0_v2/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl0"
+          },
+          "notes": "แทนรอบแรก (kwan 19 ต.ค. จับได้ว่าง้างมือขวาแต่ฟันมือซ้าย) · คำสั่ง ONE_HAND ใน pixellab_skills.py · ยอด 1,801 → 1,799 · วาดเส้นฟาดฟ้าติดมาเฟรม 5–6 ลบแล้ว · ใบมีดเฟรม 5 ถูกลบไปด้วย วาดคืนด้วยโค้ด (BLADE)"
+        },
+        {
+          "status": "fail",
+          "date": "2026-10-19",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl1_v",
+          "name": "เขี้ยวพุ่ง bl1 รอบ 1 · ไม่ผ่าน (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl1_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl1"
+          },
+          "notes": "ไม่ผ่าน (ตรวจซูม 8 เท่า): เฟรม 5–6 แขนถือมีดพาดหน้าอก ไม่มีแขนใกล้ให้เห็น = มีดอยู่มือซ้าย · เฟรม 3 มีดหาย · วาดเส้นฟาดฟ้าเฟรม 5–7 · คำสั่งเดิมไม่บอกแขนไกล/ใกล้ทุกจังหวะ · 2 gen (หักทีหลัง)"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl1_v2",
+          "name": "เขี้ยวพุ่ง bl1 รอบ 2 · มือขวาทุกเฟรม (8 เฟรม · ใช้ 3 5 6 7)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl1_v2/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl1"
+          },
+          "notes": "คำสั่งระบุทุกจังหวะ: มีด = แขนไกล ไหล่ซ่อนหลังอก · แขนใกล้กำหมัดที่อกเห็นตลอด → เฟรม 4–7 เห็นแขนใกล้ห้อยหลัง = มีดมือขวา · ยอด 1,799 → 1,795 (รวมรอบ 1) · เฟรม 4 มีดชิดปาก ไม่ใช้ · เฟรม 6 clean() ลบไส้ใบมีด → คัดลอกใบมีดเฟรม 7 (BLADE_COPY) · ภาพจัดแล้ว px_set/pls_bl1_0–7 · ฉาก blc_bl1"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-19",
+          "gens": null,
+          "seed": null,
+          "ms": 90,
+          "game_ms": null,
+          "id": "walk_ns",
+          "name": "เดินขึ้น/ลง (8 เฟรม/ทิศ)",
+          "kind": "loop",
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/zip/Idle/animations/walk_v-eb599d32/south",
+            "north": "assets/sprites/pixellab_draft/zip/Idle/animations/walk_v/north"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "walk"
+          },
+          "notes": "ชุดในเกม (kwan 19 ต.ค. เปลี่ยนเป็น PixelLab ทั้งชุด) · รวมทั้งชุด 102 gen (1,907 → 1,805) ไม่ได้แยกราคารายท่า · ภาพที่จัดแล้ว assets/sprites/pixellab_draft/px_set/ (pixellab_rion_set.py ลบแสง/เส้นฟาดที่ PixelLab วาดติดมาทั้งที่ห้าม) · เดินลงลบรอยเหงื่อ · เดินขึ้นเฟรม 2–7 เห็นแว่นบนหมวกจากข้างหลัง"
+        },
+        {
+          "status": "fail",
+          "date": "2026-10-20",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "slash_fist_v",
+          "name": "ฟันมือเปล่ากำหมัด (ทดลองวางอาวุธด้วยโค้ด) · ไม่ผ่าน (8 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/zip/Idle/animations/slash_fist_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "slash_fist"
+          },
+          "notes": "ไม่ผ่าน (ตรวจซูม 5 เท่า): เฟรม 0–4 เป็นท่าเดิน ไม่ฟัน (เฟรม 4 ประกายส้มเหนือหัว) · เฟรม 5–7 หันเข้ากล้อง + วาดดาบ/มีดยาวขึ้นมาเองทั้งที่ห้ามมีอาวุธ + เส้นฟาดขาว · ตัวฐาน (ไม่มี State) ยอด 1,795 → 1,793 · ทางแทน: weapon_swap.py เปลี่ยนมีดใน bl0 เป็นอาวุธอื่นด้วยโค้ด"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 1,
+          "seed": 27,
+          "ms": 60,
+          "game_ms": null,
+          "id": "glim_shift_v2",
+          "name": "ท่ากลางประกาย · ง้าง → ย่อ (4 เฟรม · end_frame)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/glim_shift_v2/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "glim_shift"
+          },
+          "notes": "โหมด end_frame ครั้งแรก: ภาพเริ่ม bl0_v2 เฟรม 4 (ง้างสุด) · ภาพจบ bl1_v2 เฟรม 3 · มีดมือขวาทุกเฟรม (เฟรม 2 มีดถูกลำตัวบัง เพราะแขนไกลอยู่หลังตัว) · รอบแรกเซิร์ฟเวอร์หมดเวลา ไม่หักเครดิต · รอบ 2 ใช้ 13 นาที · ยอด 1,793 → 1,792"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 2,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl7_v",
+          "name": "ตัดเอ็น bl7 (กาลี) · ใช้ 4 จาก 8 เฟรม",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl7_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl7"
+          },
+          "notes": "คำสั่งกาลี (ตัดเขี้ยวงู · ก้าวต่ำ · มีดวนวง · ถอยก้าวสั้น) ระบุแขนไกล/กำปั้นใกล้ทุกจังหวะ → มือขวาครบ · ใช้เฟรม 0 1 4 5 · ไม่ผ่าน: ไม่ย่อต่ำ · เฟรม 2–3 มีดชิดหน้า · 5–7 เดินหน้าไม่ถอย · 6 วาดประกาย · 7 มีดหาย"
+        },
+        {
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 1,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "id": "bl7_back_v",
+          "name": "ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame 4 เฟรม)",
+          "kind": "attack",
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl7_back_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl7_back"
+          },
+          "notes": "ภาพเริ่ม bl7_v เฟรม 5 (ปาด) → ภาพจบ bl7_v เฟรม 0 · ถอยหันหน้าหาเป้า มีดกลับการ์ดมือขวา · วาดวงขาวติดเฟรม 1–2 (ลบด้วย clean) · ต่ำกว่าภาพต้นทาง 2 จุด (ALIGN_X) · ยอด 1,792 → 1,789 รวมท่า bl7"
+        },
+        {
+          "id": "state_BT_bat_stance",
+          "name": "State · ยืนถือไม้เบสบอลสองมือ (ภาพนิ่ง 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "BT_bat_stance"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "kwan 25 ต.ค. \"ทื่อมาก ลองเจน pixellab มาเทียบ\" (กับภาพ Flow) · สายทุบ = ไม้เบสบอล (BT_A_stance เดิมถือค้อน) · ผ่าน: สองมือจับด้ามที่อก ไม้พาดไหล่ · 15 gen (1,782 → 1,767) · edit_description ต้อง ≤ 1000 ตัวอักษร"
+        },
+        {
+          "id": "bt0_bat",
+          "name": "ทุบ bt0 · หวดไม้เบสบอลสองมือ (10 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 3,
+          "seed": 27,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/bt0_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt0_bat"
+          },
+          "notes": "PL_STATE=BT_bat_stance · 3 gen (1,767 → 1,764) · ได้หวดแนวนอนระดับอกแบบนักเบสบอล (สั่งฟาดลงจากบน) · เฟรม 0–5 ไม้ค้างหลังแนวนอน (ทื่อ) · 6 ไม้หลบหลังหัว · 7 วาดเส้นฟ้าทั้งที่ห้าม (clean ลบได้) · 8–9 ตัวหันเฉียงเข้ากล้อง · ฉาก pl_bt0 เทียบกับ flw_bt0"
+        },
+        {
+          "id": "bt0_bat2",
+          "name": "ทุบ bt0 รอบ 2 · ฟาดลงตามรายงาน (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 31,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/bt0_bat2_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt0_bat2"
+          },
+          "notes": "ไม่ผ่าน: 0–4 ไม้พาดไหล่นิ่ง · 5–7 ตัวหันขวา/เข้ากล้อง + วาดเส้น · 1,764 → 1,762"
+        },
+        {
+          "id": "hop_bat",
+          "name": "กระโดดถอยถือไม้ รอบ 1 (8 เฟรม)",
+          "kind": "move",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 33,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/hop_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hop_bat"
+          },
+          "notes": "ไม่ผ่าน: กลายเป็นพุ่งไปหน้า · แต่เฟรม 6 (ไม้ตั้งเหนือหัว ก้าวหน้า หันซ้าย) ใช้เป็นภาพเริ่มของ chop_bat2 · 1,762 → 1,760"
+        },
+        {
+          "id": "chop_bat",
+          "name": "ฟาดลงจากไม้เหนือหัว (PL_START_IMG hop_bat 6 · 4 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 31,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/chop_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "chop_bat"
+          },
+          "notes": "ไม่ผ่าน: ตัวหันเข้ากล้อง/หันขวา · 1,760 → 1,758"
+        },
+        {
+          "id": "hop_bat2",
+          "name": "กระโดดถอยถือไม้ รอบ 2 (6 เฟรม)",
+          "kind": "move",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 41,
+          "ms": 60,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/hop_bat2_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "hop_bat2"
+          },
+          "notes": "ผ่าน: ย่อ 1–3 · ลอย 4 (ขาซีดหลัง clean) · ลง 5 → pls_bat_hop · ฉาก pl_bt0 ถอยแบบท่าฟัน · 1,758 → 1,756"
+        },
+        {
+          "id": "state_BT_bat_impact",
+          "name": "State · กระทบไม้ลงเฉียง ตัวตั้งตรง (ภาพนิ่ง 4 ทิศ)",
+          "kind": "still",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 15,
+          "seed": 27,
+          "dirs": {
+            "south": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/south.png",
+            "east": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/east.png",
+            "north": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/north.png",
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_impact/BT_bat_impact/rotations/west.png"
+          },
+          "prompt": {
+            "type": "state",
+            "key": "BT_bat_impact"
+          },
+          "ms": 500,
+          "game_ms": null,
+          "notes": "ผ่านรอบแรก: ไม้ชี้ลงเฉียงหน้า ตัวตั้งตรง ก้าวหน้า ตะโกน (ตามรายงาน bt0) · State แม่นกว่าท่าเหวี่ยง · 1,756 → 1,741"
+        },
+        {
+          "id": "chop_bat2",
+          "name": "ทุบ bt0 รอบ 4 · ท่ากลาง ไม้เหนือหัว → State กระทบ (4 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-25",
+          "gens": 2,
+          "seed": 31,
+          "ms": 90,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/chop_bat2_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "chop_bat2"
+          },
+          "notes": "PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact (วางผืน 96 ลง 128 ที่ +16,+16) · ผ่าน: ง้างขึ้น → ไม้นอนหลัง → ไม้ขึ้นหลังหัว → กระทบ · เฟรม 1–2 วาดขีดเล็ก (clean ลบ) · ฉาก pl_bt0 · 1,741 → 1,739"
+        },
+        {
+          "id": "run_bat",
+          "name": "วิ่งแบกไม้เบสบอล (8 เฟรม)",
+          "kind": "move",
+          "status": "draft",
+          "date": "2026-10-26",
+          "gens": 2,
+          "seed": 33,
+          "ms": 60,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/run_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "run_bat"
+          },
+          "notes": "kwan 26 ต.ค. \"วิ่งไปโจมตีแบบฟัน\" · ผ่านทั้ง 8 เฟรม (ไม้บนไหล่ = ช่วง load ของรายงาน) · 1,739 → 1,737 · ฉาก pl_bt0"
+        },
+        {
+          "id": "idle_bat",
+          "name": "ยืนหายใจถือไม้เบสบอล (4 เฟรม)",
+          "kind": "idle",
+          "status": "draft",
+          "date": "2026-10-26",
+          "gens": 1,
+          "seed": 33,
+          "ms": 180,
+          "game_ms": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/states/BT_bat_stance/BT_bat_stance/animations/idle_bat_v/west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "idle_bat"
+          },
+          "notes": "ผ่าน 0–1 · 2–3 ยกไม้ขึ้น + วาดแสง → ใช้ 0–1 วนสลับ (pls_bat_breath) · 1,737 → 1,736"
+        }
+      ]
+    },
+    {
+      "id": "vfx_slash2",
+      "cat": "vfx",
+      "name": "รอยมีด (ฟันมีดรอบ 2)",
+      "anims": [
+        {
+          "id": "with_sprite",
+          "name": "รอยมีด + Rion (ตามที่ PixelLab ทำ)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 2,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/vfx/slash2_trail/with_sprite"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "vfx",
+            "key": "slash2_trail"
+          },
+          "ms": 111,
+          "game_ms": null,
+          "notes": "/vfx lite · ราคาเสนอ 2 gen (สไปรต์เคลื่อนไหว) · จ่ายจริง 2 (19 → 17) · 44 วิ · ทำงานแบบชั้น 'หลังตัว' · ได้: เส้นโค้งฟ้าบาง 1–2 จุดที่เฟรม 5 · ประกาย 3–4 จุดเฟรม 6–7 · ไม่ได้: ประกายบนใบมีดเฟรม 4 · เส้นหนา 3 จุด · เฟรม 6 เส้นหายแทบหมด (15 จุด) · รอยเทาใหญ่เฟรม 6 เป็นของภาพท่าเดิม ไม่ใช่ของ VFX"
+        },
+        {
+          "id": "fx",
+          "name": "รอยมีดล้วน (ชั้นเอฟเฟกต์)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-18",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/vfx/slash2_trail/fx"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "vfx",
+            "key": "slash2_trail"
+          },
+          "ms": 111,
+          "game_ms": null,
+          "notes": "ชั้น 'whole' จาก game pack วางตาม anchor + offset ลงผืน 124 · ซ้อนบนเฟรมท่าแล้วตรงกับภาพ with_sprite ทุกพิกเซล (ตรวจ 8/8) · gen = 0 (ไฟล์เดียวกับแถวบน)"
+        }
+      ]
+    },
+    {
+      "id": "fx_ideas",
+      "cat": "vfx",
+      "name": "คลังไอเดีย · เอฟเฟกต์ที่ PixelLab วาดติดมา",
+      "anims": [
+        {
+          "id": "fx_slash2",
+          "name": "เอฟเฟกต์จาก ฟันมีด (รอบ 2)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/slash2/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "legacy",
+            "key": "slash2"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า slash2 (ภาพดิบ assets/sprites/pixellab_draft/zip/Idle/animations/slash2/west) · 1234 จุด · มีเอฟเฟกต์เฟรม [5] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bt5",
+          "name": "เอฟเฟกต์จาก ทุบถ่วง · กระทะ (สายทุบ C1)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bt5/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bt5"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bt5 (ภาพดิบ assets/sprites/pixellab_draft/zip/Idle/animations/bt5_v/west) · 717 จุด · มีเอฟเฟกต์เฟรม [0, 2, 3, 4, 5, 6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl15_r2",
+          "name": "เอฟเฟกต์จาก คมสวน รอบ 2 · คัตเตอร์ (คำสั่งแก้)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl15_r2/west"
+          },
+          "mirror": {
+            "east": "west"
+          },
+          "prompt": {
+            "type": "moves",
+            "key": "bl15"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl15_r2 (ภาพดิบ assets/sprites/pixellab_draft/zip/Idle/animations/bl15_v2/west) · 1775 จุด · มีเอฟเฟกต์เฟรม [0, 1, 2, 3, 4, 5, 6, 7] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl15",
+          "name": "เอฟเฟกต์จาก คมสวน · คัตเตอร์ (สายคม C5)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl15/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl15"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl15 (ภาพดิบ assets/sprites/pixellab_draft/zip/Idle/animations/bl15_v/west) · 438 จุด · มีเอฟเฟกต์เฟรม [1, 2, 3, 4, 5, 6, 7] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl16",
+          "name": "เอฟเฟกต์จาก พันคมดับเถ้า · ไม้ตายสายคม (ฟันอยู่กับที่ 12 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl16/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl16"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl16 (ภาพดิบ assets/sprites/pixellab_draft/zip/Idle/animations/bl16_v/west) · 1232 จุด · มีเอฟเฟกต์เฟรม [0, 1, 2, 3, 5, 9, 10, 11] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl0_set",
+          "name": "เอฟเฟกต์จาก โจมตีพื้นฐาน bl0 · คม · มีด (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl0_set/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl0"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl0_set (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl0_v/west) · 1039 จุด · มีเอฟเฟกต์เฟรม [5, 6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bt0_set",
+          "name": "เอฟเฟกต์จาก โจมตีพื้นฐาน bt0 · ทุบ · ค้อน (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bt0_set/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bt0"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bt0_set (ภาพดิบ assets/sprites/pixellab_draft/states/BT_A_stance/BT_A_stance/animations/bt0_v/west) · 1979 จุด · มีเอฟเฟกต์เฟรม [1, 2, 3, 4, 5, 7] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_pt0_set",
+          "name": "เอฟเฟกต์จาก โจมตีพื้นฐาน pt0 · แทง · ไขควง (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/pt0_set/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "pt0"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า pt0_set (ภาพดิบ assets/sprites/pixellab_draft/states/PT_A_stance/PT_A_stance/animations/pt0_v/west) · 305 จุด · มีเอฟเฟกต์เฟรม [5] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_rg0_set",
+          "name": "เอฟเฟกต์จาก โจมตีพื้นฐาน rg0 · ยิง · ธนู (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/rg0_set/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "rg0"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า rg0_set (ภาพดิบ assets/sprites/pixellab_draft/states/RG_A_stance/RG_A_stance/animations/rg0_v/west) · 167 จุด · มีเอฟเฟกต์เฟรม [3, 5, 6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_fs0_set",
+          "name": "เอฟเฟกต์จาก โจมตีพื้นฐาน fs0 · มือเปล่า · นวม (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/fs0_set/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "fs0"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า fs0_set (ภาพดิบ assets/sprites/pixellab_draft/states/FS_A_stance/FS_A_stance/animations/fs0_v/west) · 2350 จุด · มีเอฟเฟกต์เฟรม [3, 4, 6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_hurt_k",
+          "name": "เอฟเฟกต์จาก โดนตี ถือมีด (6 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/hurt_k/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "hurt_k"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า hurt_k (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/hurt_k_v/west) · 1750 จุด · มีเอฟเฟกต์เฟรม [1, 2] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_ko_k",
+          "name": "เอฟเฟกต์จาก ล้ม มีดหลุดมือ (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": null,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/ko_k/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "ko_k"
+          },
+          "ms": 110,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า ko_k (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/ko_k_v/west) · 253 จุด · มีเอฟเฟกต์เฟรม [1] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_run_k",
+          "name": "เอฟเฟกต์จาก วิ่งถือมีด (8 เฟรม · ใช้ 6)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 33,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/run_k/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "run_k"
+          },
+          "ms": 60,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า run_k (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/run_k_v/west) · 2252 จุด · มีเอฟเฟกต์เฟรม [5, 6, 7] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_hop_k",
+          "name": "เอฟเฟกต์จาก กระโดดถอยถือมีด (8 เฟรม · ใช้ 5)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 33,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/hop_k/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "hop_k"
+          },
+          "ms": 60,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า hop_k (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/hop_k_v/west) · 156 จุด · มีเอฟเฟกต์เฟรม [6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl0_v2",
+          "name": "เอฟเฟกต์จาก ฟันมีดพื้นฐาน bl0 รอบ 2 · มือขวาทุกเฟรม (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl0_v2/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl0"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl0_v2 (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl0_v2/west) · 1031 จุด · มีเอฟเฟกต์เฟรม [5, 6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl1_v",
+          "name": "เอฟเฟกต์จาก เขี้ยวพุ่ง bl1 รอบ 1 · ไม่ผ่าน (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl1_v/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl1"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl1_v (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl1_v/west) · 1059 จุด · มีเอฟเฟกต์เฟรม [5, 6, 7] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_slash_fist_v",
+          "name": "เอฟเฟกต์จาก ฟันมือเปล่ากำหมัด (ทดลองวางอาวุธด้วยโค้ด) · ไม่ผ่าน (8 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/slash_fist_v/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "slash_fist"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า slash_fist_v (ภาพดิบ assets/sprites/pixellab_draft/zip/Idle/animations/slash_fist_v/west) · 710 จุด · มีเอฟเฟกต์เฟรม [4, 5, 6, 7] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl7_v",
+          "name": "เอฟเฟกต์จาก ตัดเอ็น bl7 (กาลี) · ใช้ 4 จาก 8 เฟรม",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl7_v/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl7"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl7_v (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl7_v/west) · 254 จุด · มีเอฟเฟกต์เฟรม [6] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        },
+        {
+          "id": "fx_bl7_back_v",
+          "name": "เอฟเฟกต์จาก ตัดเอ็น · ก้าวถอยแบบกาลี (end_frame 4 เฟรม)",
+          "kind": "attack",
+          "status": "draft",
+          "date": "2026-10-21",
+          "gens": 0,
+          "seed": 27,
+          "dirs": {
+            "west": "assets/sprites/pixellab_draft/fx_ideas/bl7_back_v/west"
+          },
+          "mirror": null,
+          "prompt": {
+            "type": "moves",
+            "key": "bl7_back"
+          },
+          "ms": 90,
+          "game_ms": null,
+          "notes": "ส่วนที่ clean() ลบออกจากท่า bl7_back_v (ภาพดิบ assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl7_back_v/west) · 826 จุด · มีเอฟเฟกต์เฟรม [0, 1] · ไอเดียเท่านั้น ไม่เสียเครดิตเพิ่ม"
+        }
+      ]
+    }
+  ]
+}

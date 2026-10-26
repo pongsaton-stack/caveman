@@ -1,0 +1,95 @@
+<title>Rion 3D หมุนรอบตัว</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600&family=Kanit:wght@600&display=swap">
+<style>
+/* Layout: turntable beside kwan's reference, then the 8 directions as a strip */
+:root {
+  --bg: #f4f1ec; --surface: #fffdf9; --fg: #241d18; --muted: #6f6359; --line: #e2d8cd;
+  --accent: #2f5fb8; --accent-fg: #ffffff; --stage: #a7b5a0;
+  --display: "Kanit", "IBM Plex Sans Thai", system-ui, sans-serif; --body: "IBM Plex Sans Thai", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15120f; --surface: #1f1a16; --fg: #f1e9e1; --muted: #a9998c; --line: #352c25; --accent: #7aa3f0; --accent-fg: #10151f; --stage: #5d6b58; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #15120f; --surface: #1f1a16; --fg: #f1e9e1; --muted: #a9998c; --line: #352c25; --accent: #7aa3f0; --accent-fg: #10151f; --stage: #5d6b58; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.6; padding: 0 16px; }
+main { max-width: 1000px; margin: 0 auto; padding-block: 28px 48px; display: grid; gap: 18px; }
+h1 { font-family: var(--display); font-size: 1.5rem; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-size: 1.1rem; margin: 6px 0 0; }
+.sub { color: var(--muted); margin: 2px 0 0; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+figure { margin: 0; background: var(--stage); border-radius: 10px; border: 1px solid var(--line); overflow: hidden; display: grid; }
+figure canvas, figure img { display: block; width: 100%; height: auto; }
+figure img { aspect-ratio: 1; object-fit: contain; background: #00b048; }
+figcaption { background: var(--surface); padding: 8px 12px; font-weight: 600; font-size: .9rem; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; font-variant-numeric: tabular-nums; }
+.seg button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.strip { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+@media (max-width: 560px) { .strip { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.strip figure { cursor: pointer; }
+.strip figcaption { padding: 4px 6px; font-size: .8rem; text-align: center; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.note ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+</style>
+<main>
+  <header>
+    <h1>Rion 3D ปั้นใน Blender</h1>
+    <p class="sub">โมเดลแยก 24 ชิ้น + โครงกระดูก 10 ท่อน · แสงเงาการ์ตูน 2 ระดับ + เส้นขอบ · ผืน 512 ตัวสูง 464 เท่าร่างภาพคมเดิม · ร่าง ยังไม่เข้าเกม</p>
+  </header>
+  <div class="seg" role="group" aria-label="การหมุน">
+    <button id="spin" aria-pressed="true">หมุนเอง</button>
+    <button id="prev" aria-pressed="false">◀ ทิศก่อน</button>
+    <button id="next" aria-pressed="false">ทิศถัดไป ▶</button>
+  </div>
+  <div class="pair">
+    <figure><canvas id="cv" width="512" height="512" aria-label="Rion 3D หมุนรอบตัว"></canvas><figcaption id="cap">ทิศ 0 · หน้า</figcaption></figure>
+    <figure><img id="ref" alt="ภาพต้นแบบ Rion จาก kwan"><figcaption>ภาพต้นแบบจาก kwan</figcaption></figure>
+  </div>
+  <h2>ครบ 8 ทิศ</h2>
+  <div class="strip" id="strip"></div>
+  <div class="note">
+    <ul>
+      <li>ลากบนภาพหมุนได้ · กดภาพเล็กเพื่อหยุดที่ทิศนั้น</li>
+      <li>มุมหลังและหลังเฉียงซ่อนตา-ปาก (ลายหน้าทำเป็นแผ่นบาง หันเกินครึ่งจะโผล่พ้นขอบหัว)</li>
+      <li>มีโครงกระดูกพร้อมทำท่าแล้ว แต่ยังไม่มีท่าเดิน/วิ่ง/โจมตี/โดนตี</li>
+    </ul>
+  </div>
+</main>
+<script>
+const D = __DATA__;
+const NAMES = ['หน้า', 'หน้าเฉียงขวา', 'หันขวา', 'หลังเฉียงขวา', 'หลัง', 'หลังเฉียงซ้าย', 'หันซ้าย', 'หน้าเฉียงซ้าย'];
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+(async () => {
+  const ims = await Promise.all(D.dirs.map(load));
+  document.getElementById('ref').src = D.ref;
+  const cv = document.getElementById('cv'), ctx = cv.getContext('2d'), cap = document.getElementById('cap');
+  let dir = 0, spin = true, last = 0;
+  function draw() {
+    ctx.clearRect(0, 0, 512, 512); ctx.drawImage(ims[dir], 0, 0);
+    cap.textContent = 'ทิศ ' + dir + ' · ' + NAMES[dir];
+  }
+  const strip = document.getElementById('strip');
+  ims.forEach((im, i) => {
+    const f = document.createElement('figure'); const c = document.createElement('canvas'); c.width = c.height = 256;
+    c.getContext('2d').drawImage(im, 0, 0, 256, 256); const fc = document.createElement('figcaption'); fc.textContent = i + ' ' + NAMES[i];
+    f.append(c, fc); f.addEventListener('click', () => { dir = i; setSpin(false); draw(); }); strip.append(f);
+  });
+  const spinBtn = document.getElementById('spin');
+  function setSpin(v) { spin = v; spinBtn.setAttribute('aria-pressed', v); }
+  spinBtn.addEventListener('click', () => setSpin(!spin));
+  document.getElementById('prev').addEventListener('click', () => { setSpin(false); dir = (dir + 7) % 8; draw(); });
+  document.getElementById('next').addEventListener('click', () => { setSpin(false); dir = (dir + 1) % 8; draw(); });
+  let dragX = null;
+  cv.addEventListener('pointerdown', e => { dragX = e.clientX; setSpin(false); cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => {
+    if (dragX === null) return; const step = cv.clientWidth / 10;
+    while (e.clientX - dragX > step) { dir = (dir + 7) % 8; dragX += step; draw(); }
+    while (dragX - e.clientX > step) { dir = (dir + 1) % 8; dragX -= step; draw(); }
+  });
+  cv.addEventListener('pointerup', () => { dragX = null; });
+  function tick(now) { if (spin && now - last > 450) { dir = (dir + 1) % 8; last = now; draw(); } requestAnimationFrame(tick); }
+  draw(); requestAnimationFrame(tick);
+})();
+</script>

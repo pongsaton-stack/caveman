@@ -1,0 +1,104 @@
+{
+ "_doc": "Rion + อาวุธจากชีต อบด้วยริก (tools/sprites/rion_rig.py) · ร่าง ยังไม่เข้าเกม · เฟรม 0 ยืน · ง้าง ~4 · ฟาด ~6 · คืน 11",
+ "n": 12,
+ "items": [
+  {
+   "code": "SL01",
+   "family": "SL",
+   "pose": "slash",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "SL30",
+   "family": "SL",
+   "pose": "slash",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "PC01",
+   "family": "PC",
+   "pose": "thrust",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "PC30",
+   "family": "PC",
+   "pose": "thrust",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "CR01",
+   "family": "CR",
+   "pose": "swing2",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "CR30",
+   "family": "CR",
+   "pose": "swing2",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "ST01",
+   "family": "ST",
+   "pose": "aim",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "ST30",
+   "family": "ST",
+   "pose": "aim",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "BD01",
+   "family": "BD",
+   "pose": "punch",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "BD30",
+   "family": "BD",
+   "pose": "punch",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "DV07",
+   "family": "DV",
+   "pose": "point",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "DV29",
+   "family": "DV",
+   "pose": "point",
+   "name": null,
+   "frames": 12
+  },
+  {
+   "code": "W301",
+   "family": "W",
+   "pose": "slash",
+   "name": "กระทะ",
+   "frames": 12
+  },
+  {
+   "code": "W309",
+   "family": "W",
+   "pose": "swing2",
+   "name": "จอบ",
+   "frames": 12
+  }
+ ]
+}

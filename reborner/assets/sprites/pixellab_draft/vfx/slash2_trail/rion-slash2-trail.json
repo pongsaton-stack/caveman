@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "rion-slash2-trail 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 1.png",
+   "frame": {
+    "x": 124,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 2.png",
+   "frame": {
+    "x": 248,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 3.png",
+   "frame": {
+    "x": 0,
+    "y": 124,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 4.png",
+   "frame": {
+    "x": 124,
+    "y": 124,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 5.png",
+   "frame": {
+    "x": 248,
+    "y": 124,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 6.png",
+   "frame": {
+    "x": 0,
+    "y": 248,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  },
+  {
+   "filename": "rion-slash2-trail 7.png",
+   "frame": {
+    "x": 124,
+    "y": 248,
+    "w": 124,
+    "h": 124
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 124,
+    "h": 124
+   },
+   "sourceSize": {
+    "w": 124,
+    "h": 124
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8548387096774194
+   },
+   "duration": 111
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "rion-slash2-trail.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 372,
+   "h": 372
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "feet",
+   "x": 62,
+   "y": 106
+  },
+  "frameTags": [
+   {
+    "name": "rion-slash2-trail",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

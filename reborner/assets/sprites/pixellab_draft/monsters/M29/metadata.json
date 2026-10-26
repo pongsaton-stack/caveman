@@ -1,0 +1,45 @@
+{
+  "group_id": "e43433b4-2b23-4e59-acc2-2bef7f8a6623",
+  "states": [
+    {
+      "character": {
+        "id": "309d22a9-ed42-4b2f-a43c-b2e797d0f4fb",
+        "name": "Idle",
+        "prompt": "A single monster for a turn-based JRPG battle, full body, centered. Cute and warm Ghibli-like creature design, readable chunky silhouette, thick dark outline. No background, no ground, no shadow, no text, no extra characters, no weapons other than those described. A big stocky golem made of carved stone, larger and heavier than the other monsters and filling most of the frame. Body built from stacked rounded stone blocks, broad shoulders, two huge stone fists hanging low, warm softly glowing orange rune letters carved all over the body, eyes are small fire lights inside a slot in the stone head, short thick legs. Strong but slow and gentle looking. Palette: #6C5947, #8A7460, #523624, rune glow #92552D. 2D pixel art, classic 32-bit era style (16/32-bit JRPG, SNES and PlayStation 1 look), crisp square pixels, limited palette, flat shading with hard edges, no anti-aliasing, no smooth gradients, no 3D rendering.",
+        "size": {
+          "width": 96,
+          "height": 96
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-19T01:14:14.734693+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {
+          "hurt": {
+            "east": [
+              "Idle/animations/hurt/east/frame_000.png",
+              "Idle/animations/hurt/east/frame_001.png",
+              "Idle/animations/hurt/east/frame_002.png",
+              "Idle/animations/hurt/east/frame_003.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-19T01:30:29.579601"
+}

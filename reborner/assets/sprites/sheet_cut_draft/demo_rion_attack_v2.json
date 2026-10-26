@@ -1,0 +1,125 @@
+{
+ "source": "ชีตจำลอง (x5 · พื้นchecker · สีเพี้ยน±8) จาก poses64_draft/rion_attack_v2",
+ "background": "flood",
+ "frames": 8,
+ "size": [
+  64,
+  76
+ ],
+ "baseline": 74,
+ "scale": 5.0,
+ "scale_mode": "พิกเซลปลอม k=5 (มั่นใจ 0.98)",
+ "palette": "rion",
+ "palette_dist": 4.3,
+ "ms": 80,
+ "files": [
+  "demo_rion_attack_v2_0.png",
+  "demo_rion_attack_v2_1.png",
+  "demo_rion_attack_v2_2.png",
+  "demo_rion_attack_v2_3.png",
+  "demo_rion_attack_v2_4.png",
+  "demo_rion_attack_v2_5.png",
+  "demo_rion_attack_v2_6.png",
+  "demo_rion_attack_v2_7.png"
+ ],
+ "cells": [
+  {
+   "box": [
+    110,
+    119,
+    280,
+    409
+   ],
+   "row": 0,
+   "dx": 15,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    484,
+    118,
+    654,
+    408
+   ],
+   "row": 0,
+   "dx": 15,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    854,
+    141,
+    1019,
+    431
+   ],
+   "row": 0,
+   "dx": 16,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    1226,
+    158,
+    1386,
+    443
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    1611,
+    130,
+    1771,
+    415
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    1964,
+    124,
+    2124,
+    409
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    2334,
+    135,
+    2494,
+    420
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    2719,
+    154,
+    2879,
+    434
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 19,
+   "clipped": false
+  }
+ ],
+ "compare_with": "rion_attack_v2",
+ "match": 95.3
+}

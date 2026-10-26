@@ -1,0 +1,17 @@
+{
+ "size": [
+  96,
+  112
+ ],
+ "feet": 110,
+ "frames": {
+  "south_w": 6,
+  "north_w": 6,
+  "west_w": 6,
+  "east_w": 6,
+  "west_i": 2,
+  "west_a": 6,
+  "west_h": 5,
+  "west_k": 3
+ }
+}

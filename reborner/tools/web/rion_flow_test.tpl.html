@@ -1,0 +1,234 @@
+<title>Rion Flow ทดลอง</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#f3f1ec;--card:#fffdf8;--ink:#2a1a14;--mute:#6d625a;--line:#ded6cb;--acc:#2a70be;--bad:#b4371f;--ok:#2e7d4f;--stage:#9aa7a0;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1916;--card:#25221e;--ink:#efe7dc;--mute:#a99d90;--line:#3b3631;--acc:#6aa5e6;--bad:#e2775f;--ok:#6fc28f;--stage:#3d4642;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1916;--card:#25221e;--ink:#efe7dc;--mute:#a99d90;--line:#3b3631;--acc:#6aa5e6;--bad:#e2775f;--ok:#6fc28f;--stage:#3d4642;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif;padding:20px 16px 48px}
+main{max-width:1100px;margin:0 auto;display:grid;gap:18px}
+h1{font-size:24px;margin:0;text-wrap:balance}
+.sub{color:var(--mute);margin:2px 0 0;max-width:70ch}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:2}
+button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 12px;cursor:pointer}
+button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.grid.pairs{grid-template-columns:repeat(auto-fill,minmax(min(100%,480px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:6px}
+.card h2{font-size:16px;margin:0;display:flex;justify-content:space-between;gap:8px}
+.card h2 span{font-weight:400;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
+canvas{width:100%;aspect-ratio:260/230;max-width:100%;border-radius:6px;display:block;image-rendering:auto}
+.note{font-size:13px;margin:0;color:var(--mute)}
+.note b{color:var(--bad);font-weight:600}.note i{color:var(--ok);font-style:normal;font-weight:600}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+details img{width:100%;max-width:560px;display:block;margin-top:8px}
+</style>
+<main>
+  <header>
+    <h1>Rion · ชีต Google Flow ทดลอง</h1>
+    <p class="sub" id="built">สร้างเมื่อ __BUILT__</p>
+    <p class="sub">ตัดจากชีตที่ kwan ส่ง 15 ต.ค. ทีละช่อง ลบพื้นเขียว ไม่ย่อ · ท่าในศึกที่ Flow วาดหันขวา พลิกเป็นหันซ้ายแล้วตอนตัด (นาฬิกาอยู่ข้อมือซ้ายแขนใกล้ = ถูก) · ข้อที่แก้ด้วยโค้ดได้ แก้แล้ว (ดูป้ายเขียว "แก้แล้ว") · จังหวะเป็นค่าดูในหน้านี้เท่านั้น · ร่าง ยังไม่เข้าเกม</p>
+  </header>
+  <div class="bar">
+    <span id="sets"></span>
+    <button id="play" aria-pressed="true">เล่น</button>
+    <button data-spd="0.5">×0.5</button><button data-spd="1" aria-pressed="true">×1</button>
+    <button id="m70" aria-pressed="true">70 เฟรม × 45 ms</button>
+    <button data-bg="stage" aria-pressed="true">พื้นเทา</button><button data-bg="green">พื้นเขียว</button><button data-bg="dark">พื้นมืด</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <details><summary>ชีตต้นทาง</summary><img id="sheet" alt="ชีตต้นทางจาก Google Flow"></details>
+</main>
+<script>
+const D = __DATA__;
+// ผลตรวจทีละท่า ต่อชุด (ดูภาพ + วัดความต่างระหว่างเฟรม · รายงานในแชท 15 ต.ค.)
+const NOTE = {
+  main: {
+    idle_battle: '<i>ใหม่ (รอบ 8-1)</i> · ถือมีดตั้งท่า 6 เฟรม (สั่ง 8) · <b>ภาพแทบเหมือนกันทุกเฟรม</b> (โหมด 70 เฟรมเติมหายใจ)',
+    run: '<i>ใหม่</i> · วิ่ง 8 เฟรม ครบตามสั่ง',
+    attack_knife: '<i>ใหม่ · แก้แล้ว: เฟรมฟัน GPT วาดตัวชูมีดซ้อนหลัง → ลบตัวหลังออก</i> · ตัดเฟรมตามแรง (หมวกซ้อนสองใบ) · เหลือ 6 เฟรม · วิ่งเข้า → ชูมีด → ฟันมีรอย (เฟรม 5)',
+    hurt: '<i>ใหม่</i> · โดน → เซถอย → ตั้งหลัก · <i>แก้แล้ว: ตัดเฟรมแรกที่ถือมีดสองเล่ม</i> · 6 เฟรม',
+    death: '<i>ใหม่ · แก้แล้ว: ท่านอน 3 ตัวเหลื่อมติดกัน → ผ่าตามขอบหมวก/แว่น ใช้ 2 ตัวที่ครบ</i> (ตัวกลางไม่มีขา) · 5 เฟรม',
+    walk_front: 'ชีต A · <i>วนเรียบ</i>', walk_back: 'ชีต A', walk_left: 'ชีต A · 8 เฟรม',
+    walk_right: 'ชีต A พลิก + ลบนาฬิกา',
+    cast: '<i>ใหม่ (รอบ 8-2)</i> · พนมมือหลับตา → แสงที่มือ → วงพลัง → ผลักปล่อยลูกพลัง · <b>สั่ง 8 ได้ 6 เฟรม</b> · ย่อ ×0.47 ให้เท่าชีต A',
+    kneel: '<i>ใหม่ · แก้แล้ว: คุกเข่าข้างเดียว มือแตะพื้น ไม่คลานสี่ขา</i> · 7 เฟรม',
+    guard: '<i>ใหม่ · แก้แล้ว: ไขว้แขนกันหน้า + ประกายตอนโดน (เฟรม 5)</i> · 7 เฟรม',
+    dodge: 'ชีต A · กระโดดถอยเอนหลัง',
+    watch: 'ชีต A · มือป้องตา',
+    jump_roll: '<i>ใหม่ · แก้แล้ว: ชูมีดสองมือ → ฟันลงมีรอยมีด</i> · 7 เฟรม (สั่ง 8)',
+    victory: '<i>ใหม่</i> · มีหมุนหลัง (เฟรม 7) + ชี้นิ้ว + ชูมือ · <b>ส่ายสะโพกยังน้อย</b> (ส่วนใหญ่เท้าเอว) · ย่อ ×0.50',
+  },
+  v8a: { idle_battle: 'ขนาดเดิมของชีต', attack_knife: 'ขนาดเดิม', hurt: 'ขนาดเดิม', death: 'ขนาดเดิม', run: 'ขนาดเดิม' },
+  v8b: {
+    cast: 'ขนาดเดิมของชีต (ตัวสูง ~360) · ลูกพลังติดเฟรม 6', kneel: 'ขนาดเดิม', guard: 'ขนาดเดิม', jump_roll: 'ขนาดเดิม', victory: 'ขนาดเดิม',
+  },
+  v6: {
+    walk_front: '<i>ทิศถูก 14 เฟรม</i> · วนเรียบ (ต่าง 35–49% ทุกคู่ ไม่มีเฟรมโดด) · <b>หัวไม่ขึ้นลง</b> (โหมด 70 เฟรมเติมให้)',
+    walk_back: '<i>ทิศถูก ไม่มีหน้า 14 เฟรม</i> · วนเรียบ · หัวไม่ขึ้นลง',
+    walk_left: '<b>Flow วาดหันขวา</b> (สั่งหันซ้าย) → <i>แก้แล้ว: พลิก</i> · 7 เฟรม (สั่ง 8)',
+    walk_right: '<i>ได้จากภาพเดิมของ Flow ที่หันขวา</i> · ไม่เห็นนาฬิกาในทุกเฟรม (ไม่ต้องลบ)',
+    kneel: '<i>แก้แล้ว: จบที่ย่อ เข่าลง มือแตะพื้น</i> (ตัด 4 เฟรมท้ายที่คลานสี่ขา) · <b>สั่ง "ห้ามคลานสี่ขา" แล้วก็ยังคลาน</b>',
+    kneel_b: 'ชุดที่ Flow วาดซ้ำ · <i>แก้แล้ว: จบคุกเข่าข้างเดียว</i> (ตัด 3 เฟรมคลานสี่ขา)',
+    guard: '<i>ไขว้แขนกันหน้าได้ถูก</i> · มุม 3/4 เกือบหันหน้า (ไม่ใช่หันข้าง)',
+    dodge: '<i>ย่อ → กระโดดหลบ → ลงยืน</i> · มุม 3/4',
+    dodge_b: 'ชุดที่ Flow วาดซ้ำ คล้ายชุด 1',
+    jump_roll: '<i>ชูมือ → ม้วนกลางอากาศ → ลงฟันมีรอยมีด (เฟรม 6)</i> · <b>ฟันมือเดียว</b> (สั่งสองมือ)',
+    kneel_knife: '<b>ไม่ได้สั่ง</b> — Flow เติมเอง: ตะเบ๊ะ → คุกเข่าถือมีด · ใช้เป็นท่าจบของม้วนได้',
+    watch: '<i>มือป้องตามองไกล หันซ้ายขวา</i> 7 เฟรม',
+    victory: '<i>ชี้นิ้ว → กระโดดชูสองมือ</i> · <b>ยังไม่ใช่สามช่า</b> (ไม่มีส่ายสะโพก/หมุน)',
+  },
+  v5a: {
+    walk_front: '<i>ทิศถูก · วนเรียบ</i> (ต่าง 26–56%/เฟรม ไม่มีเฟรมกระโดด) · หัวขึ้นลง 1–4 จุด',
+    walk_back: '<i>ทิศถูก ไม่มีหน้า</i> · วนเรียบ',
+    walk_left: '<i>หันซ้ายครบ 8 เฟรม</i> · วนเรียบ',
+    walk_right: '<i>แก้แล้ว: พลิกจากเดินซ้าย + ลบนาฬิกา (หน้าปัดฟ้าอ่อน) ครบ 8 เฟรม</i> · ผม/แว่นกลับด้านตามภาพพลิก',
+    kneel: '<i>แก้แล้ว: จบที่เข่าลง มือใกล้พื้น</i> (ตัดเฟรมท้ายที่คลานสี่ขา) · พลิกให้หันซ้าย',
+    guard: '<b>ไม่ใช่ท่าป้องกัน</b> — มือกุมหน้า (เหมือนตกใจ/คิด) · 3 เฟรม · <i>ขยายแถว ×1.13</i> ให้เท่าตัวเดิน',
+    dodge: '<i>กระโดดถอยเอนหลัง → ลงยืน</i> · <i>ขยาย ×1.23</i>',
+    watch: '<i>มือป้องตามองไกล</i> 4 เฟรม · <i>ขยาย ×1.32</i> (ชีตวาดเล็ก)',
+    jump_roll: '<i>ย่อ → กระโดด → ม้วนกลางอากาศ → ลงฟันมีรอยมีด (เฟรม 6)</i> · <i>ขยาย ×1.30</i> (ชีตวาดเล็กมาก)',
+    victory: '<i>หันหน้า ชูมือดีใจ</i> · ไม่ใช่สามช่าชัดเจน · เฟรม 5 หันข้าง · <i>ขยาย ×1.16</i>',
+  },
+  v5b: {
+    walk_front: '<i>ทิศถูก · วนเรียบ</i> (ต่าง 26–56%/เฟรม ไม่มีเฟรมกระโดด) · หัวขึ้นลง 1–4 จุด',
+    walk_back: '<i>ทิศถูก ไม่มีหน้า</i> · วนเรียบ',
+    walk_left: '<i>หันซ้าย</i> · <b>มีแค่ 6 เฟรม</b> (สั่ง 8)',
+    walk_right: '<i>แก้แล้ว: พลิกจากเดินซ้าย + ลบนาฬิกา</i> (เฟรม 3–4 แขนแกว่งไปหน้า ไม่เห็นนาฬิกาอยู่แล้ว) · เหลือเศษสายนาฬิกา 1–2 จุดที่ขอบข้อมือเฟรม 5–6',
+    kneel: '<i>แก้แล้ว: จบที่คุกเข่าข้างเดียว</i> (ตัด 2 เฟรมท้ายที่คลานสี่ขา) · พลิกให้หันซ้าย',
+    guard: '<i>ไขว้แขนกันหน้า</i> 4 เฟรม · <i>ขยาย ×1.25</i>',
+    dodge: '<i>ย่อหลบ → ลุก</i> · <i>ขยาย ×1.32</i>',
+    watch: '<i>มือป้องตามองไกล</i> · <b>มีแค่ 3 เฟรม</b> · <i>ขยาย ×1.47</i> (ชีตวาดเล็กสุด)',
+    jump_roll: '<i>ย่อ → ม้วน 2 เฟรม (มีดติดมือ) → ลงฟันมีรอยมีด (เฟรม 6) → ลุก</i> · <i>ขยาย ×1.33</i>',
+    victory: '<i>หันหน้า โบกมือ กระโดดดีใจ</i> · ไม่ใช่สามช่าชัดเจน · <i>ขยาย ×1.36</i>',
+  },
+  v3: {
+    idle_battle: '<i>หันข้างจริง</i> (Flow วาดหันขวา → พลิกแล้ว) · วนไม่กระตุก (ต่าง 7–25%/เฟรม)',
+    walk_front: '<i>ทิศถูก</i> · เฟรม 1 ต่าง 49% (70 เฟรมข้ามให้) · หัวไม่ขึ้นลง (โค้ดเติมให้)',
+    walk_back: '<i>ทิศถูก ไม่มีหน้า</i> · เฟรม 1 ต่าง 39% (70 เฟรมข้ามให้)',
+    walk_left: '<i>แก้แล้ว: เฟรม 4 ที่หันขวาพลิกเป็นหันซ้าย</i> · เฟรม 1 ต่าง 46% (70 เฟรมข้ามให้)',
+    walk_right: '<i>แก้แล้ว: พลิกจากเดินซ้าย + ลบนาฬิกา</i> (แถวเดิมของ Flow หันซ้าย ใช้ไม่ได้) · ผม/แว่นกลับด้านตามภาพพลิก',
+    attack_knife: '<i>มีดทำครัว · หันซ้ายหลังพลิก</i> · รอยฟันเฟรม 6',
+    hurt: '<i>มีดาว หน้าเจ็บ</i> · 5 เฟรม',
+    kneel: '<i>แก้แล้ว: จบที่คุกเข่าข้างเดียว มือวางเข่า</i> (ตัด 2 เฟรมท้ายที่คลานสี่ขาออก) · ไม่มีมือแตะพื้น',
+    death: '<i>ล้มไปข้างหน้า นอนหัวซ้าย ทิศเดียวทั้งคลิป</i>',
+    cast: '<i>พนมมือ → ชาร์จ → ปล่อย</i> · <b>ช่อง 5 ในชีตมีแต่คลื่น ไม่มีตัว</b> (ตัดออกจากคลิป) · ช่องกว้างไม่เท่ากัน',
+    run: '<i>ลอยจริง</i> (ยอดหัวขึ้นลง 3–19 จุด) · หันซ้ายหลังพลิก',
+  },
+  v1: {
+    idle_battle: '<b>หันหน้า 3/4</b> · เฟรม 1 ต่าง 36%',
+    walk_front: '<i>ทิศถูก</i> · ขาขยับน้อย · เฟรม 1 ต่าง 43%',
+    walk_back: '<i>ทิศถูก ไม่มีหน้า</i> · เฟรม 1 ต่าง 31%',
+    walk_left: '<i>หันซ้ายครบ 8 เฟรม</i> · เฟรม 1 ต่าง 38%',
+    walk_right: '<i>หันขวาครบ 8 เฟรม</i> · นาฬิกาแขนใกล้',
+    attack_knife: '<i>มีดทำครัว</i> · พลิกแล้ว',
+    hurt: 'หัน 3/4 · พลิกแล้ว',
+    kneel: '<i>จบคุกเข่าข้างเดียว มือแตะพื้น</i> · พลิกแล้ว',
+    death: '<b>ช่วงล้มหันขวา นอนหัวซ้าย</b> (ไม่พลิก)',
+    cast: '<i>ตัวครบทุกช่อง</i> · พลิกแล้ว · คลื่นเฟรม 5 ถูกตัดในชีต',
+    run: 'พลิกแล้ว · จังหวะลอยไม่ชัด',
+  },
+};
+// ── 70 เฟรม × 45 ms (แบบคลิป SL01 ในหน้า animation test) ── เฟรมจากชีต = คีย์ ค้างไม่เท่ากัน + โค้ดเติมการเคลื่อนไหว (ค่าภาพในหน้านี้ ไม่ใช่ค่าเกม)
+// ทุกท่าในศึกหันซ้ายแล้ว → ข้างหน้า = -x · ใช้ได้กับจำนวนเฟรมใดก็ได้: hit = เฟรมกระทบ/ปล่อยพลัง (จาก rion_flow_cut.py)
+const N70 = 70, SEC70 = 45;
+const eo = k => 1 - (1 - k) * (1 - k), ei = k => k * k, cl = k => Math.max(0, Math.min(1, k));
+const shakeAt = (f, f0, amp, len) => { const d = f - f0; return d >= 0 && d < len ? amp * (1 - d / len) : 0; };
+function plan(n, hit) {   // ช่วงเฟรมของแต่ละภาพ: ก่อนกระทบ 32 เฟรม (ภาพก่อนกระทบค้างนานสุด = ง้าง) · กระทบ 8 · หลังกระทบที่เหลือ · ภาพสุดท้ายค้าง
+  const d = new Array(n).fill(0), h = hit ?? Math.floor(n / 2), pre = h > 0 ? 32 : 0, post = N70 - pre - 8;   // กระทบเฟรมแรก (โดนตี) = ไม่มีช่วงก่อนกระทบ
+  if (h > 0) { const w = Array.from({ length: h }, (_, i) => i === h - 1 ? 2.2 : 1), s = w.reduce((a, b) => a + b, 0); w.forEach((v, i) => d[i] = Math.round(pre * v / s)); }
+  d[h] = 8;
+  const rest = n - h - 1; if (rest > 0) { const last = Math.round(post * .45); for (let i = h + 1; i < n - 1; i++) d[i] = Math.round((post - last) / Math.max(1, rest - 1)); d[n - 1] = last; }
+  const tot = d.reduce((a, b) => a + b, 0); d[n - 1] += N70 - tot;
+  const start = []; let a = 0; for (const v of d) { start.push(a); a += v; } return { d, start, hitF: start[h] };
+}
+function frameAt(p, f) { for (let i = p.d.length - 1; i >= 0; i--) if (f >= p.start[i]) return i; return 0; }
+function t70(row, n, f) {
+  const id = row.id;
+  if (row.loop) {
+    const k0 = row.skip0 ? 1 : 0, m = n - k0;
+    if (id === 'idle_battle') { const b = .5 - .5 * Math.cos(2 * Math.PI * f / 24); return { i: k0 + Math.floor(f / 6) % m, sy: 1 - .016 * b, sx: 1 + .006 * b }; }
+    if (id === 'run') { const s = Math.abs(Math.sin(2 * Math.PI * f / (2 * m))); return { i: k0 + Math.floor(f / 2) % m, dy: -4 * s }; }
+    if (id === 'watch') { const b = .5 - .5 * Math.cos(2 * Math.PI * f / 35); return { i: k0 + Math.floor(f / 7) % m, sy: 1 - .012 * b }; }   // มองไกล: ช้า หายใจ ไม่ย่ำเท้า
+    if (id === 'victory') { const ph = Math.floor(f / 5) % m; return { i: k0 + ph, dy: ph >= m - 2 ? -4 * Math.sin(Math.PI * (f % 5) / 5) : 0 }; }   // ดีใจ: 2 เฟรมท้ายเด้ง
+    const s = Math.abs(Math.sin(2 * Math.PI * f / (2 * m)));   // เดิน: ตัวลงตอนแตะพื้น ขึ้นตอนก้าวผ่าน (รอบละ m ภาพ × 2 เฟรม)
+    return { i: k0 + Math.floor(f / 2) % m, dy: -3 * s, sy: 1 - .02 * (1 - s), sx: 1 + .008 * (1 - s) };
+  }
+  const p = plan(n, row.hit), H = p.hitF, i = frameAt(p, f), o = { i };
+  if (id === 'attack_knife') {   // ง้างค้างตัวสั่น → พุ่งเข้า 30 จุดก่อนกระทบ → หยุดภาพ 3 เฟรม + วาบ + สั่น → ค้าง → ถอยกลับ
+    o.dx = f < H - 5 ? 3 * eo(cl(f / (H - 5))) : f < H ? 3 - 33 * ei(cl((f - H + 5) / 5)) : f < H + 22 ? -30 : -30 * (1 - eo(cl((f - H - 22) / 10)));
+    if (f >= H && f < H + 3) o.i = row.hit; o.shake = shakeAt(f, H, 6, 8) + (f > H - 14 && f < H - 5 ? .8 : 0); o.flash = f === H ? .45 : f === H + 1 ? .2 : 0;
+  } else if (id === 'hurt') {   // โดนจากซ้าย → กระเด็นไปขวา
+    o.dx = f < 12 ? 24 * eo(cl(f / 12)) : f < 40 ? 24 : 24 * (1 - eo(cl((f - 40) / 14))); o.shake = shakeAt(f, 0, 7, 10); o.flash = f < 2 ? .5 - f * .2 : 0;
+  } else if (id === 'cast') {   // ชาร์จตัวสั่นแรงขึ้น → ปล่อย: วาบ + สั่น + ถอยตามแรงสะท้อน (ไปขวา)
+    const ch = f < H ? cl(f / H) : 0; o.shake = ch * 1.4 + shakeAt(f, H, 6, 8); o.flash = f === H ? .35 : 0; o.sy = 1 - .03 * ch;
+    o.dx = f >= H && f < H + 14 ? 6 * Math.sin(Math.PI * (f - H) / 14) : 0;
+  } else if (id === 'dodge' || id === 'dodge_b') {   // หลบ: กระโดดถอยไปขวา (ห่างศัตรู) ตอนเฟรมหลบ → ค้าง → คืนที่
+    o.dx = f < H ? 0 : f < H + 8 ? 26 * eo(cl((f - H) / 8)) : f < H + 30 ? 26 : 26 * (1 - eo(cl((f - H - 30) / 12)));
+    o.dy = f >= H && f < H + 8 ? -10 * Math.sin(Math.PI * (f - H) / 8) : 0;
+  } else if (id === 'guard') {   // ป้องกัน: ตั้งการ์ด → โดนกระแทกถอยนิด + สั่น
+    o.dx = f >= H && f < H + 14 ? 6 * Math.sin(Math.PI * (f - H) / 14) : 0; o.shake = shakeAt(f, H, 4, 8); o.flash = f === H ? .25 : 0;
+  } else if (id === 'jump_roll') {   // กระโดดม้วนเข้าหาเป้า → ฟันตอนแตะพื้น (ไม่หยุดตั้งท่า) → ไถลต่อ → เดินกลับ
+    o.dx = f < H ? -36 * eo(cl(f / H)) : f < H + 6 ? -36 - 6 * eo(cl((f - H) / 6)) : f < H + 24 ? -42 : -42 * (1 - eo(cl((f - H - 24) / 14)));
+    o.shake = shakeAt(f, H, 6, 8); o.flash = f === H ? .4 : f === H + 1 ? .15 : 0;
+  } else {   // คุกเข่า / ล้มนอน: สั่นตอนกระแทกพื้น
+    o.shake = shakeAt(f, H, 5, 6); if (id === 'death' && f >= H + 12 && f < H + 16) o.dy = -3 * Math.sin(Math.PI * (f - H - 12) / 4);
+  }
+  return o;
+}
+let playing = true, speed = 1, bg = 'stage', m70 = true, cur = D.sets[0].id;
+const BG = { stage: () => getComputedStyle(document.documentElement).getPropertyValue('--stage'), green: () => '#13b54b', dark: () => '#141210' };
+const load = s => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+let cards = [];
+async function build(sid) {
+  cur = sid; const set = D.sets.find(s => s.id === sid);
+  document.querySelectorAll('#sets button').forEach(b => b.setAttribute('aria-pressed', b.dataset.set === sid));
+  document.getElementById('sheet').src = set.sheet;
+  const grid = document.getElementById('grid'); grid.textContent = ''; const out = [];
+  const pairSet = set.pair && D.sets.find(s => s.id === set.pair);   // ชุดพิกเซล: เล่นคู่กับภาพคม ซ้าย = ภาพคม · ขวา = พิกเซล
+  grid.classList.toggle('pairs', !!pairSet);
+  for (const row of set.rows) {
+    const frames = await Promise.all(row.frames.map(load));
+    const pr = pairSet && pairSet.rows.find(r => r.id === row.id), pframes = pr ? await Promise.all(pr.frames.map(load)) : null;
+    const W = pframes ? 520 : 260;
+    const el = document.createElement('section'); el.className = 'card';
+    el.innerHTML = `<h2>${row.label}<span>${frames.length} เฟรม · สั่ง: ${row.want}${row.flipped ? ' · พลิก' : ''}</span></h2><canvas width="${W}" height="230" style="aspect-ratio:${W}/230"></canvas><p class="note">${pframes ? 'ซ้าย = ภาพคม (ชุดหลัก) · ขวา = พิกเซล ตัวยืนสูง ~' + set.pxh + ' จุด · ' + set.pxc + ' สี · แสดงขยาย ×' + set.px + ' (ตัวเล็กกว่าซ้าย ~7%) · ' : ''}${(NOTE[sid] || {})[row.id] || ''}</p>`;
+    grid.append(el); out.push({ row, frames, pframes, px: set.px || 0, W, cv: el.querySelector('canvas'), t: 0 });
+  }
+  cards = out;
+}
+(async () => {
+  const box = document.getElementById('sets');
+  for (const s of D.sets) { const b = document.createElement('button'); b.dataset.set = s.id; b.textContent = s.label; b.onclick = () => build(s.id); box.append(b); }
+  await build(cur);
+  let last = performance.now();
+  const tick = now => {
+    const dt = Math.max(0, Math.min(60, now - last)); last = now;   // เฟรมแรกของ rAF อาจเร็วกว่า performance.now() → ห้ามติดลบ
+    for (const c of cards) {
+      if (playing) c.t += dt * speed;
+      const x = c.cv.getContext('2d'); x.fillStyle = BG[bg](); x.fillRect(0, 0, c.W, 230);
+      const n = c.frames.length; let o = {}, label;
+      if (m70) { const f = ((Math.floor(c.t / SEC70) % N70) + N70) % N70; o = t70(c.row, n, f); label = (f + 1) + '/70'; }
+      else { const dur = c.row.ms * n, hold = c.row.loop ? 0 : 700, tt = ((c.t % (dur + hold)) + dur + hold) % (dur + hold); o = { i: Math.min(n - 1, Math.floor(tt / c.row.ms)) }; label = (o.i + 1) + '/' + n; }
+      const sh = o.shake || 0, f0 = Math.floor(c.t / SEC70);
+      const ox = (o.dx || 0) + (sh ? Math.sin(f0 * 2.3) * sh : 0), oy = (o.dy || 0) + (sh ? Math.cos(f0 * 3.1) * sh * .6 : 0);
+      const put = (im, cx, k) => {   // k > 0 = พิกเซล: ขยายจำนวนเต็ม ไม่ลื่นภาพ ตำแหน่งลงตารางเม็ด
+        x.save(); x.imageSmoothingEnabled = !k;
+        const q = k ? v => Math.round(v / k) * k : v => v;
+        x.translate(q(cx + ox), q(226 + oy)); x.scale((o.sx || 1) * (k || 1), (o.sy || 1) * (k || 1));
+        x.drawImage(im, -Math.round(im.width / 2), -im.height); x.restore();
+      };
+      if (c.pframes) { put(c.pframes[o.i], 130, 0); put(c.frames[o.i], 390, c.px); x.fillStyle = 'rgba(0,0,0,.25)'; x.fillRect(259, 0, 2, 230); }
+      else put(c.frames[o.i], 130, c.px);
+      if (o.flash) { x.fillStyle = 'rgba(255,255,255,' + o.flash + ')'; x.fillRect(0, 0, c.W, 230); }
+      x.fillStyle = 'rgba(0,0,0,.55)'; x.fillRect(4, 4, 46, 18); x.fillStyle = '#fff'; x.font = '12px system-ui'; x.fillText(label, 9, 17);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
+document.getElementById('play').onclick = e => { playing = !playing; e.target.setAttribute('aria-pressed', playing); e.target.textContent = playing ? 'เล่น' : 'หยุด'; };
+document.querySelectorAll('[data-spd]').forEach(b => b.onclick = () => { speed = +b.dataset.spd; document.querySelectorAll('[data-spd]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
+document.getElementById('m70').onclick = e => { m70 = !m70; e.target.setAttribute('aria-pressed', m70); e.target.textContent = m70 ? '70 เฟรม × 45 ms' : 'เฟรมดิบ'; cards.forEach(c => c.t = 0); };
+document.querySelectorAll('[data-bg]').forEach(b => b.onclick = () => { bg = b.dataset.bg; document.querySelectorAll('[data-bg]').forEach(o => o.setAttribute('aria-pressed', o === b)); });
+</script>

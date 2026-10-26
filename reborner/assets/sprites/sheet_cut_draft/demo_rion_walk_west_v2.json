@@ -1,0 +1,125 @@
+{
+ "source": "ชีตจำลอง (x6 · พื้นflat · สีเพี้ยน±6) จาก poses64_draft/rion_walk_west_v2",
+ "background": "flood",
+ "frames": 8,
+ "size": [
+  64,
+  76
+ ],
+ "baseline": 74,
+ "scale": 6.0,
+ "scale_mode": "พิกเซลปลอม k=6 (มั่นใจ 0.97)",
+ "palette": "rion",
+ "palette_dist": 2.9,
+ "ms": 80,
+ "files": [
+  "demo_rion_walk_west_v2_0.png",
+  "demo_rion_walk_west_v2_1.png",
+  "demo_rion_walk_west_v2_2.png",
+  "demo_rion_walk_west_v2_3.png",
+  "demo_rion_walk_west_v2_4.png",
+  "demo_rion_walk_west_v2_5.png",
+  "demo_rion_walk_west_v2_6.png",
+  "demo_rion_walk_west_v2_7.png"
+ ],
+ "cells": [
+  {
+   "box": [
+    136,
+    149,
+    328,
+    497
+   ],
+   "row": 0,
+   "dx": 16,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    561,
+    170,
+    753,
+    512
+   ],
+   "row": 0,
+   "dx": 16,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    994,
+    140,
+    1186,
+    482
+   ],
+   "row": 0,
+   "dx": 16,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    1416,
+    175,
+    1608,
+    517
+   ],
+   "row": 0,
+   "dx": 16,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    1836,
+    170,
+    2028,
+    512
+   ],
+   "row": 0,
+   "dx": 16,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    2262,
+    149,
+    2454,
+    491
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    2696,
+    149,
+    2888,
+    491
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  },
+  {
+   "box": [
+    3133,
+    140,
+    3325,
+    482
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 18,
+   "clipped": false
+  }
+ ],
+ "compare_with": "rion_walk_west_v2",
+ "match": 97.7
+}

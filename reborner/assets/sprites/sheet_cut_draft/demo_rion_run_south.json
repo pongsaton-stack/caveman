@@ -1,0 +1,86 @@
+{
+ "source": "ชีตจำลอง (x7 · พื้นflat · สีเพี้ยน±0) จาก poses64_draft/rion_run_south",
+ "background": "flood",
+ "frames": 5,
+ "size": [
+  64,
+  76
+ ],
+ "baseline": 74,
+ "scale": 7.0,
+ "scale_mode": "พิกเซลปลอม k=7 (มั่นใจ 0.98)",
+ "palette": "rion",
+ "palette_dist": 0.1,
+ "ms": 80,
+ "files": [
+  "demo_rion_run_south_0.png",
+  "demo_rion_run_south_1.png",
+  "demo_rion_run_south_2.png",
+  "demo_rion_run_south_3.png",
+  "demo_rion_run_south_4.png"
+ ],
+ "cells": [
+  {
+   "box": [
+    145,
+    183,
+    376,
+    589
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    641,
+    173,
+    872,
+    579
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    1137,
+    165,
+    1368,
+    571
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    1636,
+    152,
+    1867,
+    558
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 17,
+   "clipped": false
+  },
+  {
+   "box": [
+    2133,
+    161,
+    2364,
+    567
+   ],
+   "row": 0,
+   "dx": 17,
+   "dy": 17,
+   "clipped": false
+  }
+ ],
+ "compare_with": "rion_run_south",
+ "match": 99.6
+}

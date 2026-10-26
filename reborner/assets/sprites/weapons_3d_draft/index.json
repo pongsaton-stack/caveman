@@ -1,0 +1,42 @@
+{
+ "_doc": "อาวุธ render จาก Blender (tools/sprites/weapons_3d.py) · 48px · หมุน 16 มุม · ร่าง ยังไม่เข้าเกม",
+ "size": 48,
+ "items": [
+  {
+   "id": "SL-1",
+   "name": "มีดทำครัว",
+   "school": "คม",
+   "frames": 16
+  },
+  {
+   "id": "CR-2",
+   "name": "ไม้เบสบอลอลูมิเนียม",
+   "school": "ทุบ",
+   "frames": 16
+  },
+  {
+   "id": "PC-1",
+   "name": "ดินสอ",
+   "school": "แทง",
+   "frames": 16
+  },
+  {
+   "id": "ST-1",
+   "name": "หนังสติ๊กกิ่งไม้",
+   "school": "ยิง",
+   "frames": 16
+  },
+  {
+   "id": "DV-1",
+   "name": "ที่เย็บกระดาษ",
+   "school": "กล",
+   "frames": 16
+  },
+  {
+   "id": "BD-1",
+   "name": "ถุงมือผ้าทำสวน",
+   "school": "มือเปล่า",
+   "frames": 16
+  }
+ ]
+}

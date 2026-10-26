@@ -1,0 +1,713 @@
+{
+ "_doc": "ไอเท็มร่าง — รายชื่อ/ตัวเลขจาก data/items.csv + drop ใน data/monsters.csv (tools/sprites/items_icons.py)",
+ "items": [
+  {
+   "id": "I01",
+   "name": "ยาสมุนไพร",
+   "kind": "heal_hp",
+   "value": "0.4",
+   "price": "20",
+   "stock": "6",
+   "note": "ฟื้น HP ตัวเอก 40% · ⚠ ค่าชั่วคราว — ชีต Items ในเวิร์กบุ๊กไม่ได้อยู่ใน repo",
+   "from": "data/items.csv",
+   "cat": "ยา"
+  },
+  {
+   "id": "L01",
+   "name": "ยาเติมชีวิต",
+   "kind": "restore_lp",
+   "value": "1",
+   "price": "130",
+   "stock": "3",
+   "note": "คืน LP มอน 1 แต้ม · ห้ามชุบมอนที่หายถาวร (GDD 9.2) · 130g = GDD 12.4 · สต๊อก 2-3 ต่อภูมิภาค",
+   "from": "data/items.csv",
+   "cat": "ยา"
+  },
+  {
+   "id": "D-M01",
+   "name": "เมือกเถ้า",
+   "sources": [
+    {
+     "monster_id": "M01",
+     "monster": "สไลม์เถ้า",
+     "region": "ที่ราบเถ้า",
+     "rate": "60"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M02",
+   "name": "หนังหนู",
+   "sources": [
+    {
+     "monster_id": "M02",
+     "monster": "หนูท่อ",
+     "region": "ที่ราบเถ้า",
+     "rate": "70"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M03",
+   "name": "หินดิบ",
+   "sources": [
+    {
+     "monster_id": "M03",
+     "monster": "หนอนหิน",
+     "region": "ที่ราบเถ้า",
+     "rate": "50"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M04",
+   "name": "สปอร์",
+   "sources": [
+    {
+     "monster_id": "M04",
+     "monster": "เห็ดพิษ",
+     "region": "ที่ราบเถ้า",
+     "rate": "55"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M05",
+   "name": "ขนดำ",
+   "sources": [
+    {
+     "monster_id": "M05",
+     "monster": "กาสามตา",
+     "region": "ที่ราบเถ้า",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M06",
+   "name": "ปีกบาง",
+   "sources": [
+    {
+     "monster_id": "M06",
+     "monster": "ค้างคาวเงา",
+     "region": "ที่ราบเถ้า",
+     "rate": "50"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M07",
+   "name": "เถ้าเรือง",
+   "sources": [
+    {
+     "monster_id": "M07",
+     "monster": "ผีไฟป่า",
+     "region": "ที่ราบเถ้า",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M08",
+   "name": "กระดูกผุ",
+   "sources": [
+    {
+     "monster_id": "M08",
+     "monster": "โครงกระดูกเดินเวร",
+     "region": "ที่ราบเถ้า",
+     "rate": "60"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M09",
+   "name": "ไม้สลัก",
+   "sources": [
+    {
+     "monster_id": "M09",
+     "monster": "ตุ๊กตาไม้",
+     "region": "ที่ราบเถ้า",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M10",
+   "name": "ใยเหนียว",
+   "sources": [
+    {
+     "monster_id": "M10",
+     "monster": "แมงมุมสาน",
+     "region": "ที่ราบเถ้า",
+     "rate": "50"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M11",
+   "name": "ขวานบิ่น",
+   "sources": [
+    {
+     "monster_id": "M11",
+     "monster": "คนเถื่อนถือขวาน",
+     "region": "ที่ราบเถ้า",
+     "rate": "35"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M12",
+   "name": "ตำราฉีก",
+   "sources": [
+    {
+     "monster_id": "M12",
+     "monster": "นักบวชโทรม",
+     "region": "ที่ราบเถ้า",
+     "rate": "30"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M13",
+   "name": "ถุงเงิน",
+   "sources": [
+    {
+     "monster_id": "M13",
+     "monster": "โจรทางหลวง",
+     "region": "ที่ราบเถ้า",
+     "rate": "65"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "เงิน"
+  },
+  {
+   "id": "D-M14",
+   "name": "เขี้ยวคู่",
+   "sources": [
+    {
+     "monster_id": "M14",
+     "monster": "งูเถ้าสองหัว",
+     "region": "ที่ราบเถ้า",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M15",
+   "name": "เขี้ยวหมาป่า",
+   "sources": [
+    {
+     "monster_id": "M15",
+     "monster": "หมาป่าคู่",
+     "region": "ที่ราบเถ้า",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M16",
+   "name": "ฟันคม",
+   "sources": [
+    {
+     "monster_id": "M16",
+     "monster": "ปลาปากขวาน",
+     "region": "เมืองใต้ซาก",
+     "rate": "50"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M17",
+   "name": "เฟืองทอง",
+   "sources": [
+    {
+     "monster_id": "M17",
+     "monster": "ทหารกลไก",
+     "region": "เมืองใต้ซาก",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M18",
+   "name": "เกราะจม",
+   "sources": [
+    {
+     "monster_id": "M18",
+     "monster": "ทหารซากไร้หัว",
+     "region": "เมืองใต้ซาก",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M19",
+   "name": "ตำรา Red ระดับ 2",
+   "sources": [
+    {
+     "monster_id": "M19",
+     "monster": "นักเวทย์เร่ร่อน",
+     "region": "เมืองใต้ซาก",
+     "rate": "25"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-M20",
+   "name": "เหล็กก้าม",
+   "sources": [
+    {
+     "monster_id": "M20",
+     "monster": "แมงป่องเหล็ก",
+     "region": "เมืองใต้ซาก",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M21",
+   "name": "น้ำตาแก้ว",
+   "sources": [
+    {
+     "monster_id": "M21",
+     "monster": "หญิงร่ำไห้",
+     "region": "เมืองใต้ซาก",
+     "rate": "35"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M22",
+   "name": "แก่นไม้",
+   "sources": [
+    {
+     "monster_id": "M22",
+     "monster": "ต้นไม้เดินได้",
+     "region": "เมืองใต้ซาก",
+     "rate": "50"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M23",
+   "name": "เกราะสนิม",
+   "sources": [
+    {
+     "monster_id": "M23",
+     "monster": "อัศวินซาก",
+     "region": "เมืองใต้ซาก",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M24",
+   "name": "ตำรา Black ระดับ 2",
+   "sources": [
+    {
+     "monster_id": "M24",
+     "monster": "นักสวดมืด",
+     "region": "เมืองใต้ซาก",
+     "rate": "25"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-M25",
+   "name": "เกล็ดเรือง",
+   "sources": [
+    {
+     "monster_id": "M25",
+     "monster": "หนอนกลืนแสง",
+     "region": "เมืองใต้ซาก",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M26",
+   "name": "ปีกราชินี",
+   "sources": [
+    {
+     "monster_id": "M26",
+     "monster": "ค้างคาวราชินี",
+     "region": "เมืองใต้ซาก",
+     "rate": "35"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M27",
+   "name": "หน้ากากว่าง",
+   "sources": [
+    {
+     "monster_id": "M27",
+     "monster": "เงาไร้หน้า",
+     "region": "เมืองใต้ซาก",
+     "rate": "30"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M28",
+   "name": "หนังจ่าฝูง",
+   "sources": [
+    {
+     "monster_id": "M28",
+     "monster": "หมาป่าจ่าฝูง",
+     "region": "เมืองใต้ซาก",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M29",
+   "name": "ตำรา Red \"ใส่จุดอ่อน\"",
+   "sources": [
+    {
+     "monster_id": "M29",
+     "monster": "โกลเลมสลัก",
+     "region": "เมืองใต้ซาก",
+     "rate": "100"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-M30",
+   "name": "บัญชีวิญญาณ",
+   "sources": [
+    {
+     "monster_id": "M30",
+     "monster": "ผู้เก็บวิญญาณ",
+     "region": "เมืองใต้ซาก",
+     "rate": "35"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ของสำคัญ"
+  },
+  {
+   "id": "D-M31",
+   "name": "หนังหมี",
+   "sources": [
+    {
+     "monster_id": "M31",
+     "monster": "หมีน้ำแข็ง",
+     "region": "ยอดเขาคำสาป",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M32",
+   "name": "เกล็ดอ่อน",
+   "sources": [
+    {
+     "monster_id": "M32",
+     "monster": "มังกรน้อย",
+     "region": "ยอดเขาคำสาป",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M33",
+   "name": "เขี้ยวประจุ",
+   "sources": [
+    {
+     "monster_id": "M33",
+     "monster": "หมาป่าสายฟ้า",
+     "region": "ยอดเขาคำสาป",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M34",
+   "name": "กระดูกยักษ์",
+   "sources": [
+    {
+     "monster_id": "M34",
+     "monster": "ยักษ์หิมะ",
+     "region": "ยอดเขาคำสาป",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M35",
+   "name": "ตำรา Black ระดับ 3",
+   "sources": [
+    {
+     "monster_id": "M35",
+     "monster": "แม่มดเถ้า",
+     "region": "ยอดเขาคำสาป",
+     "rate": "30"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-M36",
+   "name": "ตำรา White ระดับ 3",
+   "sources": [
+    {
+     "monster_id": "M36",
+     "monster": "นักบุญตกสวรรค์",
+     "region": "ยอดเขาคำสาป",
+     "rate": "30"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-M37",
+   "name": "กุญแจหิน",
+   "sources": [
+    {
+     "monster_id": "M37",
+     "monster": "ผู้พิทักษ์ประตู",
+     "region": "ยอดเขาคำสาป",
+     "rate": "50"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ของสำคัญ"
+  },
+  {
+   "id": "D-M38",
+   "name": "ดาบเงา",
+   "sources": [
+    {
+     "monster_id": "M38",
+     "monster": "นักดาบเงา",
+     "region": "ยอดเขาคำสาป",
+     "rate": "35"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M39",
+   "name": "ธนูดำ",
+   "sources": [
+    {
+     "monster_id": "M39",
+     "monster": "นักล่าไร้เงา",
+     "region": "ยอดเขาคำสาป",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M40",
+   "name": "ตาแก้ว",
+   "sources": [
+    {
+     "monster_id": "M40",
+     "monster": "ตาแห่งห้วงลึก",
+     "region": "ยอดเขาคำสาป",
+     "rate": "25"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M41",
+   "name": "ขี้เถ้าตำรา",
+   "sources": [
+    {
+     "monster_id": "M41",
+     "monster": "ผู้เผาตำรา",
+     "region": "ยอดเขาคำสาป",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M42",
+   "name": "กระดูกมังกร",
+   "sources": [
+    {
+     "monster_id": "M42",
+     "monster": "กระดูกมังกร",
+     "region": "ยอดเขาคำสาป",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M43",
+   "name": "เกล็ดหนา",
+   "sources": [
+    {
+     "monster_id": "M43",
+     "monster": "งูพันภูเขา",
+     "region": "ยอดเขาคำสาป",
+     "rate": "45"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-M44",
+   "name": "ตำรา White ระดับ 4",
+   "sources": [
+    {
+     "monster_id": "M44",
+     "monster": "เทวทูตแตกหัก",
+     "region": "ยอดเขาคำสาป",
+     "rate": "40"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-M45",
+   "name": "เงาตกผลึก",
+   "sources": [
+    {
+     "monster_id": "M45",
+     "monster": "เงาของผู้กล้า",
+     "region": "ยอดเขาคำสาป",
+     "rate": "30"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "วัตถุดิบ"
+  },
+  {
+   "id": "D-B1",
+   "name": "ตำรา White \"คืน LP\"",
+   "sources": [
+    {
+     "monster_id": "B1",
+     "monster": "ราชาหนอนเถ้า",
+     "region": "บอส",
+     "rate": "100"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-B2",
+   "name": "ตำราอัญเชิญ #1",
+   "sources": [
+    {
+     "monster_id": "B2",
+     "monster": "อัศวินสนิมผู้ไม่ยอมตาย",
+     "region": "บอส",
+     "rate": "100"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-B3",
+   "name": "ตำรา Red \"หยุดเวลา\"",
+   "sources": [
+    {
+     "monster_id": "B3",
+     "monster": "คณะเงาไร้หน้า",
+     "region": "บอส",
+     "rate": "100"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  },
+  {
+   "id": "D-B4",
+   "name": "ตำราอัญเชิญ #2",
+   "sources": [
+    {
+     "monster_id": "B4",
+     "monster": "มังกรใต้พสุธา",
+     "region": "บอส",
+     "rate": "100"
+    }
+   ],
+   "from": "data/monsters.csv (drop)",
+   "cat": "ตำรา"
+  }
+ ]
+}

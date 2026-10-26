@@ -1,0 +1,389 @@
+<title>สมุดรวม REBORNER</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Sarabun:wght@400;500;700&display=swap">
+<style>
+/* หน้าเดียว · แถบหัวติดบน (ชื่อ ค้นหา แท็บ) · เนื้อหาเป็นการ์ดตามหมวด · พาเลตต์จาก UiKit ของเกม (เถ้า + ทอง) */
+:root {
+	--bg: #efe8da; --panel: #f8f3e8; --line: #d6cab0; --fg: #2a2318; --muted: #6e6350; --gold: #96731f; --good: #4d6a2f; --bad: #a3442e; --blue: #2e5f9e;
+	--chip: #e6dcc6; --shadow: 0 1px 0 rgba(60,45,20,.06);
+	--display: "Chakra Petch", "Sarabun", system-ui, sans-serif; --body: "Sarabun", system-ui, sans-serif;
+	color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+	--bg: #15130f; --panel: #1d1a15; --line: #3a3329; --fg: #e8d9b5; --muted: #a89b80; --gold: #d6af55; --good: #8fa865; --bad: #d36f57; --blue: #7ea8e0;
+	--chip: #2a251d; --shadow: none; color-scheme: dark } }
+:root[data-theme="dark"] {
+	--bg: #15130f; --panel: #1d1a15; --line: #3a3329; --fg: #e8d9b5; --muted: #a89b80; --gold: #d6af55; --good: #8fa865; --bad: #d36f57; --blue: #7ea8e0;
+	--chip: #2a251d; --shadow: none; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); margin: 0 }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel) }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line) }
+header .wrap { padding-block: 12px 0; display: grid; gap: 10px }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px }
+h1 { font: 700 22px/1.2 var(--display); margin: 0; letter-spacing: .02em }
+h1 small { font: 500 13px var(--body); color: var(--muted); letter-spacing: 0; margin-left: 8px }
+.search { flex: 1 1 220px; display: flex }
+.search input { width: 100%; font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px }
+.search input:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px }
+nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: thin }
+nav button { font: 600 14px var(--display); color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; padding: 6px 12px 8px; cursor: pointer; white-space: nowrap }
+nav button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--gold) }
+nav button .n { font: 500 11px var(--body); color: var(--muted); margin-left: 4px; font-variant-numeric: tabular-nums }
+main .wrap { padding-block: 20px 48px; display: grid; gap: 18px }
+h2 { font: 700 19px/1.3 var(--display); margin: 0; text-wrap: balance }
+h3 { font: 700 16px/1.3 var(--display); margin: 0 }
+.lead { color: var(--muted); max-width: 70ch; margin: 0 }
+.filters { display: flex; flex-wrap: wrap; gap: 6px }
+.filters button { font: 500 13px var(--body); color: var(--fg); background: var(--chip); border: 1px solid transparent; border-radius: 999px; padding: 3px 12px; cursor: pointer }
+.filters button[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); background: var(--panel) }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)) }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: grid; gap: 8px; align-content: start; min-width: 0; box-shadow: var(--shadow) }
+.card .head { display: flex; gap: 12px; align-items: center }
+.pic { width: 64px; height: 64px; flex: none; display: grid; place-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; overflow: hidden }
+.pic img { image-rendering: pixelated; max-width: 60px; max-height: 60px }
+.pic.none { color: var(--muted); font-size: 11px; text-align: center; line-height: 1.3; padding: 4px }
+.name { font: 700 16px/1.3 var(--display) }
+.sub { color: var(--muted); font-size: 13px }
+.chips { display: flex; flex-wrap: wrap; gap: 4px }
+.chip { font-size: 12px; line-height: 1.5; padding: 0 8px; border-radius: 4px; background: var(--chip); color: var(--fg); white-space: nowrap }
+.chip.gold { color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); background: none }
+.chip.prop { color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); background: none }
+.chip.draft { color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); background: none }
+.chip.good { color: var(--good) } .chip.bad { color: var(--bad) }
+dl.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 0; text-align: center; font-variant-numeric: tabular-nums }
+dl.stats div { background: var(--bg); border-radius: 4px; padding: 2px 0 }
+dl.stats dt { font-size: 11px; color: var(--muted); letter-spacing: .06em } dl.stats dd { margin: 0; font-weight: 700 }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 2px 10px; font-size: 14px; margin: 0 }
+.kv dt { color: var(--muted) } .kv dd { margin: 0; min-width: 0 }
+.tree { display: grid; gap: 14px }
+.school { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 12px }
+.school > .top h3 { font-size: 18px }
+.branches { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)) }
+.branch { display: grid; gap: 6px; align-content: start; min-width: 0 }
+.branch h4 { margin: 0; font: 600 13px var(--display); color: var(--gold); letter-spacing: .06em; text-transform: uppercase }
+.tech { border-left: 3px solid var(--line); padding: 4px 0 4px 10px; display: grid; gap: 2px }
+.tech.ult { border-left-color: var(--gold) }
+.tech .t1 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline }
+.tech .tn { font-weight: 700 }
+.tech .nums { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
+.tech .note { font-size: 13px }
+.req { font: 600 12px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; min-width: 4.5em }
+.formula { font: 600 15px/1.5 ui-monospace, "SFMono-Regular", Menlo, monospace; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre }
+table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums }
+.tbl { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 8px }
+th, td { text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--line) } th { font: 600 12px var(--display); color: var(--muted); letter-spacing: .05em }
+tr:last-child td { border-bottom: 0 } td.num { text-align: right }
+.bar { height: 6px; background: var(--gold); border-radius: 3px; min-width: 2px }
+.cols { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)) }
+.prose { max-width: 70ch; display: grid; gap: 8px; align-content: start } .prose p, .prose ol { margin: 0 }
+.empty { color: var(--muted); padding: 20px 0 }
+footer { color: var(--muted); font-size: 12px; padding-block: 0 32px }
+@media (prefers-reduced-motion: no-preference) { nav button { transition: color .15s, border-color .15s } }
+</style>
+
+<header>
+	<div class="wrap">
+		<div class="top">
+			<h1>สมุดรวม REBORNER <small id="built"></small></h1>
+			<label class="search" for="q"><input id="q" type="search" placeholder="ค้นหาชื่อ สาย ภูมิภาค ธาตุ…" autocomplete="off"></label>
+		</div>
+		<nav id="tabs" role="tablist" aria-label="หมวด"></nav>
+	</div>
+</header>
+<main><div class="wrap" id="view"></div></main>
+<footer><div class="wrap" id="foot"></div></footer>
+
+<script>
+const D = /*DATA*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const chip = (t, cls = '') => t ? `<span class="chip ${cls}">${esc(t)}</span>` : '';
+const pic = (src, alt) => src ? `<div class="pic"><img src="${src}" alt="${esc(alt)}"></div>` : `<div class="pic none">ยังไม่มีภาพ</div>`;
+const SCOPE = { single: 'เป้าเดียว', row: 'ทั้งแถว', column: 'แนวหน้า-หลัง', all: 'ทั้งหมด', party: 'ทีมเรา', self: 'ตัวเอง' };
+const SCHOOLS = ['คม', 'ทุบ', 'แทง', 'ยิง', 'กล', 'มือเปล่า'];
+const S = { tab: 'skills', q: '', f: {} };
+try { const h = location.hash.slice(1); if (h) S.tab = h; } catch (e) {}
+
+const match = (...xs) => !S.q || xs.join(' ').toLowerCase().includes(S.q);
+const filterBar = (key, opts, all = 'ทั้งหมด') => {
+	const cur = S.f[key] ?? '';
+	return `<div class="filters" data-key="${key}">${[['', all], ...opts.map(o => [o, o])].map(([v, l]) =>
+		`<button type="button" data-v="${esc(v)}" aria-pressed="${cur === v}">${esc(l)}</button>`).join('')}</div>`;
+};
+
+// ── สกิล ──
+function techSpecial(t) {
+	const out = [];
+	if (+t.hits > 1) out.push(`${t.hits} ครั้ง`);
+	if (+t.ignore_def > 0) out.push(`ไม่สนเกราะ ${Math.round(t.ignore_def * 100)}%`);
+	if (+t.target_av_mult > 1) out.push(`คิวเป้าช้าลง ${Math.round((t.target_av_mult - 1) * 100)}%`);
+	if (t.ignore_pos === '1') out.push('ไม่เสียแรงจากแถวหลัง');
+	if (t.free_row === '1') out.push('ตีแถวหลังได้เต็ม');
+	if (t.status) out.push(`${t.status} ${Math.round(t.status_chance * 100)}%`);
+	if (t.effect === 'counter') out.push('ตั้งท่าสวน');
+	return out;
+}
+function techRow(t) {
+	const ult = +t.req_prof >= D.ult && t.effect !== 'counter', prop = t.note.startsWith('[เสนอ]');
+	const note = t.note.replace(/^\[เสนอ\]\s*/, '');
+	return `<div class="tech${ult ? ' ult' : ''}">
+		<div class="t1"><span class="req">ชำนาญ ${esc(t.req_prof)}</span><span class="tn">${esc(t.name_th)}</span>
+			${ult ? chip('ไม้ตาย', 'gold') : ''}${prop ? chip('ตัวเลขเสนอ', 'prop') : ''}</div>
+		<div class="nums">พลัง ${esc(t.power)}${+t.hits > 1 ? ' ×' + t.hits : ''} · SP ${esc(t.sp)} · น้ำหนักคิว ${esc(t.weight)} · ${SCOPE[t.scope] || esc(t.scope)} · ธาตุ${esc(t.element)}</div>
+		${techSpecial(t).length || note ? `<div class="note">${techSpecial(t).map(s => chip(s)).join(' ')} ${esc(note)}</div>` : ''}
+	</div>`;
+}
+function vSkills() {
+	const sch = S.f.school ?? '';
+	const list = D.skills.filter(t => (!sch || t.school === sch) && match(t.name_th, t.school, t.branch, t.note, t.element, t.status));
+	let html = `<div class="prose"><h2>สกิล · ต้นไม้ท่า ${SCHOOLS.length} สาย</h2>
+		<p class="lead">ถืออาวุธสายไหน ใช้ได้และประกายได้เฉพาะท่าสายนั้น · ท่าใหม่ได้จากการประกายเท่านั้น ต้องเรียนท่าก่อนหน้าและความชำนาญถึง · ไม้ตาย = ท่าที่ต้องชำนาญ ${D.ult} ขึ้นไป</p></div>
+		${filterBar('school', SCHOOLS)}`;
+	const groups = (sch ? [sch] : SCHOOLS).map(s => [s, list.filter(t => t.school === s)]).filter(([, l]) => l.length);
+	if (!groups.length) return html + `<p class="empty">ไม่พบท่าที่ตรงกับคำค้น</p>`;
+	html += '<div class="tree">' + groups.map(([s, l]) => {
+		const total = D.skills.filter(t => t.school === s).length;
+		const root = l.filter(t => !t.branch), br = [...new Set(l.filter(t => t.branch).map(t => t.branch))];
+		return `<section class="school"><div class="top"><h3>สาย${esc(s)}</h3><span class="sub">${total} ท่า</span></div>
+			${root.map(techRow).join('')}
+			<div class="branches">${br.map(b => `<div class="branch"><h4>${b === 'ไม้ตาย' ? 'ไม้ตายรวมของสาย' : 'กิ่ง' + esc(b)}</h4>${l.filter(t => t.branch === b).sort((a, z) => a.req_prof - z.req_prof).map(techRow).join('')}</div>`).join('')}</div></section>`;
+	}).join('') + '</div>';
+	return html;
+}
+
+// ── เวทย์ ──
+function vSpells() {
+	const sp = D.spells, list = sp.schools.flatMap(s => s.spells.map(x => ({ ...x, school: s }))).filter(x => match(x.name, x.school.name, x.element, x.effect, x.look));
+	return `<div class="prose"><h2>เวทย์มนต์ 4 สาย</h2>
+		<p class="lead">ร่ายจากตำรา · ตำรา = ราก ประกาย = กิ่ง (GDD 7.2) · ${chip(sp.status, 'draft')} ยังไม่อยู่ในเกม · ตัวเลขใส่เฉพาะที่ GDD กำหนด</p></div>
+		${sp.schools.map(s => {
+			const l = list.filter(x => x.school === s); if (!l.length) return '';
+			return `<section class="grid" aria-label="สาย${esc(s.name)}"><div class="card" style="grid-column:1/-1;background:none;border:0;box-shadow:none;padding:0">
+				<h3>สาย${esc(s.name)} <span class="sub">${esc(s.gdd)} ${esc(s.version)} · ${esc(s.identity)}</span></h3></div>
+				${l.map(x => `<article class="card"><div class="name">${esc(x.name)}</div>
+					<div class="chips">${chip(x.id)}${chip('ธาตุ' + x.element)}${chip(SCOPE[x.scope] || x.scope)}${x.power != null ? chip('พลัง ' + x.power, 'gold') : ''}</div>
+					<dl class="kv"><dt>ผล</dt><dd>${esc(x.effect)}</dd><dt>ภาพ</dt><dd>${esc(x.look)}</dd></dl></article>`).join('')}</section>`;
+		}).join('') || `<p class="empty">ไม่พบเวทย์ที่ตรงกับคำค้น</p>`}`;
+}
+
+// ── ประกาย ──
+function vGlimmer() {
+	const g = D.glimmer, max = Math.max(...g.insight.map(x => x.v));
+	return `<div class="prose"><h2>ประกาย</h2>
+		<p class="lead">หัวใจของเกม ท่าใหม่ไม่ได้มาจากเลเวล แต่ "ประกาย" ขึ้นกลางศึก แล้วท่านั้นยิงออกทันทีในเทิร์นนั้น ฟรี SP แรง ×1.5</p></div>
+		<div class="cols">
+			<div class="prose"><h3>โอกาสประกายทุกครั้งที่ใช้ท่า</h3>
+				<div class="formula">P = ${g.base} × ThreatFactor × (1 − สัดส่วนท่าที่เรียนแล้ว) × (1 + LUCK × 0.015)</div>
+				<p>ศัตรูยิ่งแข็งกว่าความชำนาญ โอกาสยิ่งสูง ศัตรูอ่อนกว่ามากแทบไม่ประกาย จึงฟาร์มมอนอ่อนไม่ได้ผล · ยิ่งเรียนท่าในสายครบ โอกาสยิ่งลด</p>
+				<h3>Insight เต็ม = ประกายแน่นอน</h3>
+				<p>สะสมจากสถานการณ์คับขัน ครบ ${g.threshold} แล้วท่าถัดไปประกายแน่นอน · เศษเกินยกไป ${Math.round(g.carry * 100)}% · หลังประกายจาก Insight เต็ม ล็อกการสะสม ${g.lock} รอบ · จบศึกแล้ว Insight ค้างไปศึกถัดไปตามความสูสีของศึก (ศัตรูอ่อนสุดขั้วไม่ค้าง)</p>
+				<p>ประกายแรกของเกมแน่นอนเสมอ ให้ผู้เล่นเห็นกลไกตั้งแต่ต้น</p>
+				<h3>ประกายแบบอื่น</h3>
+				<p><b>ประกายสวนกลับ</b> ตั้งรับแล้วโดนตี มีโอกาสประกายแล้วสวนทันทีนอกคิว · <b>อ่านทางหลบ</b> โดนท่าเด่นของมอนบ่อยพอ จะอ่านทางและหลบท่านั้นได้เมื่อติดตั้ง · <b>อาวุธชี้ทาง</b> อาวุธแต่ละชิ้นเพิ่มโอกาสประกายท่าในกิ่งของมัน ×2</p>
+			</div>
+			<div class="prose"><h3>แหล่ง Insight</h3>
+				<div class="tbl"><table><thead><tr><th>เหตุการณ์</th><th>ชนิด</th><th style="text-align:right">Insight</th><th style="width:30%"></th></tr></thead><tbody>
+				${g.insight.filter(x => match(x.what, x.kind)).map(x => `<tr><td>${esc(x.what)}</td><td>${chip(x.kind, x.kind === 'วิกฤต' ? 'bad' : '')}</td><td class="num">+${x.v}</td>
+					<td><div class="bar" style="width:${(x.v / max * 100).toFixed(1)}%"></div></td></tr>`).join('')}</tbody></table></div>
+				<p class="sub">ทุกแหล่งคือสถานการณ์ที่กำลังแย่ ประกายจึงมาถึงตอนกำลังจะแพ้</p></div>
+		</div>`;
+}
+
+// ── อาวุธ ──
+function vWeapons() {
+	const w = D.weapons, sch = S.f.wschool ?? '';
+	const fams = w.families.filter(f => !sch || f.school === sch);
+	const body = fams.map(f => {
+		const l = f.weapons.filter(x => match(x.name, x.concept, f.school, f.object, x.steer)); if (!l.length) return '';
+		return `<section class="grid" aria-label="สาย${esc(f.school)}"><div style="grid-column:1/-1"><h3>สาย${esc(f.school)} · ${esc(f.object)}</h3><p class="lead">${esc(f.concept)}</p></div>
+			${l.map(x => `<article class="card"><div class="head">${pic(x.icon, x.name)}<div><div class="name">${esc(x.name)}</div>
+				<div class="sub">${esc(x.id)} · ระดับ ${x.tier} ${esc(w.tiers[x.tier]?.label || '')}</div></div></div>
+				<div class="chips">${x.base ? chip('ค่าอาวุธ ' + x.base, 'gold') : chip('ยังไม่มีค่าอาวุธ', 'draft')}${x.steer ? chip('ชี้ทางกิ่ง' + x.steer) : ''}</div>
+				<p class="note" style="margin:0">${esc(x.concept)}</p></article>`).join('')}</section>`;
+	}).join('');
+	return `<div class="prose"><h2>อาวุธ 30 ชิ้น</h2><p class="lead">6 สาย × 5 ระดับ ของใช้ในบ้านที่โตเป็นอาวุธ · ${chip(w.status, 'draft')} ในเกมตอนนี้มีค่าอาวุธเฉพาะชิ้นที่ระบุ</p></div>
+		${filterBar('wschool', w.families.map(f => f.school))}${body || '<p class="empty">ไม่พบอาวุธที่ตรงกับคำค้น</p>'}`;
+}
+
+// ── มอน / บอส ──
+const ELEM = s => s ? s.split('|').join(' · ') : '';
+function monCard(m) {
+	return `<article class="card"><div class="head">${pic(m.img, m.name)}<div style="min-width:0"><div class="name">${esc(m.name)}</div>
+		<div class="sub">${esc(m.id)} · ${esc(m.en)} · ${esc(m.region)}${m.sub ? ' · ' + esc(m.sub) : ''}</div></div></div>
+		<dl class="stats"><div><dt>HP</dt><dd>${m.hp}</dd></div><div><dt>ATK</dt><dd>${m.atk}</dd></div><div><dt>DEF</dt><dd>${m.def}</dd></div><div><dt>SPD</dt><dd>${m.spd}</dd></div></dl>
+		<div class="chips">${chip('tier ' + m.tier)}${chip('แถว' + m.row)}${chip('ร่าง' + m.body)}${m.weak ? chip('แพ้ ' + ELEM(m.weak), 'good') : ''}${m.resist ? chip('ต้านทาน ' + ELEM(m.resist), 'bad') : ''}${m.immune ? chip('ภูมิคุ้มกัน ' + ELEM(m.immune), 'bad') : ''}</div>
+		<dl class="kv">${m.sig ? `<dt>ท่าเด่น</dt><dd><b>${esc(m.sig)}</b> — ${esc(m.sig_fx)}</dd>` : ''}
+			${m.status ? `<dt>สถานะ</dt><dd>${esc(m.status)}</dd>` : ''}
+			${m.drop ? `<dt>ดรอป</dt><dd>${esc(m.drop)}${m.rate ? ' · ' + m.rate + '%' : ''}</dd>` : ''}
+			${m.teaches ? `<dt>สอน</dt><dd>${esc(m.teaches)}</dd>` : ''}</dl></article>`;
+}
+function vMon(boss) {
+	const all = D.monsters.filter(m => m.boss === boss), regs = [...new Set(all.map(m => m.region))];
+	const key = boss ? 'breg' : 'reg', reg = S.f[key] ?? '';
+	const l = all.filter(m => (!reg || m.region === reg) && match(m.name, m.en, m.id, m.region, m.sub, m.weak, m.sig, m.body, m.drop));
+	return `<div class="prose"><h2>${boss ? 'บอส' : 'มอนสเตอร์'} ${all.length} ตัว</h2>
+		<p class="lead">ค่าจาก monsters.csv ที่เกมใช้จริง · ภาพพิกเซลมีเฉพาะตัวที่ทำแล้ว${boss ? '' : ' · แพ้ = ดาเมจแรงขึ้น · ร่างกายมีผลกับสายอาวุธ'}</p></div>
+		${regs.length > 1 ? filterBar(key, regs) : ''}<div class="grid">${l.map(monCard).join('') || '<p class="empty">ไม่พบที่ตรงกับคำค้น</p>'}</div>`;
+}
+
+// ── ไอเท็ม ──
+function vItems() {
+	const cats = [...new Set(D.items.map(x => x.cat))], cat = S.f.cat ?? '';
+	const l = D.items.filter(x => (!cat || x.cat === cat) && match(x.name, x.cat, x.note, ...(x.sources || []).map(s => s.monster + ' ' + s.region)));
+	return `<div class="prose"><h2>ไอเท็ม ${D.items.length} ชนิด</h2><p class="lead">ยาจากร้าน (items.csv) และของดรอปจากมอน · หน้าที่ของวัตถุดิบยังไม่กำหนด</p></div>
+		${filterBar('cat', cats)}
+		<div class="grid">${l.map(x => `<article class="card"><div class="head">${pic(x.icon, x.name)}<div><div class="name">${esc(x.name)}</div><div class="sub">${esc(x.id)} · ${esc(x.cat)}</div></div></div>
+			${x.price ? `<div class="chips">${chip('ราคา ' + x.price + 'g', 'gold')}${chip('สต๊อก ' + x.stock)}</div>` : ''}
+			${x.note ? `<p class="note" style="margin:0">${esc(x.note)}</p>` : ''}
+			${x.sources ? `<dl class="kv"><dt>ได้จาก</dt><dd>${x.sources.map(s => `${esc(s.monster)} (${esc(s.region)}) ${s.rate}%`).join('<br>')}</dd></dl>` : ''}</article>`).join('') || '<p class="empty">ไม่พบไอเท็มที่ตรงกับคำค้น</p>'}</div>`;
+}
+
+// ── NPC / ยานพาหนะ ──
+function vNpcs() {
+	const n = D.npcs, l = n.items.filter(x => match(x.name, x.role, x.where, x.source));
+	return `<div class="prose"><h2>NPC ชาวบ้าน ${n.items.length} คน</h2><p class="lead">${chip(n.status, 'draft')} ปิ่นกับยายขี้เถ้ามาจากร่างเรื่อง ที่เหลือเป็นข้อเสนอ · ภาพเดิมทำจากแบบตัวเอกที่เลิกใช้แล้ว จึงยังไม่แสดง</p></div>
+		<div class="grid">${l.map(x => `<article class="card"><div class="name">${esc(x.name)}</div><div class="sub">${esc(x.role)}</div>
+			<dl class="kv"><dt>อยู่ที่</dt><dd>${esc(x.where)}</dd><dt>ที่มา</dt><dd>${esc(x.source)}</dd></dl></article>`).join('') || '<p class="empty">ไม่พบ NPC ที่ตรงกับคำค้น</p>'}</div>`;
+}
+function vVehicles() {
+	const v = D.vehicles, l = v.items.filter(x => match(x.name, x.use, x.kind));
+	return `<div class="prose"><h2>ยานพาหนะ ${v.items.length} คัน</h2><p class="lead">${chip(v.status, 'draft')} ตอนนี้เป็นของประดับฉากหรือทางลัดที่เสนอ</p></div>
+		<div class="grid">${l.map(x => `<article class="card"><div class="head">${pic(x.img, x.name)}<div><div class="name">${esc(x.name)}</div><div class="sub">${esc(x.id)}</div></div></div>
+			<div class="chips">${chip(x.kind, 'prop')}</div><p class="note" style="margin:0">${esc(x.use)}</p></article>`).join('') || '<p class="empty">ไม่พบที่ตรงกับคำค้น</p>'}</div>`;
+}
+
+// ── สถานะ / ธาตุ / ร่างกาย ──
+const names = l => l.length ? l.map(esc).join(' · ') : '<span class="sub">ไม่มี</span>';
+function vStatuses() {
+	const s = D.statuses, l = s.list.filter(x => match(x.name, x.note, ...x.techs, ...x.mons));
+	return `<div class="prose"><h2>สถานะผิดปกติ ${s.list.length} แบบ</h2>
+		<p class="lead">ติดนาน ${s.duration} เทิร์นของตัวที่ติด · โอกาสติดจริง = โอกาสฐาน × (1 − DEF ÷ (DEF + ${s.resist_k})) ยิ่ง DEF สูงยิ่งต้านได้ · ตั้งรับสลัดสถานะออกได้ 1 เทิร์น · ตัวเอกติดสถานะได้ Insight</p></div>
+		<div class="grid">${l.map(x => `<article class="card"><div class="name">${esc(x.name)}</div><p style="margin:0">${esc(x.note)}</p>
+			<dl class="kv"><dt>ท่าที่ลง</dt><dd>${names(x.techs)}</dd><dt>มอนที่ลง</dt><dd>${names(x.mons)}</dd></dl></article>`).join('') || '<p class="empty">ไม่พบสถานะที่ตรงกับคำค้น</p>'}</div>`;
+}
+function vElements() {
+	const e = D.elements, l = e.list.filter(x => match(x.name, ...x.techs, ...x.weak, ...x.resist, ...x.immune));
+	return `<div class="prose"><h2>ธาตุและจุดอ่อน</h2>
+		<p class="lead">ตีโดนธาตุที่แพ้ ดาเมจ ×${e.weak} และดันคิวผู้ตีให้ได้ตาถัดไปเร็วขึ้น (AV ×${e.push}) · ธาตุที่ต้านทาน ×${e.resist} · ภูมิคุ้มกัน = 0 · ธาตุที่ยังไม่มีท่าใช้ = รอสายเวทย์</p></div>
+		<div class="tbl"><table><thead><tr><th>ธาตุ</th><th>ท่าที่ใช้ธาตุนี้</th><th>มอนที่แพ้</th><th>ต้านทาน / ภูมิคุ้มกัน</th></tr></thead><tbody>
+		${l.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${x.techs.length ? x.techs.length + ' ท่า' : '<span class="sub">ยังไม่มีท่า</span>'}</td>
+			<td>${names(x.weak)}</td><td>${names([...x.resist, ...x.immune.map(m => m + ' (ภูมิคุ้มกัน)')])}</td></tr>`).join('')}</tbody></table></div>
+		${e.special.length ? `<p class="sub">ภูมิคุ้มกันแบบพิเศษ: ${e.special.map(x => esc(x.monster) + ' = ' + esc(x.rule)).join(' · ')}</p>` : ''}`;
+}
+function vBodies() {
+	const b = D.bodies, cell = (s, body) => b.aff.find(a => a.school === s && a.body === body);
+	const mark = a => !a ? `<td class="num sub">ปกติ</td>` : `<td class="num" title="${esc(a.why)}">${a.sign > 0 ? `<span class="chip good">×${b.good}</span>` : `<span class="chip bad">×${b.bad}</span>`}</td>`;
+	const why = b.aff.filter(a => match(a.school, a.body, a.why));
+	return `<div class="prose"><h2>ร่างกาย × สายอาวุธ</h2>
+		<p class="lead">มอนแต่ละตัวมีร่างกาย 1 แบบ · สายที่เข้ากับร่างนั้นดาเมจ ×${b.good} สายที่เข้าน้อย ×${b.bad} · เป็นชั้นแยกจากธาตุ คูณดาเมจอย่างเดียว ไม่ดันคิว · จอศึกขึ้นคำ "อ่อนแอ!" / "ต้านทาน"</p></div>
+		<div class="tbl"><table><thead><tr><th>ร่างกาย</th>${SCHOOLS.map(s => `<th style="text-align:right">${esc(s)}</th>`).join('')}<th>มอน</th></tr></thead><tbody>
+		${b.bodies.map(body => `<tr><td><b>${esc(body)}</b></td>${SCHOOLS.map(s => mark(cell(s, body))).join('')}<td class="sub">${b.mons[body].length} ตัว</td></tr>`).join('')}</tbody></table></div>
+		<div class="grid">${why.map(a => `<article class="card"><div class="chips">${chip(a.school)}${chip('ร่าง' + a.body)}${chip(a.sign > 0 ? 'เข้าดี ×' + b.good : 'เข้าน้อย ×' + b.bad, a.sign > 0 ? 'good' : 'bad')}</div>
+			<p style="margin:0">${esc(a.why)}</p></article>`).join('')}</div>`;
+}
+
+// ── ภูมิภาค / ทีมมอน ──
+const TILE = { '#': '#5b5146', '~': '#4f7ea6', '.': '#b8a888', ',': '#7f9a52' };
+function drawMap(cv) {
+	const m = D.regions.map, g = m.grid, w = Math.max(...g.map(r => r.length)), h = g.length, k = 12;
+	cv.width = w * k; cv.height = h * k; const c = cv.getContext('2d');
+	g.forEach((row, y) => [...row].forEach((ch, x) => {
+		c.fillStyle = TILE[ch] || TILE['.']; c.fillRect(x * k, y * k, k, k);
+		const mark = ch === 'R' ? ['#f2e6b0', 'พ'] : ch === 'H' ? ['#ffffff', '★'] : ch === 'S' ? ['#e0b84a', 'ร'] : ch === 'B' ? ['#c0392b', 'B']
+			: m.enc[ch] ? ['#2a1a14', ch] : m.chests[ch] ? ['#c9a24a', '▣'] : null;
+		if (!mark) return;
+		c.fillStyle = mark[0] === '#2a1a14' ? '#f4ead2' : mark[0]; c.fillRect(x * k + 1, y * k + 1, k - 2, k - 2);
+		c.fillStyle = '#2a1a14'; c.font = '700 9px Sarabun, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(mark[1], x * k + k / 2, y * k + k / 2 + 1);
+	}));
+}
+function vRegions() {
+	const r = D.regions, m = r.map;
+	const regs = r.list.map(reg => {
+		const subs = reg.subs.map(sb => ({ ...sb, mons: sb.mons.filter(x => match(x.name, x.id, reg.name, sb.name)) })).filter(sb => sb.mons.length);
+		if (!subs.length) return '';
+		return `<section class="school"><div class="top"><h3>${esc(reg.name)}</h3><span class="sub">${reg.name === 'บอส' ? 'monsters.csv ยังไม่ระบุว่าบอสอยู่ภูมิภาคไหน (แผนที่ภูมิภาค 1 มี B1)' : reg.subs.length + ' สถานที่ย่อย'}</span></div>
+			<div class="branches">${subs.map(sb => `<div class="branch">${sb.name && sb.name !== '-' ? `<h4>${esc(sb.name)}</h4>` : ''}${sb.mons.map(x =>
+				`<div class="tech${x.boss ? ' ult' : ''}"><div class="t1"><span class="req">tier ${esc(x.tier)}</span><span class="tn">${esc(x.name)}</span>${x.boss ? chip('บอส', 'gold') : ''}</div>
+				<div class="nums">${esc(x.id)} · เจอเมื่อ EC ${esc(x.ec)}</div></div>`).join('')}</div>`).join('')}</div></section>`;
+	}).join('');
+	return `<div class="prose"><h2>ภูมิภาค</h2><p class="lead">มอนแต่ละตัวอยู่ภูมิภาคและสถานที่ย่อยไหน และเจอได้ช่วง EC เท่าไหร่ (EC เพิ่มเมื่อเนื้อเรื่องเดินหน้า โลกเปลี่ยนตาม) · GDD วางไว้ 3 ภูมิภาค × 3 สถานที่ย่อย</p></div>
+		<div class="cols"><div class="prose"><h3>แผนที่ที่เล่นได้ตอนนี้ · ${esc(m.title)}</h3>
+			<div class="tbl" style="padding:8px"><canvas id="map" style="image-rendering:pixelated;max-width:100%;display:block" aria-label="แผนที่ภูมิภาค 1"></canvas></div>
+			<div class="chips">${chip('★ จุดเริ่ม')}${chip('พ จุดพัก')}${chip('ร ร้านค้า')}${chip('B บอส', 'bad')}${chip('▣ หีบ')}</div>
+			<dl class="kv">${Object.entries(m.enc).map(([s, e]) => `<dt>${esc(s)}</dt><dd>${esc(e.label)}${e.boss ? ' ' + chip('บอส', 'gold') : ''}</dd>`).join('')}
+				${Object.values(m.chests).map(c => `<dt>▣</dt><dd>หีบ: ${esc(c.label)}${c.base ? ' (ค่าอาวุธ ' + esc(c.base) + ')' : ''}</dd>`).join('')}</dl></div>
+			<div class="tree">${regs || '<p class="empty">ไม่พบที่ตรงกับคำค้น</p>'}</div></div>`;
+}
+function vTeam() {
+	const t = D.team, card = (x, extra) => `<article class="card"><div class="head">${pic(x.img, x.name)}<div><div class="name">${esc(x.name)}</div><div class="sub">${esc(x.monster_id)}${x.region ? ' · ' + esc(x.region) : ''}</div></div></div>${extra}</article>`;
+	return `<div class="prose"><h2>มอนร่วมทีม</h2><p class="lead">ชนะมอนแล้วความเข้าใจท่าเด่นครบ เลือกได้ทางเดียว: ยึดท่า (ได้ 1 ท่า กินช่องความจำ) หรือรับเข้าทีม (ได้ทั้งตัว กินช่องทีม) · LP ล้มเสีย 1 หมดแล้วหายถาวร · ความเชื่อใจโตจากการสู้ด้วยกัน</p></div>
+		<h3>เริ่มเกมพร้อม ${t.start.length} ตัว</h3><div class="grid">${t.start.filter(x => match(x.name, x.note)).map(x => card(x,
+			`<div class="chips">${chip('LP ' + x.lp)}${chip('ความเชื่อใจ ' + x.loyalty)}${x.sig ? chip('ท่าเด่น ' + x.sig) : ''}</div><p class="note" style="margin:0">${esc(x.note)}</p>`)).join('')}</div>
+		<h3>รับเข้าทีมได้</h3><div class="grid">${t.recruits.filter(x => match(x.name, x.note, x.region)).map(x => card(x,
+			`<div class="chips">${chip('กิน ' + x.slots + ' ช่อง', +x.slots > 1 ? 'gold' : '')}${chip('ต้องเข้าใจ ' + x.need)}${x.sig ? chip('ท่าเด่น ' + x.sig) : ''}</div><p class="note" style="margin:0">${esc(x.note)}</p>`)).join('')}</div>
+		<h3>ท่าที่ยึดได้</h3><div class="grid">${t.seize.filter(x => match(x.name_th, x.monster, x.note)).map(x => card({ ...x, name: x.name_th },
+			`<div class="chips">${chip('จาก ' + x.monster)}${+x.power ? chip('พลัง ' + x.power) : ''}${chip('SP ' + x.sp)}${chip('กิน ' + x.slots + ' ช่องความจำ')}${x.status === 'ยืนยัน' ? chip('ยืนยันแล้ว', 'good') : ''}</div>
+			<p class="note" style="margin:0">${esc(x.note)}</p>`)).join('')}</div>
+		<h3>ช่องทีมตาม EC</h3><div class="tbl"><table><thead><tr><th>EC ตั้งแต่</th><th style="text-align:right">ช่องมอน</th><th>หมายเหตุ</th></tr></thead><tbody>
+			${t.slots.map(s => `<tr><td>${esc(s.ec)}</td><td class="num">${esc(s.monster_slots)}</td><td>${esc(s.note)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+// ── เศรษฐกิจ ──
+const econKey = k => +((D.economy.keys.find(r => r.key === k) || {}).value || 1);
+const ecMult = ec => D.economy.inflation.reduce((m, r) => ec >= +r.ec ? +r.price_mult : m, 1);
+function vEconomy() {
+	const e = D.economy, ec = +(S.f.ec ?? 0), pm = S.f.pm != null ? +S.f.pm : econKey('PRICE_MULT'), mult = pm * ecMult(ec), sr = econKey('SELL_RATIO');
+	const stat = s => s === 'เสนอ' ? chip('ตัวเลขเสนอ', 'prop') : s === 'ยืนยัน' ? chip('ยืนยันแล้ว', 'good') : chip(s || '', 'draft');
+	const maxM = Math.max(...e.inflation.map(r => +r.price_mult));
+	const shops = [...new Set(e.shops.map(r => r.shop_id))].map(id => e.shops.filter(r => r.shop_id === id));
+	return `<div class="prose"><h2>เศรษฐกิจ</h2>
+		<p class="lead">ราคาจริง = ราคาฐาน × ตัวคูณช่วงเวลา (ขึ้นตาม EC) × ตัวคูณรวม (PRICE_MULT) · ขายอาวุธคืนได้ ${Math.round(sr * 100)}% ของราคาซื้อช่วงนั้น · ตายเสียเงินครึ่งหนึ่ง · ลองปรับค่าด้านล่างเพื่อดูราคา (ในหน้านี้เท่านั้น ไม่แตะเกม)</p></div>
+		<div class="card" style="gap:10px"><h3>ลองปรับเงินเฟ้อ</h3>
+			<div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center">
+				<label for="ecIn">EC <input id="ecIn" type="range" min="0" max="20" step="1" value="${ec}" data-k="ec" style="vertical-align:middle"> <b>${ec}</b></label>
+				<label for="pmIn">ตัวคูณรวม <input id="pmIn" type="range" min="0.5" max="3" step="0.05" value="${pm}" data-k="pm" style="vertical-align:middle"> <b>×${pm.toFixed(2)}</b></label>
+				<span>ราคาช่วงนี้ <b style="color:var(--gold)">×${mult.toFixed(2)}</b></span></div></div>
+		<div class="cols"><div class="prose"><h3>เงินเฟ้อตามช่วงเรื่อง</h3>
+			<div class="tbl"><table><thead><tr><th>EC ตั้งแต่</th><th style="text-align:right">ตัวคูณ</th><th style="width:40%"></th><th></th></tr></thead><tbody>
+			${e.inflation.map(r => `<tr><td>${esc(r.ec)}</td><td class="num">×${(+r.price_mult).toFixed(2)}</td><td><div class="bar" style="width:${(r.price_mult / maxM * 100).toFixed(0)}%"></div></td><td class="sub">${esc(r.note)} ${stat(r.status)}</td></tr>`).join('')}</tbody></table></div></div>
+			<div class="prose"><h3>ค่าตั้ง (data/economy.csv)</h3>
+			<div class="tbl"><table><tbody>${e.keys.map(r => `<tr><td><b>${esc(r.key)}</b></td><td class="num">${esc(r.value)}</td><td class="sub">${esc(r.note)} ${stat(r.status)}</td></tr>`).join('')}</tbody></table></div></div></div>
+		<h3>ร้านค้าแต่ละภูมิภาค · ราคาที่ EC ${ec}</h3>
+		<div class="grid">${shops.map(l => `<article class="card"><div class="name">${esc(l[0].region)}</div><div class="sub">ร้าน ${esc(l[0].shop_id)} · เปิดตั้งแต่ EC ${esc(Math.min(...l.map(r => +r.ec_min)))}</div>
+			<dl class="kv">${l.filter(r => match(r.name, r.region, r.kind)).map(r => `<dt>${esc(r.name)}</dt><dd>${r.price ? Math.round(r.price * mult) + 'g' : '<span class="sub">ยังไม่มีราคา</span>'} · สต๊อก ${esc(r.stock)}${+r.ec_min > ec ? ' ' + chip('EC ' + r.ec_min, 'draft') : ''}</dd>`).join('')}</dl></article>`).join('')}</div>
+		<div class="cols"><div class="prose"><h3>ราคาอาวุธ (ซื้อ / ขายคืน)</h3><div class="tbl"><table><thead><tr><th>อาวุธ</th><th style="text-align:right">ซื้อ</th><th style="text-align:right">ขายคืน</th></tr></thead><tbody>
+			${e.weapons.filter(w => match(w.name, w.school)).map(w => `<tr><td>${esc(w.name)} <span class="sub">${esc(w.weapon_id)}${w.weapon_base ? '' : ' · ยังใช้ไม่ได้'}</span></td><td class="num">${Math.round(w.price * mult)}</td><td class="num">${Math.round(w.price * sr * mult)}</td></tr>`).join('')}</tbody></table></div></div>
+			<div class="prose"><h3>ราคารับซื้อวัตถุดิบ</h3><div class="tbl"><table><thead><tr><th>วัตถุดิบ</th><th>จาก</th><th style="text-align:right">ขายได้</th></tr></thead><tbody>
+			${e.materials.filter(m => match(m.name, m.monster_id)).map(m => `<tr><td>${esc(m.name)}</td><td class="sub">${esc((D.monsters.find(x => x.id === m.monster_id) || {}).name || m.monster_id)}</td><td class="num">${Math.round(m.sell_base * mult)}</td></tr>`).join('')}</tbody></table></div></div></div>
+		<h3>ตำราเวทย์</h3><div class="tbl"><table><thead><tr><th>ตำรา</th><th>สาย</th><th style="text-align:right">ราคา</th><th>หมายเหตุ</th></tr></thead><tbody>
+			${e.tomes.filter(t => match(t.name, t.school)).map(t => `<tr><td>${esc(t.name)}</td><td>${esc(t.school)}</td><td class="num">${Math.round(t.price * mult)}</td><td class="sub">${esc(t.note)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+const TABS = [
+	['skills', 'สกิล', () => D.skills.length, vSkills], ['spells', 'เวทย์', () => D.spells.schools.reduce((a, s) => a + s.spells.length, 0), vSpells],
+	['glimmer', 'ประกาย', () => '', vGlimmer], ['weapons', 'อาวุธ', () => D.weapons.families.reduce((a, f) => a + f.weapons.length, 0), vWeapons],
+	['monsters', 'มอน', () => D.monsters.filter(m => !m.boss).length, () => vMon(false)], ['bosses', 'บอส', () => D.monsters.filter(m => m.boss).length, () => vMon(true)],
+	['statuses', 'สถานะ', () => D.statuses.list.length, vStatuses], ['elements', 'ธาตุ', () => D.elements.list.length, vElements],
+	['bodies', 'ร่างกาย', () => D.bodies.bodies.length, vBodies], ['regions', 'ภูมิภาค', () => D.regions.list.length, vRegions],
+	['team', 'ทีมมอน', () => D.team.start.length + D.team.recruits.length, vTeam],
+	['economy', 'เศรษฐกิจ', () => '', vEconomy], ['items', 'ไอเท็ม', () => D.items.length, vItems], ['npcs', 'NPC', () => D.npcs.items.length, vNpcs], ['vehicles', 'ยานพาหนะ', () => D.vehicles.items.length, vVehicles]];
+if (!TABS.some(t => t[0] === S.tab)) S.tab = 'skills';
+
+function render() {
+	$('tabs').innerHTML = TABS.map(([id, label, n]) => `<button type="button" role="tab" id="t-${id}" aria-selected="${S.tab === id}" data-tab="${id}">${label}<span class="n">${n()}</span></button>`).join('');
+	$('view').innerHTML = TABS.find(t => t[0] === S.tab)[3]();
+	if ($('map')) drawMap($('map'));
+}
+$('tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (!b) return;
+	S.tab = b.dataset.tab; try { history.replaceState(null, '', '#' + S.tab); } catch (x) {} render(); window.scrollTo(0, 0); });
+$('view').addEventListener('click', e => { const b = e.target.closest('.filters button'); if (!b) return;
+	S.f[b.parentElement.dataset.key] = b.dataset.v; render(); });
+$('view').addEventListener('change', e => { const k = e.target.dataset.k; if (!k) return; S.f[k] = e.target.value; render(); const el = document.querySelector(`[data-k="${k}"]`); if (el) el.focus(); });
+$('q').addEventListener('input', e => { S.q = e.target.value.trim().toLowerCase(); render(); });
+$('built').textContent = 'ข้อมูล ณ ' + D.built;
+$('foot').textContent = 'สร้างจากไฟล์ข้อมูลเกมโดยตรง (techs.csv · monsters.csv · items · weapons · spells · Insight.gd) · ป้าย "ตัวเลขเสนอ" = รอผู้ออกแบบยืนยัน · ป้ายร่าง = ยังไม่อยู่ในเกม';
+render();
+</script>

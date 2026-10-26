@@ -1,0 +1,51 @@
+{
+  "app": "night-forge-vfx-lab",
+  "version": 2,
+  "comp": {
+    "name": "ฟันดวงดาว",
+    "theme": "ดวงดาว",
+    "layers": [
+      {
+        "part": "slash",
+        "name": "ท่าฟัน",
+        "params": {
+          "pattern": "1",
+          "parts": "sparkle",
+          "puffMode": "0",
+          "pal": [
+            "#0d0830",
+            "#241a66",
+            "#3b2a94",
+            "#b51a00",
+            "#ffe9b8"
+          ],
+          "flashColor": "#b51a00",
+          "puffColor": "#fefb41",
+          "partColor": "#ff4015",
+          "thick": 1.02,
+          "span": 226,
+          "stretch": 1.75,
+          "rimW": 0.02,
+          "wisp": 0.16,
+          "glow": 2.75,
+          "partAmount": 1,
+          "seed": 38,
+          "tempo": 0.8
+        },
+        "tf": {
+          "x": 0,
+          "y": 1.3,
+          "z": 0,
+          "rx": 0,
+          "ry": 0,
+          "rz": 0,
+          "s": 1,
+          "mirror": false
+        },
+        "start": 0,
+        "speed": 1,
+        "on": true
+      }
+    ]
+  }
+}

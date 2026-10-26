@@ -1,0 +1,71 @@
+{
+ "_doc": "PixelLab ท่าจาก master v2 · tools/sprites/pixellab_walk.py page · ร่าง ยังไม่เข้าเกม",
+ "clips": [
+  {
+   "group": "Rion พิกเซล · ชุดครบ · ท่าศึก",
+   "id": "pixellab_slash2_west",
+   "label": "PixelLab · ฟันมีด (PixelLab รอบ 2 · หันซ้ายทุกเฟรม) · west · ความเร็วดู (ทดลอง 18 ต.ค. · จาก master v2)",
+   "frames": [
+    "pixellab_slash2_west_0",
+    "pixellab_slash2_west_1",
+    "pixellab_slash2_west_2",
+    "pixellab_slash2_west_3",
+    "pixellab_slash2_west_4",
+    "pixellab_slash2_west_5",
+    "pixellab_slash2_west_6",
+    "pixellab_slash2_west_7"
+   ],
+   "ms": 110,
+   "loop": true,
+   "w": 104,
+   "travel": 0,
+   "src": [
+    "pixellab slash2 west"
+   ]
+  },
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "pixellab_walk_east",
+   "label": "PixelLab · เดิน · east · ความเร็วดู (ทดลอง 18 ต.ค. · จาก master v2)",
+   "frames": [
+    "pixellab_walk_east_0",
+    "pixellab_walk_east_1",
+    "pixellab_walk_east_2",
+    "pixellab_walk_east_3",
+    "pixellab_walk_east_4",
+    "pixellab_walk_east_5",
+    "pixellab_walk_east_6",
+    "pixellab_walk_east_7"
+   ],
+   "ms": 90,
+   "loop": true,
+   "w": 67,
+   "travel": 48,
+   "src": [
+    "pixellab walk east"
+   ]
+  },
+  {
+   "group": "★ Rion master v2 · เดินหลัก (ชีต B · kwan เลือก 18 ต.ค.)",
+   "id": "pixellab_walk_east_game",
+   "label": "PixelLab · เดิน · east · ความเร็วในเกม (ทดลอง 18 ต.ค. · จาก master v2)",
+   "frames": [
+    "pixellab_walk_east_0",
+    "pixellab_walk_east_1",
+    "pixellab_walk_east_2",
+    "pixellab_walk_east_3",
+    "pixellab_walk_east_4",
+    "pixellab_walk_east_5",
+    "pixellab_walk_east_6",
+    "pixellab_walk_east_7"
+   ],
+   "ms": 37.5,
+   "loop": true,
+   "w": 67,
+   "travel": 48,
+   "src": [
+    "pixellab walk east"
+   ]
+  }
+ ]
+}

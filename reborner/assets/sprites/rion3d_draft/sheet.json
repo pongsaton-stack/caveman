@@ -1,0 +1,23 @@
+{
+ "cell": 512,
+ "foot_y": 504,
+ "center_x": 256,
+ "body_h": 464,
+ "sheet_4dir": [
+  "front",
+  "right",
+  "back",
+  "left"
+ ],
+ "sheet_8dir": [
+  "front",
+  "front_right",
+  "right",
+  "back_right",
+  "back",
+  "back_left",
+  "left",
+  "front_left"
+ ],
+ "note": "right = หันไปทางขวาของภาพ · 8 ทิศเรียงซ้าย→ขวา บน→ล่าง"
+}
