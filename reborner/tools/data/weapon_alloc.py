@@ -2,6 +2,7 @@
 #
 #   python3 tools/data/weapon_alloc.py template <out.md>   สร้างไฟล์แม่แบบ (60 แถวเรียงแล้ว ช่องที่ล็อกกรอกให้แล้ว)
 #   python3 tools/data/weapon_alloc.py check <file.md>     ตรวจตามรายการ F + กติกา H ของโจทย์ · exit 0 = ผ่าน
+#   python3 tools/data/weapon_alloc.py apply <file.md>     (Claude) นำเข้าผลงานที่ผ่าน check → weapons_full.json แล้วรัน econ_csv.py + weapons_csv.py
 #
 # ตัวเดียวกับที่ Claude ใช้ตรวจรับ · ทีมรันเองได้ (Python 3.8+ ไม่ต้องลงอะไรเพิ่ม) · ระบุ --json <weapons_full.json> ถ้ารันนอก repo
 import json, os, re, sys, unicodedata
@@ -305,6 +306,73 @@ def check(path, jpath):
 	return report(fails, warns)
 
 
+def apply(path, jpath):
+	"""นำเข้าผลงานที่ผ่าน check → weapons_full.json (ร่าง · เกมใช้แค่ชี้ทาง) · ราคาคิดใหม่ด้วย econ_csv.py"""
+	if check(path, jpath):
+		sys.exit('ยังไม่ผ่าน check — ไม่นำเข้า')
+	T = tables(open(path, encoding='utf-8').read())
+	R = {}
+	for r in T['2'][1:]:
+		x = {c: norm(v) for c, v in zip(COLS, r)}
+		R[x['รหัส']] = x
+	defs = {r[0]: r + [''] * 5 for r in T['1'][1:] if r and r[0] in MODS}
+	sdefs = {r[0]: r for r in T['1b'][1:] if r and r[0] in DMG_ST + CTL_ST}
+	life = {r[0]: float(r[1]) for r in T['3'][1:] if len(r) >= 2 and r[0] in LIMITS}
+	text = open(jpath, encoding='utf-8').read()
+	d = json.loads(text)
+	DROP = ('price', 'price_status', 'price_note', 'base_draft', 'mods_draft', 'weak_draft', 'status_draft', 'limit_draft', 'upkeep_draft')
+	for f in d['families']:
+		for w in f['weapons']:
+			x = R[w['id']]
+			nw = {}
+			for k, v in w.items():
+				if k in DROP:
+					continue
+				if k == 'steer':
+					v = x['ชี้ทาง'] or None
+				nw[k] = v
+				if k == 'weapon_base':
+					if v is None:
+						nw['base_draft'] = VALUE[lv(w['id'])]
+					mods = [m for m in (x['ตัวปรับ 1'], x['ตัวปรับ 2']) if m]
+					if mods:
+						nw['mods_draft'] = mods
+					if x['ตัวปรับอ่อน']:
+						nw['weak_draft'] = x['ตัวปรับอ่อน']
+					if x['สถานะ']:
+						nw['status_draft'] = {'status': x['สถานะ'], 'chance': float(x['อัตรา %']) / 100}
+					if x['ข้อจำกัด']:
+						nw['limit_draft'] = {'kind': x['ข้อจำกัด'], 'n': int(x['จำนวนต่อเติม']), 'unit': x['หน่วย'],
+							'refill_price': int(x['ค่าเติม']), 'use_per_battle': life[x['ข้อจำกัด']]}
+					if x['ค่าบำรุง']:
+						nw['upkeep_draft'] = int(x['ค่าบำรุง'])
+					if x['เหตุผล']:
+						nw['alloc_note'] = x['เหตุผล']
+			w.clear()
+			w.update(nw)
+	md = d['modifiers_draft']
+	md['_doc'] = ('ความสามารถอาวุธ — ผลงานจัดสรรทีมวิจัย (docs/design/weapons60/WEAPON_ALLOCATION_RESULT.md · ผ่าน tools/data/weapon_alloc.py check) · '
+		'กติกา = docs/design/weapons60/MASTER.md · ร่าง เกมยังไม่ใช้ (ยกเว้น steer) · base_draft = เส้นค่าพลังที่ล็อก (ข้อยกเว้น SL-1 14 · CR-2 28 อยู่ใน weapon_base) · '
+		'Lv.5 weak_draft · Lv.6–8 mods_draft + status_draft (รวม 2) + limit_draft · Lv.9–10 mods_draft 1 + status_draft + upkeep_draft · '
+		'ข้อจำกัดสะสมข้ามศึก เติมที่จุดพัก (refill_price) · ค่าบำรุงคิดจากทุกชิ้น Lv.9–10 ที่ใช้สู้ตั้งแต่พักครั้งก่อน ไม่จ่าย = โอกาสติดสถานะเหลือครึ่ง')
+	md['rules'] = {m: {'mech': norm(defs[m][1]), 'weak': norm(defs[m][2]) or None, 'text': norm(defs[m][3]), 'weak_text': norm(defs[m][4]) or None} for m in MODS}
+	md['statuses'] = {s: norm(sdefs[s][1]) for s in DMG_ST + CTL_ST}
+	md['status_rates'] = {'dmg': DMG_ST, 'ctl': CTL_ST, 'by_level': RATE, 'boss_ctl_mult': 0.5, 'unpaid_upkeep_mult': 0.5}
+	md.pop('mod_status_chance', None)
+	c = lambda o: json.dumps(o, ensure_ascii=False)
+	L = ['{', '  "_doc": %s,' % c(d['_doc']), '  "status": %s,' % c(d['status']), '  "tiers": {']
+	L += ['    %s: %s%s' % (c(k), c(v), ',' if i < len(d['tiers']) - 1 else '') for i, (k, v) in enumerate(d['tiers'].items())]
+	L += ['  },', '  "modifiers_draft": %s,' % c(md), '  "families": [']
+	for i, f in enumerate(d['families']):
+		h = {k: v for k, v in f.items() if k != 'weapons'}
+		L.append('    ' + c(h)[:-1] + ', "weapons": [')
+		L += ['      %s%s' % (c(w), ',' if j < len(f['weapons']) - 1 else '') for j, w in enumerate(f['weapons'])]
+		L.append('    ]}' + (',' if i < len(d['families']) - 1 else ''))
+	L += ['  ]', '}']
+	open(jpath, 'w', encoding='utf-8').write('\n'.join(L) + '\n')
+	print('นำเข้า', len(R), 'ชิ้น →', jpath, '· ต่อ: python3 tools/data/econ_csv.py && python3 tools/data/weapons_csv.py')
+
+
 def report(fails, warns):
 	for w in warns:
 		print('เตือน ', w)
@@ -325,5 +393,7 @@ if __name__ == '__main__':
 		template(a[1], jp)
 	elif len(a) == 2 and a[0] == 'check':
 		sys.exit(check(a[1], jp))
+	elif len(a) == 2 and a[0] == 'apply':
+		apply(a[1], jp)
 	else:
 		sys.exit(__doc__ or 'ใช้: weapon_alloc.py template <out.md> | check <file.md>')

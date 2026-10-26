@@ -24,7 +24,7 @@ func _initialize() -> void:
 		var k := str(r["school"]) + "/" + st
 		if seen.has(k): bad.append(k)
 		seen[k] = id
-	check(bad.is_empty() and seen.size() == 18, "ชี้ทาง 18 กิ่ง กิ่งละ 1 ชิ้น ตรงสาย %s" % [bad])
+	check(bad.is_empty() and seen.size() == 19, "ชี้ทาง 19 กิ่ง กิ่งละ 1 ชิ้น ตรงสาย %s" % [bad])
 
 	# เกมใหม่ = มีดทำครัว สาย คม ชี้ เขี้ยว
 	var ps := PlayerState.new()
