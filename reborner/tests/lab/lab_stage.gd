@@ -21,10 +21,10 @@ const PX := "res://assets/sprites/pixellab_draft/px_set/"
 const MPX := "res://assets/sprites/monsters_px_draft/"
 const FPX := "res://assets/sprites/flow_draft/bt/"
 const WSK := "res://assets/sprites/pixellab_draft/weapon_skin/"   # ไม้เบสบอลระดับอื่นบนภาพ pls_bat* (tools/sprites/bat_tiers.py)
-## ปุ่มเลือกอาวุธ (kwan 26 ต.ค.): สายของท่า → อาวุธ 5 ระดับใน weapons.csv · ชื่อสั้นบนปุ่ม · ภาพเปลี่ยนได้เฉพาะไม้เบสบอล (WSK) · มีดยังเป็นภาพมีดครัว
+## ปุ่มเลือกอาวุธ (kwan 26 ต.ค. · ชุด 60 ชิ้น): สายของท่า → อาวุธ Lv.1–10 ใน weapons.csv · ปุ่มเป็นเลข Lv · ชื่อเต็มอยู่ในแถบล่าง
+## ภาพเปลี่ยนได้เฉพาะไม้เบสบอลที่มีสกิน (WSK · BAT_SKINS) · ชิ้นอื่นยังใช้ภาพชิ้นตั้งต้น (มีดครัว/ไม้อลูมิเนียม) และบอกในแถบล่าง
 const SCHOOL := {"bl": "คม", "bt": "ทุบ", "pt": "แทง", "rg": "ยิง", "dv": "กล", "fs": "มือเปล่า"}
-const WSHORT := {"SL-1": "มีดครัว", "SL-2": "อีโต้", "SL-3": "พร้าเลื่อย", "SL-4": "ใบพัดลม", "SL-5": "มีดเชฟ",
-	"CR-1": "ไม้ร้าว", "CR-2": "อลูมิเนียม", "CR-3": "ตอกตะปู", "CR-4": "หัวเฟือง", "CR-5": "โฮมรัน"}   # ภาพ Rion จาก Flow (Muse เจน · flow_to_px.py) ชื่อ flw_*
+const BAT_SKINS := ["CR-1", "CR-4", "CR-6", "CR-9", "CR-10"]   # ไม้ร้าว · หัวเฟือง · ไม้ตะปู · เหล็กกล้า · สายฟ้า (CR-2 = ภาพเดิม)
 const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพลงต่อสู้แนวรอบ 4 (kwan 5 ต.ค.) อัดจากหน้าเว็บ
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
@@ -137,6 +137,7 @@ var snaps := {}
 var snap_dir := ""
 var weapons: Array = []   # [รหัส, ชื่อ, weapon_base หรือ -1] ของสายท่านี้
 var weapon_id := ""
+var art_id := ""   # ชิ้นที่ภาพ Rion ถืออยู่จริง (ชิ้นตั้งต้นของสาย หรือไม้ที่มีสกิน)
 var speed := 1.0   # ความเร็วเล่น (ปุ่มในเมนู · เก็บใน Engine meta "lab_speed")
 var debris: Array = []   # [kind, สี, x, y, vx, vy, g, life, เฟรมเกิด]
 
@@ -144,6 +145,7 @@ var debris: Array = []   # [kind, สี, x, y, vx, vy, g, life, เฟรมเ
 func tech_id() -> String: return "bl0"
 func end_frame() -> int: return 100
 func stops() -> Array: return []
+func skinnable() -> bool: return false   # ฉากที่ใช้ภาพ pls_bat* (เปลี่ยนสกินไม้ได้)
 func setup() -> void: pass
 func frame(_f: float, _F: int, _fresh: bool) -> void: pass
 func sounds(_F: int) -> void: pass
@@ -198,7 +200,7 @@ func _img(path: String) -> Image:
 func tx(key: String) -> Texture2D:
 	if not tex.has(key):
 		var path := (PX + key + ".png") if key.begins_with("pls_") else ((FPX + key + ".png") if key.begins_with("flw_") else (MPX + key + ".png"))
-		if key.begins_with("pls_bat") and weapon_id.begins_with("CR-") and weapon_id != "CR-2":
+		if key.begins_with("pls_bat") and BAT_SKINS.has(weapon_id):
 			path = WSK + "wsk_%s__%s.png" % [key, weapon_id]
 		tex[key] = ImageTexture.create_from_image(_img(path))
 	return tex[key]
@@ -273,6 +275,7 @@ func _load_weapons() -> void:
 			if b >= 0 and base_id == "":
 				base_id = str(r.weapon_id)
 	weapon_id = str(Engine.get_meta("lab_weapon_" + tech_id().substr(0, 2), base_id))
+	art_id = weapon_id if weapon_id == base_id or (skinnable() and BAT_SKINS.has(weapon_id)) else base_id
 	var wb := -1
 	var db := -1
 	for w in weapons:
@@ -286,8 +289,14 @@ func _load_weapons() -> void:
 func weapon_name() -> String:
 	for w in weapons:
 		if w[0] == weapon_id:
-			return w[1] + ("" if w[2] >= 0 else " (ยังไม่มีค่าพลัง)")
+			return w[1] + ("" if w[2] >= 0 else " (ยังไม่มีค่าพลัง)") + ("" if art_id == weapon_id else " · ภาพยังเป็น " + weapon_short(art_id))
 	return ""
+
+func weapon_short(id: String) -> String:
+	for w in weapons:
+		if w[0] == id:
+			return str(w[1])
+	return id
 
 func place_monster(mx: int) -> void:
 	mx0 = int(round(mx - mw / 2.0))
@@ -962,13 +971,13 @@ func _build_menu() -> void:
 	snd.pressed.connect(_toggle.bind(snd, "เสียง", "lab_mute"))
 	var mus := _button(_onoff("เพลง", "lab_music_off"), Vector2(200, 111), Vector2(96, 16), 16)
 	mus.pressed.connect(_toggle.bind(mus, "เพลง", "lab_music_off"))
-	if not weapons.is_empty():   # อาวุธของสายท่านี้ 5 ระดับ: กดแล้วเล่นท่าเดิมใหม่ด้วยอาวุธนั้น
+	if not weapons.is_empty():   # อาวุธของสายท่านี้ Lv.1–10: กดแล้วเล่นท่าเดิมใหม่ด้วยอาวุธนั้น
 		var w_l := label(7, Color("#f0e4c8"), 2, false, menu)
 		w_l.text = "อาวุธ"
 		w_l.position = Vector2(6, 146)
 		for i in weapons.size():
 			var w: Array = weapons[i]
-			var b := _button(WSHORT.get(w[0], w[1]), Vector2(40 + i * 51, 145), Vector2(48, 13), 13)
+			var b := _button(str(i + 1), Vector2(40 + i * 25.5, 145), Vector2(23, 13), 13)
 			b.modulate = Color(1, 1, 0.6) if w[0] == weapon_id else Color.WHITE
 			b.pressed.connect(func():
 				Engine.set_meta("lab_weapon_" + tech_id().substr(0, 2), w[0])

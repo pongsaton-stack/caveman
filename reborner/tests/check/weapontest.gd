@@ -10,7 +10,7 @@ func _initialize() -> void:
 	var td := TechDb.new()
 	td.load_from("res://data/techs.csv")
 	var table := PlayerState.weapon_table()
-	check(table.size() == 30, "weapons.csv 30 ชิ้น (%d)" % table.size())
+	check(table.size() == 60, "weapons.csv 60 ชิ้น (%d)" % table.size())
 	# ทุกกิ่งที่ชี้ต้องเป็นกิ่งจริงของสายอาวุธนั้น และกิ่งละ 1 ชิ้น (GDD 6.3)
 	var seen := {}; var bad := []
 	for id in table:

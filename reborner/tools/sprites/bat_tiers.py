@@ -1,8 +1,9 @@
-"""ไม้เบสบอล 5 ระดับ (weapons.csv CR-1..5) บนภาพ Rion PixelLab สายทุบ — เปลี่ยนด้วยโค้ด ไม่เสียเครดิต (kwan 26 ต.ค. "เพิ่มปุ่มให้เลือกอาวุธในแลป")
+"""ไม้เบสบอลระดับต่างๆ (weapons.csv ชุด 60 ชิ้น: CR-1/2/4/6/9/10 คือไม้) บนภาพ Rion PixelLab สายทุบ — เปลี่ยนด้วยโค้ด ไม่เสียเครดิต (kwan 26 ต.ค. "เพิ่มปุ่มให้เลือกอาวุธในแลป")
 
 หาไม้: สีเทาสีเดียวกับเสื้อ/ถุงเท้า → แยกด้วยรูปทรง: ปลายไม้ = จุดเทาไกลกลางตัวสุด → ไล่จุดเทาติดกันภายใน 36 จุด → ลากเส้นตรง (PCA)
   → ไม้ = จุดเทาห่างเส้น ≤ 1.8 จุด และอยู่บนช่วงความยาวไม้ (ตัดเงาเสื้อที่ไม่อยู่บนแนวไม้)
-ระดับ: CR-1 ไม้ร้าว (สีไม้ + รอยร้าว) · CR-2 อลูมิเนียม (ภาพเดิม) · CR-3 ตอกตะปู · CR-4 หัวเฟือง (เหล็กเข้ม + เฟืองที่ปลาย) · CR-5 โฮมรัน (งาช้าง + ขอบทอง)
+ระดับ: CR-1 ไม้ร้าว (สีไม้ + รอยร้าว) · CR-2 อลูมิเนียม (ภาพเดิม) · CR-4 หัวเฟือง (เหล็กเข้ม + เฟืองที่ปลาย) · CR-6 ไม้ตะปู (สีไม้ + ตะปู)
+  CR-9 เหล็กกล้า (เงินขัดเงา + วงแหวนรูน) · CR-10 สายฟ้า (ฟ้าขาว + สายฟ้าซิกแซก + ขอบเรือง) · กระทะ/ค้อน/หนังสือ (CR-3/5/7/8) ไม่ใช่ไม้ → รอภาพจาก PixelLab
   python3 tools/sprites/bat_tiers.py → assets/sprites/pixellab_draft/weapon_skin/wsk_<ภาพ>__CR-k.png (lab_stage tx() อ่าน prefix wsk_) + check.png
   รันใหม่ทุกครั้งหลัง pixellab_rion_set.py (ภาพต้นทาง px_set/pls_bat*)
 """
@@ -17,10 +18,12 @@ from scipy import ndimage
 ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 SRC = os.path.join(ROOT, "assets/sprites/pixellab_draft/px_set")
 OUT = os.path.join(ROOT, "assets/sprites/pixellab_draft/weapon_skin")
-TIERS = ["CR-1", "CR-3", "CR-4", "CR-5"]   # CR-2 = ภาพเดิม
+TIERS = ["CR-1", "CR-4", "CR-6", "CR-9", "CR-10"]   # CR-2 = ภาพเดิม · ต้องตรงกับ BAT_SKINS ใน tests/lab/lab_stage.gd
 RAMP = {"CR-1": [(58, 36, 20), (122, 80, 42), (170, 116, 62), (214, 166, 104)],
 	"CR-4": [(40, 42, 48), (74, 78, 88), (104, 110, 122), (150, 156, 168)],
-	"CR-5": [(122, 100, 60), (204, 186, 140), (236, 224, 190), (252, 248, 232)]}
+	"CR-6": [(58, 36, 20), (122, 80, 42), (170, 116, 62), (214, 166, 104)],
+	"CR-9": [(70, 76, 90), (140, 150, 168), (200, 208, 222), (248, 250, 255)],
+	"CR-10": [(30, 60, 140), (70, 130, 230), (150, 200, 255), (240, 250, 255)]}
 
 
 def bat_mask(a):
@@ -100,7 +103,7 @@ def skin(a, tier):
 			p = at(length * 0.45 + i, s * 0.8)
 			if m[int(round(p[0])), int(round(p[1]))]:
 				put(a, *p, (40, 22, 12))
-	if tier == "CR-3":   # ตะปูโผล่สองข้างช่วงหัวไม้
+	if tier == "CR-6":   # ตะปูโผล่สองข้างช่วงหัวไม้
 		for i, t in enumerate(np.arange(2, length * 0.5, 3.5)):
 			side = 1 if i % 2 == 0 else -1
 			put(a, *at(t, side * 2.4), (54, 54, 64))   # ตะปู: หัวเข้มติดไม้ + ปลายสว่างโผล่ออก
@@ -114,13 +117,23 @@ def skin(a, tier):
 			for dx in range(-3, 4):
 				if dy * dy + dx * dx <= 9:
 					put(a, c[0] + dy, c[1] + dx, (58, 62, 70) if dy * dy + dx * dx > 2 else (150, 156, 168))
-	if tier == "CR-5":   # ขอบทองรอบไม้
+	if tier == "CR-9":   # วงแหวนรูนสีฟ้ารอบช่วงหัวไม้
+		for t in (length * 0.18, length * 0.36):
+			for s in (-1.6, -0.6, 0.6, 1.6):
+				p = at(t, s)
+				if m[int(round(p[0])), int(round(p[1]))]:
+					put(a, *p, (110, 220, 255))
+	if tier == "CR-10":   # สายฟ้าซิกแซกตามไม้ + ขอบเรืองเหลือง
+		for i, t in enumerate(np.arange(1, length * 0.8, 1.5)):
+			p = at(t, (0.9, 0, -0.9, 0)[i % 4])
+			if m[int(round(p[0])), int(round(p[1]))]:
+				put(a, *p, (255, 244, 120))
 		ring = np.zeros_like(m)
 		for dy in (-1, 0, 1):
 			for dx in (-1, 0, 1):
 				ring |= np.roll(np.roll(m, dy, 0), dx, 1)
 		for y, x in zip(*np.nonzero(ring & (a[..., 3] < 128))):
-			a[y, x] = [255, 210, 74, 210]
+			a[y, x] = [255, 236, 90, 200]
 	return a
 
 
@@ -139,7 +152,7 @@ def main():
 		rows.append(row)
 	pick = [i for i, p in enumerate(srcs) if any(k in p for k in ("breath_0", "run_3", "bat2_1", "bat2_0", "imp_0", "hop_5"))]
 	sc = 3
-	sheet = Image.new("RGB", (5 * 100 * sc, len(pick) * 87 * sc), (70, 70, 80))
+	sheet = Image.new("RGB", ((len(TIERS) + 1) * 100 * sc, len(pick) * 87 * sc), (70, 70, 80))
 	for j, i in enumerate(pick):
 		for k, b in enumerate(rows[i]):
 			im = Image.fromarray(b, "RGBA").crop((10, 25, 110, 112)).resize((100 * sc, 87 * sc), Image.NEAREST)

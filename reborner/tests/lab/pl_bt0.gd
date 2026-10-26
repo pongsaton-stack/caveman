@@ -9,3 +9,4 @@ func tips() -> Dictionary: return {"wind": Vector2(116, 38), "mid": Vector2(84, 
 const SHIFT := {"run": -2.0, "lift": -20.0, "wind": -17.0, "whip": -20.0, "mid": -12.0, "hit": -15.0, "follow": -15.0, "crouch": 3.0, "air": 2.0, "fall": 2.0, "land": 1.0}
 func shift_x(pose: String) -> float: return SHIFT.get(pose, 0.0)
 func src_name() -> String: return "ภาพ PixelLab"
+func skinnable() -> bool: return true
