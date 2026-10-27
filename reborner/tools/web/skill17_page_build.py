@@ -2,7 +2,7 @@
 """หน้า "ต้นไม้ท่า 6 สาย" — ชื่อ ท่าทาง ศาสตร์อ้างอิง อาวุธที่เหมาะ + ท่าประจำอาวุธ (ร่าง ยังไม่เข้าเกม)
 ใช้: python3 tools/data/skill17_proposal.py && python3 tools/data/skill17_content.py && python3 tools/web/skill17_page_build.py <out.html>
 """
-import base64, csv, html, json, os, sys
+import base64, csv, html, json, os, re, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 P = lambda *a: os.path.join(ROOT, *a)
@@ -49,6 +49,41 @@ def lab_techs():
 
 
 LAB, GLIM = lab_techs()
+TEAM = json.load(open(P("docs/design/moves/moves_team_r2.json"), encoding="utf-8"))["moves"]   # รายงานวิจัยท่าของทีม (tools/data/moves_team_extract.py)
+
+
+def md(t):
+	"""ข้อความทีม → HTML ปลอดภัย: escape ก่อน แล้ว **ตัวหนา** · ขึ้นบรรทัด"""
+	t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", e(t))
+	return t.replace("\n", "<br>")
+
+
+def team_block(tid):
+	t = TEAM.get(tid)
+	if not t:
+		return "", ""
+	tag = '<span class="tag tok">ทีม: เข้ากัน</span>' if t["verdict"] == "ok" else '<span class="tag tfix">ทีม: ต้องปรับ</span>'
+	rows = f'<dt>ทีมแนะนำ</dt><dd>{md(t["compare"])}</dd>'
+	if t["fix"]:
+		rows += f'<dt>ต้องแก้</dt><dd class="tfixt">{md(t["fix"])}</dd>'
+	if t["segments"] and t["frames_total"]:
+		tot = float(t["frames_total"])
+		num = [g for g in t["segments"] if isinstance(g.get("from"), (int, float)) and isinstance(g.get("to"), (int, float))]
+		segs = "".join(f'<span style="flex:{max(1, g["to"] - g["from"])}" title="{e(str(g["from"]) + "–" + str(g["to"]) + " · " + g["label"])}"></span>' for g in num)
+		hits = "".join(f'<i style="left:{min(100, h / tot * 100):.1f}%"></i>' for h in t["hits"] if isinstance(h, (int, float)))
+		steps = "".join((f'<li><b>{g["from"]}–{g["to"]}</b> ' if g in num else '<li>') + f'{e(g["label"])}</li>' for g in t["segments"])
+		rows += (f'<dt>แผนเฟรม</dt><dd><div class="tl">{segs}{hits}</div><small class="scn">{int(tot)} เฟรม × 60 ms ≈ {tot * 0.06:.1f} วิ · '
+			f'โดนที่ {", ".join(str(h) for h in t["hits"]) or "–"}</small><details><summary>ทีละช่วง</summary><ol class="steps">{steps}</ol></details></dd>')
+	prop, refs = t["proposal"], ""
+	cut = prop.find("**แหล่งอ้างอิง")
+	if cut >= 0:
+		prop, refs = prop[:cut].strip(), prop[cut:]
+	links = " · ".join(f'<a href="{e(u)}" target="_blank" rel="noopener">{e(re.sub(r"^https?://(www\.)?", "", u)[:48])}</a>' for u in t["urls"])
+	more = (f'<details class="team"><summary>รายละเอียดจากทีม (ข้อเสนอปรับ · ศาสตร์จริง · อนิเมะอ้างอิง)</summary>'
+		f'<h5>ข้อเสนอปรับ</h5><p>{md(prop)}</p><h5>ศาสตร์จริง</h5><p>{md(t["science_text"])}</p>'
+		f'<h5>อนิเมะ/สื่ออ้างอิง</h5><p>{md(t["anime"])}</p>'
+		+ (f'<h5>แหล่งอ้างอิง</h5><p class="refs">{links}</p>' if links else "") + '</details>')
+	return tag, rows + "</dl>" + more + "<dl>"
 sys.path.insert(0, P("tools/sprites"))
 import pixellab_walk as plw  # noqa: E402  (โหลดคำสั่ง 102 ท่าจาก pixellab_skills.py)
 
@@ -73,6 +108,8 @@ def card(r, c, school, wide=False):
 	if r["status"]: fx.append(f"{r['status']} {int(float(r['status_chance']) * 100)}%")
 	if r["effect"] == "counter": fx.append("ท่าสวน")
 	if tid in PAPER: fx.append(f"เขียนว่า '{PAPER[tid]}' แต่โค้ดยังไม่มี")
+	ttag, trows = team_block(tid)
+	tag += ttag
 	lab = ""
 	if tid in LAB:
 		tag += f'<a class="tag lab" href="{LAB_PAGE}" target="_blank" rel="noopener">ลองได้ในห้องทดลอง</a>'
@@ -88,7 +125,7 @@ def card(r, c, school, wide=False):
 <header><span class="slot">{e(slot)}</span><h3>{e(r['name_th'])}</h3>{tag}</header>
 <p class="stats"><span>ปลดที่ {r['req_prof']}</span><span>{pw}</span><span>{SCOPE.get(r['scope'], r['scope'])}</span><span>น้ำหนัก {r['weight']}</span><span>SP {r['sp']}</span></p>
 {'<p class="fx">' + ''.join(f'<span>{e(x)}</span>' for x in fx) + '</p>' if fx else ''}
-<dl><dt>ท่าทาง</dt><dd>{e(c['motion'][tid])}</dd>{lab}<dt>ศาสตร์</dt><dd>{e(r['art'])}</dd><dt>เหมาะกับ</dt><dd>{e(wtxt)}</dd></dl>
+<dl><dt>ท่าทาง</dt><dd>{e(c['motion'][tid])}</dd>{lab}{trows}<dt>ศาสตร์</dt><dd>{e(r['art'])}</dd><dt>เหมาะกับ</dt><dd>{e(wtxt)}</dd></dl>
 <details><summary>คำสั่ง PixelLab ({plw.MOVES[tid]['frames']} เฟรม · หันซ้าย)</summary><pre class="pr">{e(plw.build_action(tid, 'west'))}</pre></details>
 </article>'''
 
@@ -141,7 +178,9 @@ def main():
 <li>ตัวเลขทั้งหมดเป็นร่าง ต้องรัน Sim ก่อนใส่เกม</li></ol>
 <div class="pre"><pre>{e(budget)}</pre></div></div>''')
 	done = [r["tech_id"] for r in rows if r["slot"] and r["tech_id"] in LAB]
-	prog = f'ห้องทดลองฉากต่อสู้: ทำฉากแล้ว {len(done)}/{sum(1 for r in rows if r["slot"])} ท่า · <a href="{LAB_PAGE}" target="_blank" rel="noopener">เปิดห้องทดลอง</a> · การ์ดที่มีขอบเขียว = ลองเล่นได้แล้ว (ร่าง ยังไม่เข้าเกม)'
+	tok = sum(1 for v in TEAM.values() if v["verdict"] == "ok")
+	prog_team = f'<br>คำแนะนำทีมวิจัย (Muse · รอบ 2 · 25 ต.ค.): เข้ากัน {tok} · ต้องปรับ {len(TEAM) - tok} ท่า · การ์ดทุกใบมี "ทีมแนะนำ" + แผนเฟรม (แถบ = ช่วงท่า · ขีดดำ = จังหวะโดน) + รายละเอียดกดเปิดได้'
+	prog = f'ห้องทดลองฉากต่อสู้: ทำฉากแล้ว {len(done)}/{sum(1 for r in rows if r["slot"])} ท่า · <a href="{LAB_PAGE}" target="_blank" rel="noopener">เปิดห้องทดลอง</a> · การ์ดที่มีขอบเขียว = ลองเล่นได้แล้ว (ร่าง ยังไม่เข้าเกม)' + prog_team
 	out = TPL.replace("%TABS%", "".join(tabs)).replace("%PANELS%", "".join(panels)).replace("%PROG%", prog)
 	open(sys.argv[1], "w", encoding="utf-8").write(out)
 	print(sys.argv[1], f"{len(out) / 1024:.0f} KB")
@@ -176,6 +215,10 @@ h1{font:500 1.7rem/1.2 var(--fd);margin:0 0 4px;text-wrap:balance} .sub{color:va
 .card h3{font:500 1.05rem var(--fd);margin:0}
 .slot{font:600 .75rem var(--fb);letter-spacing:.05em;color:var(--sc)}
 .tag{font-size:.72rem;border-radius:999px;padding:1px 8px;border:1px solid currentColor;margin-left:auto}
+.tag.tok{color:var(--lab);margin-left:0} .tag.tfix{color:var(--wait);margin-left:0} .tfixt{color:var(--wait)}
+.tl{position:relative;display:flex;gap:1px;height:8px;margin:4px 0 2px;border-radius:4px;overflow:hidden} .tl span{background:color-mix(in srgb,var(--sc) 45%,var(--chip))}
+.tl span:nth-child(even){background:color-mix(in srgb,var(--sc) 25%,var(--chip))} .tl i{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.steps{margin:4px 0 0;padding-left:1.2em;font-size:.82rem} .team h5{font:500 .85rem var(--fd);margin:8px 0 2px} .team p{margin:0;font-size:.85rem} .refs a{color:var(--muted);overflow-wrap:anywhere}
 .tag.lab{color:var(--lab);text-decoration:none;margin-left:0} .card.done{box-shadow:inset 3px 0 0 var(--lab)} .scn{color:var(--muted)}
 .prog{margin:0 0 14px;padding:8px 12px;border:1px solid var(--line);border-left:3px solid var(--lab);border-radius:8px;background:var(--panel);font-size:.9rem} .prog a{color:var(--lab)}
 .tag.new{color:var(--new)} .tag.bad{color:var(--bad)} .tag.wait{color:var(--wait)} .tag.old{color:var(--muted)}

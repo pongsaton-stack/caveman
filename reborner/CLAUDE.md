@@ -59,7 +59,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 | มาสเตอร์ PixelLab | https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y (V18) | `python3 tools/web/pixellab_test_build.py <out.html>` · ใส่**เฉพาะภาพที่ PixelLab เจน** |
 | สมุดรวม | https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 | `python3 tools/web/codex_build.py <out.html>` |
 | UI Kit | https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz | `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` |
-| ต้นไม้ท่า 6 สาย | https://claude.ai/artifact/MEug5zmpASHwnp26RqBi35 (V3) | `python3 tools/web/skill17_page_build.py <out.html>` · ป้าย "ลองได้ในห้องทดลอง" อ่านจาก TECHS ใน lab_stage.gd อัตโนมัติ · **เพิ่มท่าใหม่ในห้องทดลองแล้วเขียน LAB_NOTE ในตัวสร้าง + สร้างหน้านี้ใหม่ทุกครั้ง** |
+| ต้นไม้ท่า 6 สาย | https://claude.ai/artifact/MEug5zmpASHwnp26RqBi35 (V4) | `python3 tools/web/skill17_page_build.py <out.html>` · คำแนะนำทีมวิจัยบนการ์ด = `docs/design/moves/moves_team_r2.json` (สร้างจากรายงาน HTML ด้วย `tools/data/moves_team_extract.py` ห้ามแก้มือ) · ป้าย "ลองได้ในห้องทดลอง" อ่านจาก TECHS ใน lab_stage.gd อัตโนมัติ · **เพิ่มท่าใหม่ในห้องทดลองแล้วเขียน LAB_NOTE ในตัวสร้าง + สร้างหน้านี้ใหม่ทุกครั้ง** |
 - หน้า animation test กับฉากต่อสู้ใช้**เทมเพลตเดียวกัน** `tools/web/anim_test.tpl.html` → แก้ฉากต่อสู้แล้วสร้างทั้งสองหน้า · เปิดทดสอบในเครื่องต้องผ่าน http server (utf-8) ไม่ใช่ file://
 - ไฟล์เดี่ยวใน Artifact ≤ 16 MB → สไปรต์แยกเป็นก้อน JSON ส่งผ่าน `files` ทุกก้อน · ใช้เกิน 85% ให้แยกหน้า V2
 
