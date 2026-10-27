@@ -12,6 +12,7 @@
   python3 tools/sprites/pixellab_walk.py fetch        ดึง ZIP ของตัวละคร แตกภาพลง OUT
   python3 tools/sprites/pixellab_walk.py vfx <ชื่อ>    เอฟเฟกต์จาก VFX_SPECS (/vfx · lite ~1 gen · พิมพ์คำสั่งเต็ม + ราคาที่ PixelLab เสนอ) → OUT/vfx/<ชื่อ>/
   python3 tools/sprites/pixellab_walk.py state [ชื่อ]     สร้าง State จาก STATES (/create-character-state · ตัวเดิมเปลี่ยนท่า/ของในมือ ครบทุกทิศ) · fetch_state [ชื่อ] ดึงภาพ
+  python3 tools/sprites/pixellab_walk.py rot8 <State>   State 4 ทิศ → v3 เติมมุมเฉียง = ภาพหมุน 8 มุม (rotations8/ · 2–9 gen)
   python3 tools/sprites/pixellab_walk.py page         ท่าเดินจาก ZIP → px/ (ผืนเดียวกับ rion_pack_px) ให้หน้า animation test
 ผลทั้งหมดอยู่ใน assets/sprites/pixellab_draft/ (.gdignore · ร่าง ยังไม่เข้าเกม) · state.json เก็บ character_id / job id
 """
@@ -577,6 +578,73 @@ MOVES["idle_bat"] = {"dir": "west", "held": BAT, "attack": False, "frames": 4, "
 	"not": ["stepping", "turning", "swinging or raising the bat", "holding the bat with one hand", "motion lines"]}
 
 
+# ---- สายกวาด ท่าหมุน (kwan 27 ต.ค. "หมุนตัวครบรอบ แขนกางมีดออก ใบมีดกวาดทุกตัว ใช้งาน pixellab ได้เลย เอาให้สุด · ต่อด้วย พายุเถ้าใบมีด") ----
+# ท่าหมุนสั่งเจนตรงๆ พังทุกครั้ง (หันเข้ากล้อง · มีดหาย) → ทำเป็น State ท่านิ่ง (ได้ 4 ทิศ) แล้ว rot8 ให้ v3 เติมมุมเฉียงจากภาพเดิม = ภาพหมุน 8 มุมของท่าเดียวกันจริง
+SPIN_KEEP = ("Keep the blue cap with brass goggles, brown hair, white shirt, blue necktie, brown belt, brown backpack, "
+	"blue shorts, white socks and brown boots. ")
+SPIN_KNIFE = ("The RIGHT hand grips ONE small kitchen knife: short dark wooden handle in the fist, short silver blade about as long as the hand, "
+	"the blade pointing straight OUTWARD away from the body, continuing the line of the right arm. ")
+SPIN_NOT = "No second knife, no sword, no glow, no trails, no motion lines, no shadow, no ground, no background."
+STATES["BL4_spin_T"] = {"seed": 41, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Spinning-top blade attack pose: standing upright, feet planted wide apart, knees slightly bent. BOTH arms stretched straight out "
+	"horizontally to the left and right of the body at shoulder height, elbows straight, like a letter T. "
+	+ SPIN_KNIFE + "The left hand is open and flat, fingers together. Torso upright, chin level, eyes narrowed, mouth set in a determined line. "
+	"The arms stay straight out to the sides in every rotation. " + SPIN_KEEP + SPIN_NOT)}
+STATES["BL12_low_sweep"] = {"seed": 43, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Low sweeping spin pose: a deep wide crouch, knees bent low, feet wide apart and flat, torso leaning slightly forward. "
+	"BOTH arms stretched straight out horizontally to the left and right of the body at waist height, elbows straight. "
+	+ SPIN_KNIFE + "The left hand is open and flat. Eyes fierce, mouth open shouting. "
+	"The arms stay straight out to the sides in every rotation. " + SPIN_KEEP + SPIN_NOT)}
+STATES["BL12_air_spin"] = {"seed": 47, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Airborne spinning jump pose: both feet off the ground, knees bent and tucked up under the body, toes pointing down, "
+	"BOTH arms stretched straight out horizontally to the left and right of the body at shoulder height, elbows straight. "
+	+ SPIN_KNIFE + "The left hand is open and flat. Hair and shirt hem blown upward by the jump. Eyes fierce, teeth gritted. "
+	"The arms stay straight out to the sides in every rotation. " + SPIN_KEEP + SPIN_NOT)}
+
+ROT8_KEEP = {}   # State ไหนภาพข้างใช้ได้ ใส่ทิศที่จะส่งไปตามเดิม
+ROT8 = ("west", "south-west", "south", "south-east", "east", "north-east", "north", "north-west")   # ลำดับหมุน: หันซ้าย → เข้ากล้อง → ขวา → หลัง
+
+
+def rot8(name):
+	"""State 4 ทิศ → v3 เติมมุมเฉียง 4 มุมจากภาพ south ของ State (ทิศที่มีแล้วส่งไปตามเดิม) → OUT/states/<ชื่อ>/<ชื่อ>/rotations8/"""
+	rd = os.path.join(OUT, "states", name, name, "rotations")
+	if not os.path.isfile(os.path.join(rd, "south.png")):
+		sys.exit("ยังไม่มีภาพ State: รัน state + fetch_state ก่อน")
+	balance()
+	body = {"description": DESC + ", " + STATES[name]["edit"][:400], "name": "Rion " + name + " rot8", "reference_image": b64(os.path.join(rd, "south.png")),
+		"direction_images": {d: b64(os.path.join(rd, d + ".png")) for d in ROT8_KEEP.get(name, ("north",))},   # ภาพข้างของ State มักไม่ได้ท่าเดียวกับหน้า/หลัง → ให้ v3 หมุนเองจากภาพหน้า
+		"n_directions": 8, "view": "low top-down", "no_background": True, "seed": STATES[name]["seed"]}
+	r = call("POST", "/create-character-v3", body)
+	s = state()
+	s.setdefault("rot8", {})[name] = r
+	save_state(s)
+	print(json.dumps(r, ensure_ascii=False)[:600])
+	if r.get("background_job_id"):
+		wait(r["background_job_id"], "rot8 " + name)
+	data = call("GET", f"/characters/{r['character_id']}/zip", raw=True)
+	dst = os.path.join(OUT, "states", name, name, "rotations8")
+	tmp = dst + "_zip"
+	shutil.rmtree(tmp, ignore_errors=True)
+	zipfile.ZipFile(io.BytesIO(data)).extractall(tmp)
+	os.makedirs(dst, exist_ok=True)
+	for f in glob_rot(tmp):
+		shutil.copy(f, os.path.join(dst, os.path.basename(f)))
+		print(" ", os.path.basename(f), Image.open(f).size)
+	shutil.rmtree(tmp, ignore_errors=True)
+	balance()
+
+
+def glob_rot(d):
+	out = []
+	for root, _, fs in os.walk(d):
+		if os.path.basename(root) == "rotations":
+			out += [os.path.join(root, f) for f in sorted(fs) if f.endswith(".png")]
+	return out
+
+
 def make_state(name):
 	s = state()
 	if "character_id" not in s:
@@ -775,4 +843,5 @@ if __name__ == "__main__":
 	 "vfx_frames": lambda: vfx_frames(sys.argv[2] if len(sys.argv) > 2 else "slash2_trail"),
 	 "state": lambda: make_state(sys.argv[2] if len(sys.argv) > 2 else "fight_knife"),
 	 "fetch_state": lambda: fetch_state(sys.argv[2] if len(sys.argv) > 2 else "fight_knife"),
+	 "rot8": lambda: rot8(sys.argv[2]),
 	 "vfx": lambda: vfx(sys.argv[2] if len(sys.argv) > 2 else "slash2_trail")}[cmd]()

@@ -476,6 +476,87 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_wheel",
+   "label": "วงล้อ bl4 · หมุน 8 มุม แขนกาง T มีดมือขวา (State BL4_spin_T + rot8) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_wheel_0",
+    "pls_wheel_1",
+    "pls_wheel_2",
+    "pls_wheel_3",
+    "pls_wheel_4",
+    "pls_wheel_5",
+    "pls_wheel_6",
+    "pls_wheel_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL4_spin_T __rot8__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_storm_low",
+   "label": "พายุเถ้าใบมีด bl12 · ย่อกวาดหมุน 8 มุม (State BL12_low_sweep + rot8) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_storm_low_0",
+    "pls_storm_low_1",
+    "pls_storm_low_2",
+    "pls_storm_low_3",
+    "pls_storm_low_4",
+    "pls_storm_low_5",
+    "pls_storm_low_6",
+    "pls_storm_low_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL12_low_sweep __rot8__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_storm_air",
+   "label": "พายุเถ้าใบมีด bl12 · กระโดดหมุนกลางอากาศ 8 มุม (State BL12_air_spin + rot8) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_storm_air_0",
+    "pls_storm_air_1",
+    "pls_storm_air_2",
+    "pls_storm_air_3",
+    "pls_storm_air_4",
+    "pls_storm_air_5",
+    "pls_storm_air_6",
+    "pls_storm_air_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL12_air_spin __rot8__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_storm_coil",
+   "label": "พายุเถ้าใบมีด bl12 · ง้างย่อข้าง (ภาพข้างของ State BL12_low_sweep) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_storm_coil_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL12_low_sweep __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_bat_idle",
    "label": "ยืนถือไม้เบสบอล (State) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [

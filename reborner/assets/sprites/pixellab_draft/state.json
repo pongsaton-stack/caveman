@@ -1071,6 +1071,33 @@
     "status": "queued"
    },
    "status": "completed"
+  },
+  "BL4_spin_T": {
+   "response": {
+    "usage": null,
+    "background_job_id": "94671530-bbc5-4060-8cdc-ae0b8ae184d0",
+    "character_id": "16964c57-1d4c-4d65-b843-3b707fe3a695",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL12_low_sweep": {
+   "response": {
+    "usage": null,
+    "background_job_id": "e8be0208-92a3-4275-b07b-f7267580bf04",
+    "character_id": "f7c4a416-8eb1-4143-ba5e-939facbc7007",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL12_air_spin": {
+   "response": {
+    "usage": null,
+    "background_job_id": "fbc913fb-00cc-4e6a-a4e8-4cd8bd98bb3a",
+    "character_id": "9a016eda-8240-4b20-a105-c6c392b09128",
+    "status": "queued"
+   },
+   "status": "completed"
   }
  },
  "monsters": {
@@ -1197,6 +1224,32 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  }
+ },
+ "rot8": {
+  "BL4_spin_T": {
+   "usage": null,
+   "background_job_id": "78279510-5954-4ee2-bf5f-f0fc091dba8a",
+   "character_id": "ab73a3ad-cc39-40fd-a724-8a7a92b4e846",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  },
+  "BL12_low_sweep": {
+   "usage": null,
+   "background_job_id": "a8eac463-042e-431c-9cbe-d2e5af4fc8a9",
+   "character_id": "1b3076e5-b088-42b1-beab-1882afd42839",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  },
+  "BL12_air_spin": {
+   "usage": null,
+   "background_job_id": "e57f3f25-a329-473e-8a1b-04b7d5608c65",
+   "character_id": "8eec6317-df5c-4f21-be25-fd378382ce89",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
   }
  }
 }

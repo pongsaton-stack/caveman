@@ -42,6 +42,10 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_bl9", "จันทร์เสี้ยว bl9 · ท่าทมโบะ (มีด)", "fight_knife", "bl9_v", "west", [0, 1, 2, 3, 4], 90, False),   # kwan 23 ต.ค. เลือก "2" เจนท่าทมโบะ (จิเง็นริว) · 2 gen · เฟรม 5–7 วาดเส้นฟาดใหญ่ + มีดหาย ตัดทิ้ง → ช่วงฟันใช้ pls_atk_bl 5–7
 	("pls_spin_bl", "หมุนตัว 4 มุมจริง · ถือมีด (State)", "fight_knife", "__rot__", "west", None, 60, True),   # ตัดเอ็นแบบ Attack on Titan (kwan 21 ต.ค.): หมุนสว่านผ่านใต้ขามอน
 	("pls_bat", "ทุบ bt0 · ไม้เบสบอลสองมือ (State BT_bat_stance)", "BT_bat_stance", "bt0_bat_v", "west", None, 90, False),   # kwan 25 ต.ค. "ทื่อมาก ลองเจน pixellab มาเทียบ" กับภาพ Flow · 18 gen (State 15 + ท่า 3)
+	("pls_wheel", "วงล้อ bl4 · หมุน 8 มุม แขนกาง T มีดมือขวา (State BL4_spin_T + rot8)", "BL4_spin_T", "__rot8__", "west", None, 60, True),   # kwan 27 ต.ค. "หมุนตัวครบรอบ แขนกางมีดออก ... ใช้งาน pixellab ได้เลย" · 17 gen
+	("pls_storm_low", "พายุเถ้าใบมีด bl12 · ย่อกวาดหมุน 8 มุม (State BL12_low_sweep + rot8)", "BL12_low_sweep", "__rot8__", "west", None, 60, True),   # kwan 27 ต.ค. "ต่อด้วย พายุเถ้าใบมีด ขอแบบจัดเต็ม"
+	("pls_storm_air", "พายุเถ้าใบมีด bl12 · กระโดดหมุนกลางอากาศ 8 มุม (State BL12_air_spin + rot8)", "BL12_air_spin", "__rot8__", "west", None, 60, True),
+	("pls_storm_coil", "พายุเถ้าใบมีด bl12 · ง้างย่อข้าง (ภาพข้างของ State BL12_low_sweep)", "BL12_low_sweep", "__rot__", "west", [0], 90, False),
 	("pls_bat_idle", "ยืนถือไม้เบสบอล (State)", "BT_bat_stance", "__rot__", "west", [0], 180, True),
 	("pls_bat2", "ทุบ bt0 รอบ 4 · ง้าง → ฟาดลงเฉียง (ท่ากลาง ไม้หลังไหล่ → State กระทบ)", "BT_bat_stance", "chop_bat2_v", "west", None, 90, False),   # kwan 25 ต.ค. "ใช้ pixellab ปรับให้ตรงกับรายงาน" · PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact
 	("pls_bat_imp", "ทุบ · กระทบลงเฉียง ตัวตั้งตรง (State BT_bat_impact)", "BT_bat_impact", "__rot__", "west", [0], 90, False),
@@ -99,6 +103,9 @@ def draw_blade(c, end, step, n, ref_cid, ref_i):
 
 def src(st, anim, d):
 	base = os.path.join(PL, "states", st, st) if st else os.path.join(PL, "zip", "Idle")
+	if anim == "__rot8__":   # ภาพหมุน 8 มุมของ State (pixellab_walk.py rot8 · ซ้าย → เข้ากล้อง → ขวา → หลัง) · ไม่ผ่าน clean (ภาพนิ่งไม่มีแสงวาดติด)
+		order = ("west", "south-west", "south", "south-east", "east", "north-east", "north", "north-west")
+		return [os.path.join(base, "rotations8", r + ".png") for r in order], None
 	if anim == "__rot__":   # ภาพหมุนตัวจริง 4 มุมของ State (ซ้าย → หลัง → ขวา → หน้า) · ผืน 96 ตัวสูงเท่าภาพท่า (72)
 		return [os.path.join(base, "rotations", r + ".png") for r in ("west", "north", "east", "south")], os.path.join(base, "rotations", d + ".png")
 	return sorted(glob.glob(os.path.join(base, "animations", anim, d, "*.png"))), os.path.join(base, "rotations", d + ".png")
@@ -146,10 +153,13 @@ def main():
 		files, rot = src(st, anim, d)
 		if not files:
 			print("ไม่มีภาพ", cid); continue
-		ref = Image.open(rot).convert("RGBA")
 		ims = [Image.open(f).convert("RGBA") for f in files]
 		if use: ims = [ims[i] for i in use]
-		cl = [clean(im if im.size == ref.size else im, ref if im.size == ref.size else ref.resize(im.size)) for im in ims]
+		if rot is None:
+			cl = [(im, 0) for im in ims]
+		else:
+			ref = Image.open(rot).convert("RGBA")
+			cl = [clean(im if im.size == ref.size else im, ref if im.size == ref.size else ref.resize(im.size)) for im in ims]
 		ims = [c[0] for c in cl]; removed = sum(c[1] for c in cl)
 		bb = [im.getchannel("A").getbbox() for im in ims]
 		x0, y1 = min(b[0] for b in bb), max(b[3] for b in bb)
