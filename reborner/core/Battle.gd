@@ -34,6 +34,7 @@ var tech_uses := 0
 var statuses_applied := 0
 var guards := 0
 var status_deaths := 0
+var enrages := 0                 # มอนที่โกรธในศึกนี้ (data/enrage.csv)
 var combos := 0
 var telegraphs := 0
 var interrupts := 0
@@ -337,6 +338,7 @@ func _tick_status_damage(a: Actor) -> bool:
 			if not a.is_hero:
 				_gain_insight(hero(), Insight.ALLY_DOWN, "เพื่อนล้ม")
 		_log("    %s ล้มจากสถานะ" % a.name)
+		_on_down(a)
 		return true
 	return false
 
@@ -681,9 +683,22 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 			if not tgt.is_hero:
 				_gain_insight(hero(), Insight.ALLY_DOWN, "เพื่อนล้ม")
 		_log("    %s ล้ม (ถูกตี %d ครั้ง)" % [tgt.name, tgt.hits])
+		_on_down(tgt)
 
 	if tgt.counter_tech != null and src.side != tgt.side and not tgt.down and not src.down:
 		_counter_strike(tgt, src)
+
+## มีตัวล้ม → คู่ชนิดเดียวกันที่มีกลไก pair_down (data/enrage.csv · มินิบอส MB-1) โกรธถาวร
+func _on_down(a: Actor) -> void:
+	for o in actors:
+		if o == a or o.down or o.enraged or o.side != a.side or o.id != a.id:
+			continue
+		if str(o.enrage.get("trigger", "")) != "pair_down":
+			continue
+		o.apply_enrage()
+		enrages += 1
+		_log("    %s โกรธ! ATK %d · SPD %d" % [o.name, o.atk, o.spd])
+		if capture: events.append({"tgt": o, "buff": "โกรธ!"})
 
 ## ตั้งท่าสวนอยู่แล้วโดนศัตรูตี → ฟันสวนผู้ตีทันที 1 ครั้ง นอกคิว · ล้างท่าก่อนตี กันสวนซ้อนและฮิตถัดไปของท่าหลายครั้ง
 func _counter_strike(h: Actor, src: Actor) -> void:
@@ -804,7 +819,7 @@ func _result() -> Dictionary:
 		"glimmers": glimmers, "glimmer_log": glimmer_log, "tech_uses": tech_uses,
 		"fills": fills, "from_fill": glimmers_from_fill,
 		"counters": counter_glimmers, "reads": read_glimmers, "dodges": dodges,
-		"statuses": statuses_applied, "guards": guards, "status_deaths": status_deaths,
+		"statuses": statuses_applied, "guards": guards, "status_deaths": status_deaths, "enrages": enrages,
 		"combos": combos, "telegraphs": telegraphs, "interrupts": interrupts,
 		"ambush": ambush,
 		"understanding": understanding.duplicate(), "understood": understood(),

@@ -50,6 +50,8 @@ var basic_status_chance: float = 0.0
 # ── ผลพิเศษ (ท่าเด่นมีผลจริง · data/sig_effects.csv) ──
 var base_def: int = 0            # DEF ก่อนบัฟ (ใช้คืนค่าตอนบัฟหมด)
 var buffs: Dictionary = {}       # "def_up" -> เทิร์นที่เหลือ
+var enrage: Dictionary = {}      # แถวจาก data/enrage.csv ({} = ไม่มีกลไกโกรธ) · Battle._on_down เป็นผู้ใช้
+var enraged: bool = false        # โกรธแล้ว (ถาวรจนจบศึก · ไม่ซ้อน)
 var sig_effect: Dictionary = {}  # แถวจาก sig_effects.csv ของมอนตัวนี้ ({} = ท่าเด่นเป็นการตีแรงแบบเดิม)
 var body: String = ""            # ร่างกายมอน (data/monster_body.csv) — "" = ไม่มีผลความเข้ากับร่างกาย
 var once_used: Array[String] = []   # ชื่อท่าแบบ "ครั้งเดียวต่อการต่อสู้" ที่ใช้ไปแล้ว
@@ -95,6 +97,20 @@ static func body_of(monster_id: String) -> String:
 	if _body_table.is_empty() and FileAccess.file_exists("res://data/monster_body.csv"):
 		_body_table = CsvDb.index_by(CsvDb.load_csv("res://data/monster_body.csv"), "monster_id")
 	return str(_body_table.get(monster_id, {}).get("body", ""))
+
+static var _enrage_table := {}
+static func enrage_table() -> Dictionary:
+	if _enrage_table.is_empty() and FileAccess.file_exists("res://data/enrage.csv"):
+		_enrage_table = CsvDb.index_by(CsvDb.load_csv("res://data/enrage.csv"), "monster_id")
+	return _enrage_table
+
+## โกรธ: ATK × atk_mult · AV ทุกการกระทำ × av_mult (= SPD ÷ av_mult เพราะ SPD ใช้คิด AV อย่างเดียว) · AV ที่ค้างในคิวลดตามทันที
+func apply_enrage() -> void:
+	enraged = true
+	var am := float(enrage.get("av_mult", 1.0))
+	atk = roundi(atk * float(enrage.get("atk_mult", 1.0)))
+	spd = roundi(spd / am)
+	av *= am
 
 static var _sig_table := {}
 static func sig_table() -> Dictionary:
@@ -173,6 +189,7 @@ static func from_csv(row_data: Dictionary) -> Actor:
 	a.basic_status = str(row_data.get("status", ""))
 	a.basic_status_chance = float(row_data.get("status_chance", 0.0))
 	a.sig_effect = sig_table().get(a.id, {})
+	a.enrage = enrage_table().get(a.id, {})
 	a.body = body_of(a.id)
 	a.reset_av()
 	return a

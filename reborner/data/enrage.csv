@@ -1,0 +1,2 @@
+monster_id,trigger,atk_mult,av_mult,status,source
+MB01,pair_down,1.5,0.7,ทีม (kwan รับ 27 ต.ค.),"docs/design/team_r3/MONSTERS_AND_BOSSES_SUMMARY.md MB-1: ตัวหนึ่งตายอีกตัวโกรธถาวร ATK +50% AV -30%"
