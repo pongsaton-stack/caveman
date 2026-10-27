@@ -32,7 +32,7 @@ func setup() -> void:
 	setup_row(mw * 0.5 + 72, 0.62, mw * 0.5 + 72)   # เว้นที่ซ้ายให้ Rion ทะลุออกไปเบรก/ตั้งการ์ดหลังแถวในจอ
 	x_home = start + 60
 	x_in = cxs[0] + mw * 0.5 + 12
-	x_out = cxs[cxs.size() - 1] - mw * 0.5 - 14
+	x_out = maxf(26.0, cxs[cxs.size() - 1] - mw * 0.5 - 14)   # แถวถูกเลื่อนซ้าย (มอนตัวใหญ่) → เบรกในจอ
 	x_land = cxs[0] + mw * 0.5 + 28
 	hits_f.clear()
 	for c in cxs:   # โดนตอนกลางตัว Rion ผ่านกลางตัวมอน

@@ -82,7 +82,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
   แก้แสงวาบตามตรวจรอบ 2 (kwan 25 ต.ค. "3"): bl8 ตัดวาบตัวมอนตอนตอก + จอวาบ 0.22→0.15 + ร่างไม่แข็งเป็นรอยแผลแทนร้าว · ประกายจอวาบ 0.6→0.3
   สัญลักษณ์บนจอต้องอยู่ใน subset ฟอนต์ (✦ ขึ้นกล่องบนเว็บ → ใช้ ★) · GDScript: `var x := round(...)`/max/min = พังตอน parse → ใช้ roundf/maxf/minf หรือระบุชนิด · ลำดับชั้น: back_fx (หลังมอน) → มอน z1 → mid_fx z2 → Rion z4 → front_fx z5
   ตรวจเร็ว (ไม่กี่วิ): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 [--bg=ash_village] --snap=30,36 --snapdir=<dir>` → เทียบกับเว็บ `websnap.cjs` (scratchpad)
-  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V14 · สายคม 10 ท่า · ปุ่มเล่นวน · ฉาก 5 ขยับได้ครบ · ชื่อปุ่มยาวบีบแนวนอนให้พอดี) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
+  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V15 · สายคม 10 ท่า · ปุ่มเล่นวน · ฉาก 5 ขยับได้ครบ · ชื่อปุ่มยาวบีบแนวนอนให้พอดี) · จอขยายแบบ canvas_items (ตัวอักษรคม · kwan 27 ต.ค.) · แถวมอนห่าง Rion ≥ `row_base.ROOM` 65px (บีบระยะก่อน แล้วเลื่อนซ้าย) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) · **บทเรียนหมวด 11 อ่านก่อนแก้อะไรก็ตาม**

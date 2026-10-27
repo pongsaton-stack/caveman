@@ -186,7 +186,7 @@ func _ready() -> void:
 	playing = recording or bool(Engine.get_meta("lab_auto", false))
 	var win := get_window()
 	win.content_scale_size = Vector2i(W, H)
-	win.content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
+	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS   # วาดตามขนาดจอจริง: ตัวอักษรคม (kwan 27 ต.ค. "ขอตัวอักษรชัดหน่อย") · ภาพพิกเซลยังกรองแบบ nearest
 	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 	if recording:
 		win.size = Vector2i(W * 2, H * 2) if snaps.is_empty() else Vector2i(W, H)

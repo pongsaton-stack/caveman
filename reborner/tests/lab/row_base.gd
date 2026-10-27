@@ -8,10 +8,19 @@ var cxs: Array[float] = []   # กลางตัวมอนแต่ละต�
 func _count() -> int:
 	return 1 if foe.begins_with("B") else 3
 
+const ROOM := 65.0   # ระยะว่างขั้นต่ำระหว่างขอบมอนตัวใกล้สุดกับกลางตัว Rion ตอนยืน (kwan 27 ต.ค. "มอนอยู่ใกล้ตัวเอกไป")
+
 ## วางแถว: ตัวไกลสุดที่ left_cx · ระยะห่าง gap × ความกว้างมอน (ซ้อนกันเล็กน้อย) · เป้าเดียว = ที่ single_cx (ไม่ระบุ = MX)
+## แถวล้นเข้าหา Rion → บีบระยะห่าง (ไม่ต่ำกว่า 0.45 เท่าตัว) ก่อน แล้วค่อยเลื่อนทั้งแถวไปทางซ้าย
 func setup_row(left_cx: float, gap := 0.62, single_cx := -1.0) -> void:
 	var sp := roundf(mw * gap)
 	var c0 := left_cx + sp * (_count() - 1) if _count() > 1 else (single_cx if single_cx > 0 else float(MX))
+	var lim := start + 60.0 - ROOM - mw * 0.5   # กลางตัวมอนตัวใกล้สุดห้ามเกินนี้
+	if _count() > 1 and c0 > lim:
+		sp = maxf(roundf(mw * 0.45), floorf((lim - left_cx) / (_count() - 1)))
+		c0 = minf(left_cx + sp * (_count() - 1), lim)
+	elif c0 > lim:
+		c0 = lim
 	place_monster(int(c0))
 	cxs.clear()
 	for i in _count():
