@@ -37,6 +37,7 @@ const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "�
 const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
 	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
 	"flooded_ruins": ["เมืองน้ำท่วม", "res://docs/art-bible/pixellab_test/bg_flooded_ruins.jpg", 3, 0.80, false],
+	"underworld": ["ใต้พสุธา", "res://docs/art-bible/world_concepts/r4_battle.jpg", 3, 0.78, false],   # kwan 27 ต.ค. ส่งภาพฉากศึกภูมิภาค 4
 	"rift": ["ในรอยแยก", "res://docs/art-bible/world_concepts/r5_battle.jpg", 3, 0.71, false]}   # kwan 27 ต.ค. "ใส่เข้าห้องทดลอง" · พื้นมุมเฉียงไอโซ
 ## ดาเมจ [ค่า, +1 อ่อนแอ/−1 ต้านทาน, จำนวนครั้ง] = csHit(ท่า, มอน) ของหน้าเว็บ (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
 const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], "M15": [57, 1, 1], "B1": [31, -1, 1]},

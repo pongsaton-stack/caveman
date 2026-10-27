@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/lab/build_web.sh — หน้าเว็บของห้องทดลองฉากต่อสู้ Godot (เมนูเลือกท่า 5 · มอน 5 · ฉาก 4 · เสียง · เพลง)
+# tests/lab/build_web.sh — หน้าเว็บของห้องทดลองฉากต่อสู้ Godot (เมนูเลือกท่า 5 · มอน 5 · ฉาก 5 · เสียง · เพลง)
 #   GODOT=<godot> tests/lab/build_web.sh <โฟลเดอร์ผลลัพธ์> [res://tests/lab/<ท่า>.tscn]
 # ต้องมี export template เว็บ (tools/get_godot.sh --web)
 # ทำโปรเจกต์ชั่วคราวใน <out>/proj ที่มีเฉพาะของที่ฉากใช้ (ไม่มี addons/autoload ของเกม) · ภาพร่างคัดลอกไปที่ทางเดิม
@@ -32,7 +32,7 @@ mkdir -p "$P/assets/sprites/pixellab_draft/weapon_skin"; cp assets/sprites/pixel
 mkdir -p "$P/assets/sprites/flow_draft/bt"; cp assets/sprites/flow_draft/bt/flw_*.png "$P/assets/sprites/flow_draft/bt/"
 for f in M01 M03 M06 M15 B1; do cp assets/sprites/monsters_px_draft/${f}_*.png "$P/assets/sprites/monsters_px_draft/"; done
 cp docs/art-bible/pixellab_test/bg_frost_volcano.jpg docs/art-bible/pixellab_test/bg_ash_village.jpg docs/art-bible/pixellab_test/bg_flooded_ruins.jpg "$P/docs/art-bible/pixellab_test/"
-mkdir -p "$P/docs/art-bible/world_concepts"; cp docs/art-bible/world_concepts/r5_battle.jpg "$P/docs/art-bible/world_concepts/"
+mkdir -p "$P/docs/art-bible/world_concepts"; cp docs/art-bible/world_concepts/r4_battle.jpg docs/art-bible/world_concepts/r5_battle.jpg "$P/docs/art-bible/world_concepts/"
 mkdir -p "$P/docs/art-bible/audio"; cp docs/art-bible/audio/battle_bgm_preview.mp3 "$P/docs/art-bible/audio/"
 "$G" --headless --path "$P" --import > "$OUT/import.log" 2>&1 || true
 "$G" --headless --path "$P" --export-release "Web" "$OUT/raw/index.html" > "$OUT/export.log" 2>&1 || { tail -20 "$OUT/export.log"; exit 1; }

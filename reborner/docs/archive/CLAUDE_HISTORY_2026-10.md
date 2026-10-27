@@ -1358,3 +1358,4 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - MB-1 (kwan "1"): กลไกโกรธ `data/enrage.csv` + `Actor.apply_enrage` + `Battle._on_down` · แถว `MB01` ใน monsters.csv + monster_body.csv (ลืมร่างกายรอบแรก → bodytest จับได้ → วัดใหม่) · จูนด้วย `tests/measure/mb1.gd --grid` → 190/50 [เสนอ] มีดครัว 64/69/77% · เทสต์ enragetest · seed ไม่เปลี่ยน · ยังไม่วาง MB-1 บนแผนที่ (หมาป่าคู่ M15 ยังเฝ้าหีบ CR-2)
 - MB-1 ล็อก 190/50 (kwan 27 ต.ค. "1") · อัปเดต MB1_GATE_CHECK · PENDING · MONSTERS_AND_BOSSES_SUMMARY
 - ภาพแนวคิดโลก 10 ภาพ → `docs/art-bible/world_concepts/` (ฉากศึก 1–3 = ภาพเดิมของ lab) · kwan "211": สีภูมิภาคยึดตามภาพ (GDD 13) · ฉากในรอยแยกเข้า lab (ระดับพื้น 0.71 · เว็บ lab V9) · ส่งข้อแก้แผนที่โลกให้ทีม (WORLD_MAP_REVIEW_1 ท้ายไฟล์)
+- ฉากศึกใต้พสุธา `world_concepts/r4_battle.jpg` → lab ฉากที่ 5 (ระดับพื้น 0.78) · เว็บ lab V10
