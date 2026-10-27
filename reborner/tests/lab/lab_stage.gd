@@ -36,7 +36,8 @@ const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "�
 ## ฉากหลัง (เหมือน combat_bgs ของ anim_test_build.py): ไฟล์ · ขยายกี่เท่า · เส้นพื้น (สัดส่วนความสูง) → ครอป 300x168 พื้นที่แถว 158
 const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
 	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
-	"flooded_ruins": ["เมืองน้ำท่วม", "res://docs/art-bible/pixellab_test/bg_flooded_ruins.jpg", 3, 0.80, false]}
+	"flooded_ruins": ["เมืองน้ำท่วม", "res://docs/art-bible/pixellab_test/bg_flooded_ruins.jpg", 3, 0.80, false],
+	"rift": ["ในรอยแยก", "res://docs/art-bible/world_concepts/r5_battle.jpg", 3, 0.71, false]}   # kwan 27 ต.ค. "ใส่เข้าห้องทดลอง" · พื้นมุมเฉียงไอโซ
 ## ดาเมจ [ค่า, +1 อ่อนแอ/−1 ต้านทาน, จำนวนครั้ง] = csHit(ท่า, มอน) ของหน้าเว็บ (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
 const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], "M15": [57, 1, 1], "B1": [31, -1, 1]},
 	"bl1": {"M01": [80, 0, 1], "M03": [24, -1, 1], "M06": [77, 0, 1], "M15": [82, 1, 1], "B1": [45, -1, 1]},
@@ -962,7 +963,8 @@ func _build_menu() -> void:
 	var keys := BGS.keys()
 	for i in keys.size():   # แถวฉาก
 		var id: String = keys[i]
-		var b := _button("ฉาก: " + BGS[id][0], Vector2(4 + i * 98, 94), Vector2(95, 14), 14)
+		var bw := 292.0 / keys.size()   # แบ่งแถวเท่ากันตามจำนวนฉาก (ผืน 300)
+		var b := _button(BGS[id][0], Vector2(4 + i * bw, 94), Vector2(bw - 3, 14), 14)
 		b.modulate = Color(1, 1, 0.6) if id == bg_id else Color.WHITE
 		b.pressed.connect(func(): _start(foe, id, scene_file_path))
 	var again := _button("เล่นซ้ำ (%s)" % foe, Vector2(4, 111), Vector2(95, 16), 16)
