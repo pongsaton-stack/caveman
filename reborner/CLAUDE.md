@@ -39,7 +39,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 - ชุดที่ใช้ในฉากต่อสู้ตอนนี้ = PixelLab `px_set` (`assets/sprites/pixellab_draft/px_set/` ผืน 120x112 เท้าแถว 108) · ยังไม่เข้าเกม
 - แนวภาพตัวละครที่ kwan ชอบ (14 ต.ค.): chibi หัวโต เส้นขอบเข้มหนา สีเรียบลงเงาการ์ตูน · เอฟเฟกต์วาดเองใช้เส้นขอบ `#2a1a14`
 
-## PixelLab (Tier 1 · 2,000 gen/เดือน · ยอดล่าสุด **1,736** ณ 26 ต.ค.)
+## PixelLab (Tier 1 · 2,000 gen/เดือน · ยอดล่าสุด **1,685** ณ 27 ต.ค.)
 - สคริปต์ `tools/sprites/pixellab_walk.py` (API v2 · พิมพ์ยอดก่อน/หลังทุกคำสั่งที่เสียเครดิต) · ท่าในต้นไม้ = `tools/sprites/pixellab_skills.py` (BEATS · HELD/HELD_NOT · HOLD_STILL · IN_PLACE)
 - **คำสั่งต้องละเอียดที่สุด** (kwan 18 ต.ค.): ทิศล็อก · ของในมือ (ขนาด/มือไหน/ทุกเฟรม) · จังหวะทีละเฟรม · โมเมนตัม · ส่วนที่คงที่ · สิ่งที่ห้าม · CHARACTER + STYLE
   ใช้ `ONE_HAND` / `KNIFE` เท่านั้น ห้ามคำว่า "front hand" · ดูคำสั่งเต็มก่อนจ่าย: `python3 tools/sprites/pixellab_walk.py prompt <ท่า>` · เจน: `PL_STATE=fight_knife ... anim <ท่า> west`
@@ -56,10 +56,10 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
 | เกมบนเว็บ | https://claude.ai/artifact/G2xSXyKupn1WSNnu96uHan | `tools/export_web.sh <out>` (ดู "เล่นผ่านเว็บ") |
 | animation test | https://claude.ai/artifact/MoNVTd5ckQLmb4tsfqsikw (V155) | `python3 tools/web/anim_test_build.py <out.html>` + files `anim_test_sprites_0.json` |
 | ฉากต่อสู้ | https://claude.ai/artifact/6XRNGR6WCWih5zwD9yB7uV (V14) | `anim_test_build.py --combat <out.html>` + files `combat_sprites_0.json` |
-| มาสเตอร์ PixelLab | https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y (V17) | `python3 tools/web/pixellab_test_build.py <out.html>` · ใส่**เฉพาะภาพที่ PixelLab เจน** |
+| มาสเตอร์ PixelLab | https://claude.ai/artifact/DD4suCKoCB1guFvkM3MW5y (V18) | `python3 tools/web/pixellab_test_build.py <out.html>` · ใส่**เฉพาะภาพที่ PixelLab เจน** |
 | สมุดรวม | https://claude.ai/artifact/SfXaREU5hLSHJvgFqWS1h4 | `python3 tools/web/codex_build.py <out.html>` |
 | UI Kit | https://claude.ai/artifact/EoUPzxnzW3hswZKMYsaqkz | `GODOT=<godot> python3 tools/web/ui_mock_build.py <out.html>` |
-| ต้นไม้ท่า 6 สาย | https://claude.ai/artifact/MEug5zmpASHwnp26RqBi35 | `python3 tools/web/skill17_page_build.py <out.html>` |
+| ต้นไม้ท่า 6 สาย | https://claude.ai/artifact/MEug5zmpASHwnp26RqBi35 (V3) | `python3 tools/web/skill17_page_build.py <out.html>` · ป้าย "ลองได้ในห้องทดลอง" อ่านจาก TECHS ใน lab_stage.gd อัตโนมัติ · **เพิ่มท่าใหม่ในห้องทดลองแล้วเขียน LAB_NOTE ในตัวสร้าง + สร้างหน้านี้ใหม่ทุกครั้ง** |
 - หน้า animation test กับฉากต่อสู้ใช้**เทมเพลตเดียวกัน** `tools/web/anim_test.tpl.html` → แก้ฉากต่อสู้แล้วสร้างทั้งสองหน้า · เปิดทดสอบในเครื่องต้องผ่าน http server (utf-8) ไม่ใช่ file://
 - ไฟล์เดี่ยวใน Artifact ≤ 16 MB → สไปรต์แยกเป็นก้อน JSON ส่งผ่าน `files` ทุกก้อน · ใช้เกิน 85% ให้แยกหน้า V2
 
@@ -82,7 +82,7 @@ JRPG ทำคนเดียวตอนเย็น · Godot 4.7.1 · GDScript
   แก้แสงวาบตามตรวจรอบ 2 (kwan 25 ต.ค. "3"): bl8 ตัดวาบตัวมอนตอนตอก + จอวาบ 0.22→0.15 + ร่างไม่แข็งเป็นรอยแผลแทนร้าว · ประกายจอวาบ 0.6→0.3
   สัญลักษณ์บนจอต้องอยู่ใน subset ฟอนต์ (✦ ขึ้นกล่องบนเว็บ → ใช้ ★) · GDScript: `var x := round(...)`/max/min = พังตอน parse → ใช้ roundf/maxf/minf หรือระบุชนิด · ลำดับชั้น: back_fx (หลังมอน) → มอน z1 → mid_fx z2 → Rion z4 → front_fx z5
   ตรวจเร็ว (ไม่กี่วิ): `xvfb-run -a <godot> --path . --rendering-driver opengl3 --fixed-fps 60 res://tests/lab/<ท่า>.tscn -- --foe=M01 [--bg=ash_village] --snap=30,36 --snapdir=<dir>` → เทียบกับเว็บ `websnap.cjs` (scratchpad)
-  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V15 · สายคม 10 ท่า · ปุ่มเล่นวน · ฉาก 5 ขยับได้ครบ · ชื่อปุ่มยาวบีบแนวนอนให้พอดี) · จอขยายแบบ canvas_items (ตัวอักษรคม · kwan 27 ต.ค.) · แถวมอนห่าง Rion ≥ `row_base.ROOM` 65px (บีบระยะก่อน แล้วเลื่อนซ้าย) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
+  อัดวิดีโอ (600x336 + f.wav): ตัด `--snap` ใส่ `--write-movie <dir>/f.png` · หน้าเว็บ: `GODOT=<godot> tests/lab/build_web.sh <out>` → https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp (V16 · สายคม 11 ท่า · ปุ่มเล่นวน · ฉาก 5 ขยับได้ครบ · ชื่อปุ่มยาวบีบแนวนอนให้พอดี) · จอขยายแบบ canvas_items (ตัวอักษรคม · kwan 27 ต.ค.) · แถวมอนห่าง Rion ≥ `row_base.ROOM` 65px (บีบระยะก่อน แล้วเลื่อนซ้าย) · ดาเมจ = ตาราง DMG ใน lab_stage.gd (ค่าจาก csHit ของเว็บ)
 
 ## แหล่งความจริง
 - `docs/GDD.md` — ดีไซน์ทั้งหมด ตัวเลขที่จูนแล้ว (หมวด 10) · **บทเรียนหมวด 11 อ่านก่อนแก้อะไรก็ตาม**

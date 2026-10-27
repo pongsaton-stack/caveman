@@ -14,6 +14,41 @@ SCOPE = {"single": "เดี่ยว", "row": "ทั้งแถว", "column
 UNUSABLE = {"rg5", "dv5", "dv6", "fs3"}
 PAPER = {"dv1": "ช่องคิวของอุปกรณ์", "dv2": "ช่องคิวของอุปกรณ์", "fs4": "แรงขึ้นตามดาเมจที่รับ", "rg6": "ต้องเล็งนิ่งก่อน"}
 e = html.escape
+LAB_PAGE = "https://claude.ai/artifact/5JNZaykSQiY9ghpD1V7BPp"   # ห้องทดลองฉากต่อสู้ Godot (หน้าเว็บ)
+# ท่าที่มีฉากในห้องทดลองแล้ว: รายชื่ออ่านจากเมนู TECHS ใน tests/lab/lab_stage.gd (เพิ่มท่าใหม่ในเมนู = หน้านี้รู้เอง) · คำอธิบายสั้นของฉากที่ทำจริงเขียนไว้ที่นี่
+LAB_NOTE = {
+	"bl0": "วิ่งเข้า ง้างระหว่างวิ่ง ฟันตอนถึงตัว ไถลตามแรง → กระโดดถอย 2 สเต็ป",
+	"bl1": "วิ่ง → เบรกย่อ → ถีบพุ่งยาวเกือบลอย แทงตอนเท้าแตะพื้น (ฟันดาบเซเบอร์ flèche)",
+	"bl2": "ฟันหน้า → ตีลังกาข้ามหัวฟันหลัง → หมุนสว่านผ่านหลังมอนฟันหน้า · วงแสง 3 วงพันตัว (ครั้ง 2–3 ยังยืมภาพฟัน รอเจนท่าฟันย้อนขึ้น)",
+	"bl7": "ย่อชาร์จ → พุ่งหมุนสว่านลอดใต้ขา (ภาพหมุน 4 มุม) → ไถลโผล่อีกฝั่ง → เงียบ → แผลเปิด มอนช้าลง (แบบ Attack on Titan)",
+	"bl8": "กระโดดจามระดับหัว มีดฝังเกราะ ปล่อยมือ → กระทืบด้ามตอกเป็นลิ่ม → เกราะร้าว (คาบูโตะวาริ)",
+	"bl9": "ตั้งท่าทมโบะ → กระโดดฟันจันทร์เสี้ยวกลางหาว → มอนแยกสองซีก ซีกที่ขาดหมุนคว่ำสลายเป็นผง",
+	"bl3": "ม้วนเก็บระหว่างวิ่ง → คมกวาดเป็นวงรีรอบทั้งแถว ผ่านหน้ามอนทีละตัว แล้ววนอ้อมหลังแถว",
+	"bl10": "วิ่งทะลุแถวไม่หยุด เหวี่ยงคมเลขแปดนอน → เบรก ตั้งการ์ดหลังแถว → กระโดดข้ามกลับ",
+	"bl11": "ปั่นมีดบนปลายนิ้ว → ขว้างบินตัดผ่านแถว → วกกลับตัดซ้ำ → รับมีดคืน (2 ครั้ง)",
+	"bl4": "หมุน 2 รอบกางแขนมีดออก (ภาพ PixelLab หมุน 8 มุม) → คมลมวงโค้งกวาดทั้งแถว → ค้างท่ากางแขนหันหน้า",
+	"bl12": "ย่อหมุนเป็นลมหมุนทะลุแถว → ดีดตัวหมุนกลางอากาศข้ามกลับ (ภาพ PixelLab 8 มุม) · กรวยพายุเถ้า + ใบมีดเงินวน · 2 ครั้ง",
+	"bt0": "ไม้เบสบอล: วิ่งเข้า ง้างกลางอากาศ ฟาดลงเฉียง ไม้จมค้าง → กระโดดถอย · ยืนหายใจ · เลือกอาวุธ Lv.1–10 (ภาพ PixelLab · มีฉากเทียบภาพ Flow)",
+}
+
+
+def lab_techs():
+	"""tech_id → [ไฟล์ฉาก] และ ชื่อท่า → [ไฟล์ฉากประกาย] จากเมนูห้องทดลอง"""
+	import re
+	src = open(P("tests/lab/lab_stage.gd"), encoding="utf-8").read()
+	block = src[src.index("const TECHS"):src.index("]]", src.index("const TECHS")) + 2]
+	moves, glim = {}, {}
+	for tid, name, scene in re.findall(r'\["([^"]+)", "([^"]+)", "res://tests/lab/([\w]+)\.tscn"\]', block):
+		if tid == "ทุบ":
+			moves.setdefault("bt0", []).append(scene)
+		elif tid == "★":
+			glim.setdefault(name, []).append(scene)
+		elif re.fullmatch(r"[a-z]{2}\d+", tid):
+			moves.setdefault(tid, []).append(scene)
+	return moves, glim
+
+
+LAB, GLIM = lab_techs()
 sys.path.insert(0, P("tools/sprites"))
 import pixellab_walk as plw  # noqa: E402  (โหลดคำสั่ง 102 ท่าจาก pixellab_skills.py)
 
@@ -38,16 +73,22 @@ def card(r, c, school, wide=False):
 	if r["status"]: fx.append(f"{r['status']} {int(float(r['status_chance']) * 100)}%")
 	if r["effect"] == "counter": fx.append("ท่าสวน")
 	if tid in PAPER: fx.append(f"เขียนว่า '{PAPER[tid]}' แต่โค้ดยังไม่มี")
+	lab = ""
+	if tid in LAB:
+		tag += f'<a class="tag lab" href="{LAB_PAGE}" target="_blank" rel="noopener">ลองได้ในห้องทดลอง</a>'
+		lab = f'<dt>ฉากที่ทำแล้ว</dt><dd>{e(LAB_NOTE.get(tid, ""))} <small class="scn">{e(" · ".join(LAB[tid]))}</small></dd>'
+	if r["name_th"] in GLIM:
+		lab += f'<dt>ประกาย</dt><dd>มีฉากเกิดประกายได้ท่านี้ <small class="scn">{e(" · ".join(GLIM[r["name_th"]]))}</small></dd>'
 	hits = f"×{r['hits']}" if r["hits"] not in ("1", "") else ""
 	pw = f"พลัง {r['power']}{hits}" if float(r["power"] or 0) else "ไม่โจมตี"
 	br = slot[0] if slot[0] in "ABC" else ""
 	wpn = c["weapons"][school][br] if br else [w for b in "ABC" for w in c["weapons"][school][b]]
 	wtxt = "ทุกอาวุธในสาย" if not br else " · ".join(wpn)
-	return f'''<article class="card{' wide' if wide else ''}" id="{tid}">
+	return f'''<article class="card{' wide' if wide else ''}{' done' if tid in LAB else ''}" id="{tid}">
 <header><span class="slot">{e(slot)}</span><h3>{e(r['name_th'])}</h3>{tag}</header>
 <p class="stats"><span>ปลดที่ {r['req_prof']}</span><span>{pw}</span><span>{SCOPE.get(r['scope'], r['scope'])}</span><span>น้ำหนัก {r['weight']}</span><span>SP {r['sp']}</span></p>
 {'<p class="fx">' + ''.join(f'<span>{e(x)}</span>' for x in fx) + '</p>' if fx else ''}
-<dl><dt>ท่าทาง</dt><dd>{e(c['motion'][tid])}</dd><dt>ศาสตร์</dt><dd>{e(r['art'])}</dd><dt>เหมาะกับ</dt><dd>{e(wtxt)}</dd></dl>
+<dl><dt>ท่าทาง</dt><dd>{e(c['motion'][tid])}</dd>{lab}<dt>ศาสตร์</dt><dd>{e(r['art'])}</dd><dt>เหมาะกับ</dt><dd>{e(wtxt)}</dd></dl>
 <details><summary>คำสั่ง PixelLab ({plw.MOVES[tid]['frames']} เฟรม · หันซ้าย)</summary><pre class="pr">{e(plw.build_action(tid, 'west'))}</pre></details>
 </article>'''
 
@@ -61,11 +102,12 @@ def main():
 		cols = ""
 		for b in "ABC":
 			branch = rs[b + "1"]["branch"]
-			cols += f'<section class="branch"><h4>กิ่ง{e(branch)} <small>{BR[b]}</small></h4><p class="wl">อาวุธที่ชี้ทางมากิ่งนี้: {e(" · ".join(c["weapons"][name][b]))}</p>' + \
+			nd = sum(1 for i in range(1, 6) if rs[f"{b}{i}"]["tech_id"] in LAB)
+			cols += f'<section class="branch"><h4>กิ่ง{e(branch)} <small>{BR[b]} · ทำฉากแล้ว {nd}/5</small></h4><p class="wl">อาวุธที่ชี้ทางมากิ่งนี้: {e(" · ".join(c["weapons"][name][b]))}</p>' + \
 				"".join(card(rs[f"{b}{i}"], c, name) for i in range(1, 6)) + "</section>"
 		tabs.append(f'<button role="tab" data-t="{key}" style="--sc:var(--{key})">{name}</button>')
 		panels.append(f'''<div class="panel" id="p-{key}" style="--sc:var(--{key})" hidden>
-<p class="lede"><b>เด่น</b> {e(good)} · <b>ด้อย</b> {e(bad)}</p>
+<p class="lede"><b>เด่น</b> {e(good)} · <b>ด้อย</b> {e(bad)} · <b>ห้องทดลอง</b> ทำฉากแล้ว {sum(1 for r in rs.values() if r["tech_id"] in LAB)}/17 ท่า</p>
 {card(rs["R"], c, name, True)}<div class="cols">{cols}</div>{card(rs["U"], c, name, True)}</div>''')
 	# ท่าประจำอาวุธ
 	sp = ""
@@ -98,7 +140,9 @@ def main():
 <li>ทุกสายมีท่าสวน 1 ท่าที่ช่อง C5 · ไม้ตาย ปลดที่ 68 SP 40 ทุกสาย</li><li>ความต่างอยู่ที่ "เก่งตอนไหน" (ร่างกายมอน แถว เกราะ ความเร็ว สถานะ) ไม่ใช่ "แรงกว่า"</li>
 <li>ตัวเลขทั้งหมดเป็นร่าง ต้องรัน Sim ก่อนใส่เกม</li></ol>
 <div class="pre"><pre>{e(budget)}</pre></div></div>''')
-	out = TPL.replace("%TABS%", "".join(tabs)).replace("%PANELS%", "".join(panels))
+	done = [r["tech_id"] for r in rows if r["slot"] and r["tech_id"] in LAB]
+	prog = f'ห้องทดลองฉากต่อสู้: ทำฉากแล้ว {len(done)}/{sum(1 for r in rows if r["slot"])} ท่า · <a href="{LAB_PAGE}" target="_blank" rel="noopener">เปิดห้องทดลอง</a> · การ์ดที่มีขอบเขียว = ลองเล่นได้แล้ว (ร่าง ยังไม่เข้าเกม)'
+	out = TPL.replace("%TABS%", "".join(tabs)).replace("%PANELS%", "".join(panels)).replace("%PROG%", prog)
 	open(sys.argv[1], "w", encoding="utf-8").write(out)
 	print(sys.argv[1], f"{len(out) / 1024:.0f} KB")
 
@@ -109,12 +153,12 @@ TPL = '''<title>ต้นไม้ท่า 6 สาย</title>
 <style>
 /* หน้าอ่านอ้างอิง: แท็บสาย → ราก · 3 กิ่งเป็นคอลัมน์ · ไม้ตาย · สีประจำสายเป็นแถบบนการ์ด */
 :root{--bg:#eef1f4;--panel:#fff;--ink:#1b2430;--muted:#5d6876;--line:#d6dce3;--chip:#e7ecf1;
---blade:#c2412d;--crush:#b7791f;--pierce:#16827a;--shoot:#4d7c2a;--device:#6b4fbf;--fist:#c25a1a;--new:#1f6fd1;--bad:#b42318;--wait:#8a6d00;
+--blade:#c2412d;--crush:#b7791f;--pierce:#16827a;--shoot:#4d7c2a;--device:#6b4fbf;--fist:#c25a1a;--new:#1f6fd1;--bad:#b42318;--wait:#8a6d00;--lab:#1d7a46;
 --fd:"Mitr","IBM Plex Sans Thai",system-ui,sans-serif;--fb:"IBM Plex Sans Thai",system-ui,sans-serif}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161c;--panel:#1b2129;--ink:#e6ebf1;--muted:#9aa6b4;--line:#2c3540;--chip:#252d37;
---blade:#ef7a63;--crush:#e0a948;--pierce:#4cc2b6;--shoot:#8cc463;--device:#a68cf0;--fist:#f0904f;--new:#6aa8f5;--bad:#f2786b;--wait:#e2c25a;color-scheme:dark}}
+--blade:#ef7a63;--crush:#e0a948;--pierce:#4cc2b6;--shoot:#8cc463;--device:#a68cf0;--fist:#f0904f;--new:#6aa8f5;--bad:#f2786b;--wait:#e2c25a;--lab:#5cc98a;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#12161c;--panel:#1b2129;--ink:#e6ebf1;--muted:#9aa6b4;--line:#2c3540;--chip:#252d37;
---blade:#ef7a63;--crush:#e0a948;--pierce:#4cc2b6;--shoot:#8cc463;--device:#a68cf0;--fist:#f0904f;--new:#6aa8f5;--bad:#f2786b;--wait:#e2c25a;color-scheme:dark}
+--blade:#ef7a63;--crush:#e0a948;--pierce:#4cc2b6;--shoot:#8cc463;--device:#a68cf0;--fist:#f0904f;--new:#6aa8f5;--bad:#f2786b;--wait:#e2c25a;--lab:#5cc98a;color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--fb)}
 .wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1{font:500 1.7rem/1.2 var(--fd);margin:0 0 4px;text-wrap:balance} .sub{color:var(--muted);margin:0 0 16px}
@@ -132,6 +176,8 @@ h1{font:500 1.7rem/1.2 var(--fd);margin:0 0 4px;text-wrap:balance} .sub{color:va
 .card h3{font:500 1.05rem var(--fd);margin:0}
 .slot{font:600 .75rem var(--fb);letter-spacing:.05em;color:var(--sc)}
 .tag{font-size:.72rem;border-radius:999px;padding:1px 8px;border:1px solid currentColor;margin-left:auto}
+.tag.lab{color:var(--lab);text-decoration:none;margin-left:0} .card.done{box-shadow:inset 3px 0 0 var(--lab)} .scn{color:var(--muted)}
+.prog{margin:0 0 14px;padding:8px 12px;border:1px solid var(--line);border-left:3px solid var(--lab);border-radius:8px;background:var(--panel);font-size:.9rem} .prog a{color:var(--lab)}
 .tag.new{color:var(--new)} .tag.bad{color:var(--bad)} .tag.wait{color:var(--wait)} .tag.old{color:var(--muted)}
 .stats{display:flex;flex-wrap:wrap;gap:4px 10px;margin:4px 0;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .fx{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0} .fx span{background:var(--chip);border-radius:4px;padding:0 6px;font-size:.8rem}
@@ -151,6 +197,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:.82rem;margin-top:6p
 <div class="wrap">
 <h1>ต้นไม้ท่า 6 สาย</h1>
 <p class="sub">สายละ 17 ท่า · ท่าทางตอนใช้ · ศาสตร์การต่อสู้อ้างอิง · อาวุธที่เหมาะ · ท่าประจำอาวุธ — ร่าง ยังไม่เข้าเกม ตัวเลขรอ Sim</p>
+<p class="prog">%PROG%</p>
 <div role="tablist">%TABS%</div>
 %PANELS%
 </div>
