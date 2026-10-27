@@ -29,7 +29,7 @@ const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพล
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
 const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "เขี้ยวพุ่ง", "res://tests/lab/blc_bl1.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"],
-	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"],
+	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"], ["bl10", "ทะลวงแนว", "res://tests/lab/tl_bl10.tscn"], ["bl11", "มีดบินวกกลับ", "res://tests/lab/tb_bl11.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
 	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
 	["ทุบ", "Flow", "res://tests/lab/flw_bt0.tscn"], ["ทุบ", "PL", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
@@ -42,6 +42,8 @@ const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs
 ## ดาเมจ [ค่า, +1 อ่อนแอ/−1 ต้านทาน, จำนวนครั้ง] = csHit(ท่า, มอน) ของหน้าเว็บ (prof 20 + มีดครัว 14) · ยังไม่ต่อสูตรเกมตรง
 const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], "M15": [57, 1, 1], "B1": [31, -1, 1]},
 	"bl1": {"M01": [80, 0, 1], "M03": [24, -1, 1], "M06": [77, 0, 1], "M15": [82, 1, 1], "B1": [45, -1, 1]},
+	"bl10": {"M01": [52, 0, 1], "M03": [16, -1, 1], "M06": [50, 0, 1], "M15": [54, 1, 1], "B1": [29, -1, 1]},   # พลัง 95 = bl0 × 0.95 (ปัดแบบ bl3)
+	"bl11": {"M01": [33, 0, 2], "M03": [10, -1, 2], "M06": [32, 0, 2], "M15": [34, 1, 2], "B1": [19, -1, 2]},   # พลัง 60 × 2 ครั้ง
 	"bl3": {"M01": [50, 0, 1], "M03": [15, -1, 1], "M06": [48, 0, 1], "M15": [51, 1, 1], "B1": [28, -1, 1]},
 	"bl5": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
 	"bl2": {"M01": [34, 0, 3], "M03": [10, -1, 3], "M06": [33, 0, 3], "M15": [35, 1, 3], "B1": [19, -1, 3]},
@@ -599,6 +601,35 @@ func _build_ambient_particles() -> void:
 	elif bg_id == "ash_village":   # ถ่านไฟลอยจากหมู่บ้าน
 		embers = _embers(Vector2(240, 100), Vector2(60, 2), 14, 5.0, 14, 24)
 		embers.direction = Vector2(-0.1, -1)
+	elif bg_id == "underworld":   # เตาหลอม: แสงไฟวูบ · ถ่านลอยจากแอ่งลาวาและปากเตา
+		lamp = Sprite2D.new()
+		lamp.texture = radial(Color("#ff8a30"), 72)
+		lamp.material = add_mat()
+		lamp.position = Vector2(53, 33)
+		add_child(lamp)
+		embers = _embers(Vector2(155, 100), Vector2(42, 2), 20, 3.2, 10, 24)
+		var e2 := _embers(Vector2(53, 40), Vector2(5, 2), 6, 1.6, 12, 20)
+		e2.direction = Vector2(0.2, -1)
+	elif bg_id == "rift":   # รอยแยก: ประกายม่วง/ฟ้าลอยขึ้นช้าๆ · แสงประตูมิติวูบ
+		flakes = particles(34, 7.0, 0)
+		flakes.one_shot = false
+		flakes.explosiveness = 0.0
+		flakes.emitting = true
+		flakes.position = Vector2(200, 112)
+		flakes.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		flakes.emission_rect_extents = Vector2(100, 4)
+		flakes.direction = Vector2(0.1, -1)
+		flakes.spread = 18
+		flakes.gravity = Vector2.ZERO
+		flakes.initial_velocity_min = 6
+		flakes.initial_velocity_max = 14
+		flakes.color_ramp = ramp([Color(0.75, 0.45, 1, 0), Color(0.8, 0.5, 1, 0.8), Color(0.45, 0.95, 1, 0.7), Color(0.45, 0.95, 1, 0)])
+		flakes.preprocess = 7.0
+		lamp = Sprite2D.new()
+		lamp.texture = radial(Color("#b04aff"), 60)
+		lamp.material = add_mat()
+		lamp.position = Vector2(292, 10)
+		add_child(lamp)
 
 func _embers(pos: Vector2, ext: Vector2, amount: int, life: float, v0: float, v1: float) -> CPUParticles2D:
 	var p := particles(amount, life, 0)
@@ -645,6 +676,10 @@ func _draw_amb() -> void:
 				var col := Color("#5d544d") if i % 2 else Color("#7a7068")
 				col.a = 0.4 * (1 - ph) * minf(1.0, ph * 6)
 				amb.draw_circle(Vector2(c[0] - ph * 18 + sin(tt + i) * 1.5, c[1] - ph * 14), 2 + ph * 7, col)
+	elif bg_id == "underworld":
+		_amb_underworld(tt)
+	elif bg_id == "rift":
+		_amb_rift(tt)
 	elif bg_id == "flooded_ruins":
 		_fall(83, 92, 33, 56, tt, 14, 3, 40)
 		_fall(117, 123, 34, 56, tt, 9, 13, 40)
@@ -676,6 +711,57 @@ func _draw_amb() -> void:
 		for i in 10:   # ระลอกคลองบน
 			var ph := fposmod(tt * 0.5 + bg_h(700 + i), 1.0)
 			px(amb, 105 + bg_h(710 + i) * 60 + ph * 6, 2 + bg_h(720 + i) * 14, Color(0.81, 0.94, 0.96, 0.35 * sin(ph * PI)), 2, 1)
+
+## ใต้พสุธา: ลาวาไหล (ริ้วสว่างเลื่อนลง) · แอ่งลาวาเดือด (จุดร้อนวูบ + ฟองแตก) · ผลึกกะพริบ
+func _amb_underworld(tt: float) -> void:
+	for i in 26:   # ริ้วลาวาในสายน้ำตก (กว้าง 132–150 · ลงมาบานที่แอ่ง)
+		var x := 132 + floorf(bg_h(300 + i) * 18)
+		var y := fposmod(bg_h(330 + i) * 82 + tt * 30 * (0.7 + bg_h(360 + i) * 0.6), 82.0)
+		var c := Color("#fff2a0") if i % 3 == 0 else Color("#ffc040")
+		c.a = 0.75 * minf(1.0, minf(y / 6.0, (82 - y) / 6.0))
+		px(amb, x + (y / 82.0) * (bg_h(390 + i) - 0.5) * 10, y, c, 1, 3 + floorf(bg_h(420 + i) * 3))
+	for i in 12:   # จุดร้อนในแอ่ง วูบขึ้นลง
+		var ph := fposmod(tt * 0.7 + bg_h(450 + i), 1.0)
+		var a := pow(sin(ph * PI), 2)
+		amb.draw_circle(Vector2(112 + bg_h(470 + i) * 86, 86 + bg_h(490 + i) * 18), 1.5 + a * 2.5, Color(1, 0.92, 0.5, 0.45 * a))
+	for j in 4:   # ฟองลาวาผุดแล้วแตก
+		var ph := fposmod(tt / 1.3 + j / 4.0, 1.0)
+		var n := floorf(tt / 1.3 + j / 4.0)
+		var x := 118 + bg_h(n * 5 + j) * 76
+		var y := 90 + bg_h(n * 5 + j + 2) * 14
+		if ph < 0.7:
+			amb.draw_circle(Vector2(x, y), 1 + ph * 3, Color(1, 0.85, 0.35, 0.8))
+		else:
+			amb.draw_arc(Vector2(x, y), 3 + (ph - 0.7) * 12, 0, TAU, 12, Color(1, 0.8, 0.3, 0.7 * (1 - ph) / 0.3), 1.0)
+	for i in 9:   # ผลึกฟ้ากะพริบ
+		var q: Array = [[168, 14], [178, 28], [186, 8], [218, 42], [228, 56], [212, 60], [258, 10], [276, 20], [246, 6]][i]
+		var ph := fposmod(tt * 0.45 + bg_h(600 + i), 1.0)
+		var a := pow(maxf(0.0, sin(ph * PI)), 6)
+		if a > 0.05:
+			px(amb, q[0], q[1], Color(1, 1, 1, a))
+			px(amb, q[0] - 2, q[1], Color(0.6, 1, 1, a * 0.6), 5, 1)
+			px(amb, q[0], q[1] - 2, Color(0.6, 1, 1, a * 0.6), 1, 5)
+
+## ในรอยแยก: หอนาฬิกาเงาสั่นเป็นคลื่น · หินลอยขยับขึ้นลง · ประกายเดินตามรอยแตก
+func _amb_rift(tt: float) -> void:
+	for y in range(0, 72):   # หอเงา (40–80) เหลื่อมเป็นแถวเหมือนภาพที่ถูกนับซ้ำ
+		var off := int(round(sin(tt * 3.1 - y * 0.35) * 1.3))
+		if off != 0:
+			amb.draw_texture_rect_region(bg_tex, Rect2(40 + off, y, 40, 1), Rect2(40, y, 40, 1), Color(1, 1, 1, 0.9))
+	var rocks := [[222, 2, 27, 30], [184, 56, 23, 21], [168, 78, 15, 18]]
+	for i in rocks.size():   # หินลอย ขึ้นลง 1 จุด
+		var r: Array = rocks[i]
+		var off := int(round(sin(tt * 1.2 + i * 2.1) * 1.2))
+		if off != 0:
+			amb.draw_texture_rect_region(bg_tex, Rect2(r[0], r[1] + off, r[2], r[3]), Rect2(r[0], r[1], r[2], r[3]))
+	var path := [Vector2(178, 0), Vector2(192, 22), Vector2(198, 40), Vector2(190, 62), Vector2(178, 76)]
+	for k in 3:   # แสงฟ้าวิ่งตามรอยแตก
+		var u := fposmod(tt * 0.35 + k / 3.0, 1.0) * (path.size() - 1)
+		var seg := mini(int(u), path.size() - 2)
+		var p: Vector2 = path[seg].lerp(path[seg + 1], u - seg)
+		var a := sin(fposmod(tt * 0.35 + k / 3.0, 1.0) * PI)
+		amb.draw_circle(p, 2.5, Color(0.5, 1, 1, 0.25 * a))
+		px(amb, p.x, p.y, Color(0.85, 1, 1, 0.9 * a), 2, 2)
 
 func _fall(x0: int, x1: int, y0: int, y1: int, tt: float, n: int, seed: int, sp: float) -> void:   # น้ำตก (bgFall)
 	var hh := y1 - y0
@@ -855,7 +941,7 @@ func _build_ui() -> void:
 	ui.add_child(bar)
 	caption_lbl = label(7, Color("#f0e4c8"), 0, false)
 	caption_lbl.position = Vector2(4, H - 11)
-	caption_lbl.text = "GODOT · %s %s · %s%s" % [mon_name, foe, caption(), (" · อาวุธ: " + weapon_name()) if weapon_id != "" else ""]
+	caption_lbl.text = "%sGODOT · %s %s · %s%s" % ["[เล่นวน · แตะจอ = หยุด] " if bool(Engine.get_meta("lab_loop", false)) and not recording else "", mon_name, foe, caption(), (" · อาวุธ: " + weapon_name()) if weapon_id != "" else ""]
 	_build_menu()
 
 ## บับเบิลชื่อท่า (rs3Bubble): เด้ง 2 เฟรมแรก · ไม่ล้นจอ · หางชี้ผู้พูด
@@ -937,11 +1023,18 @@ func _build_menu() -> void:
 	var title := label(9, Color("#fff4c8"), 3, true, menu)
 	title.text = "ห้องทดลองฉากต่อสู้ Godot · เลือกท่า มอน ฉาก"
 	title.position = Vector2(6, 2)
-	var step2 := floori(295.0 / (TECHS.size() - 7))
-	for i in TECHS.size():   # แถวท่า: บน 7 ท่า (สายคม) · ล่าง ประกาย 3 + มอนตี 2 + ทุบ
+	var top: Array = TECHS.filter(func(x): return str(x[0]).begins_with("bl"))   # แถวบน = สายคม (ชื่อท่าอย่างเดียว · เรียงตามลำดับในต้นไม้)
+	top.sort_custom(func(a, b): return int(str(a[0]).substr(2)) < int(str(b[0]).substr(2)))
+	var low: Array = TECHS.filter(func(x): return not str(x[0]).begins_with("bl"))
+	var step1 := 294.0 / top.size()
+	var step2 := floori(295.0 / low.size())
+	for i in TECHS.size():   # แถวท่า: บน สายคม · ล่าง ประกาย 3 + มอนตี 2 + ทุบ 2
 		var tc: Array = TECHS[i]
-		var row2 := i >= 7
-		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + (i - 7) * step2 if row2 else 4 + i * 42, 31 if row2 else 16), Vector2(step2 - 2 if row2 else 41, 13), 13)
+		var row2 := not str(tc[0]).begins_with("bl")
+		var k := low.find(tc) if row2 else top.find(tc)
+		var b := _button("%s %s" % [tc[0], tc[1]] if row2 else str(tc[1]), Vector2(4 + k * step2 if row2 else 4 + k * step1, 31 if row2 else 16), Vector2(step2 - 2 if row2 else step1 - 2, 13), 13)
+		if not row2 and text_w(str(tc[1]), 7) > step1 - 4:   # ชื่อยาว: ตัวเล็กลงให้พอดีปุ่ม
+			(b.get_meta("lbl") as Label).label_settings.font_size = 6
 		b.modulate = Color(1, 1, 0.6) if tc[2] == scene_file_path else Color.WHITE
 		b.pressed.connect(func(): _start(foe, bg_id, tc[2]))
 	var names := {}
@@ -968,11 +1061,15 @@ func _build_menu() -> void:
 		var b := _button(BGS[id][0], Vector2(4 + i * bw, 94), Vector2(bw - 3, 14), 14)
 		b.modulate = Color(1, 1, 0.6) if id == bg_id else Color.WHITE
 		b.pressed.connect(func(): _start(foe, id, scene_file_path))
-	var again := _button("เล่นซ้ำ (%s)" % foe, Vector2(4, 111), Vector2(95, 16), 16)
+	var again := _button("เล่นซ้ำ (%s)" % foe, Vector2(4, 111), Vector2(71, 16), 16)
 	again.pressed.connect(func(): _start(foe, bg_id, scene_file_path))
-	var snd := _button(_onoff("เสียง", "lab_mute"), Vector2(102, 111), Vector2(95, 16), 16)
+	var lp := _button("เล่นวน", Vector2(77, 111), Vector2(71, 16), 16)   # เล่นท่าเดิมซ้ำไม่หยุด · แตะจอระหว่างเล่น = หยุดวน
+	lp.pressed.connect(func():
+		Engine.set_meta("lab_loop", true)
+		_start(foe, bg_id, scene_file_path))
+	var snd := _button(_onoff("เสียง", "lab_mute"), Vector2(150, 111), Vector2(71, 16), 16)
 	snd.pressed.connect(_toggle.bind(snd, "เสียง", "lab_mute"))
-	var mus := _button(_onoff("เพลง", "lab_music_off"), Vector2(200, 111), Vector2(96, 16), 16)
+	var mus := _button(_onoff("เพลง", "lab_music_off"), Vector2(223, 111), Vector2(73, 16), 16)
 	mus.pressed.connect(_toggle.bind(mus, "เพลง", "lab_music_off"))
 	if not weapons.is_empty():   # อาวุธของสายท่านี้ Lv.1–10: กดแล้วเล่นท่าเดิมใหม่ด้วยอาวุธนั้น
 		var w_l := label(7, Color("#f0e4c8"), 2, false, menu)
@@ -1033,6 +1130,12 @@ func _button(text: String, pos: Vector2, size: Vector2, text_h: float) -> Button
 	b.set_meta("lbl", l)
 	return b
 
+## เล่นวนอยู่: แตะ/คลิกจอ = หยุดวน (จบรอบนี้แล้วขึ้นเมนู)
+func _input(event: InputEvent) -> void:
+	if playing and bool(Engine.get_meta("lab_loop", false)) and (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
+		Engine.set_meta("lab_loop", false)
+		caption_lbl.text = "หยุดวนแล้ว · จบรอบนี้แล้วกลับเมนู"
+
 func _start(id: String, bg: String, scene: String) -> void:
 	Engine.set_meta("lab_foe", id)
 	Engine.set_meta("lab_bg", bg)
@@ -1068,6 +1171,8 @@ func _process(delta: float) -> void:
 	if t > end_frame() * SEC + 0.5:
 		if recording:
 			get_tree().quit()
+		elif bool(Engine.get_meta("lab_loop", false)):   # เล่นวน: เริ่มท่าเดิมใหม่ทันที
+			_start(foe, bg_id, scene_file_path)
 		else:
 			playing = false
 			ui.move_child(menu, -1)   # เมนูอยู่บนสุด (ป้ายที่สร้างทีหลังไม่ทับ)

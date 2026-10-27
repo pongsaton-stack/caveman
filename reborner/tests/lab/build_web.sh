@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/lab/build_web.sh — หน้าเว็บของห้องทดลองฉากต่อสู้ Godot (เมนูเลือกท่า 5 · มอน 5 · ฉาก 5 · เสียง · เพลง)
+# tests/lab/build_web.sh — หน้าเว็บของห้องทดลองฉากต่อสู้ Godot (เมนูเลือกท่า 5 · มอน 5 · ฉาก 5 · เล่นวน · เสียง · เพลง)
 #   GODOT=<godot> tests/lab/build_web.sh <โฟลเดอร์ผลลัพธ์> [res://tests/lab/<ท่า>.tscn]
 # ต้องมี export template เว็บ (tools/get_godot.sh --web)
 # ทำโปรเจกต์ชั่วคราวใน <out>/proj ที่มีเฉพาะของที่ฉากใช้ (ไม่มี addons/autoload ของเกม) · ภาพร่างคัดลอกไปที่ทางเดิม

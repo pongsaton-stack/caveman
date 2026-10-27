@@ -1,4 +1,4 @@
-extends "res://tests/lab/blc_bl0.gd"
+extends "res://tests/lab/row_base.gd"
 ## กวาด bl3 (kwan 27 ต.ค. "ขอดูฝีมือ จัดท่านี้มา") — ตามรายงานวิจัยท่า R2 (ดาบเต๋าอู่ตัง · ม้วนเกลียว chan si jin) ปรับจังหวะตามรสนิยม kwan
 ## วิ่งเข้า → ม้วนเก็บระหว่างวิ่ง (วงแสงจางรอบตัว + เถ้าวน · ไม่ยืนง้าง) → ถึงตัวคลายเกลียว
 ## → คมกวาดแนวนอนระดับเอวเป็นวงรีรอบทั้งแถว: ครึ่งหน้าผ่านหน้ามอนทีละตัว (โดน HIT · +4 · +8) → ครึ่งหลังวนอ้อมหลังแถวกลับมา (wrap ไม่หยุด)
@@ -10,8 +10,6 @@ const GAP := 4            # เฟรมระหว่างโดนแต่�
 const COIL := 8           # ม้วนเก็บ 8 เฟรมสุดท้ายของการวิ่ง
 const WAIST := 22         # ระดับเอวเหนือพื้น (จุดที่คมผ่าน)
 
-var mons: Array[Sprite2D] = []
-var cxs: Array[float] = []   # กลางตัวมอนแต่ละตัว · [0] = ใกล้ Rion ที่สุด (ขวาสุด)
 var arc_c := Vector2.ZERO
 var arc_r := Vector2.ZERO
 
@@ -22,29 +20,13 @@ func end_frame() -> int: return END + EX
 func stops() -> Array: return [[HIT, 0.06]]   # หยุดภาพ 1 เฟรม เฉพาะตัวแรก (รายงาน: คมเต๋าไม่หยุด)
 func caption() -> String: return "ยืนในศึก → วิ่ง ม้วนเก็บ → กวาดทั้งแถว → กระโดดถอย"
 
-func _count() -> int:
-	return 1 if foe.begins_with("B") else 3
-
 func setup() -> void:
 	super.setup()
-	# แถว 3 ตัวต้องอยู่ในจอครบ: ตัวไกลสุดชิดขอบซ้าย · ซ้อนกันเล็กน้อย (62% ของความกว้าง)
-	var sp := roundf(mw * 0.62)
-	var c0 := mw * 0.5 + 2 + sp * (_count() - 1) if _count() > 1 else float(MX)
-	place_monster(int(c0))
+	setup_row(mw * 0.5 + 2)   # แถว 3 ตัวต้องอยู่ในจอครบ: ตัวไกลสุดชิดขอบซ้าย
 	if _count() == 1:   # เป้าเดียว (บอส): ไถลสั้น ไม่ทะลุเข้าตัว
 		BM.slide = 3
 		BM.reach = 12
 	near = mx0 + mw - 17 - BM.reach
-	for i in _count():
-		cxs.append(c0 - sp * i)
-	mons.append(mon)
-	for i in range(1, _count()):
-		var s := Sprite2D.new()
-		s.centered = false
-		s.material = fx_mat()
-		s.z_index = 1
-		add_child(s)
-		mons.append(s)
 	# วงรีของคม: ขวาสุด = มือ Rion ตอนถึงตัว · ซ้ายสุด = เลยตัวไกลสุดไป 10 · แบนแบบมองเฉียง
 	var right := near + 60 - 34
 	var left := maxf(8.0, cxs[cxs.size() - 1] - mw * 0.42)   # ปลายวงต้องอยู่ในจอ (วนกลับให้เห็น)
@@ -95,16 +77,6 @@ func _arc_pt(a: float) -> Vector2:
 ## มุมที่คมผ่านกลางตัวมอน i (ครึ่งหน้า)
 func _theta_at(i: int) -> float:
 	return acos(clampf((cxs[i] - arc_c.x) / arc_r.x, -1.0, 1.0))
-
-func _show(i: int, key: String, dx: float, amt: float) -> void:
-	var s: Sprite2D = mons[i]
-	var mt := tx(key)
-	s.visible = true
-	s.texture = mt
-	s.offset = Vector2(-mt.get_width() / 2.0, -mt.get_height())
-	s.position = Vector2(roundf(cxs[i] - mw / 2.0) + roundf(dx) + roundf((mw - mt.get_width()) / 2.0) + mt.get_width() / 2.0, G)
-	s.material.set_shader_parameter("tint", Color.WHITE)
-	s.material.set_shader_parameter("amount", amt)
 
 ## มอนไถลตามทิศกวาด (ไปทางซ้าย) แล้วค่อยกลับ · ไม่ใช่กระเด็นถอยตรง
 func _slide(d: int) -> float:
