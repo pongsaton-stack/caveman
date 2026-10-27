@@ -255,19 +255,31 @@ func _build_hero() -> void:
 ## มอนตาย → ไอคอนตรงจุดทันที · เดินทับเก็บ · ของ/โอกาสจากคอลัมน์ drop / drop_rate
 var drop_nodes := {}   # key_of(ช่อง) -> Label
 
-func _drop_loot(e: WorldEnemy, rows: Array) -> void:
+## อาวุธ: สุ่มตาม pity ต่อมอน 1 ตัว (core/WeaponDrop.gd) · คืนบรรทัดสรุปศึก (ข้อ 8 ห้ามซ่อนตัวเลข)
+func _drop_loot(e: WorldEnemy, rows: Array) -> Array[String]:
 	var got: Array = []
+	var lines: Array[String] = []
+	var shown := {}
 	for r in rows:
 		var name := str(r.get("drop", ""))
 		if name != "" and rng.randf() * 100.0 < float(r.get("drop_rate", 0)):
 			got.append(name)
+		var mid := str(r.get("monster_id", ""))
+		var wid := WeaponDrop.roll(ps, mid, rng)
+		if wid != "":
+			got.append(PlayerState.WEAPON_DROP_PREFIX + wid)
+			lines.append("★ ดรอปอาวุธ %s!" % PlayerState.weapon_row(wid).get("name", wid))
+		if WeaponDrop.weapon_of(mid) != "" and not shown.has(mid):
+			shown[mid] = true
+			lines.append(WeaponDrop.status_line(ps, mid, str(r.get("name_th", mid))))
 	if got.is_empty():
-		return
+		return lines
 	var key := PlayerState.key_of(e.cell)
 	var arr: Array = ps.ground_drops.get(key, [])
 	arr.append_array(got)
 	ps.ground_drops[key] = arr
 	_place_drop_icon(e.cell)
+	return lines
 
 func _place_drop_icon(c: Vector2i) -> void:
 	var key := PlayerState.key_of(c)
@@ -291,9 +303,17 @@ func _pick_up_drops() -> bool:
 	var key := PlayerState.key_of(ps.cell)
 	if not ps.ground_drops.has(key):
 		return false
-	var names: Array = ps.ground_drops[key]
-	for n in names:
-		ps.materials[str(n)] = int(ps.materials.get(str(n), 0)) + 1
+	var names: Array = []
+	for n in ps.ground_drops[key]:
+		var sn := str(n)
+		if sn.begins_with(PlayerState.WEAPON_DROP_PREFIX):
+			var wid := sn.substr(PlayerState.WEAPON_DROP_PREFIX.length())
+			var wname := str(PlayerState.weapon_row(wid).get("name", wid))
+			var g := WeaponDrop.claim(ps, wid)
+			names.append(wname if g == 0 else "%s (มีแล้ว → +%d เงิน)" % [wname, g])
+		else:
+			ps.materials[sn] = int(ps.materials.get(sn, 0)) + 1
+			names.append(sn)
 	ps.ground_drops.erase(key)
 	if drop_nodes.has(key):
 		drop_nodes[key].queue_free()
@@ -778,10 +798,11 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 			# จบบอส = จบเควสหลัก 1 เควส (STORY_DRAFT ฉากที่ 7) · EC เพิ่มจากตรงนี้จนกว่าจะมีระบบเควส
 			ps.ec += 1
 			lines.append("…%s  (EC %d)" % ["หนึ่ง" if ps.ec == 1 else str(ps.ec), ps.ec])
-		_drop_loot(e, rows)
+		var drop_lines := _drop_loot(e, rows)
 		_remove_enemy(e)
 		lines.append("%sชนะ %s · %.0f AV" % ["★ ชนะบอส! " if e.is_boss else "", e.label_text, res["time"]])
 		lines.append("ความชำนาญ %d → %d · เงิน +%d · HP %d/%d" % [prof_before, ps.prof, loot, ps.hp, ps.max_hp()])
+		lines.append_array(drop_lines)
 		for g in res["glimmer_log"]:
 			lines.append("★ ประกาย! เรียนรู้ %s" % g)
 		if int(res["combos"]) > 0 or int(res["interrupts"]) > 0:

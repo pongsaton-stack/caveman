@@ -28,6 +28,18 @@ func _run() -> void:
 	ow.ps.cell = e.cell
 	ok(ow._pick_up_drops(), "เดินทับ = เก็บ")
 	ok(int(ow.ps.materials.get("เมือกเถ้า", 0)) == before + 1 and not ow.ps.ground_drops.has(key), "ได้วัสดุ · หายจากพื้น")
+	# ดรอปอาวุธ (PITY_SPEC): M08 ตัวนับครบ 39 → ตัวถัดไปการันตี CR-1 · บรรทัดสรุปมีตัวเลข · เก็บ = เข้าคลัง · ชิ้นซ้ำ = เงิน
+	var m08: Dictionary = ow.by_id["M08"]
+	ow.ps.pity["M08"] = {"misses": 39, "kills": 39}
+	var wl: Array[String] = ow._drop_loot(e, [m08])
+	ok(ow.ps.ground_drops.get(key, []).has(PlayerState.WEAPON_DROP_PREFIX + "CR-1") and ow.drop_nodes.has(key), "ฆ่า M08 ครั้งที่ 40 → CR-1 ลงพื้น + ไอคอน")
+	ok(wl.size() == 2 and "ดรอปอาวุธ" in wl[0] and "ฆ่า 40" in wl[1] and "0/40" in wl[1], "สรุปศึกบอกดรอป + เรต/ยอดฆ่า/การันตี %s" % [wl])
+	ok(ow._pick_up_drops() and ow.ps.weapons_owned.has("CR-1"), "เดินทับเก็บ → CR-1 เข้าคลังอาวุธ")
+	var g0: int = ow.ps.gold
+	ow.ps.pity["M08"] = {"misses": 39, "kills": 79}
+	ow._drop_loot(e, [m08])
+	ow._pick_up_drops()
+	ok(ow.ps.gold == g0 + WeaponDrop.dup_gold("CR-1") and ow.ps.weapons_owned.count("CR-1") == 1, "CR-1 ซ้ำ → +%d เงิน ไม่เพิ่มชิ้น" % WeaponDrop.dup_gold("CR-1"))
 	# paging
 	ow._show("1\n2\n3\n4\n5", 3.0)
 	ok(ow.panel_label.text == "1\n2" and ow._pages.size() == 2, "ข้อความ 5 บรรทัด = 3 หน้า หน้าละ ≤2 (UX ข้อ 5)")

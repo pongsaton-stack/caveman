@@ -36,7 +36,9 @@ var stock_ec := 0                      # EC ตอนร้านเติมส
 var tomes: Array[String] = []          # ตำราที่ซื้อ (spell_id ใน data/tomes.csv) — ยังอ่านไม่ได้จนกว่าสายเวทย์เข้าเกม
 var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: สู้อัตโนมัติเปิดตั้งแต่เริ่ม สลับได้
 var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
-var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3)
+var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3) · อาวุธ = WEAPON_DROP_PREFIX + รหัส
+var pity: Dictionary = {}              # monster_id -> {misses, kills} ดรอปอาวุธ (core/WeaponDrop.gd) · ไม่รีเซ็ตตอน NG+
+const WEAPON_DROP_PREFIX := "อาวุธ:"   # ของบนพื้นที่เป็นอาวุธ (ไม่ใช่วัตถุดิบ)
 var seized: Array[Dictionary] = []     # ท่าที่ยึดจากมอน (GDD 5.2): {id, name, slots} — สลับได้ (ลืมแล้วยึดใหม่)
 var insight := 0.0                     # Insight ที่ค้างจากศึกก่อน (Insight.CARRY_BATTLE)
 var reads: Dictionary = {}             # อ่านทางหลบ: monster_id -> {name, p, need, on, stored} (Actor.reads · kwan 6–7 ต.ค. 2026)
@@ -422,7 +424,7 @@ func to_dict() -> Dictionary:
 		"met_species": met_species.duplicate(), "rest_count": rest_count,
 		"fought_since_rest": fought_since_rest, "items": items.duplicate(), "shop_stock": shop_stock.duplicate(),
 		"stock_ec": stock_ec, "tomes": tomes.duplicate(),
-		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true),
+		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true), "pity": pity.duplicate(true),
 		"seized": seized.duplicate(true), "reads": reads.duplicate(true), "insight": insight,
 		"falls": falls, "demo_end_seen": demo_end_seen,
 	}
@@ -488,6 +490,11 @@ func from_dict(d: Dictionary) -> void:
 		for n in gd[k]:
 			arr.append(str(n))
 		ground_drops[str(k)] = arr
+	pity.clear()
+	var pt: Dictionary = d.get("pity", {})   # เซฟเก่าไม่มี = ตัวนับเริ่ม 0
+	for k in pt:
+		var e: Dictionary = pt[k]
+		pity[str(k)] = {"misses": int(e.get("misses", 0)), "kills": int(e.get("kills", 0))}
 	seized.clear()
 	for sz in d.get("seized", []):
 		var sd: Dictionary = sz

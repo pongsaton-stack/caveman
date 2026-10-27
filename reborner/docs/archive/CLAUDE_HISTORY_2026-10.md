@@ -1348,3 +1348,10 @@ Sim ปิดตัวเองเมื่อรัน headless · บรรท
 - ร่าง Claude: ค่าพลังตาม Lv · ความสามารถ Lv.6+ · ข้อจำกัดสะสมข้ามศึกเติมที่จุดพัก 5% (kwan ไอเดีย) → ทีมวิจัย 4 มุมวิเคราะห์ 2 รอบ (หนักหน่วง −4.2% · กฎ GDD 6.2 ขัดกันเอง · AV-lock · เบามือ+หนักหน่วง +29%)
 - kwan ตัดสิน 7 ข้อ + แบบ 1 อีก 5 ข้อ + ค่าบำรุงคิดจากชิ้นที่ใช้สู้ → "บันทึกเป็นมาสเตอร์" · ดู `docs/design/weapons60/MASTER.md`
 - เครื่องมือ: `tools/data/weapon_alloc.py` (แม่แบบ/ตัวตรวจ) · `tools/data/weapons_summary_md.py` (สรุปให้ทีม)
+
+## 27 ต.ค. 2026 — ไอคอนอาวุธ 60 ชิ้น + ดรอปอาวุธ pity (v1 ขั้น 1 บางส่วน)
+- ไอคอน: แผ่น `weapon-icons-60.zip` ของ kwan → `tools/sprites/weapon_icons60.py` (ตัดพื้นกรมท่า · ตาราง FIX รายชิ้น · CR-8 ตัดจากภาพ CR-7 · ST-4 โหมดเทา) → `assets/sprites/weapon_icons/` 48x48 ครบ 60 · ต้นฉบับ `docs/design/weapons60/icons_src/` · เหลือพิกเซลหลงเล็กน้อย PC-3/PC-4/DV-3 · PC-9 เป็นเส้นบาง
+- pity ตาม `docs/design/team_r3/PITY_SPEC.md` (kwan ส่งไฟล์ซ้ำ 27 ต.ค. = ให้ทำ): `data/weapon_drops.csv` 31 แถว สร้างจาก `WEAPON_SOURCES_60.xlsx` ด้วย `tools/data/weapon_drops_csv.py` (ห้ามแก้ CSV ตรง) · ค่าคงที่ `PITY_STEP 0.5` · `PITY_GUARANTEE 40` · `PITY_DUP_RATIO 0.5` ใน economy.csv
+  `core/WeaponDrop.gd` (rate/roll/claim/status_line) · `PlayerState.pity` {misses, kills} อยู่ในเซฟ (เซฟเก่าโหลดได้) · ของบนพื้นที่เป็นอาวุธใช้คำนำหน้า `อาวุธ:` · สรุปศึกแสดงเรต/ยอดฆ่า/การันตี n/40 จนกว่าจะมีสมุดบันทึก
+  วัด: เรตฐาน 5% สุ่ม 20000 ได้ 4.89% · ฆ่าเฉลี่ย 11.3 ตัวถึงได้ (ไม่มี pity = 20) · มากสุด 40 · seed ไม่เปลี่ยน (ไม่แตะ Battle)
+  อาวุธที่ดรอปเข้าคลังได้ แต่ถือได้เฉพาะชิ้นที่มี weapon_base (ตอนนี้ SL-1 · CR-2) จนกว่าค่าพลังเส้นใหม่จะเข้าเกม · NG+ ยังไม่มี — ตัวนับอยู่ในเซฟพร้อมพกข้ามรอบ
