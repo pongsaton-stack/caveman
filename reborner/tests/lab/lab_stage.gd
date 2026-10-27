@@ -29,7 +29,7 @@ const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพล
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
 const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "เขี้ยวพุ่ง", "res://tests/lab/blc_bl1.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"],
-	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"],
+	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
 	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
 	["ทุบ", "Flow", "res://tests/lab/flw_bt0.tscn"], ["ทุบ", "PL", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
@@ -937,11 +937,11 @@ func _build_menu() -> void:
 	var title := label(9, Color("#fff4c8"), 3, true, menu)
 	title.text = "ห้องทดลองฉากต่อสู้ Godot · เลือกท่า มอน ฉาก"
 	title.position = Vector2(6, 2)
-	var step2 := floori(295.0 / (TECHS.size() - 6))
-	for i in TECHS.size():   # แถวท่า: บน 6 ท่า · ล่าง ประกาย 3 + มอนตี 2 + ทุบ
+	var step2 := floori(295.0 / (TECHS.size() - 7))
+	for i in TECHS.size():   # แถวท่า: บน 7 ท่า (สายคม) · ล่าง ประกาย 3 + มอนตี 2 + ทุบ
 		var tc: Array = TECHS[i]
-		var row2 := i >= 6
-		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + (i - 6) * step2 if row2 else 4 + i * 49, 31 if row2 else 16), Vector2(step2 - 2 if row2 else 48, 13), 13)
+		var row2 := i >= 7
+		var b := _button("%s %s" % [tc[0], tc[1]], Vector2(4 + (i - 7) * step2 if row2 else 4 + i * 42, 31 if row2 else 16), Vector2(step2 - 2 if row2 else 41, 13), 13)
 		b.modulate = Color(1, 1, 0.6) if tc[2] == scene_file_path else Color.WHITE
 		b.pressed.connect(func(): _start(foe, bg_id, tc[2]))
 	var names := {}
