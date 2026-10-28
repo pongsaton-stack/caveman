@@ -13,11 +13,11 @@ extends "res://tests/lab/row_base.gd"
 const RUN0 := 18     # เริ่มวิ่ง
 const LEAP0 := 26    # กระโดดข้ามตัวหน้า
 const SPIN0 := 34    # ลงกลางแถว เริ่มหมุน
-const REV1 := 44     # จบรอบ 1
-const REV2 := 50     # จบรอบ 2
-const STOP := 56     # หมุนจบ (หันซ้าย) → ดีดตัวลุก
-const TURN := 60     # ลุกถึงพื้น ตั้งการ์ด
-const HOLD1 := 66    # เข้ากระโดดถอยของเครื่องฟัน
+const REV1 := 48     # จบรอบ 1 (เร่ง)
+const REV2 := 58     # เร็วสุด 0.6 มุม/เฟรม (kwan 28 ต.ค. "1": เดิม 1.0 เร็วจนกระเป๋าดูกระพริบสลับ → แต่ละมุมค้าง ~1.7 เฟรม ตาอ่านเป็นการหมุน)
+const STOP := 64     # ผ่อนจบ (หันซ้าย) → ดีดตัวลุก
+const TURN := 68     # ลุกถึงพื้น ตั้งการ์ด
+const HOLD1 := 74    # เข้ากระโดดถอยของเครื่องฟัน
 const ROOM_PX := 8.0 # ตัวหน้า 2 ตัวผงะเปิดทางตอน Rion ลง
 const CHEST := 12    # ระดับมีดเหนือพื้น (windmill: มีดเลียดพื้น)
 const LEGS := 58     # ระดับวงขาเตะ
@@ -69,7 +69,7 @@ func _v(f: float) -> float:
 	if f < SPIN0:
 		return 0.0
 	if f < REV1:   # รอบ 1 เร่ง
-		return 8.0 * pow((f - SPIN0) / (REV1 - SPIN0), 1.5)
+		return 8.0 * pow((f - SPIN0) / (REV1 - SPIN0), 1.3)
 	if f < REV2:   # รอบ 2 เร็วสุด
 		return 8.0 + 6.0 * (f - REV1) / (REV2 - REV1)
 	if f < STOP:   # ผ่อนจนจบที่มุมซ้าย (v 16) ก่อนดีดตัวลุก
@@ -97,7 +97,7 @@ func _theta(v: float) -> float:
 
 ## ความเร็วหมุน 0–1 (1 = รอบ 2)
 func _spd(f: float) -> float:
-	return clampf((_v(f) - _v(f - 1)) / 1.33, 0.0, 1.0)
+	return clampf((_v(f) - _v(f - 1)) / 0.6, 0.0, 1.0)
 
 # ── ตำแหน่ง Rion ─────────────────────────────────
 func geo(f: float) -> Dictionary:
@@ -169,10 +169,10 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	set_rion(rion, g)
 	if f >= SPIN0 + 3 and f < STOP:   # ร่างติดตาตอนหมุน: มุมก่อนหน้า (ฟ้าจาง)
 		var v := _v(f)
-		for k in [2, 1]:
+		for k in [3, 2, 1]:   # ร่างติดตามุมก่อนหน้า 3 ร่าง (ชัดขึ้น · อ่านเป็นการหมุนตัว)
 			var gg := g.duplicate()
-			gg.key = _key_v(v - k * 0.9)
-			ghost(gg, 0.13 * (3 - k) * _spd(f), Color("#9ae6ff"), 0.4)
+			gg.key = _key_v(v - k * 0.8)
+			ghost(gg, (0.1 + 0.09 * (3 - k)) * (0.4 + 0.6 * _spd(f)), Color("#9ae6ff"), 0.45)
 	if F >= LEAP0 and F < SPIN0:   # ร่างติดตาตอนกระโดด
 		ghost(geo(f - 1.5), 0.18)
 		ghost(geo(f - 3), 0.1)
