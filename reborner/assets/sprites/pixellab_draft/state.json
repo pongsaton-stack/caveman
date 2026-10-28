@@ -1444,6 +1444,15 @@
     "status": "queued"
    },
    "status": "completed"
+  },
+  "ULT_powerup": {
+   "response": {
+    "usage": null,
+    "background_job_id": "0fc6b410-df33-4841-b286-1fc44b78bcbe",
+    "character_id": "6a9e33f7-e8db-4594-a84b-b8057ebe4f79",
+    "status": "queued"
+   },
+   "status": "completed"
   }
  },
  "monsters": {

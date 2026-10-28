@@ -6,17 +6,20 @@ extends "res://tests/lab/fl_base.gd"
 ## → ค้างกลางอากาศเหนือเป้า (ครึ่งจังหวะ) → 5 ฟันตัดสินลงแนวดิ่ง (State BL16_finish)
 ## → รอยดาว 5 แฉกลุกเป็นพายุไฟหมุน → ไฟมอดกลายเป็นพายุเถ้าสีเทา (ล้มสลายถ้าดาเมจรวม ≥ HP) → zanshin → กระโดดถอย
 
-const STEP1 := 22    # ก้าวเข้า 1 ก้าว
-const CHG1 := 36     # ชาร์จจบ
+const POW0 := 18    # ระเบิดพลังแบบซูเปอร์ไซย่า (ท่าสุดยอดประจำสาย · kwan 28 ต.ค.) · ก่อนพูดชื่อท่า
+const BOOM := 22    # ออร่าระเบิดออก
+const POW1 := 42    # จบระเบิดพลัง → ก้าวเข้า
+const STEP1 := 46    # ก้าวเข้า 1 ก้าว
+const CHG1 := 60     # ชาร์จจบ
 const DASH := 8      # เฟรมต่อการพุ่ง 1 ครั้ง (โดนกลางทาง) · 8 = บับเบิลคำตะโกนอ่านทัน (kwan 28 ต.ค.)
-const HANG0 := 68    # โผล่ค้างเหนือเป้า
-const DROP := 75     # ฟันตัดสินลง
-const LAND := 79
-const FIRE0 := 80    # รอยดาวลุกเป็นไฟ
-const ASH0 := 98     # ไฟมอด → พายุเถ้า
-const ASH1 := 118
-const RISE := 112    # ลุกจากท่าฟันตัดสิน
-const HOLDF := 122
+const HANG0 := 92    # โผล่ค้างเหนือเป้า
+const DROP := 99     # ฟันตัดสินลง
+const LAND := 103
+const FIRE0 := 104    # รอยดาวลุกเป็นไฟ
+const ASH0 := 122     # ไฟมอด → พายุเถ้า
+const ASH1 := 142
+const RISE := 136    # ลุกจากท่าฟันตัดสิน
+const HOLDF := 146
 
 var x_r := 0.0       # จุดโผล่ขวา
 var x_l := 0.0       # ปลายทางซ้าย
@@ -30,7 +33,7 @@ var kill16 := false
 func mv() -> Dictionary:
 	return {"id": "bl16", "slide": 0, "reach": 0, "kb": 3, "shk": 2.0, "sfx": "ฉัวะ!", "what": "พันคมดับเถ้า (bl16)"}
 
-func caption() -> String: return "★ ไม้ตาย: ชาร์จถ่านร้อน → พุ่ง 4 ทิศ (ตรง · ไขว้ · ต่ำ · หมุน) → ค้างฟ้า → ฟันตัดสิน → ดาวไฟ → พายุไฟ → พายุเถ้า"
+func caption() -> String: return "★ ไม้ตาย: ระเบิดพลัง ออร่าทอง → ชาร์จถ่านร้อน → พุ่ง 4 ทิศ (ตรง · ไขว้ · ต่ำ · หมุน) → ค้างฟ้า → ฟันตัดสิน → ดาวไฟ → พายุไฟ → พายุเถ้า"
 func stops() -> Array:
 	var out := []
 	for i in hit_f.size():
@@ -53,7 +56,7 @@ func setup() -> void:
 	set_end(x_fin)
 	bubble_name = "พันคมดับเถ้า"
 	cries = ult_cries(5)
-	bubble_at = Vector2(STEP1, CHG1)
+	bubble_at = Vector2(POW1 - 2, CHG1)   # ชื่อท่าหลังระเบิดพลัง
 	var c := vis.get_center()
 	var r := minf(vis.size.x, vis.size.y) * 0.44
 	star_pts.clear()
@@ -66,9 +69,14 @@ func _dash_k(f: float) -> int:
 
 func _move(f: float) -> Dictionary:
 	var F := int(floor(f))
+	if F < POW1:   # ระเบิดพลัง: ย่อเกร็ง (ภาพชาร์จ) → ตะโกนกำหมัด ผมตั้ง (ภาพระเบิดพลัง) สั่นทั้งตัว
+		var tr := (0.8 if F >= BOOM else 0.4) * (1.0 if F % 2 == 0 else -1.0)
+		if F < BOOM:
+			return {"cx": x_home + tr, "key": "pls_u_charge_0", "sy": 0.96}
+		return {"cx": x_home + tr, "key": "pls_u_power_0", "sy": 1.0 + (0.04 if F < BOOM + 2 else 0.0)}
 	if F < STEP1:   # ก้าวเข้า 1 ก้าว
-		var u := (f - IDLE) / (STEP1 - IDLE)
-		return {"cx": x_home + (x_c - x_home) * u, "key": "pls_run_bl_%d" % ((F - IDLE) % 6), "lean": -0.04}
+		var u := (f - POW1) / (STEP1 - POW1)
+		return {"cx": x_home + (x_c - x_home) * u, "key": "pls_run_bl_%d" % ((F - POW1) % 6), "lean": -0.04}
 	if F < CHG1:   # ชาร์จ: ทรุดลง ตัวสั่นช่วงท้าย
 		var u := (f - STEP1) / (CHG1 - STEP1)
 		var tr := 0.7 * maxf(0.0, u - 0.5) * 2 * (1.0 if F % 2 == 0 else -1.0)
@@ -106,6 +114,16 @@ func _alpha(f: float) -> float:
 	var u := (f - CHG1 - k * DASH) / DASH
 	return minf(1.0, minf(u * 4.0 + 0.2, (1 - u) * 4.0 + 0.1))
 
+## ออร่า 0–1: ก่อนระเบิดเต้นเบาๆ → ระเบิดเต็ม → คงไว้ตลอดการโจมตี → คลายช้าๆ ระหว่างกระโดดถอยกลับที่เดิม
+func _aura(f: float) -> float:
+	if f < POW0:
+		return 0.0
+	if f < BOOM:
+		return 0.25 + 0.15 * sin(f * 2.5)
+	var fade0 := float(hold1)
+	var fade1 := float(end_frame() - 6)
+	return minf(1.0, (f - BOOM + 1) / 2.0) * (1.0 - clampf((f - fade0) / (fade1 - fade0), 0.0, 1.0))
+
 ## ไฟ 0–1 · เถ้า 0–1
 func _fire(f: float) -> float:
 	if f < FIRE0:
@@ -124,8 +142,10 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	# จอ: ชาร์จแดงเข้ม → พุ่งมืด → ไฟส้ม → เถ้าเทา
 	var tint := Color("#2a0800")
 	var dm := 0.0
-	if F >= STEP1 and F < FIRE0:
-		dm = 0.45 * minf(1.0, (f - STEP1) / 8.0)
+	if F >= POW0 and F < STEP1:   # ระเบิดพลัง: จอมืดลง (ออร่าเด่น)
+		dm = 0.45 * minf(1.0, (f - POW0) / 4.0)
+	elif F >= STEP1 and F < FIRE0:
+		dm = 0.45
 	elif F >= FIRE0:
 		dm = 0.45 * clampf(1 - maxf(0.0, f - ASH1) / 8.0, 0.0, 1.0)
 		tint = Color("#3a1400").lerp(Color("#1a1a1e"), clampf((f - ASH0) / 8.0, 0.0, 1.0))
@@ -141,6 +161,10 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 		shk = maxf(shk, 1.0 * _fire(f))
 	if F >= STEP1 + 6 and F < CHG1:
 		shk = maxf(shk, 0.5)
+	if F >= BOOM and F < POW1:   # ระเบิดพลัง: สั่นแรงแล้วค่อยลด
+		shk = maxf(shk, 3.5 * (1 - (f - BOOM) / (POW1 - BOOM)) + 0.6)
+	elif F >= POW0 and F < BOOM:
+		shk = maxf(shk, 0.6)
 	shake(F, shk)
 	# มอน: ผงะทุกครั้ง · ไฟ = ย้อมส้มเต้น · เถ้า = ย้อมเทา + ล้มสลายถ้าตาย
 	var hurt := F >= int(ceil(hit_f[0])) and F < ASH1
@@ -164,7 +188,7 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 		mon.scale.y = maxf(0.7, 1 - k * 0.015)
 		mon.material.set_shader_parameter("dissolve", clampf(k / 14.0, 0.0, 1.0))
 	var g := geo(f)
-	set_rion(rion, g, _alpha(f))
+	set_rion(rion, g, _alpha(f), Color("#ffe27a"), 0.22 * _aura(f) * (0.75 + 0.25 * sin(f * 2.2)))   # ตัวเรืองทองตามออร่า
 	rion_ghosts(f, F)
 	if fresh:
 		if F == STEP1:
@@ -322,6 +346,10 @@ func _storm(n: Node2D, f: float, back: bool) -> void:
 				var g := 0.45 + 0.4 * fb_hash(k, 5, 6)
 				px(n, x, y, Color(g, g * 0.98, g * 0.95, as_ * sin(PI * ph) * 0.95), 2 if k % 3 == 0 else 1, 1 if k % 4 else 2)
 
+func draw_mid(n: Node2D) -> void:
+	var f := t / SEC
+	ult_aura(n, geo(f), _aura(f), f, true, _alpha(f))
+
 func draw_back(n: Node2D) -> void:
 	_storm(n, t / SEC, true)
 
@@ -382,6 +410,10 @@ func fx(n: Node2D, f: float) -> void:
 			px(n, vis.get_center().x - 2, 0, Color(1, 0.95, 0.85, al * 0.9), 4, G)
 			px(n, vis.get_center().x - 6, 0, Color(1, 0.6, 0.2, al * 0.35), 12, G)
 	_storm(n, f, false)
+	ult_aura(n, g, _aura(f), f, false, _alpha(f))
+	ult_burst(n, Vector2(x_home - 2, G), f - BOOM)
+	if F >= BOOM and F < BOOM + 3:   # จอวาบทองตอนระเบิด
+		px(n, -8, -8, Color(1, 0.9, 0.5, 0.3 * (1 - (f - BOOM) / 3.0)), W + 16, H + 16)
 	# เถ้าร่วงทั้งจอ
 	var as_ := _ash(f)
 	if as_ > 0:
@@ -393,7 +425,13 @@ func fx(n: Node2D, f: float) -> void:
 		px(n, -8, -8, Color(1, 0.6, 0.2, 0.18 * (1 - (f - FIRE0) / 3.0)), W + 16, H + 16)
 
 func snd(F: int) -> void:
-	step_snd(F, IDLE, STEP1)
+	step_snd(F, POW1, STEP1)
+	if F == POW0:   # เกร็งรวมพลัง: ต่ำบวมขึ้น
+		play_sfx("uk_pw_in", [T(0.3, "sine", 45, 70, 0.45, 0, 0.25), N(0.3, "bandpass", 200, 600, 0.25, 1.5, 0, {"attack": 0.25})])
+	if F == BOOM:   # ระเบิดพลัง: ตูมทุ้ม + ลมพุ่ง (ไม่มีเสียงพูด)
+		play_sfx("uk_pw_boom", [T(0.7, "sine", 80, 30, 0.85, 0, 0.003, {"drive": true}), N(0.8, "lowpass", 2500, 200, 0.6, 1.2), N(1.1, "bandpass", 600, 1800, 0.35, 1.0, 0.1, {"attack": 0.05})])
+	if F > BOOM and F < POW1 and (F - BOOM) % 5 == 0:   # ออร่าคำรามต่อเนื่อง
+		play_sfx("uk_pw_roar", [N(0.3, "bandpass", 300, 900, 0.22, 1.5)])
 	if F == STEP1:   # ชาร์จ: เสียงต่ำบวม + ไฟปะทุ
 		play_sfx("uk_charge", [T(1.0, "sine", 40, 90, 0.5, 0, 0.5), N(0.9, "bandpass", 300, 1600, 0.3, 1.2, 0, {"attack": 0.6})])
 	for k in 4:

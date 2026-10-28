@@ -296,6 +296,73 @@ func ult_cries(n: int) -> Array[String]:
 		out.append(str(bag.pop_front()))
 	return out
 
+## ออร่าพลังท่าสุดยอดประจำสาย (kwan 28 ต.ค. "ระเบิดพลังแบบซูเปอร์ไซย่า ออร่าพวยพุ่งตลอดจนโจมตีเสร็จ แล้วค่อยๆ คลายตอนกลับที่เดิม")
+## g = geo ของ Rion · k = ความแรง 0–1 · back = ชั้นหลังตัว (เรียกใน draw_mid) / หน้า (เรียกใน draw_fx: เปลวบางๆ + สายฟ้า + ประกายลอย ไม่บังหน้า)
+## เปลวทองพุ่งขึ้นรอบตัวเป็นลิ้นแหลม · แกนขาวรอบลำตัว · สั่นไหวตลอด · ประกายพลังลอยขึ้น · สายฟ้าแลบเป็นระยะ · แสงที่เท้า
+func ult_aura(n: Node2D, g: Dictionary, k: float, f: float, back: bool, alpha := 1.0) -> void:
+	k *= alpha
+	if k <= 0.02:
+		return
+	var feet := Vector2(g.cx - 2, G - g.lift + 2)
+	if back:   # เงาเปลวทั้งตัว: 3 ชั้น (ทองนอก → เหลืองอ่อน → ขาวแกน) ยอดเปลวแหลมพลิ้วขึ้นตลอด
+		for layer in [[1.0, 1.0, Color(1, 0.78, 0.18, 0.34)], [0.74, 0.86, Color(1, 0.93, 0.5, 0.3)], [0.46, 0.7, Color(1, 1, 0.9, 0.26)]]:
+			var hw: float = 34.0 * layer[0]
+			var hh: float = 62.0 * layer[1]
+			var col: Color = layer[2]
+			var x := -hw
+			while x <= hw:
+				var u := absf(x) / hw
+				var body := hh * sqrt(maxf(0.0, 1 - u * u)) + 10
+				var flame := (16 * (0.5 + 0.5 * sin(x * 0.33 - f * 1.7)) + 9 * (0.5 + 0.5 * sin(x * 0.85 + f * 2.9))) * (1 - 0.6 * u)
+				var top: float = feet.y - (body + flame * layer[1]) * (0.55 + 0.45 * k)
+				var bot: float = feet.y - (1.0 - sqrt(maxf(0.0, 1 - u * u))) * 16.0 * layer[1]   # ก้นโค้งมน (รูปไข่เปลว ไม่ใช่กล่อง)
+				var mid := lerpf(top, bot, 0.55)
+				px(n, feet.x + x, top, Color(col.r, col.g, col.b, col.a * k), 2, mid - top)
+				px(n, feet.x + x, mid, Color(col.r, col.g, col.b, col.a * k * 0.6), 2, maxf(0.0, bot - mid))   # ล่างจางกว่า
+				if layer[0] == 1.0:   # ขอบบนสว่าง
+					px(n, feet.x + x, top, Color(1, 0.9, 0.45, 0.75 * k), 2, 2)
+				x += 2.0
+		for j in 7:   # เปลวหลุดลอยขึ้นจากยอด
+			var ph := fmod(f * 0.08 + j / 7.0, 1.0)
+			var x2 := feet.x + sin(j * 2.3 + f * 0.2) * 20
+			px(n, x2, feet.y - 84 - ph * 30, Color(1, 0.85, 0.35, (1 - ph) * 0.7 * k), 2, 4)
+		for i in 16:   # วงแสงที่เท้า
+			px(n, feet.x - 32 + i * 4, feet.y - 2, Color(1, 0.9, 0.4, (0.5 + 0.3 * sin(f * 3 + i)) * k), 3, 1)
+		return
+	for i in 18:   # หน้า: ประกายพลังลอยขึ้น
+		var ph := fmod(f * (0.05 + 0.03 * fb_hash(i, 1, 9)) + fb_hash(i, 2, 9), 1.0)
+		var x := feet.x + (fb_hash(i, 3, 9) - 0.5) * 70
+		px(n, x, feet.y - 4 - ph * 96, Color(1, 0.95, 0.65, sin(PI * ph) * 0.95 * k), 1, 3 if i % 3 == 0 else 2)
+	var zf := int(floor(f / 3.0))   # สายฟ้าแลบสีขาวทอง (เปลี่ยนทุก 3 เฟรม · โผล่ 1 ใน 2)
+	if zf % 2 == 0 and k > 0.5:
+		var p := feet + Vector2((fb_hash(zf, 4, 9) - 0.5) * 50, -20 - fb_hash(zf, 5, 9) * 50)
+		for s2 in 5:
+			var q := p + Vector2((fb_hash(zf, s2, 7) - 0.5) * 10, 3 + fb_hash(zf, s2, 8) * 4)
+			for t2 in 4:
+				var m := p.lerp(q, t2 / 4.0)
+				px(n, m.x, m.y, Color(1, 1, 0.85, 0.95 * k), 1, 1)
+				px(n, m.x - 1, m.y, Color(1, 0.85, 0.3, 0.5 * k), 1, 1)
+			p = q
+
+## ระเบิดพลังตอนเริ่ม (เรียกใน draw_fx): q = เฟรมหลังระเบิด · คลื่นวงแหวนที่เท้า + เศษหินลอยขึ้น + เส้นลมพุ่งออก
+func ult_burst(n: Node2D, feet: Vector2, q: float) -> void:
+	if q < 0 or q > 22:
+		return
+	var a := 1.0 - q / 22.0
+	for r in [q * 9.0, q * 6.0]:   # วงแหวนคลื่นพื้น 2 ชั้น
+		for i in 60:
+			var t := TAU * i / 60.0
+			px(n, feet.x + cos(t) * r, feet.y + sin(t) * r * 0.16, Color(1, 0.9, 0.5, 0.8 * a), 2, 1)
+	for i in 14:   # เศษหิน/หิมะลอยขึ้น
+		var x := feet.x + (fb_hash(i, 1, 5) - 0.5) * 90
+		var y := feet.y - q * (1.5 + fb_hash(i, 2, 5) * 2.5) + 0.04 * q * q
+		px(n, x, y, Color(0.5, 0.42, 0.36, a), 2, 2)
+	for i in 12:   # เส้นลมพุ่งออก (จุดทอง)
+		var t := TAU * i / 12.0 + 0.3
+		for j in 6:
+			var r0 := 16 + q * 6 + j * 3
+			px(n, feet.x + cos(t) * r0, feet.y - 34 + sin(t) * r0 * 0.7, Color(1, 0.92, 0.6, 0.75 * a * (1 - j / 6.0)), 2, 1)
+
 func school() -> String:
 	return SCHOOL.get(tech_id().substr(0, 2), "")
 

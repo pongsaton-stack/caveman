@@ -771,6 +771,12 @@ STATES["BL4_windmill_nobag"] = {"seed": 78, "frame": None, "edit": (
 	"(short dark wooden handle, short silver blade about as long as the hand) with the blade pointing outward continuing the arm. "
 	"Cap still on the head, eyes fierce, teeth gritted. The pose stays the same in every rotation. "
 	"Keep cap, goggles, hair, white shirt, necktie, belt, blue shorts, socks and boots. No backpack, no straps. " + SPIN_NOT)}   # kwan 28 ต.ค. "3": ปลดกระเป๋าก่อนหมุน (กระเป๋าดูกระพริบสลับข้างตอนหมุน)
+STATES["ULT_powerup"] = {"seed": 79, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Powering up with a mighty roar: standing with feet wide apart and knees bent, both arms pulled down and back beside the hips with fists clenched hard, "
+	"chest pushed forward, head tilted up, mouth wide open screaming, eyes glowing and fierce, hair standing straight up. "
+	"The RIGHT fist grips ONE small kitchen knife (short dark wooden handle, short silver blade) pointing down. "
+	+ SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}   # kwan 28 ต.ค. ท่าสุดยอดของสาย: ระเบิดพลังแบบซูเปอร์ไซย่าก่อนพูดชื่อท่า
 STATES["BL16_charge"] = {"seed": 72, "frame": None, "edit": (
 	"Same character, same design, proportions and colors; only the pose changes. "
 	"Charging stance before an ultimate attack: very deep wide crouch, the back knee almost on the ground, body coiled and twisted away from the enemy. "

@@ -1844,6 +1844,28 @@
      "ms": 120,
      "game_ms": null,
      "notes": "ผ่าน 8 มุม มีดครบ → pls_windmill_nb_0–7"
+    },
+    {
+     "id": "state_ULT_powerup",
+     "name": "State · ท่าสุดยอดประจำสาย ระเบิดพลัง (ตะโกน กำหมัด ผมตั้ง)",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 79,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/ULT_powerup/ULT_powerup/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/ULT_powerup/ULT_powerup/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/ULT_powerup/ULT_powerup/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/ULT_powerup/ULT_powerup/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "ULT_powerup"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่านรอบแรก · ผมชี้ตั้งแบบซูเปอร์ไซย่า · มีดมือขวาชี้ลง → pls_u_power"
     }
    ]
   },

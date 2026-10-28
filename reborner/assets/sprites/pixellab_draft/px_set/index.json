@@ -962,6 +962,21 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_u_power",
+   "label": "ท่าสุดยอดประจำสาย · ระเบิดพลังตะโกน ผมตั้ง กำหมัด (State ULT_powerup) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_u_power_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab ULT_powerup __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_u_charge",
    "label": "พันคมดับเถ้า bl16 · ชาร์จจับมีดกลับด้าน (State BL16_charge) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [

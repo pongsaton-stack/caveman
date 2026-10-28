@@ -71,6 +71,7 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_windmill_nb", "วงล้อ bl4 · windmill ไม่สะพายเป้ 8 มุม (State BL4_windmill_nobag + rot8 · เป้ปลดวางพื้น)", "BL4_windmill_nobag", "__rot8__", "west", None, 60, True),   # kwan 28 ต.ค. "3"
 	("pls_wm_kip", "วงล้อ bl4 · สะบัดขาดีดตัวลุกจาก windmill (ท่ากลาง BL4_windmill → ยืนสู้)", "BL4_windmill", "bl4_kip_v", "west", [2, 3], 90, False),   # เฟรม 0–1 วงแสงเหลืองวาดติดตัว (clean ลบไม่ได้)
 	("pls_kneel", "กวาด bl3 · คุกเข่ากางแขนมีด 8 มุม (State BL3_kneel_sweep + rot8)", "BL3_kneel_sweep", "__rot8__", "west", None, 60, True),
+	("pls_u_power", "ท่าสุดยอดประจำสาย · ระเบิดพลังตะโกน ผมตั้ง กำหมัด (State ULT_powerup)", "ULT_powerup", "__rot__", "west", [0], 90, False),   # kwan 28 ต.ค. ซูเปอร์ไซย่าก่อนพูดชื่อท่า
 	("pls_u_charge", "พันคมดับเถ้า bl16 · ชาร์จจับมีดกลับด้าน (State BL16_charge)", "BL16_charge", "__rot__", "west", [0], 90, False),
 	("pls_u_finish", "พันคมดับเถ้า bl16 · ลงฟันตัดสิน (State BL16_finish)", "BL16_finish", "__rot__", "west", [0], 90, False),
 	("pls_bat_idle", "ยืนถือไม้เบสบอล (State)", "BT_bat_stance", "__rot__", "west", [0], 180, True),
