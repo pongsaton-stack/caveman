@@ -7,17 +7,20 @@ extends "res://tests/lab/row_base.gd"
 ## มีด (มือขวา) อยู่ที่มุม θ = 3π/2 − k·π/4 บนวงรีรอบตัว (π = ฝั่งแถว/ซ้าย · π/2 = หน้า ใกล้กล้อง)
 ## รอบ 3 (kwan 28 ต.ค. "วงล้อกับกวาด ลงไปกลางดงมอนเลย"): วิ่ง → กระโดดข้ามตัวหน้าลงกลางแถว (ท่ากลาง PixelLab bl14_leap) → ตัวหน้า 2 ตัวผงะเปิดทาง
 ## → หมุนกลางดง คมลมแผ่ออกทั้งสองข้าง (ซ้าย/ขวา) โดนตามระยะจากตัว Rion · มอนกระเด็นออกจากตัว · บอสตัวเดียว = ลงหน้าบอสแบบเดิม
+## รอบ 4 (kwan 28 ต.ค. "ท่ากงล้อ ทำท่า windmill ของ b boy ฟันหมุนแทน"): ลอยแล้วทิ้งตัวลงยันบ่า (ท่ากลาง pls_wm_dive) → windmill กลับหัว ขากาง V
+## มีดมือขวาเหยียดเลียดพื้น (State BL4_windmill + rot8 = pls_windmill_0–7 แทน pls_wheel) → คมเลียดพื้น + ลมขาเตะวงบน → สะบัดขาดีดตัวลุก (pls_wm_kip) → กระโดดถอย
 
 const RUN0 := 18     # เริ่มวิ่ง
 const LEAP0 := 26    # กระโดดข้ามตัวหน้า
 const SPIN0 := 34    # ลงกลางแถว เริ่มหมุน
 const REV1 := 44     # จบรอบ 1
 const REV2 := 50     # จบรอบ 2
-const STOP := 56     # เบรกค้างท่าหันหน้า
-const TURN := 66     # หันกลับซ้าย
-const HOLD1 := 69    # เข้ากระโดดถอยของเครื่องฟัน
+const STOP := 56     # หมุนจบ (หันซ้าย) → ดีดตัวลุก
+const TURN := 60     # ลุกถึงพื้น ตั้งการ์ด
+const HOLD1 := 66    # เข้ากระโดดถอยของเครื่องฟัน
 const ROOM_PX := 8.0 # ตัวหน้า 2 ตัวผงะเปิดทางตอน Rion ลง
-const CHEST := 40    # ระดับมีดเหนือพื้น
+const CHEST := 12    # ระดับมีดเหนือพื้น (windmill: มีดเลียดพื้น)
+const LEGS := 58     # ระดับวงขาเตะ
 const WAVE_V := 24.0 # ความเร็วคมลม (px/เฟรม)
 
 var x_home := 0.0
@@ -32,7 +35,7 @@ func mv() -> Dictionary:
 
 func end_frame() -> int: return HOLD1 + END - HOP0
 func stops() -> Array: return [[int(ceil(hits_f[0])), 0.08]] if not hits_f.is_empty() else []
-func caption() -> String: return "★ วิ่ง → กระโดดลงกลางดงมอน → หมุนตัว 2 รอบ แขนกางมีดออก → คมลมแผ่สองข้าง → เบรกค้างท่า → กระโดดถอย"
+func caption() -> String: return "★ วิ่ง → กระโดดลงกลางดงมอน → windmill หมุนกลับหัว มีดเลียดพื้น 2 รอบ → คมลมแผ่สองข้าง → ดีดตัวลุก → กระโดดถอย"
 
 func setup() -> void:
 	super.setup()
@@ -68,13 +71,11 @@ func _v(f: float) -> float:
 	if f < REV1:   # รอบ 1 เร่ง
 		return 8.0 * pow((f - SPIN0) / (REV1 - SPIN0), 1.5)
 	if f < REV2:   # รอบ 2 เร็วสุด
-		return 8.0 + 8.0 * (f - REV1) / (REV2 - REV1)
-	if f < STOP:   # หมุนเลยไปอีก 2 มุม + เบรก จบที่ภาพหน้า (v 18)
+		return 8.0 + 6.0 * (f - REV1) / (REV2 - REV1)
+	if f < STOP:   # ผ่อนจนจบที่มุมซ้าย (v 16) ก่อนดีดตัวลุก
 		var u := (f - REV2) / (STOP - REV2)
-		return 16.0 + 2.0 * (1 - pow(1 - u, 2.5))
-	if f < TURN:
-		return 18.0
-	return 18.0 - 2.0 * minf(1.0, (f - TURN) / (HOLD1 - TURN))   # หน้า → ซ้ายเฉียง → ซ้าย
+		return 14.0 + 2.0 * (1 - pow(1 - u, 2.0))
+	return 16.0
 
 func _f_of_v(v: float) -> float:
 	var lo := float(SPIN0)
@@ -88,7 +89,7 @@ func _f_of_v(v: float) -> float:
 	return lo
 
 func _key_v(v: float) -> String:
-	return "pls_wheel_%d" % posmod(int(floor(v + 0.5)), 8)
+	return "pls_windmill_%d" % posmod(int(floor(v + 0.5)), 8)
 
 ## มุมมีดบนวงรีรอบตัว
 func _theta(v: float) -> float:
@@ -112,19 +113,25 @@ func geo(f: float) -> Dictionary:
 		b.lean = -0.07 * minf(1.0, u * 2)
 		b.key = "pls_run_bl_%d" % ((F - RUN0) % 6)
 		return b
-	if F < SPIN0:   # กระโดดโค้งข้ามตัวหน้าลงกลางแถว (ย่อ → ถีบ → ลอยสูง → ลง)
+	if F < SPIN0:   # กระโดดโค้งข้ามตัวหน้า → ทิ้งตัวลงยันบ่ากลางแถว
 		var u := (f - LEAP0) / (SPIN0 - LEAP0)
 		b.cx = x_jump + (x_spin - x_jump) * u
 		b.lift = (40.0 if mid else 18.0) * sin(PI * u)
-		b.key = "pls_hop_bl_1" if u < 0.12 else ("pls_lair_0" if u < 0.72 else "pls_leap_4")   # ย่อถีบ → ลอยง้างมีด (State BL14_air) → ลง
+		b.key = "pls_hop_bl_1" if u < 0.12 else ("pls_lair_0" if u < 0.5 else "pls_wm_dive_%d" % mini(3, int((u - 0.5) * 8.0)))   # ย่อถีบ → ลอย → ทิ้งตัว
 		return b
-	b.key = _key_v(_v(f))
-	b.cx = x_spin
-	if F < SPIN0 + 2:   # ปักเท้า
-		b.sy = 0.94
-		b.sx = 1.04
-	if f >= REV2:   # เบรก: ไถลถอยเล็กน้อย
-		b.cx = x_spin + 4 * minf(1.0, (f - REV2) / (STOP + 4 - REV2))
+	if F < STOP:   # windmill
+		b.key = _key_v(_v(f))
+		b.cx = x_spin
+		if F < SPIN0 + 2:   # บ่ากระแทกพื้น
+			b.sy = 0.93
+			b.sx = 1.05
+		return b
+	b.cx = x_spin + 3
+	if F < TURN:   # สะบัดขาดีดตัวลุก
+		b.key = "pls_wm_kip_%d" % mini(1, int((f - STOP) / 2.0))
+		b.sy = 0.95 if F < STOP + 1 else 1.0
+	else:   # ตั้งการ์ดค้าง zanshin
+		b.key = "pls_atk_bl_0"
 	return b
 
 ## มอนกระเด็นตามคมลม (ไปทางซ้าย) แล้วค่อยกลับ
@@ -204,23 +211,25 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	show_bubble("วงล้อ!", g.cx, G - g.lift - 74, F - b0, (1.0 if F < SPIN0 + 2 else (SPIN0 + 6 - f) / 4.0) if F >= b0 and F < SPIN0 + 6 else 0.0)
 	var dws := F - int(ceil(hits_f[0]))
 	if dws >= 0 and dws < 18:   # เหนือหัว Rion ตอนโดนตัวแรก (ไม่ทับตัวเลขของแถว)
-		word(BM.sfx, clampf(x_spin + 22, 4, W - 72), G - 70 - mini(6, dws), Color("#e8f8ff"), 18 if dws < 2 else 16, 4)   # ข้างตัว Rion ใต้แถวตัวเลข
+		word(BM.sfx, clampf(x_spin - 26, 4, W - 72), 26 - mini(6, dws), Color("#e8f8ff"), 18 if dws < 2 else 16, 4)   # บนสุดของจอ เหนือแถวตัวเลข (ไม่ทับเลข)
 	for i in mons.size():
 		pop(dmg, maxf(16, cxs[i] + _room(i, f) - _sweep_kb(f - hits_f[i]) * _dir(i)), my + roundf(mh * 0.25) - (i % 2) * 18, F - int(ceil(hits_f[i])), Color.WHITE, aff_tag(), aff_col())
 
 # ── วาด ───────────────────────────────────────────
 ## รอยมีดวนรอบตัว (วงรีระดับอก) · back = ครึ่งหลังตัว (วาดใต้ Rion)
-func _trail(n: Node2D, f: float, back: bool) -> void:
+## legs = วงลมขาเตะของ windmill (สูงระดับขา · ขาวจาง · อยู่ตรงข้ามมีด)
+func _trail(n: Node2D, f: float, back: bool, legs := false) -> void:
 	if f < SPIN0 or f >= STOP + 2:
 		return
 	var spd := _spd(f)
-	var fade := 1.0 if f < STOP else maxf(0.0, 1 - (f - STOP) / 2.0)
+	var fade := (1.0 if f < STOP else maxf(0.0, 1 - (f - STOP) / 2.0)) * (0.55 if legs else 1.0)
 	var g := geo(f)
-	var c := Vector2(g.cx - 2, G - CHEST)
-	var R := Vector2(30 + 4 * spd, 8)
+	var c := Vector2(g.cx - 2, G - (LEGS if legs else CHEST))
+	var R := Vector2((22 if legs else 32) + 4 * spd, 6 if legs else 8)
 	var L := 1.0 + 3.2 * spd   # หางยาวตามความเร็ว · รอบ 2 เกือบเต็มวง
-	var head := _theta(_v(f))
-	for layer in [[Color("#1a3a9a"), 2.0], [Color("#9ae6ff"), 0.0], [Color.WHITE, -2.0]]:
+	var head := _theta(_v(f)) + (PI if legs else 0.0)
+	var layers := [[Color(0.75, 0.8, 0.9), 1.0], [Color(0.97, 0.98, 1.0), -1.0]] if legs else [[Color("#1a3a9a"), 2.0], [Color("#9ae6ff"), 0.0], [Color.WHITE, -2.0]]
+	for layer in layers:
 		for k in 72:
 			var u := float(k) / 71   # 0 หาง · 1 หัว
 			var a := head + L * (1 - u)
@@ -245,7 +254,7 @@ func _wave1(n: Node2D, f: float, back: bool, lag: float, amp: float) -> void:
 	if q < 0 or q > 12:
 		return
 	var g := geo(f)
-	var c := Vector2(g.cx - 2, G - CHEST + 10)
+	var c := Vector2(g.cx - 2, G - CHEST + 6)
 	var R := 22.0 + WAVE_V * q
 	var ry := R * 0.16
 	var al := 1.0 if q < 7 else maxf(0.0, 1 - (q - 7) / 5.0)
@@ -278,6 +287,7 @@ func draw_back(n: Node2D) -> void:
 
 func draw_mid(n: Node2D) -> void:
 	_trail(n, t / SEC, true)
+	_trail(n, t / SEC, true, true)
 
 func draw_fx(n: Node2D) -> void:
 	var f := t / SEC
@@ -312,6 +322,7 @@ func draw_fx(n: Node2D) -> void:
 			if sin(a) > 0:
 				px(n, c.x + cos(a) * r, y + sin(a) * 4, Color(0.86, 0.8, 0.72, 0.75 * fade), 2 if k % 4 == 0 else 1, 1)
 	_trail(n, f, false)
+	_trail(n, f, false, true)
 	_wave(n, f, false)
 	# แผลแนวนอนบนมอนแต่ละตัว ตอนคมลมผ่าน
 	for i in mons.size():

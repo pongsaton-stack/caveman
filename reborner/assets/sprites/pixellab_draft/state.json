@@ -1105,6 +1105,44 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "bl4_dive",
+   "dir": "west",
+   "seed": 76,
+   "state": "BL4_windmill",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "abf4a196-caeb-4876-967c-1b7ac0276720"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "13e60ada-e132-4c5a-9b20-ecca0afe06f7",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl4_kip",
+   "dir": "west",
+   "seed": 77,
+   "state": "BL4_windmill",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "c4af590c-5a03-4d93-8b3a-66870b3d312d"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "9019fc25-b72c-4348-a029-14f069286fde",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -1159,7 +1197,9 @@
   "f9a02221-3fbb-483d-aa1b-c9f8a628f749": "completed",
   "69f01d0c-fd69-4582-ba51-46f3c86e4c53": "completed",
   "915d7601-a397-43b7-b888-98f5025238f1": "completed",
-  "43642f76-a22b-4d23-85a5-f4c140ce8e0b": "completed"
+  "43642f76-a22b-4d23-85a5-f4c140ce8e0b": "completed",
+  "abf4a196-caeb-4876-967c-1b7ac0276720": "completed",
+  "c4af590c-5a03-4d93-8b3a-66870b3d312d": "completed"
  },
  "states": {
   "fight_knife": {
@@ -1386,6 +1426,15 @@
     "status": "queued"
    },
    "status": "completed"
+  },
+  "BL4_windmill": {
+   "response": {
+    "usage": null,
+    "background_job_id": "b602aa48-1fe4-4362-be23-251a6b771695",
+    "character_id": "b4ce2ae5-7c69-4ac9-8ca5-56307cf725ad",
+    "status": "queued"
+   },
+   "status": "completed"
   }
  },
  "monsters": {
@@ -1543,6 +1592,14 @@
    "usage": null,
    "background_job_id": "2f58ccce-227a-4e47-92de-a9932638ecbe",
    "character_id": "6545fea0-938d-4132-8a06-3de6db98da4e",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  },
+  "BL4_windmill": {
+   "usage": null,
+   "background_job_id": "1cd33d53-c155-414e-84c9-8de89ffdeb5b",
+   "character_id": "4e18a626-01cb-4a74-83f3-7bf11a6e6f77",
    "status": "processing",
    "enhanced_prompt": null,
    "enhance_usage": null

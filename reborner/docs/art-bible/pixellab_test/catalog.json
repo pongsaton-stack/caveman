@@ -1710,6 +1710,92 @@
      "ms": 500,
      "game_ms": null,
      "notes": "ผ่าน · มีดชี้พื้น แขนซ้ายเหวี่ยงหลัง → pls_u_finish"
+    },
+    {
+     "id": "state_BL4_windmill",
+     "name": "State · วงล้อ bl4 windmill b-boy (กลับหัวยันบ่า ขากาง V มีดมือขวาเลียดพื้น)",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 75,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL4_windmill"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่านรอบแรก · มีดอยู่มือขวาทุกมุม"
+    },
+    {
+     "id": "rot8_BL4_windmill",
+     "name": "State + rot8 · วงล้อ bl4 windmill (ภาพหมุน 8 มุม)",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 75,
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/west.png",
+      "south-west": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/south-west.png",
+      "south": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/south.png",
+      "south-east": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/south-east.png",
+      "east": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/east.png",
+      "north-east": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/north-east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/north.png",
+      "north-west": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/rotations8/north-west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL4_windmill"
+     },
+     "ms": 120,
+     "game_ms": null,
+     "notes": "ผ่าน · มุมข้างเห็นขาซ้อน (ถูกตามมุมมอง) → pls_windmill_0–7"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 1,
+     "seed": 76,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl4_dive_v",
+     "name": "ท่ากลาง · วงล้อ bl4 ทิ้งตัวจากกลางอากาศลง windmill (4 เฟรม · BL14_air → BL4_windmill)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/animations/bl4_dive_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl4_dive"
+     },
+     "notes": "ผ่าน 4/4 · วงฟ้า clean ลบ → pls_wm_dive (gen รวมกับ bl4_kip 2)"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 1,
+     "seed": 77,
+     "ms": 90,
+     "game_ms": null,
+     "id": "bl4_kip_v",
+     "name": "ท่ากลาง · วงล้อ bl4 สะบัดขาดีดตัวลุก (4 เฟรม · BL4_windmill → ยืนสู้)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL4_windmill/BL4_windmill/animations/bl4_kip_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl4_kip"
+     },
+     "notes": "ใช้ 2 3 · เฟรม 0–1 วงแสงเหลืองติดตัว → pls_wm_kip"
     }
    ]
   },

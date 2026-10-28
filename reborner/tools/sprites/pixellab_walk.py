@@ -726,6 +726,21 @@ MOVES.update({
 			"same as the end image: follow-through of the downward slash"],
 		"not": ["a second knife", "the knife in the left hand", "turning toward the camera", "slash trails, glow or motion lines"]},
 })
+MOVES.update({   # วงล้อ bl4 แบบ windmill ของ b-boy (kwan 28 ต.ค.) · ท่ากลางเข้า/ออกจากท่าหมุน
+	"bl4_dive": {"dir": "west", "attack": False, "frames": 4, "seed": 76, "held": KNIFE,
+		"beats": ["same as the start image: in the air, knees tucked, the knife raised over the head",
+			"falling forward and down, the LEFT hand reaching for the ground, legs starting to swing up behind",
+			"the LEFT hand and shoulders touch the ground, the body tipping upside down, legs swinging up and apart, the knife arm stretching out along the ground",
+			"same as the end image: upside down on the shoulders, legs spread wide in a V in the air, the knife arm stretched out along the ground"],
+		"not": ["a second knife", "the knife in the left hand", "slash trails, glow or motion lines", "landing on the feet"]},
+	"bl4_kip": {"dir": "west", "attack": False, "frames": 4, "seed": 77, "held": KNIFE,
+		"beats": ["same as the start image: upside down on the shoulders, legs spread wide in a V in the air",
+			"the legs whip down together toward the ground, the body rolling forward onto the hands",
+			"springing up off the hands, feet landing under the body, crouched low, knife coming to guard",
+			"same as the end image: fighting stance facing left, knife at guard in the RIGHT hand"],
+		"not": ["a second knife", "the knife in the left hand", "slash trails, glow or motion lines", "turning toward the camera"]},
+})
+
 # ท่าใหม่ (ท่านิ่ง) · kwan 28 ต.ค.: กวาด bl3 ลงกลางดงมอน · ไม้ตาย bl16 พันคมดับเถ้า
 STATES["BL3_kneel_sweep"] = {"seed": 71, "frame": None, "edit": (
 	"Same character, same design, proportions and colors; only the pose changes. "
@@ -740,6 +755,13 @@ STATES["BL14_air"] = {"seed": 74, "frame": None, "edit": (
 	"The RIGHT arm raised high above and behind the head holding ONE small kitchen knife (short dark wooden handle, short silver blade), "
 	"ready to cut down; the LEFT arm stretched forward for balance. Hair and shirt blown upward. Eyes fierce, mouth shouting. "
 	+ SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}   # bl14_leap ได้ท่าวิ่ง ไม่ลอย (kwan 28 ต.ค. "กระโดดไปแถวหลังเลย")
+STATES["BL4_windmill"] = {"seed": 75, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Breakdance windmill power move frozen mid-spin: the boy lies diagonally on his upper back and shoulders on the ground, "
+	"BOTH legs straight and spread wide apart in a big V raised high into the air. The LEFT hand is planted flat on the ground beside the hip for support. "
+	"The RIGHT arm is stretched straight out along the ground away from the body holding ONE small kitchen knife "
+	"(short dark wooden handle, short silver blade about as long as the hand) with the blade pointing outward continuing the arm. "
+	"Cap still on the head, eyes fierce, teeth gritted. The pose stays the same in every rotation. " + SPIN_KEEP + SPIN_NOT)}   # kwan 28 ต.ค. "ท่ากงล้อ ทำท่า windmill ของ b boy ฟันหมุนแทน"
 STATES["BL16_charge"] = {"seed": 72, "frame": None, "edit": (
 	"Same character, same design, proportions and colors; only the pose changes. "
 	"Charging stance before an ultimate attack: very deep wide crouch, the back knee almost on the ground, body coiled and twisted away from the enemy. "

@@ -862,6 +862,62 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_wm_dive",
+   "label": "วงล้อ bl4 · ทิ้งตัวจากกลางอากาศลง windmill (ท่ากลาง BL14_air → BL4_windmill) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 698 จุด)",
+   "frames": [
+    "pls_wm_dive_0",
+    "pls_wm_dive_1",
+    "pls_wm_dive_2",
+    "pls_wm_dive_3"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL4_windmill bl4_dive_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_windmill",
+   "label": "วงล้อ bl4 · windmill b-boy กลับหัวยันบ่า ขากาง V มีดมือขวา 8 มุม (State BL4_windmill + rot8) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_windmill_0",
+    "pls_windmill_1",
+    "pls_windmill_2",
+    "pls_windmill_3",
+    "pls_windmill_4",
+    "pls_windmill_5",
+    "pls_windmill_6",
+    "pls_windmill_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL4_windmill __rot8__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_wm_kip",
+   "label": "วงล้อ bl4 · สะบัดขาดีดตัวลุกจาก windmill (ท่ากลาง BL4_windmill → ยืนสู้) · 2 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_wm_kip_0",
+    "pls_wm_kip_1"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL4_windmill bl4_kip_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_kneel",
    "label": "กวาด bl3 · คุกเข่ากางแขนมีด 8 มุม (State BL3_kneel_sweep + rot8) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [

@@ -66,6 +66,9 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_leap", "ปาดข้ามแถว bl14 · กระโดดสูงข้ามแนวหน้า ฟันลง (8 เฟรม · ใช้ร่วมวงล้อ/กวาด/ไม้ตาย)", "fight_knife", "bl14_leap_v", "west", None, 60, False),
 	("pls_cs_counter", "คมสวน bl15 · พลิกข้อมือ → ฟันสวน (ท่ากลาง)", "fight_knife", "bl15_counter_v", "west", None, 60, False),
 	("pls_lair", "กระโดดสูงลอยง้างมีดเหนือหัว (State BL14_air · ใช้ร่วม bl14 bl4 bl3 bl16)", "BL14_air", "__rot__", "west", [0], 90, False),
+	("pls_wm_dive", "วงล้อ bl4 · ทิ้งตัวจากกลางอากาศลง windmill (ท่ากลาง BL14_air → BL4_windmill)", "BL4_windmill", "bl4_dive_v", "west", None, 60, False),   # kwan 28 ต.ค. "ท่า windmill ของ b boy ฟันหมุน"
+	("pls_windmill", "วงล้อ bl4 · windmill b-boy กลับหัวยันบ่า ขากาง V มีดมือขวา 8 มุม (State BL4_windmill + rot8)", "BL4_windmill", "__rot8__", "west", None, 60, True),
+	("pls_wm_kip", "วงล้อ bl4 · สะบัดขาดีดตัวลุกจาก windmill (ท่ากลาง BL4_windmill → ยืนสู้)", "BL4_windmill", "bl4_kip_v", "west", [2, 3], 90, False),   # เฟรม 0–1 วงแสงเหลืองวาดติดตัว (clean ลบไม่ได้)
 	("pls_kneel", "กวาด bl3 · คุกเข่ากางแขนมีด 8 มุม (State BL3_kneel_sweep + rot8)", "BL3_kneel_sweep", "__rot8__", "west", None, 60, True),
 	("pls_u_charge", "พันคมดับเถ้า bl16 · ชาร์จจับมีดกลับด้าน (State BL16_charge)", "BL16_charge", "__rot__", "west", [0], 90, False),
 	("pls_u_finish", "พันคมดับเถ้า bl16 · ลงฟันตัดสิน (State BL16_finish)", "BL16_finish", "__rot__", "west", [0], 90, False),
@@ -96,7 +99,8 @@ ALIGN_X = {"pls_bl7_back": "pls_bl7"}
 # = ตัวไม่กระโดดตอนสลับจากภาพท่าเดิมเข้าท่ากลาง (คลิป ref ต้องอยู่ก่อนใน CLIPS)
 ALIGN_MATCH = {"pls_iai_draw": ("pls_iai_crouch", 0, 0), "pls_iai_noto": ("pls_iai_draw", -1, 0),
 	"pls_sd_summon": ("pls_idle_bl", 0, 0), "pls_sd_cut": ("pls_sd_summon", -1, 0), "pls_sd_x": ("pls_sd_cut", -1, 0),
-	"pls_sh_glide": ("pls_slither", 0, 0), "pls_sh_cut": ("pls_slither", 0, 0), "pls_leap": ("pls_stride", 0, 0), "pls_cs_counter": ("pls_roll", 0, 0)}
+	"pls_sh_glide": ("pls_slither", 0, 0), "pls_sh_cut": ("pls_slither", 0, 0), "pls_leap": ("pls_stride", 0, 0), "pls_cs_counter": ("pls_roll", 0, 0),
+	"pls_wm_dive": ("pls_lair", 0, 0), "pls_windmill": ("pls_wm_dive", -1, 0), "pls_wm_kip": ("pls_idle_bl", 0, -1)}
 
 
 def match_at(im, ref_path):
