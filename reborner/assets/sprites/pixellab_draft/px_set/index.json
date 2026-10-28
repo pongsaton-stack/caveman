@@ -902,6 +902,28 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_windmill_nb",
+   "label": "วงล้อ bl4 · windmill ไม่สะพายเป้ 8 มุม (State BL4_windmill_nobag + rot8 · เป้ปลดวางพื้น) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_windmill_nb_0",
+    "pls_windmill_nb_1",
+    "pls_windmill_nb_2",
+    "pls_windmill_nb_3",
+    "pls_windmill_nb_4",
+    "pls_windmill_nb_5",
+    "pls_windmill_nb_6",
+    "pls_windmill_nb_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL4_windmill_nobag __rot8__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_wm_kip",
    "label": "วงล้อ bl4 · สะบัดขาดีดตัวลุกจาก windmill (ท่ากลาง BL4_windmill → ยืนสู้) · 2 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [

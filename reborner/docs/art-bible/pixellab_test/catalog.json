@@ -1796,6 +1796,54 @@
       "key": "bl4_kip"
      },
      "notes": "ใช้ 2 3 · เฟรม 0–1 วงแสงเหลืองติดตัว → pls_wm_kip"
+    },
+    {
+     "id": "state_BL4_windmill_nobag",
+     "name": "State · วงล้อ bl4 windmill ไม่สะพายเป้",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 78,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL4_windmill_nobag"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่าน · ไม่มีเป้ทุกมุม · ขากาง V แคบกว่าแบบมีเป้ · รอบแรกคำสั่งเกิน 1000 ตัวอักษร (HTTP 422 ไม่หักเครดิต)"
+    },
+    {
+     "id": "rot8_BL4_windmill_nobag",
+     "name": "State + rot8 · windmill ไม่สะพายเป้ (8 มุม)",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 78,
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/west.png",
+      "south-west": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/south-west.png",
+      "south": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/south.png",
+      "south-east": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/south-east.png",
+      "east": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/east.png",
+      "north-east": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/north-east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/north.png",
+      "north-west": "assets/sprites/pixellab_draft/states/BL4_windmill_nobag/BL4_windmill_nobag/rotations8/north-west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL4_windmill_nobag"
+     },
+     "ms": 120,
+     "game_ms": null,
+     "notes": "ผ่าน 8 มุม มีดครบ → pls_windmill_nb_0–7"
     }
    ]
   },

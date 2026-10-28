@@ -68,6 +68,7 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_lair", "กระโดดสูงลอยง้างมีดเหนือหัว (State BL14_air · ใช้ร่วม bl14 bl4 bl3 bl16)", "BL14_air", "__rot__", "west", [0], 90, False),
 	("pls_wm_dive", "วงล้อ bl4 · ทิ้งตัวจากกลางอากาศลง windmill (ท่ากลาง BL14_air → BL4_windmill)", "BL4_windmill", "bl4_dive_v", "west", None, 60, False),   # kwan 28 ต.ค. "ท่า windmill ของ b boy ฟันหมุน"
 	("pls_windmill", "วงล้อ bl4 · windmill b-boy กลับหัวยันบ่า ขากาง V มีดมือขวา 8 มุม (State BL4_windmill + rot8)", "BL4_windmill", "__rot8__", "west", None, 60, True),
+	("pls_windmill_nb", "วงล้อ bl4 · windmill ไม่สะพายเป้ 8 มุม (State BL4_windmill_nobag + rot8 · เป้ปลดวางพื้น)", "BL4_windmill_nobag", "__rot8__", "west", None, 60, True),   # kwan 28 ต.ค. "3"
 	("pls_wm_kip", "วงล้อ bl4 · สะบัดขาดีดตัวลุกจาก windmill (ท่ากลาง BL4_windmill → ยืนสู้)", "BL4_windmill", "bl4_kip_v", "west", [2, 3], 90, False),   # เฟรม 0–1 วงแสงเหลืองวาดติดตัว (clean ลบไม่ได้)
 	("pls_kneel", "กวาด bl3 · คุกเข่ากางแขนมีด 8 มุม (State BL3_kneel_sweep + rot8)", "BL3_kneel_sweep", "__rot8__", "west", None, 60, True),
 	("pls_u_charge", "พันคมดับเถ้า bl16 · ชาร์จจับมีดกลับด้าน (State BL16_charge)", "BL16_charge", "__rot__", "west", [0], 90, False),
@@ -100,7 +101,7 @@ ALIGN_X = {"pls_bl7_back": "pls_bl7"}
 ALIGN_MATCH = {"pls_iai_draw": ("pls_iai_crouch", 0, 0), "pls_iai_noto": ("pls_iai_draw", -1, 0),
 	"pls_sd_summon": ("pls_idle_bl", 0, 0), "pls_sd_cut": ("pls_sd_summon", -1, 0), "pls_sd_x": ("pls_sd_cut", -1, 0),
 	"pls_sh_glide": ("pls_slither", 0, 0), "pls_sh_cut": ("pls_slither", 0, 0), "pls_leap": ("pls_stride", 0, 0), "pls_cs_counter": ("pls_roll", 0, 0),
-	"pls_wm_dive": ("pls_lair", 0, 0), "pls_windmill": ("pls_wm_dive", -1, 0), "pls_wm_kip": ("pls_idle_bl", 0, -1)}
+	"pls_wm_dive": ("pls_lair", 0, 0), "pls_windmill": ("pls_wm_dive", -1, 0), "pls_windmill_nb": ("pls_windmill", 0, 0), "pls_wm_kip": ("pls_idle_bl", 0, -1)}
 
 
 def match_at(im, ref_path):
@@ -235,7 +236,8 @@ def main():
 		open(os.path.join(OUT, "index.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 	for r in report: print(*r)
 	import weapon_swap; weapon_swap.main(); weapon_swap.empty_hand()
-	import shadow_knife; shadow_knife.main()   # มีดเงา bl6: ย้อมมีดมือซ้ายของท่าสองมีด (ต้องรันกับภาพที่เพิ่งสร้าง ไม่ใช่ภาพที่ย้อมแล้ว)   # คลิปเปลี่ยนอาวุธด้วยโค้ด (ใช้ภาพ pls_atk_bl ที่เพิ่งสร้าง) · ภาพมือเปล่าของผ่าเกราะ bl8
+	import shadow_knife; shadow_knife.main()
+	import bag_drop; bag_drop.main()   # เป้แยกชิ้น (windmill ปลดเป้)   # มีดเงา bl6: ย้อมมีดมือซ้ายของท่าสองมีด (ต้องรันกับภาพที่เพิ่งสร้าง ไม่ใช่ภาพที่ย้อมแล้ว)   # คลิปเปลี่ยนอาวุธด้วยโค้ด (ใช้ภาพ pls_atk_bl ที่เพิ่งสร้าง) · ภาพมือเปล่าของผ่าเกราะ bl8
 
 
 if __name__ == "__main__":

@@ -89,7 +89,7 @@ func _f_of_v(v: float) -> float:
 	return lo
 
 func _key_v(v: float) -> String:
-	return "pls_windmill_%d" % posmod(int(floor(v + 0.5)), 8)
+	return "pls_windmill_nb_%d" % posmod(int(floor(v + 0.5)), 8)   # ไม่สะพายเป้ (kwan 28 ต.ค. "3": เป้ดูกระพริบสลับข้างตอนหมุน → ปลดก่อนหมุน)
 
 ## มุมมีดบนวงรีรอบตัว
 func _theta(v: float) -> float:
@@ -288,6 +288,37 @@ func draw_back(n: Node2D) -> void:
 func draw_mid(n: Node2D) -> void:
 	_trail(n, t / SEC, true)
 	_trail(n, t / SEC, true, true)
+	_bag(n, t / SEC)
+
+## เป้: หลุดจากหลังตอนบ่ากระแทกพื้น → กระเด็นไปข้างหลัง (ขวา) หมุนคว้าง เด้ง 1 ครั้ง → นอนนิ่งระหว่าง windmill
+## → ตอนดีดตัวลุก ดึงกลับเข้าหลัง (ภาพดีดตัวลุกสะพายเป้แล้ว) · วาดใต้ Rion
+const BAG_OFF := 0.0   # เป้หลุดพร้อมกับที่ภาพเปลี่ยนเป็นไม่สะพาย (ภาพทิ้งตัวยังสะพายอยู่ · ไม่ให้มีเป้ 2 ใบ)
+func _bag(n: Node2D, f: float) -> void:
+	var q := f - (SPIN0 - BAG_OFF)
+	if q < 0 or f >= STOP + 1.5:
+		return
+	var tex := tx("pls_bag_0")
+	var p0 := Vector2(x_spin + 4, G - 22)   # หลังตอนทิ้งตัว
+	var p1 := Vector2(x_spin + 26, G - 1)   # จุดตก (เท้าเป้แตะพื้น)
+	var pos := p1
+	var rot := PI * 0.5   # นอนตะแคง
+	if q < 7:   # กระเด็นโค้ง + หมุนคว้าง
+		var u := q / 7.0
+		pos = p0.lerp(p1, u) + Vector2(0, -16 * sin(PI * u))
+		rot = u * PI * 2.5
+	elif q < 10:   # เด้งเล็ก
+		var u := (q - 7) / 3.0
+		pos = p1 + Vector2(2 * u, -3 * sin(PI * u))
+		rot = PI * 0.5 + 0.3 * sin(PI * u)
+	else:
+		pos = p1 + Vector2(2, 0)
+	if f >= STOP - 1:   # ดึงกลับเข้าหลังตอนดีดตัวลุก
+		var u := clampf((f - (STOP - 1)) / 2.5, 0.0, 1.0)
+		pos = pos.lerp(Vector2(x_spin + 10, G - 30), u * u)
+		rot = lerpf(rot, 0.0, u)
+	n.draw_set_transform(pos, rot, Vector2.ONE)
+	n.draw_texture(tex, Vector2(-tex.get_width() / 2.0, -tex.get_height()))
+	n.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func draw_fx(n: Node2D) -> void:
 	var f := t / SEC

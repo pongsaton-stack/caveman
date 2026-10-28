@@ -1435,6 +1435,15 @@
     "status": "queued"
    },
    "status": "completed"
+  },
+  "BL4_windmill_nobag": {
+   "response": {
+    "usage": null,
+    "background_job_id": "f6c5102c-987b-4cde-8d2e-96d88d92afea",
+    "character_id": "42b66de7-fa95-41be-bd3f-92475c26de64",
+    "status": "queued"
+   },
+   "status": "completed"
   }
  },
  "monsters": {
@@ -1600,6 +1609,14 @@
    "usage": null,
    "background_job_id": "1cd33d53-c155-414e-84c9-8de89ffdeb5b",
    "character_id": "4e18a626-01cb-4a74-83f3-7bf11a6e6f77",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  },
+  "BL4_windmill_nobag": {
+   "usage": null,
+   "background_job_id": "b75ff676-a680-4653-b70b-d3b1eb8ca4e2",
+   "character_id": "d2d1dc23-35a3-4c22-b09a-3bf506bc5594",
    "status": "processing",
    "enhanced_prompt": null,
    "enhance_usage": null

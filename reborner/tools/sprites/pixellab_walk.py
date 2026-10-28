@@ -762,6 +762,15 @@ STATES["BL4_windmill"] = {"seed": 75, "frame": None, "edit": (
 	"The RIGHT arm is stretched straight out along the ground away from the body holding ONE small kitchen knife "
 	"(short dark wooden handle, short silver blade about as long as the hand) with the blade pointing outward continuing the arm. "
 	"Cap still on the head, eyes fierce, teeth gritted. The pose stays the same in every rotation. " + SPIN_KEEP + SPIN_NOT)}   # kwan 28 ต.ค. "ท่ากงล้อ ทำท่า windmill ของ b boy ฟันหมุนแทน"
+STATES["BL4_windmill_nobag"] = {"seed": 78, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes and the brown backpack is taken OFF and not worn at all, "
+	"so the back of the white shirt is visible. "
+	"Breakdance windmill power move frozen mid-spin: the boy lies diagonally on his upper back and shoulders on the ground, "
+	"BOTH legs straight and spread wide apart in a big V raised high into the air. The LEFT hand is planted flat on the ground beside the hip for support. "
+	"The RIGHT arm is stretched straight out along the ground away from the body holding ONE small kitchen knife "
+	"(short dark wooden handle, short silver blade about as long as the hand) with the blade pointing outward continuing the arm. "
+	"Cap still on the head, eyes fierce, teeth gritted. The pose stays the same in every rotation. "
+	"Keep cap, goggles, hair, white shirt, necktie, belt, blue shorts, socks and boots. No backpack, no straps. " + SPIN_NOT)}   # kwan 28 ต.ค. "3": ปลดกระเป๋าก่อนหมุน (กระเป๋าดูกระพริบสลับข้างตอนหมุน)
 STATES["BL16_charge"] = {"seed": 72, "frame": None, "edit": (
 	"Same character, same design, proportions and colors; only the pose changes. "
 	"Charging stance before an ultimate attack: very deep wide crouch, the back knee almost on the ground, body coiled and twisted away from the enemy. "
