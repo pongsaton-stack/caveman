@@ -557,6 +557,126 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_iai_crouch",
+   "label": "ปาดไว bl5 · ย่อ iaigoshi มือแตะด้ามในซอง (State BL5_iai_crouch) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_iai_crouch_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL5_iai_crouch __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_iai_cut",
+   "label": "ปาดไว bl5 · ปลายจังหวะชักฟัน (State BL5_iai_cut) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_iai_cut_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL5_iai_cut __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_enso",
+   "label": "เงาสองคม bl6 · ตั้งท่าสองมีด (State BL6_enso) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_enso_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL6_enso __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_tcut",
+   "label": "เงาสองคม bl6 · ฟันมีดขวา (State BL6_cut1) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_tcut_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL6_cut1 __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_cross",
+   "label": "เงาสองคม bl6 · มีดซ้ายไขว้เป็น X (State BL6_cross) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_cross_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL6_cross __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_slither",
+   "label": "ก้าวเงา bl13 · ก้าวไขว้เลื้อยต่ำ (State BL13_slither) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_slither_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL13_slither __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_stride",
+   "label": "ปาดข้ามแถว bl14 · ก้าวเฉียง 45° (State BL14_stride) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_stride_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL14_stride __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_roll",
+   "label": "คมสวน bl15 · พลิกข้อมือปัดคม (State BL15_roll) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_roll_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL15_roll __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_bat_idle",
    "label": "ยืนถือไม้เบสบอล (State) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [

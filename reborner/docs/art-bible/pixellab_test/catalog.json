@@ -1249,6 +1249,182 @@
      "ms": 120,
      "game_ms": null,
      "notes": "state 15 + rot8 2 · ลอยงอเข่า กางแขน กัดฟัน · pls_storm_air_0–7"
+    },
+    {
+     "id": "state_BL5_iai_crouch",
+     "name": "State · ปาดไว bl5 ย่อ iaigoshi มือแตะด้ามในซอง",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 51,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL5_iai_crouch/BL5_iai_crouch/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL5_iai_crouch/BL5_iai_crouch/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL5_iai_crouch/BL5_iai_crouch/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL5_iai_crouch/BL5_iai_crouch/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL5_iai_crouch"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ซองหนังที่เอวซ้าย · ใช้ 2 ช่วง (ก่อนชัก + เก็บคม noto) → pls_iai_crouch"
+    },
+    {
+     "id": "state_BL5_iai_cut",
+     "name": "State · ปาดไว bl5 ปลายจังหวะชักฟัน",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 52,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL5_iai_cut/BL5_iai_cut/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL5_iai_cut/BL5_iai_cut/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL5_iai_cut/BL5_iai_cut/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL5_iai_cut/BL5_iai_cut/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL5_iai_cut"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "แขนขวาเหยียดสุดระดับขมับ ซองค้างมือซ้าย → pls_iai_cut"
+    },
+    {
+     "id": "state_BL6_enso",
+     "name": "State · เงาสองคม bl6 ตั้งท่าสองมีด",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 53,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL6_enso/BL6_enso/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL6_enso/BL6_enso/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL6_enso/BL6_enso/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL6_enso/BL6_enso/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL6_enso"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ข้อยกเว้นถือสองมือ (นิเท็นอิจิริว) มีดครัวขวา + มีดสั้นซ้าย ครบ 4 มุม → pls_enso"
+    },
+    {
+     "id": "state_BL6_cut1",
+     "name": "State · เงาสองคม bl6 ฟันมีดขวา",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 54,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL6_cut1/BL6_cut1/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL6_cut1/BL6_cut1/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL6_cut1/BL6_cut1/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL6_cut1/BL6_cut1/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL6_cut1"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "มีดสั้นซ้ายคุมอก → pls_tcut"
+    },
+    {
+     "id": "state_BL6_cross",
+     "name": "State · เงาสองคม bl6 มีดซ้ายไขว้เป็น X",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 55,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL6_cross/BL6_cross/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL6_cross/BL6_cross/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL6_cross/BL6_cross/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL6_cross/BL6_cross/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL6_cross"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "สองคมไขว้หน้าอกครบ 4 มุม (ทีมคาดว่าเสี่ยงสูง แต่ผ่านรอบแรก) → pls_cross"
+    },
+    {
+     "id": "state_BL13_slither",
+     "name": "State · ก้าวเงา bl13 ก้าวไขว้เลื้อยต่ำ",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 56,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL13_slither/BL13_slither/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL13_slither/BL13_slither/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL13_slither/BL13_slither/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL13_slither/BL13_slither/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL13_slither"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ย่อลึก มีดขวาต่ำข้างเข่า (ขาไขว้ไม่ชัด ใช้โค้ดยกย่อแทน) → pls_slither"
+    },
+    {
+     "id": "state_BL14_stride",
+     "name": "State · ปาดข้ามแถว bl14 ก้าวเฉียง 45°",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 57,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL14_stride/BL14_stride/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL14_stride/BL14_stride/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL14_stride/BL14_stride/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL14_stride/BL14_stride/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL14_stride"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "แขนขวาฝั่งไกลถือมีดไปหน้า แขนซ้ายเหวี่ยงหลัง → pls_stride"
+    },
+    {
+     "id": "state_BL15_roll",
+     "name": "State · คมสวน bl15 พลิกข้อมือปัดคม",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 58,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL15_roll/BL15_roll/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL15_roll/BL15_roll/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL15_roll/BL15_roll/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL15_roll/BL15_roll/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL15_roll"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "มีดเฉียงลงหน้า มือซ้ายเปิดใกล้อก → pls_roll"
     }
    ]
   },

@@ -1098,6 +1098,78 @@
     "status": "queued"
    },
    "status": "completed"
+  },
+  "BL5_iai_crouch": {
+   "response": {
+    "usage": null,
+    "background_job_id": "6ebe99d8-9007-45b3-83ef-2fb8a53bdcee",
+    "character_id": "2e0d2b88-b44e-4399-9eff-992a5e2fed41",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL5_iai_cut": {
+   "response": {
+    "usage": null,
+    "background_job_id": "a0b6a906-7ec6-4729-afb8-cf817df247e6",
+    "character_id": "cd8dfd47-60a8-4934-a110-79c00f62e41d",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL6_enso": {
+   "response": {
+    "usage": null,
+    "background_job_id": "2a367bbe-53f1-47f2-9730-6f426e0611f9",
+    "character_id": "dfbaa2c4-8c19-43ef-bb0c-9e008a290d60",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL6_cut1": {
+   "response": {
+    "usage": null,
+    "background_job_id": "c10ff48a-9653-4753-b23e-adff338560d2",
+    "character_id": "27fb9a6d-8519-4e94-8bb0-fb913c7eb41a",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL6_cross": {
+   "response": {
+    "usage": null,
+    "background_job_id": "986d1f06-2834-41ef-8023-463637dde772",
+    "character_id": "751e6360-b14d-4115-9820-704a4c5b3225",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL13_slither": {
+   "response": {
+    "usage": null,
+    "background_job_id": "6f804162-db6a-4a30-91c6-c0ac71e93713",
+    "character_id": "d401549f-ca1c-4f9f-8cd5-efcc3efbdeee",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL14_stride": {
+   "response": {
+    "usage": null,
+    "background_job_id": "8c136094-da66-475d-9e9b-bd937b1369e4",
+    "character_id": "2d415c2c-c523-4ff8-aa72-94074c337d32",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL15_roll": {
+   "response": {
+    "usage": null,
+    "background_job_id": "d5253efb-8ed7-4fab-a192-281dd144bbbc",
+    "character_id": "630e8f52-23d8-4a90-b8ac-39d9b8e549b6",
+    "status": "queued"
+   },
+   "status": "completed"
   }
  },
  "monsters": {

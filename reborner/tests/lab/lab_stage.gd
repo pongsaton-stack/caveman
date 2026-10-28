@@ -29,7 +29,7 @@ const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพล
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
 const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "เขี้ยวพุ่ง", "res://tests/lab/blc_bl1.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"],
-	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"], ["bl10", "ทะลวงแนว", "res://tests/lab/tl_bl10.tscn"], ["bl11", "มีดบินวกกลับ", "res://tests/lab/tb_bl11.tscn"], ["bl4", "วงล้อ", "res://tests/lab/wl_bl4.tscn"], ["bl12", "พายุเถ้าใบมีด", "res://tests/lab/st_bl12.tscn"],
+	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"], ["bl10", "ทะลวงแนว", "res://tests/lab/tl_bl10.tscn"], ["bl11", "มีดบินวกกลับ", "res://tests/lab/tb_bl11.tscn"], ["bl4", "วงล้อ", "res://tests/lab/wl_bl4.tscn"], ["bl12", "พายุเถ้าใบมีด", "res://tests/lab/st_bl12.tscn"], ["bl5", "ปาดไว", "res://tests/lab/ia_bl5.tscn"], ["bl6", "เงาสองคม", "res://tests/lab/sd_bl6.tscn"], ["bl13", "ก้าวเงา", "res://tests/lab/sh_bl13.tscn"], ["bl14", "ปาดข้ามแถว", "res://tests/lab/tr_bl14.tscn"], ["bl15", "คมสวน", "res://tests/lab/cs_bl15.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
 	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
 	["ทุบ", "Flow", "res://tests/lab/flw_bt0.tscn"], ["ทุบ", "PL", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
@@ -46,6 +46,10 @@ const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], 
 	"bl11": {"M01": [33, 0, 2], "M03": [10, -1, 2], "M06": [32, 0, 2], "M15": [34, 1, 2], "B1": [19, -1, 2]},   # พลัง 60 × 2 ครั้ง
 	"bl4": {"M01": [72, 0, 1], "M03": [22, -1, 1], "M06": [69, 0, 1], "M15": [74, 1, 1], "B1": [40, -1, 1]},   # พลัง 130 = bl0 × 1.3 (ปัดแบบ bl3)
 	"bl12": {"M01": [47, 0, 2], "M03": [14, -1, 2], "M06": [45, 0, 2], "M15": [48, 1, 2], "B1": [26, -1, 2]},   # พลัง 85 × 2 ครั้ง = bl0 × 0.85 (ปัดแบบ bl3)
+	"bl6": {"M01": [39, 0, 2], "M03": [12, -1, 2], "M06": [37, 0, 2], "M15": [40, 1, 2], "B1": [22, -1, 2]},   # พลัง 70 × 2 = bl0 × 0.7 (ปัดแบบ bl3)
+	"bl13": {"M01": [36, 0, 1], "M03": [11, -1, 1], "M06": [34, 0, 1], "M15": [37, 1, 1], "B1": [20, -1, 1]},   # พลัง 65
+	"bl14": {"M01": [47, 0, 1], "M03": [14, -1, 1], "M06": [45, 0, 1], "M15": [48, 1, 1], "B1": [26, -1, 1]},   # พลัง 85 (ตีแถวหลังเต็ม)
+	"bl15": {"M01": [83, 0, 1], "M03": [26, -1, 1], "M06": [80, 0, 1], "M15": [86, 1, 1], "B1": [47, -1, 1]},   # พลัง 150 (ท่าสวน)
 	"bl3": {"M01": [50, 0, 1], "M03": [15, -1, 1], "M06": [48, 0, 1], "M15": [51, 1, 1], "B1": [28, -1, 1]},
 	"bl5": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
 	"bl2": {"M01": [34, 0, 3], "M03": [10, -1, 3], "M06": [33, 0, 3], "M15": [35, 1, 3], "B1": [19, -1, 3]},
@@ -1028,13 +1032,14 @@ func _build_menu() -> void:
 	var top: Array = TECHS.filter(func(x): return str(x[0]).begins_with("bl"))   # แถวบน = สายคม (ชื่อท่าอย่างเดียว · เรียงตามลำดับในต้นไม้)
 	top.sort_custom(func(a, b): return int(str(a[0]).substr(2)) < int(str(b[0]).substr(2)))
 	var low: Array = TECHS.filter(func(x): return not str(x[0]).begins_with("bl"))
-	var step1 := 294.0 / top.size()
+	var per := ceili(top.size() / 2.0)   # สายคม 2 แถว (ท่าเยอะขึ้น ชื่อยาวต้องอ่านออก)
+	var step1 := 294.0 / per
 	var step2 := floori(295.0 / low.size())
 	for i in TECHS.size():   # แถวท่า: บน สายคม · ล่าง ประกาย 3 + มอนตี 2 + ทุบ 2
 		var tc: Array = TECHS[i]
 		var row2 := not str(tc[0]).begins_with("bl")
 		var k := low.find(tc) if row2 else top.find(tc)
-		var b := _button("%s %s" % [tc[0], tc[1]] if row2 else str(tc[1]), Vector2(4 + k * step2 if row2 else 4 + k * step1, 31 if row2 else 16), Vector2(step2 - 2 if row2 else step1 - 2, 13), 13)
+		var b := _button("%s %s" % [tc[0], tc[1]] if row2 else str(tc[1]), Vector2(4 + k * step2 if row2 else 4 + (k % per) * step1, 42 if row2 else (16 if k < per else 29)), Vector2(step2 - 2 if row2 else step1 - 2, 12), 12)
 		if not row2 and text_w(str(tc[1]), 7) > step1 - 4:   # ชื่อยาว: ตัวเล็กลงให้พอดีปุ่ม
 			var bl := b.get_meta("lbl") as Label
 			bl.label_settings.font_size = 6
@@ -1050,7 +1055,7 @@ func _build_menu() -> void:
 		names[str(r.monster_id)] = str(r.name_th)
 	for i in FOES.size():   # แถวมอน: ชื่อบน รูปล่าง (กดแล้วเล่นทันที)
 		var id: String = FOES[i]
-		var b := _button("%s\n%s" % [id, names.get(id, "")], Vector2(4 + i * 59, 46), Vector2(57, 45), 20)
+		var b := _button("%s\n%s" % [id, names.get(id, "")], Vector2(4 + i * 59, 56), Vector2(57, 36), 20)
 		b.modulate = Color(1, 1, 0.6) if id == foe else Color.WHITE
 		b.pressed.connect(func(): _start(id, bg_id, scene_file_path))
 		var ic := TextureRect.new()
@@ -1059,8 +1064,8 @@ func _build_menu() -> void:
 		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		ic.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		ic.position = Vector2(4, 19)
-		ic.size = Vector2(49, 25)
+		ic.position = Vector2(4, 18)
+		ic.size = Vector2(49, 17)
 		b.add_child(ic)
 	var keys := BGS.keys()
 	for i in keys.size():   # แถวฉาก

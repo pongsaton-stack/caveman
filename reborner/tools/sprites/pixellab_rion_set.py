@@ -46,6 +46,15 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_storm_low", "พายุเถ้าใบมีด bl12 · ย่อกวาดหมุน 8 มุม (State BL12_low_sweep + rot8)", "BL12_low_sweep", "__rot8__", "west", None, 60, True),   # kwan 27 ต.ค. "ต่อด้วย พายุเถ้าใบมีด ขอแบบจัดเต็ม"
 	("pls_storm_air", "พายุเถ้าใบมีด bl12 · กระโดดหมุนกลางอากาศ 8 มุม (State BL12_air_spin + rot8)", "BL12_air_spin", "__rot8__", "west", None, 60, True),
 	("pls_storm_coil", "พายุเถ้าใบมีด bl12 · ง้างย่อข้าง (ภาพข้างของ State BL12_low_sweep)", "BL12_low_sweep", "__rot__", "west", [0], 90, False),
+	# กิ่งลื่นไหล (kwan 28 ต.ค. "2" แบบผสม · key pose ตามรายงานทีม R2 เป็น State ภาพนิ่ง ทิศซ้าย)
+	("pls_iai_crouch", "ปาดไว bl5 · ย่อ iaigoshi มือแตะด้ามในซอง (State BL5_iai_crouch)", "BL5_iai_crouch", "__rot__", "west", [0], 90, False),
+	("pls_iai_cut", "ปาดไว bl5 · ปลายจังหวะชักฟัน (State BL5_iai_cut)", "BL5_iai_cut", "__rot__", "west", [0], 90, False),
+	("pls_enso", "เงาสองคม bl6 · ตั้งท่าสองมีด (State BL6_enso)", "BL6_enso", "__rot__", "west", [0], 90, False),
+	("pls_tcut", "เงาสองคม bl6 · ฟันมีดขวา (State BL6_cut1)", "BL6_cut1", "__rot__", "west", [0], 90, False),
+	("pls_cross", "เงาสองคม bl6 · มีดซ้ายไขว้เป็น X (State BL6_cross)", "BL6_cross", "__rot__", "west", [0], 90, False),
+	("pls_slither", "ก้าวเงา bl13 · ก้าวไขว้เลื้อยต่ำ (State BL13_slither)", "BL13_slither", "__rot__", "west", [0], 90, False),
+	("pls_stride", "ปาดข้ามแถว bl14 · ก้าวเฉียง 45° (State BL14_stride)", "BL14_stride", "__rot__", "west", [0], 90, False),
+	("pls_roll", "คมสวน bl15 · พลิกข้อมือปัดคม (State BL15_roll)", "BL15_roll", "__rot__", "west", [0], 90, False),
 	("pls_bat_idle", "ยืนถือไม้เบสบอล (State)", "BT_bat_stance", "__rot__", "west", [0], 180, True),
 	("pls_bat2", "ทุบ bt0 รอบ 4 · ง้าง → ฟาดลงเฉียง (ท่ากลาง ไม้หลังไหล่ → State กระทบ)", "BT_bat_stance", "chop_bat2_v", "west", None, 90, False),   # kwan 25 ต.ค. "ใช้ pixellab ปรับให้ตรงกับรายงาน" · PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact
 	("pls_bat_imp", "ทุบ · กระทบลงเฉียง ตัวตั้งตรง (State BT_bat_impact)", "BT_bat_impact", "__rot__", "west", [0], 90, False),

@@ -604,6 +604,47 @@ STATES["BL12_air_spin"] = {"seed": 47, "frame": None, "edit": (
 	+ SPIN_KNIFE + "The left hand is open and flat. Hair and shirt hem blown upward by the jump. Eyes fierce, teeth gritted. "
 	"The arms stay straight out to the sides in every rotation. " + SPIN_KEEP + SPIN_NOT)}
 
+# ---- กิ่งลื่นไหล สายคม (kwan 27–28 ต.ค. เลือก "2" = แบบผสม: key pose ที่ตาจำได้เป็น State · ที่เหลือใช้ภาพเดิม + โค้ด) ----
+# ท่าตาม key pose ใหม่ในรายงานทีม R2 (SPRITES ใน docs/design/moves/MOVES_RESEARCH_102_R2.html) · bl6 = ข้อยกเว้นถือสองมีด (นิเท็นอิจิริว · ทีมแนะนำ)
+SIDE = "In side views stay in a true side view facing the same direction as the source rotation, never turned toward the camera. "
+FLOW_NOT = "No sword, no glow, no trails, no motion lines, no shadow, no ground, no background."
+STATES["BL5_iai_crouch"] = {"seed": 51, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes and a plain brown leather knife sheath is added at the LEFT side of the belt. "
+	"Iaido ready crouch: knees deeply bent, feet wide, body coiled low and perfectly still. The kitchen knife is SHEATHED: only its short dark wooden handle "
+	"sticks out of the sheath at the left hip; the RIGHT hand rests on that handle and the LEFT hand holds the sheath. No blade visible. Eyes narrowed, mouth closed, calm. "
+	+ SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+STATES["BL5_iai_cut"] = {"seed": 52, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes and a plain brown leather knife sheath is added at the LEFT side of the belt. "
+	"Finish of a lightning-fast draw cut: body lunged forward low, front knee bent deep, back leg stretched straight. The RIGHT arm is fully extended forward at temple height "
+	"holding ONE small kitchen knife (short dark wooden handle, short silver blade about as long as the hand) with the blade horizontal and pointing forward. "
+	"The LEFT hand still holds the empty sheath back at the left hip. Head lowered slightly, eyes fierce. " + SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+TWO = ("Exactly TWO knives, one in each hand, in every rotation: the RIGHT hand holds a small kitchen knife (dark wooden handle, short silver blade about as long as the hand) "
+	"and the LEFT hand holds a SHORTER small knife (blade about half as long). ")
+STATES["BL6_enso"] = {"seed": 53, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose and the held items change. Two-knife stance: " + TWO +
+	"The right knife is raised forward with its blade angled up and forward; the left short knife is held low behind the hip with its blade angled down and back; "
+	"arms spread wide apart. Knees bent, feet apart, eyes forward and calm. " + SIDE + SPIN_KEEP + FLOW_NOT)}
+STATES["BL6_cut1"] = {"seed": 54, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose and the held items change. Two-knife attack: " + TWO +
+	"The right knife slashes diagonally downward and forward, arm extended; the left short knife is held back near the chest as a guard. "
+	"Torso leaning into the cut, front foot stepped in, knees bent, mouth shouting. " + SIDE + SPIN_KEEP + FLOW_NOT)}
+STATES["BL6_cross"] = {"seed": 55, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose and the held items change. Crossing two-knife strike: " + TWO +
+	"The LEFT arm is extended forward at chest height with the short knife; the RIGHT hand kitchen knife is lowered across the waist; "
+	"the two blades cross in an X shape in front of the body. Torso twisted, knees bent deep, teeth gritted. " + SIDE + SPIN_KEEP + FLOW_NOT)}
+STATES["BL13_slither"] = {"seed": 56, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. Very low slithering cross-step: the front leg crossed over the back leg, "
+	"body crouched close to the ground, ONE small kitchen knife held in the RIGHT hand low beside the knee, the LEFT hand reaching low for balance without covering the face, "
+	"head up, eyes sharp. " + SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+STATES["BL14_stride"] = {"seed": 57, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. Long diagonal stride: the front leg reaching far forward, the back leg pushing off, "
+	"torso leaned into the step, ONE small kitchen knife held ready in the RIGHT hand at the side, the LEFT arm swung back for balance, eyes forward. "
+	+ SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+STATES["BL15_roll"] = {"seed": 58, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. Deflecting an unseen blade: ONE small kitchen knife in the RIGHT hand is rolled over "
+	"to the far side of the wrist, the blade angled diagonally across the body pointing down and forward, the wrist turned outward, the body half-stepped back and turned slightly; "
+	"the LEFT hand raised open near the chest. Eyes sharp, mouth tight. " + SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+
 ROT8_KEEP = {}   # State ไหนภาพข้างใช้ได้ ใส่ทิศที่จะส่งไปตามเดิม
 ROT8 = ("west", "south-west", "south", "south-east", "east", "north-east", "north", "north-west")   # ลำดับหมุน: หันซ้าย → เข้ากล้อง → ขวา → หลัง
 
