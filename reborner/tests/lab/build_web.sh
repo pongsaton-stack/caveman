@@ -29,7 +29,6 @@ cp core/CsvDb.gd "$P/core/"
 cp tests/lab/*.gd tests/lab/*.tscn "$P/tests/lab/"
 cp assets/sprites/pixellab_draft/px_set/pls_*.png "$P/assets/sprites/pixellab_draft/px_set/"
 mkdir -p "$P/assets/sprites/pixellab_draft/weapon_skin"; cp assets/sprites/pixellab_draft/weapon_skin/wsk_*.png "$P/assets/sprites/pixellab_draft/weapon_skin/"
-mkdir -p "$P/assets/sprites/flow_draft/bt"; cp assets/sprites/flow_draft/bt/flw_*.png "$P/assets/sprites/flow_draft/bt/"
 for f in M01 M03 M06 M15 B1; do cp assets/sprites/monsters_px_draft/${f}_*.png "$P/assets/sprites/monsters_px_draft/"; done
 cp docs/art-bible/pixellab_test/bg_frost_volcano.jpg docs/art-bible/pixellab_test/bg_ash_village.jpg docs/art-bible/pixellab_test/bg_flooded_ruins.jpg "$P/docs/art-bible/pixellab_test/"
 mkdir -p "$P/docs/art-bible/world_concepts"; cp docs/art-bible/world_concepts/r4_battle.jpg docs/art-bible/world_concepts/r5_battle.jpg "$P/docs/art-bible/world_concepts/"

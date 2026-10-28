@@ -236,7 +236,7 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	var g := geo(f)
 	# มอน: ยืนหายใจ → วาบขาว 2 · ผงะ 10 · กระเด็นถอย แล้วกลับ
 	var kb := _kb(d)
-	show_mon(hurt_key() if d >= 0 and d < 10 else idle_key(f), kb, 1.0 if d >= 0 and d < 2 else 0.0)
+	show_mon(hurt_key() if d >= 0 and d < 10 else idle_key(f), kb, (0.6 if d == 0 else 0.3) if d >= 0 and d < 2 else 0.0)   # ไม่ขาวทึบทั้งตัว (ตรวจท่าเก่า 28 ต.ค.)
 	set_rion(rion, g)
 	# ร่างติดตา: ช่วงง้างวิ่ง (bl1 = ช่วงพุ่ง 3 ร่าง) · สเตปถอยแรก
 	if gz < 0 and F > (BM.LAUNCH if _bl1() else HIT - 8) and F < HIT:
@@ -276,12 +276,12 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 			t0 += h.l
 	# ตัวหนังสือ: คำเสียง · ตะโกนชื่อท่าตอนเริ่มออกท่า (ประกาย = ชื่อท่าใหม่ หลังเวลาเดิน) · ตัวเลข
 	if d >= 0 and d < 14:
-		word(BM.sfx, maxf(4, mx0 + kb + mw / 2.0 - 14), maxf(24 if BM.has("glim") else 16, my - 8 - mini(5, d)), Color("#ffe27a") if BM.has("glim") else Color.WHITE)
+		word(BM.sfx, maxf(4, mon_rect().get_center().x + kb - 64), maxf(24 if BM.has("glim") else 14, mon_rect().position.y - 30 - mini(5, d)), Color("#ffe27a") if BM.has("glim") else Color.WHITE)   # ซ้ายของตัวเลข
 	var b0: int = BM.FZ + 1 if BM.has("glim") else (BM.CROUCH - 2 if _bl1() else HIT - 10)
 	var nm: String = ROWS[BM.to].name_th if BM.has("glim") else ("เขี้ยวพุ่ง" if _bl1() else "ฟัน")
 	show_bubble(nm + "!", g.cx, G - g.lift - 74, F - b0, (1.0 if F < HIT + 4 else (HIT + 8 - f) / 4.0) if gz < 0 and F >= b0 and F < HIT + 8 else 0.0)
 	if gz < 0:
-		pop(dmg, maxf(16, mx0 + kb - 8), my + roundf(mh * 0.25), d, Color("#ffe08a") if BM.has("glim") else Color.WHITE, aff_tag(), aff_col())
+		pop(dmg, maxf(16, mon_rect().get_center().x + kb - 4), maxf(26.0, mon_rect().position.y - 6), d, Color("#ffe08a") if BM.has("glim") else Color.WHITE, aff_tag(), aff_col())
 
 # ── ประกาย (glimFx) ──────────────────────────────────
 func _glim_frame(f0: float, F0: int, f: float, F: int, gz: int, st: Dictionary) -> void:

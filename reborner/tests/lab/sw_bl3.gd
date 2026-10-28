@@ -118,7 +118,7 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 			dust_at(g.cx + 6, 1.0, 0.8 - d0 * 0.05)
 		for i in mons.size():
 			if F == _hit_f(i):
-				debris_at(Vector2(cxs[i] - 4, G - WAIST), "คม", F, 0.7)
+				debris_at(Vector2(cxs[i] - 4, gy(i) - WAIST), "คม", F, 0.7)
 		var bf := int(_base_f(f))
 		if bf >= HOP0:   # ฝุ่นกระโดดถอยของเครื่องฟัน
 			var t0 := HOP0
@@ -208,7 +208,7 @@ func draw_fx(n: Node2D) -> void:
 			var al := 1.0 if d < 6 else maxf(0.0, 1 - (d - 6) / 6.0)
 			var half := mw * (0.18 if hard_body() else 0.24)
 			var x0 := cxs[i] + _slide(d)
-			var wy := _arc_pt(_theta_at(i)).y - 3   # แผลอยู่ระดับที่คมผ่านตัวนั้นจริง
+			var wy := _arc_pt(_theta_at(i)).y - 3 - dep[i]   # แผลอยู่ระดับที่คมผ่านตัวนั้นจริง
 			slash_line(n, x0 + half, wy - 1, x0 - half, wy + 1, 2, minf(1.0, (d + 1) / 2.0), al)
 	if st.lift > 1:   # เงาพื้นตอนลอย
 		for i in range(-9, 10):

@@ -181,15 +181,15 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	# มอน: ผงะทุกครั้งที่โดน · ถูกบีบตอนรัด · แตก = วาบ → เลือดไหล (อมแดงเป็นจังหวะ)
 	var cz := _cz(F)
 	var hurt := cz > 0.3 or (db >= 0 and db < 10)
-	var flash := db >= 0 and db < 2
+	var flash := 0.6 if db == 0 else (0.3 if db == 1 else 0.0)   # ไม่ขาวทึบทั้งตัว (ตรวจท่าเก่า 28 ต.ค.)
 	for d in hk:
 		hurt = hurt or (d >= 0 and d < 5)
-		flash = flash or (d >= 0 and d < 2)
+		flash = maxf(flash, 0.6 if d == 0 else (0.3 if d == 1 else 0.0))
 	var bleed := db >= 6
-	var fl := 1.0 if flash else (0.05 + 0.07 * maxf(0.0, sin(F * 0.5)) if bleed else 0.0)
+	var fl := flash if flash > 0 else (0.05 + 0.07 * maxf(0.0, sin(F * 0.5)) if bleed else 0.0)
 	var sqx := 1 - 0.1 * cz + (0.06 if db >= 0 and db < 3 else 0.0)
 	var sqy := 1 + 0.05 * cz - (0.08 if db >= 0 and db < 3 else 0.0)
-	show_mon(hurt_key() if hurt else idle_key(f), _kb(F), fl, Color("#c02838") if bleed and fl < 1 else Color.WHITE, sqx, sqy)
+	show_mon(hurt_key() if hurt else idle_key(f), _kb(F), fl, Color("#c02838") if bleed and flash == 0 else Color.WHITE, sqx, sqy)
 	# Rion: หลังมอนตอนสว่าน (ถูกบัง) + ร่างติดตา
 	var g := geo(f)
 	rion.z_index = 0 if g.back else 4

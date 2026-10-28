@@ -19,7 +19,6 @@ const G := 158
 const SEC := 0.06
 const PX := "res://assets/sprites/pixellab_draft/px_set/"
 const MPX := "res://assets/sprites/monsters_px_draft/"
-const FPX := "res://assets/sprites/flow_draft/bt/"
 const WSK := "res://assets/sprites/pixellab_draft/weapon_skin/"   # ไม้เบสบอลระดับอื่นบนภาพ pls_bat* (tools/sprites/bat_tiers.py)
 ## ปุ่มเลือกอาวุธ (kwan 26 ต.ค. · ชุด 60 ชิ้น): สายของท่า → อาวุธ Lv.1–10 ใน weapons.csv · ปุ่มเป็นเลข Lv · ชื่อเต็มอยู่ในแถบล่าง
 ## ภาพเปลี่ยนได้เฉพาะไม้เบสบอลที่มีสกิน (WSK · BAT_SKINS) · ชิ้นอื่นยังใช้ภาพชิ้นตั้งต้น (มีดครัว/ไม้อลูมิเนียม) และบอกในแถบล่าง
@@ -32,7 +31,7 @@ const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "�
 	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"], ["bl10", "ทะลวงแนว", "res://tests/lab/tl_bl10.tscn"], ["bl11", "มีดบินวกกลับ", "res://tests/lab/tb_bl11.tscn"], ["bl4", "วงล้อ", "res://tests/lab/wl_bl4.tscn"], ["bl12", "พายุเถ้าใบมีด", "res://tests/lab/st_bl12.tscn"], ["bl5", "ปาดไว", "res://tests/lab/ia_bl5.tscn"], ["bl6", "เงาสองคม", "res://tests/lab/sd_bl6.tscn"], ["bl13", "ก้าวเงา", "res://tests/lab/sh_bl13.tscn"], ["bl14", "ปาดข้ามแถว", "res://tests/lab/tr_bl14.tscn"], ["bl15", "คมสวน", "res://tests/lab/cs_bl15.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
 	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
-	["ทุบ", "Flow", "res://tests/lab/flw_bt0.tscn"], ["ทุบ", "PL", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน 6 ท่า · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ท่าภาพ Flow
+	["ทุบ", "ไม้เบสบอล", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน สายคม · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ทุบ (kwan 28 ต.ค. เอาท่าภาพ Flow ออก)
 ## ฉากหลัง (เหมือน combat_bgs ของ anim_test_build.py): ไฟล์ · ขยายกี่เท่า · เส้นพื้น (สัดส่วนความสูง) → ครอป 300x168 พื้นที่แถว 158
 const BGS := {"frost_volcano": ["ภูเขาไฟหิมะ", "res://docs/art-bible/pixellab_test/bg_frost_volcano.jpg", 1, 1250.0 / 1376.0, true],
 	"ash_village": ["หมู่บ้านเถ้า", "res://docs/art-bible/pixellab_test/bg_ash_village.jpg", 3, 0.69, false],
@@ -97,6 +96,7 @@ var mx0 := 0
 var my := 0
 var mcx := 0.0
 var top0 := 0
+var used := Rect2i()   # พิกเซลที่มีสีในภาพมอน (กรอบภาพกว้างกว่าตัวจริง)
 var bh := 0
 var home := W - 40
 var mon_name := ""
@@ -209,7 +209,7 @@ func _img(path: String) -> Image:
 
 func tx(key: String) -> Texture2D:
 	if not tex.has(key):
-		var path := (PX + key + ".png") if key.begins_with("pls_") else ((FPX + key + ".png") if key.begins_with("flw_") else (MPX + key + ".png"))
+		var path := (PX + key + ".png") if key.begins_with("pls_") else (MPX + key + ".png")
 		if key.begins_with("pls_bat") and BAT_SKINS.has(weapon_id):
 			path = WSK + "wsk_%s__%s.png" % [key, weapon_id]
 		tex[key] = ImageTexture.create_from_image(_img(path))
@@ -256,6 +256,7 @@ func _load_monster() -> void:
 	mw = mon_img.get_width()
 	mh = mon_img.get_height()
 	my = G - mh
+	used = mon_img.get_used_rect()
 	top0 = int(round(mh * 0.3))
 	var found := false
 	for y in mh:
@@ -267,6 +268,10 @@ func _load_monster() -> void:
 		if found:
 			break
 	bh = mh - top0
+
+## ขอบตัวมอนจริงบนจอ (ตามตำแหน่ง place_monster) · ใช้วางตัวเลข/คำเสียงเหนือตัว ไม่ใช่ขอบกรอบภาพ
+func mon_rect() -> Rect2:
+	return Rect2(mx0 + used.position.x, my + used.position.y, used.size.x, used.size.y)
 
 func school() -> String:
 	return SCHOOL.get(tech_id().substr(0, 2), "")

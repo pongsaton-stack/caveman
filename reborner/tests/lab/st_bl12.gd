@@ -152,9 +152,9 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 			dust_at(g.cx + 6, 1.0, 1.0 - (F - LAND) * 0.1)
 		for i in mons.size():
 			if F == int(ceil(hit1[i])):
-				debris_at(Vector2(cxs[i] - 4, G - 26), "คม", F, 0.7)
+				debris_at(Vector2(cxs[i] - 4, gy(i) - 26), "คม", F, 0.7)
 			if F == int(ceil(hit2[i])):
-				debris_at(Vector2(cxs[i] + 4, G - (mh - top0) * 0.6), "คม", F, 0.8)
+				debris_at(Vector2(cxs[i] + 4, gy(i) - (mh - top0) * 0.6), "คม", F, 0.8)
 				if i == 0:
 					burst(Vector2(cxs[0] + 6, G - (mh - top0) * 0.55), F, Color("#ffb070"))
 		var bf := F - HOLD1 + HOP0
@@ -302,11 +302,11 @@ func draw_fx(n: Node2D) -> void:
 		if d1 >= 0 and d1 < 12:
 			var al := 1.0 if d1 < 6 else maxf(0.0, 1 - (d1 - 6) / 6.0)
 			var half := mw * 0.22
-			slash_line(n, x0 + half, G - 22, x0 - half, G - 26, 2, minf(1.0, (d1 + 1) / 2.0), al)
+			slash_line(n, x0 + half, gy(i) - 22, x0 - half, gy(i) - 26, 2, minf(1.0, (d1 + 1) / 2.0), al)
 		var d2 := f - hit2[i]
 		if d2 >= 0 and d2 < 12:
 			var al := 1.0 if d2 < 6 else maxf(0.0, 1 - (d2 - 6) / 6.0)
-			var vy := G - (mh - top0) * 0.55
+			var vy := gy(i) - (mh - top0) * 0.55
 			var sz := minf(18.0, mw * 0.2)
 			slash_line(n, x0 - sz, vy - sz * 0.8, x0 + sz, vy + sz * 0.6, 3 if i == 0 else 2, minf(1.0, (d2 + 1) / 2.0), al)
 	if f >= IN0 and f < OUT0 + 4:   # รอยลมหมุนบนพื้น

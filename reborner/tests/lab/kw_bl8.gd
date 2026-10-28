@@ -165,7 +165,7 @@ func frame(f: float, F: int, fresh: bool) -> void:
 	# มอน: ผงะตอนจาม · ตอนตอกยุบรับแรง · เกราะแตกกระเด็นถอย
 	var hurt := (dc >= 0 and dc < 6) or (dd >= 0 and dd < 4) or (db >= 0 and db < 10)
 	# วาบขาวตัวมอน 2 ครั้ง (จาม/แตก) · ตอนตอกไม่วาบ ใช้ยุบตัว+จอสั่นแทน (ตรวจแสงวาบรอบ 2: เดิม 3 ครั้งใน 17 เฟรม = แตะเพดาน)
-	var fl := 1.0 if (dc >= 0 and dc < 2) or db == 0 else 0.0
+	var fl := (0.6 if dc == 0 else 0.3) if dc >= 0 and dc < 2 else (0.6 if db == 0 else 0.0)   # ไม่ขาวทึบทั้งตัว (ตรวจท่าเก่า 28 ต.ค. · แบบท่าใหม่ 0.45–0.6)
 	var squash := (0.88 if body == "นุ่ม" else 0.94) if dd >= 0 and dd < 3 else 1.0   # ร่างนุ่มยุบลึกกว่า (ตารางปฏิกิริยา)
 	show_mon(hurt_key() if hurt else idle_key(f), _kb(F), fl, Color.WHITE, 1.0, squash)
 	var g := geo(f)

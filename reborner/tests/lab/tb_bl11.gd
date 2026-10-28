@@ -112,16 +112,17 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	if fresh:
 		for i in mons.size():
 			if F == hits_out[i]:
-				debris_at(Vector2(cxs[i] - 4, G - 26), "คม", F, 0.45)
+				debris_at(Vector2(cxs[i] - 4, gy(i) - 26), "คม", F, 0.45)
 			if F == hits_back[i]:
-				debris_at(Vector2(cxs[i] + 4, G - 40), "คม", F, 0.35)
+				debris_at(Vector2(cxs[i] + 4, gy(i) - 40), "คม", F, 0.35)
 	var b0 := SPIN0
 	show_bubble("มีดบินวกกลับ!", g.cx, G - 86, F - b0, (1.0 if F < OUT0 + 4 else (OUT0 + 8 - f) / 4.0) if F >= b0 and F < OUT0 + 8 else 0.0)
-	for i in mons.size():   # ตัวเลขสองครั้งต่อตัว · รอบสองต่ำกว่า
+	for i in mons.size():   # ตัวเลขสองครั้งต่อตัว: ครั้งที่ 2 ขึ้นแทนที่ครั้งแรกที่เดิม + บอกยอดรวม (เดิมซ้อนกันอ่านไม่ออก · ตรวจท่าเก่า 28 ต.ค.)
 		var d1 := F - hits_out[i]
 		var d2 := F - hits_back[i]
-		pop(dmg, maxf(16, cxs[i]), my + roundf(mh * 0.25) - (i % 2) * 14, d1, Color.WHITE, aff_tag(), aff_col())
-		pop(dmg, maxf(16, cxs[i] + 6), my + roundf(mh * 0.25) + 14 - (i % 2) * 14, d2, Color("#e8f0ff"), "", Color.WHITE)
+		var y := my + roundf(mh * 0.25) - (i % 2) * 16 - dep[i]
+		pop(dmg, maxf(16, cxs[i]), y, d1 if d2 < 0 else -1, Color.WHITE, aff_tag(), aff_col())
+		pop(dmg, maxf(16, cxs[i]), y, d2, Color("#cfe4ff"), "รวม %d" % (dmg * 2), Color("#cfe4ff"))
 
 ## วาดมีดหมุน: แผ่นวงรีเหล็ก ขอบเข้ม · ประกายขอบวิ่งรอบตามรอบหมุน · rate = รอบต่อเฟรม
 func _draw_disc(n: Node2D, p: Vector2, rx: float, ry: float, f: float, rate: float, al := 1.0) -> void:
@@ -172,7 +173,7 @@ func draw_fx(n: Node2D) -> void:
 			var d := F - (hits_out[i] if r == 0 else hits_back[i])
 			if d >= 0 and d < 10:
 				var al := 1.0 if d < 5 else maxf(0.0, 1 - (d - 5) / 5.0)
-				var y := G - 26 if r == 0 else G - 40
+				var y := gy(i) - (26 if r == 0 else 40)
 				var hw := 9.0 if r == 0 else 6.0
 				slash_line(n, cxs[i] + hw, y - 1, cxs[i] - hw, y + 1, 2, minf(1.0, (d + 1) / 2.0), al)
 	if F >= BACK1 and F < BACK1 + 4:   # ประกายรับคืน

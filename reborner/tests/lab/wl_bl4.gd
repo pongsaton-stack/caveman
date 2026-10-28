@@ -151,7 +151,7 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 			dust_at(g.cx + (10 if F % 4 == 0 else -10), 1.0 if F % 4 == 0 else -1.0, 0.9)
 		for i in mons.size():
 			if F == int(ceil(hits_f[i])):
-				debris_at(Vector2(cxs[i] - 2, G - CHEST + 8), "คม", F, 1.0 - i * 0.15)
+				debris_at(Vector2(cxs[i] - 2, gy(i) - CHEST + 8), "คม", F, 1.0 - i * 0.15)
 				if i == 0:
 					burst(Vector2(cxs[0] + mw * 0.3, G - CHEST + 6), F, Color("#9ae6ff"))
 		var bf := F - HOLD1 + HOP0
@@ -289,7 +289,7 @@ func draw_fx(n: Node2D) -> void:
 			var al := 1.0 if d < 6 else maxf(0.0, 1 - (d - 6) / 6.0)
 			var half := mw * (0.2 if hard_body() else 0.26)
 			var x0: float = cxs[i] + _sweep_kb(d)
-			var wy := G - CHEST + 7
+			var wy := gy(i) - CHEST + 7
 			slash_line(n, x0 + half, wy - 2, x0 - half, wy + 2, 3 if i == 0 else 2, minf(1.0, (d + 1) / 2.0), al)
 	var dw := f - release
 	if dw >= 0 and dw < 2:   # จอวาบเบาตอนปล่อย

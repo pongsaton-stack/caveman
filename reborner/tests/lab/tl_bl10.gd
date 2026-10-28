@@ -124,7 +124,7 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 			dust_at(g.cx, 1.0, 1.2)
 		for i in mons.size():
 			if F == hits_f[i]:   # เศษพุ่งออกด้านข้างตามทิศแหวก (ไม่ย้อนเข้าหา Rion) · ลดลงตามลำดับ
-				debris_at(Vector2(cxs[i] + 6, G - 30), "คม", F, [1.0, 0.7, 0.45][mini(i, 2)])
+				debris_at(Vector2(cxs[i] + 6, gy(i) - 30), "คม", F, [1.0, 0.7, 0.45][mini(i, 2)])
 	var b0 := RUN0 - 2
 	show_bubble("ทะลวงแนว!", g.cx, G - g.lift - 74, F - b0, (1.0 if F < PASS0 + 6 else (PASS0 + 10 - f) / 4.0) if F >= b0 and F < PASS0 + 10 else 0.0)
 	for i in mons.size():
@@ -163,7 +163,7 @@ func draw_fx(n: Node2D) -> void:
 			var al := 1.0 if d < 7 else maxf(0.0, 1 - (d - 7) / 7.0)
 			var x0 := cxs[i] + _part(i, d)
 			var dir := 1.0 if i % 2 == 0 else -1.0   # forehand/backhand สลับทิศแผล
-			slash_line(n, x0 + 12 * s, G - 30 - 9 * s * dir, x0 - 12 * s, G - 30 + 9 * s * dir, 3 if i == 0 else 2, minf(1.0, (d + 1) / 2.0), al)
+			slash_line(n, x0 + 12 * s, gy(i) - 30 - 9 * s * dir, x0 - 12 * s, gy(i) - 30 + 9 * s * dir, 3 if i == 0 else 2, minf(1.0, (d + 1) / 2.0), al)
 	if F >= PASS1 and F < BRAKE1 + 6:   # รอยไถลบนพื้น
 		var q := F - PASS1
 		for i in 7:

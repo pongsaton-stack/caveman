@@ -18,8 +18,7 @@ var vis := Rect2()   # ขอบตัวมอนจริง (พิกเซ�
 func setup() -> void:
 	super.setup()
 	x_home = start + 60
-	var r := mon_img.get_used_rect()
-	vis = Rect2(mx0 + r.position.x, my + r.position.y, r.size.x, r.size.y)
+	vis = mon_rect()
 
 ## ระดับมีด (ใกล้พื้น G − h) แต่ไม่เลยตัวมอน
 func blade_y(h: float) -> float:

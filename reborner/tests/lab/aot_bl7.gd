@@ -160,9 +160,9 @@ func frame(f: float, F: int, fresh: bool) -> void:
 			burst(Vector2(legs[0 if F == B else 1], G - roundf((G - cy) * kneel) - 2), F, Color("#9ae6ff"))
 	# ตัวหนังสือ
 	if d >= 0 and d < 16:
-		word("ฉึบ!", maxf(4, legs[0] - 18), maxf(16, G - mh - 6 - mini(5, d)))
+		word("ฉึบ!", maxf(4, mon_rect().get_center().x - 64), maxf(14, mon_rect().position.y - 30 - mini(5, d)))   # ซ้ายของตัวเลข
 	if F >= B2 and F < B2 + 14:
-		word("ฉึบ!", legs[0] + 10, maxf(30, G - mh + 6 - mini(5, F - B2)))
+		word("ฉึบ!", minf(W - 34, mon_rect().get_center().x + 44), maxf(14, mon_rect().position.y - 30 - mini(5, F - B2)))   # ขวาของตัวเลขครั้งที่ 2
 	if F >= TURN + 2 and F < B:   # เงียบ: มอนยังไม่รู้ตัว
 		var k := F - TURN - 2
 		word(".".repeat(1 + mini(2, k >> 1)), mx0 + mw / 2.0 - 4, G - mh - 4, Color(42 / 255.0, 26 / 255.0, 20 / 255.0, minf(1.0, k / 2.0)), 9)
@@ -177,8 +177,8 @@ func frame(f: float, F: int, fresh: bool) -> void:
 			word("+20%", W - 122 + 46 + roundf(e * 110 * 0.2) + 6, 13, Color("#ffb0a0"), 7)
 	show_bubble("ตัดเอ็น!!", g.cx, G - 74, F - CR, (1.0 if F < GO else (GO + 3 - f) / 3.0) if F >= CR and F < GO + 3 else 0.0)
 	if hits > 1:
-		pop(dmg, maxf(16, mx0 - 10), G - roundf(mh * 0.7), F - B, Color.WHITE, aff_tag(), aff_col())
-	pop(dmg, maxf(16, mx0 - 10) - (4 if hits > 1 else 0), G - roundf(mh * 0.7) - (14 if hits > 1 else 0), F - B2, Color.WHITE, aff_tag(), aff_col())
+		pop(dmg, maxf(16, mon_rect().get_center().x - 4), maxf(26.0, mon_rect().position.y - 6), F - B, Color.WHITE, aff_tag(), aff_col())
+	pop(dmg, maxf(16, mon_rect().get_center().x - 4) + (32 if hits > 1 else 0), maxf(26.0, mon_rect().position.y - 6) - (6 if hits > 1 else 0), F - B2, Color.WHITE, aff_tag(), aff_col())   # เหนือตัวมอน ไม่ทับ Rion ที่ยืนหลังมอน · ครั้งที่ 2 เรียงข้าง
 
 ## ชั้นกลาง (หลังมอน หน้า Rion ตามลำดับวาดของเว็บ): แผลที่ขา · วงเกลียวสว่าน · ชาร์จ
 func draw_mid(n: Node2D) -> void:

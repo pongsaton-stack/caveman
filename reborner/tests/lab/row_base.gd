@@ -4,6 +4,12 @@ extends "res://tests/lab/blc_bl0.gd"
 
 var mons: Array[Sprite2D] = []
 var cxs: Array[float] = []   # กลางตัวมอนแต่ละตัว
+var dep: Array[float] = []   # ถอยลึก (ยกขึ้นบนจอ) · ตัวกลางยืนแถวหลัง ไม่กองทับกัน (kwan 28 ต.ค. ให้แก้ท่าเก่าได้)
+const BACK := 9.0
+
+## พื้นของมอนตัวที่ i (ตัวแถวหลังสูงขึ้น BACK) · เอฟเฟกต์ต่อตัวใช้แทน G
+func gy(i: int) -> float:
+	return G - dep[i]
 
 func _count() -> int:
 	return 1 if foe.begins_with("B") else 3
@@ -23,8 +29,10 @@ func setup_row(left_cx: float, gap := 0.62, single_cx := -1.0) -> void:
 		c0 = lim
 	place_monster(int(c0))
 	cxs.clear()
+	dep.clear()
 	for i in _count():
 		cxs.append(c0 - sp * i)
+		dep.append(BACK if _count() == 3 and i == 1 else 0.0)
 	mons.clear()
 	mons.append(mon)
 	for i in range(1, _count()):
@@ -34,6 +42,9 @@ func setup_row(left_cx: float, gap := 0.62, single_cx := -1.0) -> void:
 		s.z_index = 1
 		add_child(s)
 		mons.append(s)
+	if mons.size() == 3:   # ตัวแถวหลังวาดหลังตัวหน้า 2 ตัว · สีหม่นลงนิด
+		move_child(mons[1], mon.get_index())
+		mons[1].self_modulate = Color(0.82, 0.82, 0.88)
 
 ## ภาพมอนตัวที่ i (แบบ show_mon) · dx = เลื่อน · amt = วาบขาว · lift = ยกจากพื้น · sy = ยุบ/ยืดรอบเท้า
 func _show(i: int, key: String, dx: float, amt: float, lift := 0.0, sy := 1.0) -> void:
@@ -42,7 +53,7 @@ func _show(i: int, key: String, dx: float, amt: float, lift := 0.0, sy := 1.0) -
 	s.visible = true
 	s.texture = mt
 	s.offset = Vector2(-mt.get_width() / 2.0, -mt.get_height())
-	s.position = Vector2(roundf(cxs[i] - mw / 2.0) + roundf(dx) + roundf((mw - mt.get_width()) / 2.0) + mt.get_width() / 2.0, G - roundf(lift))
+	s.position = Vector2(roundf(cxs[i] - mw / 2.0) + roundf(dx) + roundf((mw - mt.get_width()) / 2.0) + mt.get_width() / 2.0, G - roundf(lift + dep[i]))
 	s.scale = Vector2(1.0, sy)
 	s.material.set_shader_parameter("tint", Color.WHITE)
 	s.material.set_shader_parameter("amount", amt)
