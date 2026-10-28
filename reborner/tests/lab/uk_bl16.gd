@@ -8,15 +8,15 @@ extends "res://tests/lab/fl_base.gd"
 
 const STEP1 := 22    # ก้าวเข้า 1 ก้าว
 const CHG1 := 36     # ชาร์จจบ
-const DASH := 6      # เฟรมต่อการพุ่ง 1 ครั้ง (โดนกลางทาง)
-const HANG0 := 60    # โผล่ค้างเหนือเป้า
-const DROP := 66     # ฟันตัดสินลง
-const LAND := 70
-const FIRE0 := 71    # รอยดาวลุก → พายุไฟ
-const ASH0 := 86     # ไฟมอด → พายุเถ้า
-const ASH1 := 104
-const RISE := 98     # ลุกจากท่าฟันตัดสิน
-const HOLDF := 108
+const DASH := 8      # เฟรมต่อการพุ่ง 1 ครั้ง (โดนกลางทาง) · 8 = บับเบิลคำตะโกนอ่านทัน (kwan 28 ต.ค.)
+const HANG0 := 68    # โผล่ค้างเหนือเป้า
+const DROP := 75     # ฟันตัดสินลง
+const LAND := 79
+const FIRE0 := 80    # รอยดาวลุกเป็นไฟ
+const ASH0 := 98     # ไฟมอด → พายุเถ้า
+const ASH1 := 118
+const RISE := 112    # ลุกจากท่าฟันตัดสิน
+const HOLDF := 122
 
 var x_r := 0.0       # จุดโผล่ขวา
 var x_l := 0.0       # ปลายทางซ้าย
@@ -24,20 +24,25 @@ var x_fin := 0.0     # จุดลงฟันตัดสิน
 var x_c := 0.0       # จุดชาร์จ
 var star_pts: Array[Vector2] = []   # ปลายแฉกดาว 5 จุด (บนตัวเป้า)
 var total := 0
+var cries: Array[String] = []   # คำตะโกนตอนโจมตี สุ่มลำดับทุกครั้งที่เล่น (ไม้ตายเท่านั้น · kwan 28 ต.ค.)
 var kill16 := false
 
 func mv() -> Dictionary:
 	return {"id": "bl16", "slide": 0, "reach": 0, "kb": 3, "shk": 2.0, "sfx": "ฉัวะ!", "what": "พันคมดับเถ้า (bl16)"}
 
 func caption() -> String: return "★ ไม้ตาย: ชาร์จถ่านร้อน → พุ่ง 4 ทิศ (ตรง · ไขว้ · ต่ำ · หมุน) → ค้างฟ้า → ฟันตัดสิน → ดาวไฟ → พายุไฟ → พายุเถ้า"
-func stops() -> Array: return [[39, 0.04], [45, 0.04], [51, 0.04], [57, 0.04], [69, 0.14]]
+func stops() -> Array:
+	var out := []
+	for i in hit_f.size():
+		out.append([int(ceil(hit_f[i])), 0.14 if i == hit_f.size() - 1 else 0.04])
+	return out
 
 func setup() -> void:
 	super.setup()
 	hold1 = HOLDF
 	hit_f.clear()
 	for k in 4:
-		hit_f.append(36.0 + k * DASH + 3)
+		hit_f.append(float(CHG1 + k * DASH) + DASH * 0.5)
 	hit_f.append(float(LAND - 1))
 	total = dmg * hit_f.size()
 	kill16 = total >= hp
@@ -47,6 +52,7 @@ func setup() -> void:
 	x_fin = vis.end.x + 40   # ห่างพอไม่ให้พายุกลืนตัว Rion
 	set_end(x_fin)
 	bubble_name = "พันคมดับเถ้า"
+	cries = ult_cries(5)
 	bubble_at = Vector2(STEP1, CHG1)
 	var c := vis.get_center()
 	var r := minf(vis.size.x, vis.size.y) * 0.44
@@ -200,6 +206,12 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	var b0 := int(bubble_at.x)
 	var b1 := int(bubble_at.y)
 	show_bubble(bubble_name + "!", g.cx, maxf(14.0, G - g.lift - 74), F - b0, (1.0 if F < b1 - 3 else (b1 - f) / 3.0) if F >= b0 and F < b1 else 0.0)
+	var kc := _dash_k(f)   # คำตะโกน: 1 คำต่อการพุ่ง (ค้างที่จุดโผล่) · คำสุดท้ายตอนค้างฟ้า → ฟันตัดสิน
+	if kc >= 0:
+		var q := f - CHG1 - kc * DASH
+		show_bubble(cries[kc], x_r - 8, G - 78, int(q), 1.0 if q < DASH - 2 else (DASH - q) / 2.0)
+	elif F >= HANG0 and F < LAND + 2:
+		show_bubble(cries[4], vis.get_center().x + 14, maxf(14.0, G - 58 - 74), F - HANG0, 1.0 if F < LAND else (LAND + 2 - f) / 2.0)
 	var cx := vis.get_center().x
 	var ty := maxf(26.0, vis.position.y - 6)
 	var words := ["ฉัวะ!", "แคว้ง!", "แฉ่บ!", "ซวบ!", "ขาด!!" if kill16 else "ฉับ!!"]
@@ -230,70 +242,85 @@ func rion_ghosts(f: float, F: int) -> void:
 func _ember(n: Node2D, x: float, y: float, a: float, s := 1.0) -> void:
 	px(n, x, y, Color(1, 0.55 + 0.4 * s * 0.5, 0.15, a), 2 if s > 0.7 else 1, 2 if s > 0.7 else 1)
 
-## พายุไฟ/เถ้าหมุนรอบตัวเป้า (กรวยเกลียวสูงถึงขอบจอบน) · back = ครึ่งหลัง (วาดหลังมอน)
+## ไฟลุกท่วมตัวเป้า (ลิ้นไฟซ้อน 3 ชั้น แดง → ส้ม → เหลืองขาว · สั่นไหวไม่เป็นจังหวะ · เปลวหลุดลอย · ควันดำ · ถ่าน)
+## → ไฟมอด ลิ้นไฟหดลง ควันกลายเป็นเถ้าเทาฟุ้งหมุนตามลม (ไม่ใช่เกลียวแข็ง) · back = ลิ้นไฟแถวหลัง (หลังมอน)
+func _flick(j: int, f: float) -> float:
+	return 0.72 + 0.16 * sin(f * 0.83 + j * 1.7) + 0.08 * sin(f * 2.1 + j * 0.9) + 0.06 * sin(f * 3.7 + j * 2.3)
+
 func _storm(n: Node2D, f: float, back: bool) -> void:
 	var fi := _fire(f)
 	var as_ := _ash(f)
 	if fi <= 0.0 and as_ <= 0.0:
 		return
-	var c := Vector2(vis.get_center().x, G - 2)
-	var hgt := 140.0
-	var ash_mix := clampf((f - ASH0 + 2) / 8.0, 0.0, 1.0)
-	var grow := minf(1.0, (f - FIRE0) / 5.0)   # กรวยพุ่งขึ้นจากพื้นตอนลุก
-	var spin := f * (0.5 - 0.3 * ash_mix)
-	var wide := vis.size.x * 0.5 + 10
-	# ริบบิ้นเกลียว 5 เส้น (อ่านเป็นพายุหมุน)
-	for bnd in 5:
-		for k in 70:
-			var ph := k / 69.0
-			if ph > grow:
-				break
-			var a := spin * 1.3 + bnd * TAU / 5.0 + ph * 7.0
-			var front := sin(a) > 0
-			if front == back:
+	var c := Vector2(vis.get_center().x, G - 1)
+	var wd := vis.size.x + 26
+	var grow := clampf((f - FIRE0) / 7.0, 0.0, 1.0)
+	var lv := grow * fi   # ความสูงไฟ (ลุกขึ้นจากรอยดาว → มอดลงตอนเป็นเถ้า)
+	if lv > 0.02:
+		if back:   # แสงร้อนที่ฐาน (หลังมอน)
+			for k in 3:
+				disc(n, c.x, c.y - 10 - k * 14, wd * 0.55 - k * 6, Color(1, 0.45, 0.1, 0.12 * lv))
+		var N := 9
+		for j in N:
+			if (j % 2 == 1) != back:   # คี่ = แถวหลัง (สูงกว่า) · คู่ = แถวหน้า (เตี้ย เห็นตัวมอนผ่านเปลว)
 				continue
-			var r := 8 + pow(ph, 1.1) * (wide + 34) + ash_mix * 14 * ph
-			var x := c.x + cos(a) * r
-			var y := c.y - ph * hgt + sin(a) * (3 + r * 0.14)
-			var heat := 1 - ph
-			var fire_col := Color(1, 0.35 + 0.55 * heat, 0.08 + 0.35 * heat * heat)
-			var ash_col := Color(0.8, 0.78, 0.74).lerp(Color(0.3, 0.29, 0.3), float(bnd % 2))
-			var col := fire_col.lerp(ash_col, ash_mix)
-			col.a = clampf((fi * 0.95 + as_ * 1.0) * (0.45 + 0.65 * sin(PI * minf(1.0, ph * 1.15))) * (1.0 if front else 0.5), 0.0, 1.0)
-			var sz := 3.0 + 2.0 * heat * (1 - ash_mix)
-			px(n, x - sz / 2, y - sz / 2, col, ceil(sz), ceil(sz))
-	# เปลวเม็ดหมุนตามกรวย
-	for k in 220:
-		var ph := fmod(f * (0.03 - 0.015 * ash_mix) + fb_hash(k, 1, 1), 1.0) * grow
-		var a := spin * (1.6 - ph * 0.7) + k * 2.399
-		var front := sin(a) > 0
-		if front == back:
-			continue
-		var r := 6 + pow(ph, 1.1) * (wide + 30) * (0.6 + 0.4 * fb_hash(k, 2, 2)) + ash_mix * 12 * ph
-		var x := c.x + cos(a) * r
-		var y := c.y - ph * hgt + sin(a) * (3 + r * 0.14)
-		var heat := 1 - ph
-		var col := Color(1, 0.3 + 0.65 * heat * heat, 0.06 + 0.4 * heat * heat * heat).lerp(Color(0.82, 0.8, 0.76).lerp(Color(0.28, 0.27, 0.28), fb_hash(k, 2, 3)), ash_mix)
-		col.a = clampf((fi + as_ * 1.1) * sin(PI * minf(1.0, ph * 1.1 + 0.05)) * (1.0 if front else 0.55), 0.0, 1.0)
-		var sz := 2.0 + 3.0 * heat * (1 - ash_mix) + fb_hash(k, 3, 2) * 2.0 + ash_mix
-		px(n, x - sz / 2, y - sz / 2, col, ceil(sz), ceil(sz * (1.4 - 0.5 * ash_mix)))
-	if not back and fi > 0.05:   # แกนร้อนกลางกรวย + ลิ้นไฟจากพื้น
-		for j in 10:
-			var y := c.y - 6 - j * 12 * grow
-			disc(n, c.x + sin(f * 0.7 + j) * 2, y, 12 - j * 0.6, Color(1, 0.85, 0.4, 0.16 * fi))
-		for k in 14:
-			var x := c.x - wide - 10 + k * (wide * 2 + 20) / 13.0
-			var h := (16 + fb_hash(k, floor(f / 2), 4) * 30) * fi
-			for j in int(h / 2):
-				var u := j / maxf(1.0, h / 2)
-				var w := maxf(1.0, 5 * (1 - u))
-				var col := Color(1, 0.88 - 0.6 * u, 0.3 - 0.25 * u, 0.9 * (1 - u) * fi)
-				px(n, x + sin(f * 0.8 + k + u * 3) * 2.5 * u - w / 2, c.y - j * 2, col, w, 2)
-	if not back and as_ > 0.05:   # ก้อนเถ้าฟุ้งรอบฐาน
-		for k in 10:
-			var a := spin * 0.6 + k * 0.63
-			var r := wide + 10 + k % 3 * 6
-			disc(n, c.x + cos(a) * r, c.y - 10 - fb_hash(k, 4, 4) * 50 * as_, 7 + fb_hash(k, 5, 5) * 7, Color(0.55, 0.54, 0.52, 0.32 * as_))
+			var u0 := float(j) / (N - 1)
+			var bell := exp(-pow((u0 - 0.5) / 0.32, 2))
+			var x0 := c.x + (u0 - 0.5) * wd + sin(j * 7.3) * 3
+			var h := (34 + 118 * bell) * (1.0 if back else 0.6) * _flick(j, f) * lv
+			var w0 := (16 + 12 * bell) * (1.0 if back else 0.9)
+			for layer in [[Color(0.8, 0.14, 0.05, 0.9), 1.0, 1.0], [Color(1, 0.48, 0.08, 0.95), 0.66, 0.9], [Color(1, 0.86, 0.38, 1.0), 0.38, 0.7], [Color(1, 0.98, 0.85, 1.0), 0.16, 0.42]]:
+				var col: Color = layer[0]
+				var hh: float = h * layer[2]
+				var y := 0.0
+				while y < hh:
+					var u := y / maxf(1.0, hh)
+					var w: float = w0 * layer[1] * pow(1 - u, 0.75) * (1 + 0.12 * sin(f * 1.3 + j + u * 5))
+					var dx := sin(u * 3.2 + f * 0.55 + j * 1.1) * u * 7 + sin(f * 1.7 + j) * u * u * 4
+					if w >= 1:
+						px(n, x0 + dx - w / 2, c.y - y - 2, Color(col.r, col.g, col.b, col.a * fi), ceil(w), 2)
+					y += 2
+			for m in 3:   # เปลวหลุดลอยขึ้นจากปลายลิ้นไฟ
+				var ph := fmod(f * 0.09 + fb_hash(j, m, 3), 1.0)
+				var tip := Vector2(x0 + sin(f * 0.55 + j * 1.1 + 3.2) * 7, c.y - h - 2)
+				var r := 3.2 * (1 - ph) * lv
+				if r >= 0.8:
+					var cc := Color(1, 0.75 - 0.45 * ph, 0.2 - 0.15 * ph, 0.85 * (1 - ph) * fi)
+					disc(n, tip.x + sin(ph * 6 + j) * 3, tip.y - ph * 26, r, cc)
+	if not back:
+		# ถ่านลอยขึ้นส่ายตามลมร้อน
+		for k in 40:
+			var ph := fmod(f * (0.03 + 0.02 * fb_hash(k, 1, 4)) + fb_hash(k, 2, 4), 1.0)
+			var x := c.x + (fb_hash(k, 3, 4) - 0.5) * wd * 1.1 + sin(ph * 9 + k) * 5
+			var y := c.y - 6 - ph * 130
+			var a := sin(PI * ph) * (fi + as_ * 0.3)
+			if a > 0.05:
+				px(n, x, y, Color(1, 0.7 + 0.25 * fb_hash(k, 5, 4), 0.25, a), 2 if k % 5 == 0 else 1, 2 if k % 5 == 0 else 1)
+		# ควันดำเหนือไฟ → กลายเป็นเถ้าเทาฟุ้ง (ก้อนควันพองโตลอยขึ้น เอียงตามลม)
+		var ash_mix := clampf((f - ASH0 + 2) / 8.0, 0.0, 1.0)
+		var sm := fi * grow * 0.8 + as_
+		if sm > 0.02:
+			for k in 16:
+				var ph := fmod(f * 0.018 + fb_hash(k, 6, 4), 1.0)
+				var r := (5 + ph * 16 + fb_hash(k, 7, 4) * 5) * (1 + 0.4 * ash_mix)
+				var x := c.x + (fb_hash(k, 8, 4) - 0.5) * wd * 0.8 + ph * 18 + sin(ph * 4 + k) * 6
+				var y := c.y - 70 * (0.4 + 0.6 * grow) - ph * 70 + ash_mix * 30 * (1 - ph)
+				var col := Color(0.16, 0.12, 0.12).lerp(Color(0.6, 0.58, 0.56), ash_mix)
+				var al := 0.13 * sm * sin(PI * ph)
+				for q in 6:   # ก้อนควันนุ่ม: วงเล็กซ้อนเหลื่อมกัน ขอบไม่คม
+					var o := Vector2(cos(q * 1.05 + k) * r * 0.45, sin(q * 1.05 + k) * r * 0.3)
+					disc(n, x + o.x, y + o.y, r * (0.45 + 0.1 * (q % 3)), Color(col.r, col.g, col.b, al))
+				disc(n, x, y, r * 0.35, Color(col.r, col.g, col.b, al * 1.4))
+		# เถ้าเกล็ดหมุนวนตามลม (หลวมๆ แต่ละเกล็ดเร็ว/รัศมีไม่เท่ากัน)
+		if as_ > 0.02:
+			for k in 90:
+				var ph := fmod(f * (0.012 + 0.012 * fb_hash(k, 1, 6)) + fb_hash(k, 2, 6), 1.0)
+				var a := f * (0.12 + 0.1 * fb_hash(k, 3, 6)) + k * 2.399
+				var r := 10 + ph * (wd * 0.6 + 20) + fb_hash(k, 4, 6) * 10
+				var x := c.x + cos(a) * r + ph * 20
+				var y := c.y - 4 - ph * 110 + sin(a) * r * 0.18 + sin(f * 0.3 + k) * 3
+				var g := 0.45 + 0.4 * fb_hash(k, 5, 6)
+				px(n, x, y, Color(g, g * 0.98, g * 0.95, as_ * sin(PI * ph) * 0.95), 2 if k % 3 == 0 else 1, 1 if k % 4 else 2)
 
 func draw_back(n: Node2D) -> void:
 	_storm(n, t / SEC, true)

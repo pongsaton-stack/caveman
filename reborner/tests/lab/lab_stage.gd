@@ -274,6 +274,28 @@ func _load_monster() -> void:
 func mon_rect() -> Rect2:
 	return Rect2(mx0 + used.position.x, my + used.position.y, used.size.x, used.size.y)
 
+## คำตะโกนตอนโจมตีของท่าสุดยอดประจำสาย (kwan 28 ต.ค. "เฉพาะท่าสุดยอดของสาย ให้มีบับเบิ้ลตอนโจมตี แบบแรนดอม") · บับเบิลเท่านั้น ไม่มีเสียงพูด
+const ULT_CRIES := ["โอร่า โอร่า โอร่า!", "ย๊ากกก!", "รับนี่ไป!", "ตายซะะะ!", "หายไปซะะ!"]
+
+## n คำ สุ่มลำดับใหม่ทุกครั้งที่เล่น (ครบชุดแล้วค่อยวนซ้ำ ไม่ซ้ำติดกัน)
+func ult_cries(n: int) -> Array[String]:
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	var out: Array[String] = []
+	var bag: Array = []
+	while out.size() < n:
+		if bag.is_empty():
+			bag = ULT_CRIES.duplicate()
+			for i in range(bag.size() - 1, 0, -1):
+				var j := rng.randi_range(0, i)
+				var tmp = bag[i]
+				bag[i] = bag[j]
+				bag[j] = tmp
+			if not out.is_empty() and bag[0] == out[-1]:
+				bag.reverse()
+		out.append(str(bag.pop_front()))
+	return out
+
 func school() -> String:
 	return SCHOOL.get(tech_id().substr(0, 2), "")
 
