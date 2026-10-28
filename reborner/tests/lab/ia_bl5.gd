@@ -4,15 +4,17 @@ extends "res://tests/lab/fl_base.gd"
 ## → ชักฟันพุ่งแว้บเดียว 2 เฟรม ปลายจังหวะ (State BL5_iai_cut) โดนตอนถึงตัว · เส้นคมขาวยาวพาดจอ
 ## → สะบัดคม chiburi (โค้ดหมุน −25°) → เก็บเข้าซองช้าๆ noto (ภาพย่อ) → "แกร๊ก" แผลวาบซ้ำ → zanshin → กระโดดถอยแบบท่าฟัน
 ## ทีม: อย่าเจนท่ากลางจังหวะชัก (PixelLab พัง) → เจนท่าปลายจังหวะแล้วเร่งด้วยโค้ด/ร่างติดตา
+## รอบ 2 (kwan 28 ต.ค. "ท่าดูไม่ลื่นเลย เจนเพิ่มให้ไหลลื่นได้"): ท่ากลางแบบสองภาพหัวท้าย (ไม่ใช่สั่งท่าชักลอยๆ) ผ่าน →
+## ชัก = pls_iai_draw_1–5 (ย่อ → ปลายจังหวะ 6 ภาพ) · สะบัด + เก็บเข้าซอง = pls_iai_noto_1–5 (ปลายจังหวะ → ย่อ) แทนการหมุนภาพเดียว
 
 const CR := 26      # ถึงจุดย่อ เริ่มไถลในท่าย่อ
 const STILL := 30   # นิ่งสนิท
 const DRAW := 36    # ชัก
-const HITF := 38     # ถึงตัว = โดน
-const CHIB := 42    # สะบัดคม
-const NOTO := 44    # เก็บคม
-const CLICK := 50   # คมเข้าซอง
-const HOLDF := 56
+const HITF := 39     # ถึงตัว = โดน
+const CHIB := 43    # สะบัดคม
+const NOTO := 45    # เก็บคม
+const CLICK := 51   # คมเข้าซอง
+const HOLDF := 57
 
 var x_cr := 0.0
 var x_hit := 0.0
@@ -47,24 +49,24 @@ func _move(f: float) -> Dictionary:
 		return {"cx": x_cr + 6 - 6 * (1 - pow(1 - u, 2)), "key": "pls_iai_crouch_0", "sy": 0.96 + 0.04 * u}
 	if F < DRAW:   # นิ่งสนิท
 		return {"cx": x_cr, "key": "pls_iai_crouch_0"}
-	if F < HITF:   # ชักพุ่งแว้บ: 2 เฟรม
+	if F < HITF:   # ชักพุ่งแว้บ 3 เฟรม: ภาพท่ากลางชักออกจากซอง 5 ภาพ
 		var u := (f - DRAW) / (HITF - DRAW)
-		return {"cx": x_cr + (x_hit - x_cr) * (u * u), "key": "pls_iai_cut_0", "sx": 1.08, "sy": 0.96}
+		return {"cx": x_cr + (x_hit - x_cr) * (u * u), "key": "pls_iai_draw_%d" % (1 + mini(4, int(u * 5.0))), "sx": 1.04, "sy": 0.98}
 	if F < CHIB:   # ปลายจังหวะ ไถลตามแรงนิดเดียว
 		var q := f - HITF
-		return {"cx": x_hit + 6 * (1 - pow(1 - minf(1.0, q / 4.0), 2)), "key": "pls_iai_cut_0"}
-	if F < NOTO:   # chiburi: สะบัดคมลง
-		var q := f - CHIB
-		return {"cx": x_hit + 6, "key": "pls_iai_cut_0", "lean": -0.42 * sin(PI * q / 2.0)}
-	# noto → zanshin: ภาพย่อมือแตะด้าม (ภาพเดียวใช้ 2 ช่วงตามทีม) ถอยครึ่งก้าว
+		return {"cx": x_hit + 6 * (1 - pow(1 - minf(1.0, q / 4.0), 2)), "key": "pls_iai_draw_5"}
+	if F < NOTO:   # chiburi: สะบัดคมลงด้านข้าง (ภาพ noto 1)
+		return {"cx": x_hit + 6, "key": "pls_iai_noto_1"}
+	# noto → zanshin: เก็บเข้าซองช้าๆ (ภาพ noto 2–5) ถอยครึ่งก้าว · ค้างท่าย่อ
 	var q := f - NOTO
-	return {"cx": x_hit + 6 + 4 * minf(1.0, q / 6.0), "key": "pls_iai_crouch_0", "sy": 1.0 - 0.02 * minf(1.0, q / 6.0)}
+	var k := 2 + mini(3, int(q / ((CLICK - NOTO) / 4.0)))
+	return {"cx": x_hit + 6 + 4 * minf(1.0, q / 6.0), "key": "pls_iai_noto_%d" % k if f < CLICK else "pls_iai_crouch_0", "sy": 1.0 - 0.02 * minf(1.0, q / 6.0)}
 
 func rion_ghosts(_f: float, F: int) -> void:
 	if F >= DRAW and F < HITF + 3:   # ร่างติดตาตามทางพุ่ง 4 ร่าง
 		for k in 4:
 			var gg := geo(float(DRAW) - 0.5 + k * 0.6)
-			gg.key = "pls_iai_cut_0" if k > 1 else "pls_iai_crouch_0"
+			gg.key = "pls_iai_draw_%d" % (1 + k)
 			ghost(gg, 0.28 - k * 0.04 if F < HITF + 1 else 0.12, Color("#9ae6ff"), 0.5)
 
 func frame(f0: float, F0: int, fresh: bool) -> void:

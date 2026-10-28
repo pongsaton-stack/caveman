@@ -263,7 +263,9 @@ def build_action(move, d):
 		parts.append(mb[DIR_BLOCK[d]] + " The body keeps this exact facing in every frame and never turns toward the camera.")
 	else:
 		parts.append("Front view facing the viewer in every frame.")
-	if m["held"]:
+	if m.get("held_free"):   # ของในมือเปลี่ยนกลางท่า (เช่น เสกมีดเล่มที่สอง) → เขียนเองทั้งประโยค
+		parts.append("Held items: " + m["held"])
+	elif m["held"]:
 		where = "both hands" if "BOTH hands" in m["held"] else "that same hand"   # ไม้เบสบอลจับสองมือ
 		parts.append("Held item: " + m["held"] + ". It stays in " + where + " in every frame, never disappears, and there is never a second one.")
 	else:
@@ -644,6 +646,111 @@ STATES["BL15_roll"] = {"seed": 58, "frame": None, "edit": (
 	"Same character, same design, proportions and colors; only the pose changes. Deflecting an unseen blade: ONE small kitchen knife in the RIGHT hand is rolled over "
 	"to the far side of the wrist, the blade angled diagonally across the body pointing down and forward, the wrist turned outward, the body half-stepped back and turned slightly; "
 	"the LEFT hand raised open near the chest. Eyes sharp, mouth tight. " + SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+
+# ---- ท่ากลางให้ลื่น (kwan 28 ต.ค. "ท่าดูไม่ลื่นเลย เจนเพิ่มให้ไหลลื่นได้") ----
+# ภาพ State เป็นท่านิ่งภาพเดียว → สลับภาพแล้วกระตุก · เจนท่ากลางระหว่างสอง key pose (PL_START_IMG → PL_END_IMG · ~2 gen/ท่า)
+# ภาพ State 96x96 · ภาพท่าจาก fight_knife 128x128 (ขนาดตัวเท่ากัน) → ผสมกันต้องเติมขอบ State เป็น 128 ก่อน (scratch)
+SHEATH = "a plain brown leather knife sheath stays at the LEFT side of the belt in every frame"
+MOVES.update({
+	"bl5_draw": {"dir": "west", "attack": True, "frames": 6, "seed": 61,
+		"held": KNIFE + "; in the first frame the knife is still inside the sheath at the left hip with only the handle showing, then the RIGHT hand draws it out; " + SHEATH,
+		"beats": ["same as the start image: iaido crouch, perfectly still, the RIGHT hand on the knife handle at the left hip, the LEFT hand holding the sheath",
+			"the RIGHT hand starts pulling the knife out of the sheath, the blade sliding out across the belly, knees still deep",
+			"the blade clears the sheath and sweeps forward horizontally at waist height, the front foot steps forward",
+			"lunging forward low, the RIGHT arm sweeping the knife horizontally forward, the LEFT hand pulling the empty sheath back",
+			"the RIGHT arm almost fully extended forward at temple height, blade horizontal, back leg stretching",
+			"same as the end image: finish of the draw cut, RIGHT arm fully extended forward, LEFT hand holding the sheath back at the hip"],
+		"not": ["a second knife", "a sword or long blade", "the knife in the left hand", "slash trails, glow or motion lines"]},
+	"bl5_noto": {"dir": "west", "attack": False, "frames": 6, "seed": 62,
+		"held": KNIFE + "; it ends back inside the sheath at the left hip; " + SHEATH,
+		"beats": ["same as the start image: RIGHT arm extended forward with the knife after the cut",
+			"chiburi: the RIGHT arm flicks the knife sharply down and out to the side to shake off blood, body still low",
+			"the RIGHT hand slowly brings the knife back toward the left hip, blade horizontal, the LEFT hand holding the sheath mouth",
+			"the blade tip enters the sheath mouth at the left hip, sliding in slowly, eyes still on the enemy",
+			"the knife almost fully sheathed, only the handle and a little blade showing, knees deep",
+			"same as the end image: iaido crouch, knife fully sheathed, the RIGHT hand resting on the handle"],
+		"not": ["a second knife", "looking down at the sheath", "the knife in the left hand", "slash trails, glow or motion lines"]},
+	"bl6_summon": {"dir": "west", "attack": False, "frames": 6, "seed": 63, "held_free": True,
+		"held": ("the RIGHT hand holds ONE small kitchen knife (short dark wooden handle, short silver blade about as long as the hand) in every frame; "
+			"the LEFT hand starts EMPTY and open, then closes around the handle of a SHORTER second knife that appears in it from frame 4 on, "
+			"so the last frame has exactly two knives, one in each hand"),
+		"beats": ["same as the start image: fighting stance, the knife in the RIGHT hand, the LEFT hand empty",
+			"the LEFT hand opens wide and reaches back low behind the hip, palm open, fingers spread, eyes narrowing",
+			"the LEFT fist closes on empty air behind the hip as if gripping a handle, knees bending",
+			"a short second knife is now in the LEFT fist, blade angled down and back; the RIGHT knife rises forward",
+			"arms spreading wide apart, the RIGHT knife angled up and forward, the LEFT short knife low behind the hip",
+			"same as the end image: two-knife stance, arms spread wide, knees bent"],
+		"not": ["the right knife switching hands", "a sword", "turning toward the camera", "glow, smoke, trails or motion lines"]},
+	"bl6_cut": {"dir": "west", "attack": True, "frames": 4, "seed": 64, "held_free": True,
+		"held": "exactly two knives in every frame: a small kitchen knife in the RIGHT hand and a SHORTER knife in the LEFT hand",
+		"beats": ["same as the start image: two-knife stance, arms spread",
+			"step in with the front foot, the RIGHT arm raising the knife high forward, the LEFT short knife pulled toward the chest",
+			"the RIGHT knife slashing diagonally down and forward, torso leaning into the cut",
+			"same as the end image: RIGHT arm extended down-forward after the slash, LEFT short knife guarding near the chest"],
+		"not": ["a third knife", "knives switching hands", "turning toward the camera", "slash trails, glow or motion lines"]},
+	"bl6_x": {"dir": "west", "attack": True, "frames": 4, "seed": 65, "held_free": True,
+		"held": "exactly two knives in every frame: a small kitchen knife in the RIGHT hand and a SHORTER knife in the LEFT hand",
+		"beats": ["same as the start image: RIGHT arm extended down-forward after the first slash, LEFT short knife near the chest",
+			"the torso twists, the LEFT arm drives the short knife forward while the RIGHT knife sweeps back across the waist",
+			"the two blades meet crossing in front of the body, knees bending deep",
+			"same as the end image: LEFT arm extended forward with the short knife, RIGHT knife low across the waist, the blades forming an X"],
+		"not": ["a third knife", "knives switching hands", "turning toward the camera", "slash trails, glow or motion lines"]},
+	"bl13_glide": {"dir": "west", "attack": False, "frames": 6, "seed": 66, "held": KNIFE,
+		"beats": ["same as the start image: very low cross-step, the front leg crossed over the back leg, knife low beside the knee",
+			"the back leg slides out from behind and steps wide forward-left, body staying very low, head level",
+			"legs wide apart, body at its lowest, knife low, the LEFT hand reaching low forward for balance",
+			"the other leg slides across in front, crossing over again, body still low and level",
+			"crossed legs, weight shifting forward onto the front foot, head level",
+			"same as the start image, ready to loop"],
+		"not": ["standing up tall", "jumping", "turning toward the camera", "a second knife", "slash trails, glow or motion lines"]},
+	"bl13_cut": {"dir": "west", "attack": True, "frames": 4, "seed": 67, "held": KNIFE,
+		"beats": ["same as the start image: very low cross-step, knife low beside the knee",
+			"springing up and forward out of the crouch, the RIGHT arm whipping the knife up from low",
+			"the knife slashing forward at knee-to-hip height, front foot landing, body leaning in",
+			"same as the end image: low slash finish, RIGHT arm extended forward low"],
+		"not": ["a second knife", "the knife in the left hand", "turning toward the camera", "slash trails, glow or motion lines"]},
+	"bl14_leap": {"dir": "west", "attack": True, "frames": 8, "seed": 68, "held": KNIFE,
+		"beats": ["same as the start image: long diagonal stride, pushing off the back leg, knife ready at the side",
+			"both knees bend deep for a big jump, arms swinging back, knife low",
+			"launching up and forward to the LEFT, legs extending, arms swinging up, the knife raised",
+			"high in the air over the enemies, knees tucked up, the knife held high over the head ready to strike",
+			"descending to the LEFT, legs reaching down, the RIGHT arm starting to swing the knife down",
+			"landing on the front foot, the knife slashing down diagonally in front of the body",
+			"knees bending deep to absorb the landing, the RIGHT arm low after the slash",
+			"rising into a low fighting stance facing left, knife at guard"],
+		"not": ["turning toward the camera", "flipping upside down", "a second knife", "the knife in the left hand", "slash trails, glow or motion lines"]},
+	"bl15_counter": {"dir": "west", "attack": True, "frames": 4, "seed": 69, "held": KNIFE,
+		"beats": ["same as the start image: the knife rolled over the wrist deflecting, body half-stepped back",
+			"the wrist rolls the knife back over, the blade coming up and around overhead, a diagonal step forward",
+			"the RIGHT arm cuts down diagonally in front of the body, weight landing on the front foot",
+			"same as the end image: follow-through of the downward slash"],
+		"not": ["a second knife", "the knife in the left hand", "turning toward the camera", "slash trails, glow or motion lines"]},
+})
+# ท่าใหม่ (ท่านิ่ง) · kwan 28 ต.ค.: กวาด bl3 ลงกลางดงมอน · ไม้ตาย bl16 พันคมดับเถ้า
+STATES["BL3_kneel_sweep"] = {"seed": 71, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Kneeling sweep pose: the left knee down touching the ground, the right leg bent with the foot flat, torso low and upright. "
+	"The RIGHT arm is stretched straight out horizontally to the side at knee height holding ONE small kitchen knife "
+	"(short dark wooden handle, short silver blade about as long as the hand) with the blade pointing outward continuing the arm. "
+	"The LEFT hand is pressed flat on the ground for balance. Eyes fierce, mouth set. "
+	"The pose stays the same in every rotation. " + SPIN_KEEP + SPIN_NOT)}
+STATES["BL14_air"] = {"seed": 74, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"High in the air in the middle of a big forward jump: both feet off the ground, knees tucked up under the body, body leaning forward. "
+	"The RIGHT arm raised high above and behind the head holding ONE small kitchen knife (short dark wooden handle, short silver blade), "
+	"ready to cut down; the LEFT arm stretched forward for balance. Hair and shirt blown upward. Eyes fierce, mouth shouting. "
+	+ SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}   # bl14_leap ได้ท่าวิ่ง ไม่ลอย (kwan 28 ต.ค. "กระโดดไปแถวหลังเลย")
+STATES["BL16_charge"] = {"seed": 72, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Charging stance before an ultimate attack: very deep wide crouch, the back knee almost on the ground, body coiled and twisted away from the enemy. "
+	"The RIGHT hand holds ONE small kitchen knife in a REVERSE grip low behind the right hip, the blade lying back along the forearm. "
+	"The LEFT arm stretched forward toward the enemy with the hand open and fingers spread. Hair standing up, eyes wide and burning, teeth gritted. "
+	+ SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
+STATES["BL16_finish"] = {"seed": 73, "frame": None, "edit": (
+	"Same character, same design, proportions and colors; only the pose changes. "
+	"Landing after a huge decisive downward cut: the front knee bent very deep, the back leg stretched far behind, torso leaned forward low. "
+	"The RIGHT arm swung all the way down in front so ONE small kitchen knife (short dark wooden handle, short silver blade) points at the ground near the front foot. "
+	"The LEFT arm swept back behind. Head up, eyes fierce, mouth closed. " + SIDE + SPIN_KEEP + "No second knife. " + FLOW_NOT)}
 
 ROT8_KEEP = {}   # State ไหนภาพข้างใช้ได้ ใส่ทิศที่จะส่งไปตามเดิม
 ROT8 = ("west", "south-west", "south", "south-east", "east", "north-east", "north", "north-west")   # ลำดับหมุน: หันซ้าย → เข้ากล้อง → ขวา → หลัง

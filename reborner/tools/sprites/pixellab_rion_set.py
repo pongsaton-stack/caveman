@@ -55,6 +55,20 @@ CLIPS += [("pls_hurt", "โดนตี · ถือมีด", "fight_knife", "
 	("pls_slither", "ก้าวเงา bl13 · ก้าวไขว้เลื้อยต่ำ (State BL13_slither)", "BL13_slither", "__rot__", "west", [0], 90, False),
 	("pls_stride", "ปาดข้ามแถว bl14 · ก้าวเฉียง 45° (State BL14_stride)", "BL14_stride", "__rot__", "west", [0], 90, False),
 	("pls_roll", "คมสวน bl15 · พลิกข้อมือปัดคม (State BL15_roll)", "BL15_roll", "__rot__", "west", [0], 90, False),
+	# ท่ากลางให้ลื่น (kwan 28 ต.ค. "ท่าดูไม่ลื่นเลย เจนเพิ่มให้ไหลลื่นได้") · ภาพเริ่ม/จบ = key pose เดิม (end_frame) · จัดวางด้วย ALIGN_MATCH
+	("pls_iai_draw", "ปาดไว bl5 · ชักฟันออกจากซอง (ท่ากลาง ย่อ → ปลายจังหวะ)", "BL5_iai_crouch", "bl5_draw_v", "west", None, 60, False),
+	("pls_iai_noto", "ปาดไว bl5 · สะบัดคม + เก็บเข้าซอง (ท่ากลาง ปลายจังหวะ → ย่อ)", "BL5_iai_crouch", "bl5_noto_v", "west", None, 90, False),
+	("pls_sd_summon", "เงาสองคม bl6 · เสกมีดเงามือซ้าย (ท่ากลาง ยืนสู้ → ตั้งท่าสองมีด)", "fight_knife", "bl6_summon_v", "west", [0, 1, 4, 5], 90, False),   # เฟรม 2 เส้นโค้งสีผิววาดติด (clean ลบไม่ได้) · 3 ตัวซีดขาวทั้งตัว
+	("pls_sd_cut", "เงาสองคม bl6 · ฟันมีดขวา (ท่ากลาง ตั้งท่า → ฟัน)", "BL6_enso", "bl6_cut_v", "west", [0, 2, 3], 60, False),   # เฟรม 1 วงขาววาดติดตัว
+	("pls_sd_x", "เงาสองคม bl6 · ไขว้มีดเงาเป็น X (ท่ากลาง ฟัน → ไขว้)", "BL6_enso", "bl6_x_v", "west", [1, 2, 3], 60, False),   # เฟรม 0 วงขาวพันตัว ลบแล้วตัวขาด
+	("pls_sh_glide", "ก้าวเงา bl13 · เลื้อยก้าวไขว้ (วน 6 เฟรม)", "BL13_slither", "bl13_glide_v", "west", None, 60, True),
+	("pls_sh_cut", "ก้าวเงา bl13 · ดีดตัวปาดต่ำ (ท่ากลาง เลื้อย → ปาด)", "fight_knife", "bl13_cut_v", "west", None, 60, False),
+	("pls_leap", "ปาดข้ามแถว bl14 · กระโดดสูงข้ามแนวหน้า ฟันลง (8 เฟรม · ใช้ร่วมวงล้อ/กวาด/ไม้ตาย)", "fight_knife", "bl14_leap_v", "west", None, 60, False),
+	("pls_cs_counter", "คมสวน bl15 · พลิกข้อมือ → ฟันสวน (ท่ากลาง)", "fight_knife", "bl15_counter_v", "west", None, 60, False),
+	("pls_lair", "กระโดดสูงลอยง้างมีดเหนือหัว (State BL14_air · ใช้ร่วม bl14 bl4 bl3 bl16)", "BL14_air", "__rot__", "west", [0], 90, False),
+	("pls_kneel", "กวาด bl3 · คุกเข่ากางแขนมีด 8 มุม (State BL3_kneel_sweep + rot8)", "BL3_kneel_sweep", "__rot8__", "west", None, 60, True),
+	("pls_u_charge", "พันคมดับเถ้า bl16 · ชาร์จจับมีดกลับด้าน (State BL16_charge)", "BL16_charge", "__rot__", "west", [0], 90, False),
+	("pls_u_finish", "พันคมดับเถ้า bl16 · ลงฟันตัดสิน (State BL16_finish)", "BL16_finish", "__rot__", "west", [0], 90, False),
 	("pls_bat_idle", "ยืนถือไม้เบสบอล (State)", "BT_bat_stance", "__rot__", "west", [0], 180, True),
 	("pls_bat2", "ทุบ bt0 รอบ 4 · ง้าง → ฟาดลงเฉียง (ท่ากลาง ไม้หลังไหล่ → State กระทบ)", "BT_bat_stance", "chop_bat2_v", "west", None, 90, False),   # kwan 25 ต.ค. "ใช้ pixellab ปรับให้ตรงกับรายงาน" · PL_START_IMG hop_bat 6 + PL_END_IMG BT_bat_impact
 	("pls_bat_imp", "ทุบ · กระทบลงเฉียง ตัวตั้งตรง (State BT_bat_impact)", "BT_bat_impact", "__rot__", "west", [0], 90, False),
@@ -78,6 +92,21 @@ BLADE_COPY = {("pls_bl1", 6): (7, (-3, 0), (26, 64, 36, 73), (30, 64, 39, 73))}
 ALIGN_BLEND = {"pls_glim_shift": ("pls_atk_bl", "pls_bl1")}
 # วางแนวนอนตามคลิปอื่น แต่เท้าตามกรอบตัวเอง: bl7_back (end_frame จาก bl7_v) PixelLab วาดต่ำกว่าภาพต้นทาง 2 จุด → วางทั้งคลิปเท่า pls_bl7 แล้วเท้าลอย/จม
 ALIGN_X = {"pls_bl7_back": "pls_bl7"}
+# ท่ากลางที่ผืนภาพดิบขนาดไม่คงที่ (96 · 108x124 · 160x140 …) → จัดวางทั้งคลิปให้เฟรม mine ทับภาพ px_set ของคลิป ref เฟรม ri พอดี (หาเลื่อนที่ทับกันมากสุด)
+# = ตัวไม่กระโดดตอนสลับจากภาพท่าเดิมเข้าท่ากลาง (คลิป ref ต้องอยู่ก่อนใน CLIPS)
+ALIGN_MATCH = {"pls_iai_draw": ("pls_iai_crouch", 0, 0), "pls_iai_noto": ("pls_iai_draw", -1, 0),
+	"pls_sd_summon": ("pls_idle_bl", 0, 0), "pls_sd_cut": ("pls_sd_summon", -1, 0), "pls_sd_x": ("pls_sd_cut", -1, 0),
+	"pls_sh_glide": ("pls_slither", 0, 0), "pls_sh_cut": ("pls_slither", 0, 0), "pls_leap": ("pls_stride", 0, 0), "pls_cs_counter": ("pls_roll", 0, 0)}
+
+
+def match_at(im, ref_path):
+	"""ตำแหน่งมุมซ้ายบนของ im บนผืน 120x112 ที่เนื้อทับภาพ ref มากสุด (สหสัมพันธ์ของมาสก์)"""
+	from scipy.signal import fftconvolve
+	A = (np.array(im)[..., 3] > 127).astype(float)
+	B = (np.array(Image.open(ref_path).convert("RGBA"))[..., 3] > 127).astype(float)
+	c = fftconvolve(B, A[::-1, ::-1], mode="full")
+	i, j = np.unravel_index(int(np.argmax(c)), c.shape)
+	return (int(j - (A.shape[1] - 1)), int(i - (A.shape[0] - 1)))
 
 
 def copy_blade(f, ref, shift, clear, srcbox):
@@ -157,7 +186,7 @@ def clean(im, ref):
 
 def main():
 	shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT)
-	clips, report, place = [], [], {}
+	clips, report, place, names_of = [], [], {}, {}
 	for cid, th, st, anim, d, use, ms, loop in CLIPS:
 		files, rot = src(st, anim, d)
 		if not files:
@@ -174,6 +203,10 @@ def main():
 		x0, y1 = min(b[0] for b in bb), max(b[3] for b in bb)
 		names = []
 		place[cid] = (30 - x0 + max(0, (60 - (max(b[2] for b in bb) - x0)) // 2), 108 - y1)
+		if cid in ALIGN_MATCH:
+			rc, ri, mi = ALIGN_MATCH[cid]
+			rn = names_of[rc][ri]
+			place[cid] = match_at(ims[mi], os.path.join(OUT, rn + ".png"))
 		for i, im in enumerate(ims):
 			at = place[cid]
 			if cid in ALIGN_X:
@@ -181,7 +214,10 @@ def main():
 			if cid in ALIGN_BLEND:
 				(ax, ay), (bx, by), u = place[ALIGN_BLEND[cid][0]], place[ALIGN_BLEND[cid][1]], i / max(1, len(ims) - 1)
 				at = (round(ax + (bx - ax) * u), round(ay + (by - ay) * u))
-			c = Image.new("RGBA", (120, 112)); c.alpha_composite(im, at)
+			if min(at) < 0 or at[0] + im.width > 120 or at[1] + im.height > 112:   # ผืนดิบใหญ่กว่า 120x112 (ท่ากลาง) → วางบนผืนใหญ่แล้วตัดเฉพาะกรอบ
+				big = Image.new("RGBA", (im.width + 400, im.height + 400)); big.alpha_composite(im, (at[0] + 200, at[1] + 200)); c = big.crop((200, 200, 320, 312))
+			else:
+				c = Image.new("RGBA", (120, 112)); c.alpha_composite(im, at)
 			n = f"{cid}_{i}"; c.save(os.path.join(OUT, n + ".png")); names.append(n)
 		for (bc, bi), spec in BLADE.items():   # หลังบันทึกครบทั้งคลิป (ใช้สีจากเฟรมอื่นของคลิปเดียวกัน)
 			if bc == cid and bi < len(names):
@@ -190,11 +226,12 @@ def main():
 			if bc == cid and max(bi, ri) < len(names): copy_blade(os.path.join(OUT, f"{cid}_{bi}.png"), os.path.join(OUT, f"{cid}_{ri}.png"), sh, clr, sb)
 		clips.append({"group": G, "id": cid, "label": f"{th} · {len(names)} เฟรม (PixelLab · ลบแสงที่วาดติดมา {removed} จุด)", "frames": names, "ms": ms,
 			"loop": loop, "w": 120, "travel": 0, "src": [f"pixellab {st or 'base'} {anim} {d}"]})
-		report.append((cid, len(names), removed))
+		report.append((cid, len(names), removed)); names_of[cid] = names
 	json.dump({"_doc": "ชุด Rion ในเกมจาก PixelLab · tools/sprites/pixellab_rion_set.py · ร่าง ยังไม่เข้าเกม", "clips": clips},
 		open(os.path.join(OUT, "index.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 	for r in report: print(*r)
-	import weapon_swap; weapon_swap.main(); weapon_swap.empty_hand()   # คลิปเปลี่ยนอาวุธด้วยโค้ด (ใช้ภาพ pls_atk_bl ที่เพิ่งสร้าง) · ภาพมือเปล่าของผ่าเกราะ bl8
+	import weapon_swap; weapon_swap.main(); weapon_swap.empty_hand()
+	import shadow_knife; shadow_knife.main()   # มีดเงา bl6: ย้อมมีดมือซ้ายของท่าสองมีด (ต้องรันกับภาพที่เพิ่งสร้าง ไม่ใช่ภาพที่ย้อมแล้ว)   # คลิปเปลี่ยนอาวุธด้วยโค้ด (ใช้ภาพ pls_atk_bl ที่เพิ่งสร้าง) · ภาพมือเปล่าของผ่าเกราะ bl8
 
 
 if __name__ == "__main__":

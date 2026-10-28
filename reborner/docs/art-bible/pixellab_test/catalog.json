@@ -1425,6 +1425,291 @@
      "ms": 500,
      "game_ms": null,
      "notes": "มีดเฉียงลงหน้า มือซ้ายเปิดใกล้อก → pls_roll"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 61,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl5_draw_v",
+     "name": "ท่ากลาง · ปาดไว bl5 ชักฟันออกจากซอง (6 เฟรม · end_frame ย่อ → ปลายจังหวะ)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL5_iai_crouch/BL5_iai_crouch/animations/bl5_draw_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl5_draw"
+     },
+     "notes": "ผ่าน · วาดเส้นฟาดฟ้าติดมา clean ลบ · → pls_iai_draw"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 62,
+     "ms": 90,
+     "game_ms": null,
+     "id": "bl5_noto_v",
+     "name": "ท่ากลาง · ปาดไว bl5 สะบัดคม + เก็บเข้าซอง (6 เฟรม · end_frame ปลายจังหวะ → ย่อ)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL5_iai_crouch/BL5_iai_crouch/animations/bl5_noto_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl5_noto"
+     },
+     "notes": "ผ่าน · เฟรม 1 สะบัด 2–5 เก็บเข้าซอง → pls_iai_noto"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 63,
+     "ms": 90,
+     "game_ms": null,
+     "id": "bl6_summon_v",
+     "name": "ท่ากลาง · เงาสองคม bl6 เสกมีดมือซ้าย (6 เฟรม · ยืนสู้ → ตั้งท่าสองมีด)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl6_summon_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl6_summon"
+     },
+     "notes": "ใช้ 0 1 4 5 · เฟรม 2 เส้นโค้งสีผิว (clean ลบไม่ได้) · 3 ตัวซีดขาว → pls_sd_summon (มีดซ้ายย้อมเงา shadow_knife.py)"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 1,
+     "seed": 64,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl6_cut_v",
+     "name": "ท่ากลาง · เงาสองคม bl6 ฟันมีดขวา (4 เฟรม · ตั้งท่า → ฟัน)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL6_enso/BL6_enso/animations/bl6_cut_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl6_cut"
+     },
+     "notes": "ใช้ 0 2 3 · เฟรม 1 วงขาววาดติดตัว → pls_sd_cut"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 1,
+     "seed": 65,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl6_x_v",
+     "name": "ท่ากลาง · เงาสองคม bl6 ไขว้ X (4 เฟรม · ฟัน → ไขว้)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL6_enso/BL6_enso/animations/bl6_x_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl6_x"
+     },
+     "notes": "ใช้ 1 2 3 · เฟรม 0 วงขาวพันตัว → pls_sd_x"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 66,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl13_glide_v",
+     "name": "ก้าวเงา bl13 เลื้อยก้าวไขว้ (6 เฟรม วน · จาก State BL13_slither)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL13_slither/BL13_slither/animations/bl13_glide_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl13_glide"
+     },
+     "notes": "ได้ก้าวไขว้แต่ตัวไม่ต่ำ (โค้ดย่อแทน) · เส้นฟาดฟ้า clean ลบ → pls_sh_glide"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 1,
+     "seed": 67,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl13_cut_v",
+     "name": "ท่ากลาง · ก้าวเงา bl13 ดีดตัวปาดต่ำ (4 เฟรม · เลื้อย → ปาดของ bl7)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl13_cut_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl13_cut"
+     },
+     "notes": "ผ่าน · วงฟ้าใหญ่เฟรม 1 clean ลบ → pls_sh_cut"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 68,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl14_leap_v",
+     "name": "ปาดข้ามแถว bl14 กระโดดข้ามแนวหน้า (8 เฟรม · จาก State BL14_stride)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl14_leap_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl14_leap"
+     },
+     "notes": "ไม่ผ่านส่วนกระโดด: ได้ท่าวิ่ง เท้าไม่พ้นพื้น → ใช้เฉพาะเฟรม 4–7 (ลงฟัน) · ช่วงลอยใช้ State BL14_air → pls_leap"
+    },
+    {
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 69,
+     "ms": 60,
+     "game_ms": null,
+     "id": "bl15_counter_v",
+     "name": "ท่ากลาง · คมสวน bl15 พลิกข้อมือ → ฟันสวน (4 เฟรม · BL15_roll → ฟันลงของ bl0)",
+     "kind": "attack",
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/fight_knife/fight_knife/animations/bl15_counter_v/west"
+     },
+     "prompt": {
+      "type": "moves",
+      "key": "bl15_counter"
+     },
+     "notes": "ผ่าน · วงฟ้าทุกเฟรม clean ลบ 2,189 จุด → pls_cs_counter"
+    },
+    {
+     "id": "state_BL3_kneel_sweep",
+     "name": "State · กวาด bl3 คุกเข่ากางแขนมีด",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 71,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL3_kneel_sweep"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่าน · แขนขวามีดชี้ออกระดับเข่า มือซ้ายแตะพื้น"
+    },
+    {
+     "id": "rot8_BL3_kneel_sweep",
+     "name": "State + rot8 · กวาด bl3 คุกเข่ากวาด (ภาพหมุน 8 มุม)",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 2,
+     "seed": 71,
+     "dirs": {
+      "west": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/west.png",
+      "south-west": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/south-west.png",
+      "south": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/south.png",
+      "south-east": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/south-east.png",
+      "east": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/east.png",
+      "north-east": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/north-east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/north.png",
+      "north-west": "assets/sprites/pixellab_draft/states/BL3_kneel_sweep/BL3_kneel_sweep/rotations8/north-west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL3_kneel_sweep"
+     },
+     "ms": 120,
+     "game_ms": null,
+     "notes": "ผ่าน · มีดอยู่ตามมุม (ซ้าย → หน้า → ขวา → หลัง) → pls_kneel_0–7"
+    },
+    {
+     "id": "state_BL14_air",
+     "name": "State · กระโดดสูงลอยง้างมีดเหนือหัว (bl14 bl4 bl3 bl16)",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 74,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL14_air/BL14_air/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL14_air/BL14_air/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL14_air/BL14_air/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL14_air/BL14_air/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL14_air"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่าน · ทดแทน bl14_leap ช่วงลอย → pls_lair"
+    },
+    {
+     "id": "state_BL16_charge",
+     "name": "State · พันคมดับเถ้า bl16 ชาร์จ จับมีดกลับด้าน",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 72,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL16_charge/BL16_charge/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL16_charge/BL16_charge/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL16_charge/BL16_charge/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL16_charge/BL16_charge/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL16_charge"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่าน · ผมตั้ง ตาดุ แขนซ้ายเหยียดหน้า → pls_u_charge"
+    },
+    {
+     "id": "state_BL16_finish",
+     "name": "State · พันคมดับเถ้า bl16 ลงฟันตัดสิน",
+     "kind": "still",
+     "status": "draft",
+     "date": "2026-10-28",
+     "gens": 15,
+     "seed": 73,
+     "dirs": {
+      "south": "assets/sprites/pixellab_draft/states/BL16_finish/BL16_finish/rotations/south.png",
+      "east": "assets/sprites/pixellab_draft/states/BL16_finish/BL16_finish/rotations/east.png",
+      "north": "assets/sprites/pixellab_draft/states/BL16_finish/BL16_finish/rotations/north.png",
+      "west": "assets/sprites/pixellab_draft/states/BL16_finish/BL16_finish/rotations/west.png"
+     },
+     "prompt": {
+      "type": "state",
+      "key": "BL16_finish"
+     },
+     "ms": 500,
+     "game_ms": null,
+     "notes": "ผ่าน · มีดชี้พื้น แขนซ้ายเหวี่ยงหลัง → pls_u_finish"
     }
    ]
   },

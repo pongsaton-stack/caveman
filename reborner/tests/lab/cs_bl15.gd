@@ -4,6 +4,7 @@ extends "res://tests/lab/ma_hit.gd"
 ## Rion รอในท่าการ์ดผ่อน (ภาพเดิม pls_guard) → ตอนคมกระทบ พลิกข้อมือปัดให้ไหลออกข้าง (State BL15_roll · ประกายโลหะ)
 ## → 3 เฟรมต่อมาก้าวเฉียงฟันสวนทันที (ภาพเดิม pls_atk_bl_5 · โดน · ดาเมจของท่า) มอนกระเด็นหมุนกลับที่ → zanshin → ถอยกลับที่
 ## ห้ามมีเฟรมค้างระหว่างรับกับสวน (ทีม) · Rion ไม่เสีย HP
+## รอบ 2 (kwan 28 ต.ค. "ท่าดูไม่ลื่น"): พลิกข้อมือ → ฟันสวน = ท่ากลาง PixelLab pls_cs_counter_0–3 (ภาพเริ่ม State BL15_roll · ภาพจบ ฟันลงของ bl0) แทนการสลับภาพตรง
 
 const CUT := HIT + 3   # สวนตรงจังหวะมอนเด้งกลับ (BACK)
 
@@ -30,12 +31,12 @@ func geo(f: float) -> Dictionary:
 		r.key = "pls_guard_0"
 	elif F < HIT:   # เห็นมอนถีบตัว → ย่อรับ
 		r.key = "pls_guard_1"
-	elif F < CUT:   # รับให้ไหล + พลิกข้อมือ (ถอยครึ่งก้าว)
-		r.key = "pls_roll_0"
+	elif F < CUT:   # รับให้ไหล + พลิกข้อมือ (ถอยครึ่งก้าว) → ข้อมือม้วนมีดกลับขึ้น
+		r.key = "pls_cs_counter_0" if f - HIT < 1.5 else "pls_cs_counter_1"
 		r.x = _home() + 3 * minf(1.0, (f - HIT) / 2.0)
 	elif F < CUT + 10:   # ฟันสวน ก้าวเฉียงออก (ลงหน้านิด) → zanshin
 		var q := f - CUT
-		r.key = "pls_atk_bl_5" if q < 4 else "pls_atk_bl_6"
+		r.key = "pls_cs_counter_2" if q < 2 else ("pls_cs_counter_3" if q < 6 else "pls_atk_bl_6")
 		r.x = _home() + 3 - 12 * (1 - pow(1 - minf(1.0, q / 3.0), 2))
 		r.lift = -3 * minf(1.0, q / 3.0)
 		r.lean = -0.1 if q < 3 else 0.0

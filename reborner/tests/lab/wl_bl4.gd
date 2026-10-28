@@ -5,19 +5,25 @@ extends "res://tests/lab/row_base.gd"
 ## ขยายออกกวาดทุกตัวทีละตัว (ใกล้ → ไกล) → หมุนเลยครึ่งรอบแล้วเบรกค้างท่ากางแขนหันหน้า → หันกลับ → กระโดดถอยแบบท่าฟัน
 ## มุมภาพ pls_wheel_k: 0 ซ้าย · 1 ซ้ายเฉียงหน้า · 2 หน้า · 3 ขวาเฉียงหน้า · 4 ขวา · 5 ขวาเฉียงหลัง · 6 หลัง · 7 ซ้ายเฉียงหลัง
 ## มีด (มือขวา) อยู่ที่มุม θ = 3π/2 − k·π/4 บนวงรีรอบตัว (π = ฝั่งแถว/ซ้าย · π/2 = หน้า ใกล้กล้อง)
+## รอบ 3 (kwan 28 ต.ค. "วงล้อกับกวาด ลงไปกลางดงมอนเลย"): วิ่ง → กระโดดข้ามตัวหน้าลงกลางแถว (ท่ากลาง PixelLab bl14_leap) → ตัวหน้า 2 ตัวผงะเปิดทาง
+## → หมุนกลางดง คมลมแผ่ออกทั้งสองข้าง (ซ้าย/ขวา) โดนตามระยะจากตัว Rion · มอนกระเด็นออกจากตัว · บอสตัวเดียว = ลงหน้าบอสแบบเดิม
 
 const RUN0 := 18     # เริ่มวิ่ง
-const SPIN0 := 30    # ถึงหน้าแถว เริ่มหมุน
-const REV1 := 40     # จบรอบ 1
-const REV2 := 46     # จบรอบ 2
-const STOP := 52     # เบรกค้างท่าหันหน้า
-const TURN := 62     # หันกลับซ้าย
-const HOLD1 := 65    # เข้ากระโดดถอยของเครื่องฟัน
+const LEAP0 := 26    # กระโดดข้ามตัวหน้า
+const SPIN0 := 34    # ลงกลางแถว เริ่มหมุน
+const REV1 := 44     # จบรอบ 1
+const REV2 := 50     # จบรอบ 2
+const STOP := 56     # เบรกค้างท่าหันหน้า
+const TURN := 66     # หันกลับซ้าย
+const HOLD1 := 69    # เข้ากระโดดถอยของเครื่องฟัน
+const ROOM_PX := 8.0 # ตัวหน้า 2 ตัวผงะเปิดทางตอน Rion ลง
 const CHEST := 40    # ระดับมีดเหนือพื้น
 const WAVE_V := 24.0 # ความเร็วคมลม (px/เฟรม)
 
 var x_home := 0.0
 var x_spin := 0.0
+var x_jump := 0.0            # จุดถีบตัวกระโดด
+var mid := false             # ลงกลางแถว (มอน 3 ตัว)
 var release := 0.0           # เฟรมที่ปล่อยคมลม (มีดผ่านฝั่งแถวในรอบ 2)
 var hits_f: Array[float] = []
 
@@ -26,19 +32,34 @@ func mv() -> Dictionary:
 
 func end_frame() -> int: return HOLD1 + END - HOP0
 func stops() -> Array: return [[int(ceil(hits_f[0])), 0.08]] if not hits_f.is_empty() else []
-func caption() -> String: return "★ วิ่งเข้า → หมุนตัว 2 รอบ แขนกางมีดออก → คมลมกวาดทั้งแถว → เบรกค้างท่า → กระโดดถอย"
+func caption() -> String: return "★ วิ่ง → กระโดดลงกลางดงมอน → หมุนตัว 2 รอบ แขนกางมีดออก → คมลมแผ่สองข้าง → เบรกค้างท่า → กระโดดถอย"
 
 func setup() -> void:
 	super.setup()
 	setup_row(mw * 0.5 + 6)
 	x_home = start + 60
-	x_spin = cxs[0] + mw * 0.5 + 14
+	mid = cxs.size() == 3
+	x_spin = cxs[1] if mid else cxs[0] + mw * 0.5 + 14
+	x_jump = cxs[0] + mw * 0.5 + 30 if mid else x_spin + 22
 	near = x_spin + 4 - 60   # จุดเริ่มกระโดดถอย = หลังเบรก
 	# มีดผ่านฝั่งแถว (k = 2 → θ = π) ในรอบ 2 = v 10
 	release = _f_of_v(10.0)
 	hits_f.clear()
 	for c in cxs:
-		hits_f.append(release + maxf(0.0, (x_spin - c - 16) / WAVE_V))
+		hits_f.append(release + maxf(0.0, (absf(x_spin - c) - 16) / WAVE_V))
+
+## ทิศกระเด็นของมอนตัวที่ i (ออกจากตัว Rion) · ตัวกลาง (แถวหลัง) ถอยไปซ้ายเบาๆ
+func _dir(i: int) -> float:
+	if not mid or i == 1:
+		return -1.0 if not mid else -0.4
+	return signf(cxs[i] - x_spin)
+
+## ตัวหน้าผงะเปิดทางตอน Rion ลงกลางแถว
+func _room(i: int, f: float) -> float:
+	if not mid or i == 1 or f < SPIN0 - 2:
+		return 0.0
+	var u := minf(1.0, (f - SPIN0 + 2) / 4.0)
+	return _dir(i) * ROOM_PX * (1 - pow(1 - u, 2))
 
 # ── มุมหมุน (หน่วย = มุมภาพ · 8 ต่อรอบ) ─────────────
 func _v(f: float) -> float:
@@ -85,11 +106,17 @@ func geo(f: float) -> Dictionary:
 	if F >= HOLD1:
 		return super.geo(f - HOLD1 + HOP0)
 	var b := {"cx": x_home, "lift": 0.0, "lean": 0.0, "sx": 1.0, "sy": 1.0, "key": "pls_run_bl_0", "flip": false}
-	if F < SPIN0:   # วิ่งเร่ง · ง้าง 6 เฟรมท้าย (มีดพาดอก = ม้วนเก็บแรงบิด)
-		var u := (f - RUN0) / (SPIN0 - RUN0)
-		b.cx = x_home + (x_spin - x_home) * (u * u * 0.5 + u * 0.5)
+	if F < LEAP0:   # วิ่งเร่งถึงจุดถีบ
+		var u := (f - RUN0) / (LEAP0 - RUN0)
+		b.cx = x_home + (x_jump - x_home) * (u * u * 0.5 + u * 0.5)
 		b.lean = -0.07 * minf(1.0, u * 2)
-		b.key = "pls_run_bl_%d" % ((F - RUN0) % 6) if F < SPIN0 - 6 else "pls_atk_bl_%d" % (1 + mini(3, (F - (SPIN0 - 6)) / 2))
+		b.key = "pls_run_bl_%d" % ((F - RUN0) % 6)
+		return b
+	if F < SPIN0:   # กระโดดโค้งข้ามตัวหน้าลงกลางแถว (ย่อ → ถีบ → ลอยสูง → ลง)
+		var u := (f - LEAP0) / (SPIN0 - LEAP0)
+		b.cx = x_jump + (x_spin - x_jump) * u
+		b.lift = (40.0 if mid else 18.0) * sin(PI * u)
+		b.key = "pls_hop_bl_1" if u < 0.12 else ("pls_lair_0" if u < 0.72 else "pls_leap_4")   # ย่อถีบ → ลอยง้างมีด (State BL14_air) → ลง
 		return b
 	b.key = _key_v(_v(f))
 	b.cx = x_spin
@@ -129,9 +156,9 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	for i in mons.size():
 		var d := f - hits_f[i]
 		var dF := F - int(ceil(hits_f[i]))
-		var key := hurt_key() if d >= 0 and d < 14 else idle_key(f + i * 3)
+		var key := hurt_key() if (d >= 0 and d < 14) or (_room(i, f) != 0.0 and f < SPIN0 + 4) else idle_key(f + i * 3)
 		var amt := (0.25 if foe.begins_with("B") else 0.5) if dF == 0 else 0.0
-		_show(i, key, _sweep_kb(d), amt, 0.0, 0.95 if d >= 0 and d < 2 else 1.0)
+		_show(i, key, _room(i, f) - _sweep_kb(d) * _dir(i), amt, 0.0, 0.95 if d >= 0 and d < 2 else 1.0)
 	set_rion(rion, g)
 	if f >= SPIN0 + 3 and f < STOP:   # ร่างติดตาตอนหมุน: มุมก่อนหน้า (ฟ้าจาง)
 		var v := _v(f)
@@ -139,14 +166,17 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 			var gg := g.duplicate()
 			gg.key = _key_v(v - k * 0.9)
 			ghost(gg, 0.13 * (3 - k) * _spd(f), Color("#9ae6ff"), 0.4)
-	if F >= SPIN0 - 6 and F < SPIN0:
-		ghost(geo(f - 1.5), 0.15)
+	if F >= LEAP0 and F < SPIN0:   # ร่างติดตาตอนกระโดด
+		ghost(geo(f - 1.5), 0.18)
+		ghost(geo(f - 3), 0.1)
 	if fresh:
-		if F >= RUN0 and F < SPIN0 and (F - RUN0) % 3 == 0:
+		if F >= RUN0 and F < LEAP0 and (F - RUN0) % 3 == 0:
 			dust_at(g.cx + 6, 1.0, 0.5 + 0.5 * (F - RUN0) / (SPIN0 - RUN0))
-		if F == SPIN0:
-			dust_at(g.cx, 1.0, 1.3)
-			dust_at(g.cx, -1.0, 1.3)
+		if F == LEAP0:
+			dust_at(g.cx + 6, 1.0, 1.1)
+		if F == SPIN0:   # ลงกลางแถว
+			dust_at(g.cx, 1.0, 1.5)
+			dust_at(g.cx, -1.0, 1.5)
 		if F > SPIN0 and F < STOP and F % 2 == 0:   # ฝุ่นวนรอบเท้า
 			dust_at(g.cx + (10 if F % 4 == 0 else -10), 1.0 if F % 4 == 0 else -1.0, 0.9)
 		for i in mons.size():
@@ -174,9 +204,9 @@ func frame(f0: float, F0: int, fresh: bool) -> void:
 	show_bubble("วงล้อ!", g.cx, G - g.lift - 74, F - b0, (1.0 if F < SPIN0 + 2 else (SPIN0 + 6 - f) / 4.0) if F >= b0 and F < SPIN0 + 6 else 0.0)
 	var dws := F - int(ceil(hits_f[0]))
 	if dws >= 0 and dws < 18:   # เหนือหัว Rion ตอนโดนตัวแรก (ไม่ทับตัวเลขของแถว)
-		word(BM.sfx, clampf(x_spin - 34, 4, W - 72), G - 92 - mini(6, dws), Color("#e8f8ff"), 18 if dws < 2 else 16, 4)
+		word(BM.sfx, clampf(x_spin + 22, 4, W - 72), G - 70 - mini(6, dws), Color("#e8f8ff"), 18 if dws < 2 else 16, 4)   # ข้างตัว Rion ใต้แถวตัวเลข
 	for i in mons.size():
-		pop(dmg, maxf(16, cxs[i] + _sweep_kb(f - hits_f[i])), my + roundf(mh * 0.25) - (i % 2) * 18, F - int(ceil(hits_f[i])), Color.WHITE, aff_tag(), aff_col())
+		pop(dmg, maxf(16, cxs[i] + _room(i, f) - _sweep_kb(f - hits_f[i]) * _dir(i)), my + roundf(mh * 0.25) - (i % 2) * 18, F - int(ceil(hits_f[i])), Color.WHITE, aff_tag(), aff_col())
 
 # ── วาด ───────────────────────────────────────────
 ## รอยมีดวนรอบตัว (วงรีระดับอก) · back = ครึ่งหลังตัว (วาดใต้ Rion)
@@ -222,10 +252,11 @@ func _wave1(n: Node2D, f: float, back: bool, lag: float, amp: float) -> void:
 	var th := maxf(1.5, 5.5 - q * 0.35) * (0.6 + 0.4 * amp)   # บางลงเมื่อไกล
 	var span := 1.25
 	for layer in [[Color("#1a3a9a"), 2.0], [Color("#9ae6ff"), 0.0], [Color.WHITE, -2.2]]:
-		for k in 120:
-			var u := float(k) / 119
-			var a := PI - span + 2 * span * u
-			var front := sin(a) < 0   # มุม > π = ล่าง (หน้า ใกล้กล้อง) ตามแกน y ลง
+		for k in (240 if mid else 120):   # กลางแถว: วงโค้งสองฝั่ง (ซ้าย π · ขวา 0)
+			var side := 0.0 if k >= 120 else PI
+			var u := float(k % 120) / 119
+			var a := side - span + 2 * span * u
+			var front := sin(a) < 0   # มุม sin < 0 = ล่าง (หน้า ใกล้กล้อง) ตามแกน y ลง · ทั้งสองฝั่ง
 			if front == back:
 				continue
 			var mid := 1 - absf(u - 0.5) * 2   # หนาสุดตรงกลาง (ระดับแถว)
@@ -237,8 +268,8 @@ func _wave1(n: Node2D, f: float, back: bool, lag: float, amp: float) -> void:
 			col.a = al * amp * (1.0 if front else 0.55) * (0.3 + 0.7 * mid)
 			px(n, p.x - w / 2, p.y - w / 2, col, ceil(w), ceil(w))
 	if not back and lag == 0.0:   # เศษลม/เถ้าที่ขอบนำ
-		for i in 10:
-			var a := PI + (fb_hash(i, 3, 2) - 0.5) * 1.6
+		for i in (20 if mid else 10):
+			var a := (PI if i < 10 else 0.0) + (fb_hash(i, 3, 2) - 0.5) * 1.6
 			var r := R + fb_hash(i, floor(f), 6) * 6
 			px(n, c.x + cos(a) * r, c.y + sin(a) * r * 0.16 - fb_hash(i, 5, 1) * 10, Color(0.88, 0.95, 1, al * 0.8), 2 if i % 3 == 0 else 1, 1)
 
@@ -288,7 +319,7 @@ func draw_fx(n: Node2D) -> void:
 		if d >= 0 and d < 12:
 			var al := 1.0 if d < 6 else maxf(0.0, 1 - (d - 6) / 6.0)
 			var half := mw * (0.2 if hard_body() else 0.26)
-			var x0: float = cxs[i] + _sweep_kb(d)
+			var x0: float = cxs[i] + _room(i, f) - _sweep_kb(d) * _dir(i)
 			var wy := gy(i) - CHEST + 7
 			slash_line(n, x0 + half, wy - 2, x0 - half, wy + 2, 3 if i == 0 else 2, minf(1.0, (d + 1) / 2.0), al)
 	var dw := f - release

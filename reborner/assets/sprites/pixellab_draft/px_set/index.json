@@ -677,6 +677,243 @@
   },
   {
    "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_iai_draw",
+   "label": "ปาดไว bl5 · ชักฟันออกจากซอง (ท่ากลาง ย่อ → ปลายจังหวะ) · 6 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1112 จุด)",
+   "frames": [
+    "pls_iai_draw_0",
+    "pls_iai_draw_1",
+    "pls_iai_draw_2",
+    "pls_iai_draw_3",
+    "pls_iai_draw_4",
+    "pls_iai_draw_5"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL5_iai_crouch bl5_draw_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_iai_noto",
+   "label": "ปาดไว bl5 · สะบัดคม + เก็บเข้าซอง (ท่ากลาง ปลายจังหวะ → ย่อ) · 6 เฟรม (PixelLab · ลบแสงที่วาดติดมา 503 จุด)",
+   "frames": [
+    "pls_iai_noto_0",
+    "pls_iai_noto_1",
+    "pls_iai_noto_2",
+    "pls_iai_noto_3",
+    "pls_iai_noto_4",
+    "pls_iai_noto_5"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL5_iai_crouch bl5_noto_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_sd_summon",
+   "label": "เงาสองคม bl6 · เสกมีดเงามือซ้าย (ท่ากลาง ยืนสู้ → ตั้งท่าสองมีด) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 11 จุด)",
+   "frames": [
+    "pls_sd_summon_0",
+    "pls_sd_summon_1",
+    "pls_sd_summon_2",
+    "pls_sd_summon_3"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl6_summon_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_sd_cut",
+   "label": "เงาสองคม bl6 · ฟันมีดขวา (ท่ากลาง ตั้งท่า → ฟัน) · 3 เฟรม (PixelLab · ลบแสงที่วาดติดมา 271 จุด)",
+   "frames": [
+    "pls_sd_cut_0",
+    "pls_sd_cut_1",
+    "pls_sd_cut_2"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL6_enso bl6_cut_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_sd_x",
+   "label": "เงาสองคม bl6 · ไขว้มีดเงาเป็น X (ท่ากลาง ฟัน → ไขว้) · 3 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_sd_x_0",
+    "pls_sd_x_1",
+    "pls_sd_x_2"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL6_enso bl6_x_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_sh_glide",
+   "label": "ก้าวเงา bl13 · เลื้อยก้าวไขว้ (วน 6 เฟรม) · 6 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1335 จุด)",
+   "frames": [
+    "pls_sh_glide_0",
+    "pls_sh_glide_1",
+    "pls_sh_glide_2",
+    "pls_sh_glide_3",
+    "pls_sh_glide_4",
+    "pls_sh_glide_5"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL13_slither bl13_glide_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_sh_cut",
+   "label": "ก้าวเงา bl13 · ดีดตัวปาดต่ำ (ท่ากลาง เลื้อย → ปาด) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1794 จุด)",
+   "frames": [
+    "pls_sh_cut_0",
+    "pls_sh_cut_1",
+    "pls_sh_cut_2",
+    "pls_sh_cut_3"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl13_cut_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_leap",
+   "label": "ปาดข้ามแถว bl14 · กระโดดสูงข้ามแนวหน้า ฟันลง (8 เฟรม · ใช้ร่วมวงล้อ/กวาด/ไม้ตาย) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 1345 จุด)",
+   "frames": [
+    "pls_leap_0",
+    "pls_leap_1",
+    "pls_leap_2",
+    "pls_leap_3",
+    "pls_leap_4",
+    "pls_leap_5",
+    "pls_leap_6",
+    "pls_leap_7"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl14_leap_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_cs_counter",
+   "label": "คมสวน bl15 · พลิกข้อมือ → ฟันสวน (ท่ากลาง) · 4 เฟรม (PixelLab · ลบแสงที่วาดติดมา 2189 จุด)",
+   "frames": [
+    "pls_cs_counter_0",
+    "pls_cs_counter_1",
+    "pls_cs_counter_2",
+    "pls_cs_counter_3"
+   ],
+   "ms": 60,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab fight_knife bl15_counter_v west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_lair",
+   "label": "กระโดดสูงลอยง้างมีดเหนือหัว (State BL14_air · ใช้ร่วม bl14 bl4 bl3 bl16) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_lair_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL14_air __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_kneel",
+   "label": "กวาด bl3 · คุกเข่ากางแขนมีด 8 มุม (State BL3_kneel_sweep + rot8) · 8 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_kneel_0",
+    "pls_kneel_1",
+    "pls_kneel_2",
+    "pls_kneel_3",
+    "pls_kneel_4",
+    "pls_kneel_5",
+    "pls_kneel_6",
+    "pls_kneel_7"
+   ],
+   "ms": 60,
+   "loop": true,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL3_kneel_sweep __rot8__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_u_charge",
+   "label": "พันคมดับเถ้า bl16 · ชาร์จจับมีดกลับด้าน (State BL16_charge) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_u_charge_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL16_charge __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
+   "id": "pls_u_finish",
+   "label": "พันคมดับเถ้า bl16 · ลงฟันตัดสิน (State BL16_finish) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
+   "frames": [
+    "pls_u_finish_0"
+   ],
+   "ms": 90,
+   "loop": false,
+   "w": 120,
+   "travel": 0,
+   "src": [
+    "pixellab BL16_finish __rot__ west"
+   ]
+  },
+  {
+   "group": "★ Rion PixelLab · ชุดในเกม (ร่าง 19 ต.ค.)",
    "id": "pls_bat_idle",
    "label": "ยืนถือไม้เบสบอล (State) · 1 เฟรม (PixelLab · ลบแสงที่วาดติดมา 0 จุด)",
    "frames": [

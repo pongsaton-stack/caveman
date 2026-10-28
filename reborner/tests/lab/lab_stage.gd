@@ -28,7 +28,7 @@ const MUSIC := "res://docs/art-bible/audio/battle_bgm_preview.mp3"   # เพล
 const FOES := ["M01", "M03", "M06", "M15", "B1"]   # มอน 5 ตัวแรกของหน้าฉากต่อสู้ (kwan 25 ต.ค.)
 ## ท่าที่ย้ายมาแล้ว: [id, ชื่อในเมนู, ฉาก]
 const TECHS := [["bl0", "ฟัน", "res://tests/lab/blc_bl0.tscn"], ["bl1", "เขี้ยวพุ่ง", "res://tests/lab/blc_bl1.tscn"], ["bl2", "เขี้ยวพัน", "res://tests/lab/wr_bl2.tscn"],
-	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"], ["bl10", "ทะลวงแนว", "res://tests/lab/tl_bl10.tscn"], ["bl11", "มีดบินวกกลับ", "res://tests/lab/tb_bl11.tscn"], ["bl4", "วงล้อ", "res://tests/lab/wl_bl4.tscn"], ["bl12", "พายุเถ้าใบมีด", "res://tests/lab/st_bl12.tscn"], ["bl5", "ปาดไว", "res://tests/lab/ia_bl5.tscn"], ["bl6", "เงาสองคม", "res://tests/lab/sd_bl6.tscn"], ["bl13", "ก้าวเงา", "res://tests/lab/sh_bl13.tscn"], ["bl14", "ปาดข้ามแถว", "res://tests/lab/tr_bl14.tscn"], ["bl15", "คมสวน", "res://tests/lab/cs_bl15.tscn"],
+	["bl7", "ตัดเอ็น", "res://tests/lab/aot_bl7.tscn"], ["bl8", "ผ่าเกราะ", "res://tests/lab/kw_bl8.tscn"], ["bl9", "จันทร์เสี้ยว", "res://tests/lab/jg_bl9.tscn"], ["bl3", "กวาด", "res://tests/lab/sw_bl3.tscn"], ["bl10", "ทะลวงแนว", "res://tests/lab/tl_bl10.tscn"], ["bl11", "มีดบินวกกลับ", "res://tests/lab/tb_bl11.tscn"], ["bl4", "วงล้อ", "res://tests/lab/wl_bl4.tscn"], ["bl12", "พายุเถ้าใบมีด", "res://tests/lab/st_bl12.tscn"], ["bl5", "ปาดไว", "res://tests/lab/ia_bl5.tscn"], ["bl6", "เงาสองคม", "res://tests/lab/sd_bl6.tscn"], ["bl13", "ก้าวเงา", "res://tests/lab/sh_bl13.tscn"], ["bl14", "ปาดข้ามแถว", "res://tests/lab/tr_bl14.tscn"], ["bl15", "คมสวน", "res://tests/lab/cs_bl15.tscn"], ["bl16", "พันคมดับเถ้า", "res://tests/lab/uk_bl16.tscn"],
 	["★", "เขี้ยวพุ่ง", "res://tests/lab/glim_bl1.tscn"], ["★", "กวาด", "res://tests/lab/glim_bl3.tscn"], ["★", "ปาดไว", "res://tests/lab/glim_bl5.tscn"],
 	["มอนตี", "โดน", "res://tests/lab/ma_hit.tscn"], ["มอนตี", "ตั้งรับ", "res://tests/lab/ma_guard.tscn"],
 	["ทุบ", "ไม้เบสบอล", "res://tests/lab/pl_bt0.tscn"]]   # แถวบน สายคม · แถวล่าง ★ = ประกายได้ท่าใหม่ + มอนตีกลับ + ทุบ (kwan 28 ต.ค. เอาท่าภาพ Flow ออก)
@@ -49,6 +49,7 @@ const DMG := {"bl0": {"M01": [55, 0, 1], "M03": [17, -1, 1], "M06": [53, 0, 1], 
 	"bl13": {"M01": [36, 0, 1], "M03": [11, -1, 1], "M06": [34, 0, 1], "M15": [37, 1, 1], "B1": [20, -1, 1]},   # พลัง 65
 	"bl14": {"M01": [47, 0, 1], "M03": [14, -1, 1], "M06": [45, 0, 1], "M15": [48, 1, 1], "B1": [26, -1, 1]},   # พลัง 85 (ตีแถวหลังเต็ม)
 	"bl15": {"M01": [83, 0, 1], "M03": [26, -1, 1], "M06": [80, 0, 1], "M15": [86, 1, 1], "B1": [47, -1, 1]},   # พลัง 150 (ท่าสวน)
+	"bl16": {"M01": [33, 0, 5], "M03": [10, -1, 5], "M06": [32, 0, 5], "M15": [34, 1, 5], "B1": [19, -1, 5]},   # ไม้ตาย พลัง 60 × 5 ครั้ง = bl0 × 0.6 (ปัดแบบ bl3 · เท่า bl11)
 	"bl3": {"M01": [50, 0, 1], "M03": [15, -1, 1], "M06": [48, 0, 1], "M15": [51, 1, 1], "B1": [28, -1, 1]},
 	"bl5": {"M01": [44, 0, 1], "M03": [13, -1, 1], "M06": [42, 0, 1], "M15": [45, 1, 1], "B1": [25, -1, 1]},
 	"bl2": {"M01": [34, 0, 3], "M03": [10, -1, 3], "M06": [33, 0, 3], "M15": [35, 1, 3], "B1": [19, -1, 3]},

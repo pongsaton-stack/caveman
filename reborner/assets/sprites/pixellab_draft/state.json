@@ -934,6 +934,177 @@
     "enhanced_prompt": null,
     "enhance_usage": null
    }
+  },
+  {
+   "move": "bl5_draw",
+   "dir": "west",
+   "seed": 61,
+   "state": "BL5_iai_crouch",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "704c590e-0a2a-4950-99e2-00480505e9dd"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "d91fdb5f-0c7f-48cf-954f-e6c199c13509",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl5_noto",
+   "dir": "west",
+   "seed": 62,
+   "state": "BL5_iai_crouch",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "82b7e922-2f56-4768-80b1-4a5f073d414d"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "079e7344-9c46-4e00-a592-74294290cd50",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl6_summon",
+   "dir": "west",
+   "seed": 63,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "3afdd49f-342a-4101-88fb-1b85e478042d"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "217361d5-6fe8-46f5-9139-58dbbbfa5722",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl6_cut",
+   "dir": "west",
+   "seed": 64,
+   "state": "BL6_enso",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "411bbacc-1d22-47a7-be3b-bf040e27fd30"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "e08dfe8b-defb-40d4-83f3-41c30ae5c1a8",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl6_x",
+   "dir": "west",
+   "seed": 65,
+   "state": "BL6_enso",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "bdcf2660-e0a9-47e9-b43b-6d36c0b133fa"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "f18c29fe-3ed1-4a10-8b90-14dff6179387",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl13_glide",
+   "dir": "west",
+   "seed": 66,
+   "state": "BL13_slither",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "f9a02221-3fbb-483d-aa1b-c9f8a628f749"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "0669d4c3-8027-4419-afea-8bdb55e30ca1",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl13_cut",
+   "dir": "west",
+   "seed": 67,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "69f01d0c-fd69-4582-ba51-46f3c86e4c53"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "8a52060f-1243-4943-9e68-580032587d50",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl14_leap",
+   "dir": "west",
+   "seed": 68,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "915d7601-a397-43b7-b888-98f5025238f1"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "df912d89-4849-44ea-bdc7-3961c359f645",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
+  },
+  {
+   "move": "bl15_counter",
+   "dir": "west",
+   "seed": 69,
+   "state": "fight_knife",
+   "start": null,
+   "response": {
+    "background_job_ids": [
+     "43642f76-a22b-4d23-85a5-f4c140ce8e0b"
+    ],
+    "directions": [
+     "west"
+    ],
+    "animation_group_id": "0f35c4c0-dadd-499b-bd32-49ca9256065f",
+    "status": "processing",
+    "enhanced_prompt": null,
+    "enhance_usage": null
+   }
   }
  ],
  "anim_jobs": {
@@ -979,7 +1150,16 @@
   "50768459-37b8-47df-9118-21c182cce4bf": "completed",
   "ed4142de-0db2-44eb-9636-affad22b968c": "completed",
   "075a4b67-70dd-4174-908e-438640704071": "completed",
-  "a8edbb09-07b2-4ed8-892e-6a0fd125632c": "completed"
+  "a8edbb09-07b2-4ed8-892e-6a0fd125632c": "completed",
+  "704c590e-0a2a-4950-99e2-00480505e9dd": "completed",
+  "82b7e922-2f56-4768-80b1-4a5f073d414d": "completed",
+  "3afdd49f-342a-4101-88fb-1b85e478042d": "completed",
+  "411bbacc-1d22-47a7-be3b-bf040e27fd30": "completed",
+  "bdcf2660-e0a9-47e9-b43b-6d36c0b133fa": "completed",
+  "f9a02221-3fbb-483d-aa1b-c9f8a628f749": "completed",
+  "69f01d0c-fd69-4582-ba51-46f3c86e4c53": "completed",
+  "915d7601-a397-43b7-b888-98f5025238f1": "completed",
+  "43642f76-a22b-4d23-85a5-f4c140ce8e0b": "completed"
  },
  "states": {
   "fight_knife": {
@@ -1170,6 +1350,42 @@
     "status": "queued"
    },
    "status": "completed"
+  },
+  "BL3_kneel_sweep": {
+   "response": {
+    "usage": null,
+    "background_job_id": "84766817-54dd-4759-bf11-b02a137784a0",
+    "character_id": "9bf086af-19fc-49c5-8bc2-89bce2bf4bcb",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL16_charge": {
+   "response": {
+    "usage": null,
+    "background_job_id": "69587100-180f-4437-8ff3-f653083f0ac8",
+    "character_id": "f6de1e2e-2700-4027-a881-707c1b3fecc4",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL16_finish": {
+   "response": {
+    "usage": null,
+    "background_job_id": "4eab3100-10bb-4e7e-92a8-9c95bfe486db",
+    "character_id": "f036089f-4a72-48c8-8231-bc8b33d5642b",
+    "status": "queued"
+   },
+   "status": "completed"
+  },
+  "BL14_air": {
+   "response": {
+    "usage": null,
+    "background_job_id": "ee97bfd8-6276-4ee9-886f-f6787165e59e",
+    "character_id": "24c1c580-c32b-40c4-a8f6-6b39aec92b48",
+    "status": "queued"
+   },
+   "status": "completed"
   }
  },
  "monsters": {
@@ -1319,6 +1535,14 @@
    "usage": null,
    "background_job_id": "e57f3f25-a329-473e-8a1b-04b7d5608c65",
    "character_id": "8eec6317-df5c-4f21-be25-fd378382ce89",
+   "status": "processing",
+   "enhanced_prompt": null,
+   "enhance_usage": null
+  },
+  "BL3_kneel_sweep": {
+   "usage": null,
+   "background_job_id": "2f58ccce-227a-4e47-92de-a9932638ecbe",
+   "character_id": "6545fea0-938d-4132-8a06-3de6db98da4e",
    "status": "processing",
    "enhanced_prompt": null,
    "enhance_usage": null
