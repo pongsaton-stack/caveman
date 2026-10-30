@@ -150,6 +150,11 @@ func _commit(action: Dictionary) -> void:
 	var kind := str(action.get("kind"))
 	b.player_act(action)
 	_flush_log()
+	if await _try_cutin():
+		_refresh()
+		await get_tree().create_timer(step_delay).timeout
+		_advance()
+		return
 	_refresh()
 	_play_events()
 	if kind != "guard" and kind != "watch" and hero.counter_tech == null:
@@ -199,11 +204,85 @@ func _react_hero() -> void:
 func _hero_auto_turn() -> void:
 	b.auto_act(hero)
 	_flush_log()
+	if await _try_cutin():
+		_refresh()
+		return
 	_refresh()
 	_play_events()
 	if not hero.guarding and hero.counter_tech == null:
 		await _play_attack()
 	await _await_fx()
+
+# ── ฉากท่าจากห้องทดลอง (kwan 30 ต.ค. "ฉากท่า มอน เพลง ที่ทำไว้ เอาเข้ามาลองจริง") ──
+## Rion ใช้ท่าที่มีฉากใน tests/lab → ตัดเข้าฉากเต็มจอ (มอนตัวที่โดน · ตัวเลขจริงจาก Battle) แล้วกลับจอศึก
+## ฉากต้นทางเป็นร่างในห้องทดลอง · มอนต้องมีภาพใน monsters_px_draft · เทสต์ (step_delay 0) ข้าม
+const CUTIN_BG := "ash_village"
+var cutins := true   # เทสต์ภาพท่าเดิม (animtest) ปิดได้
+const CUTIN_W := 300
+const CUTIN_H := 168
+const LAB_STAGE := "res://tests/lab/lab_stage.gd"
+
+func _cutin_scene(tech_id: String) -> String:
+	if not ResourceLoader.exists(LAB_STAGE):   # เกมที่ export แล้วไม่มี tests/ → ใช้เอฟเฟกต์เดิม
+		return ""
+	var techs: Array = (load(LAB_STAGE) as Script).get_script_constant_map().get("TECHS", [])
+	for row in techs:
+		if str(row[0]) == tech_id:
+			return str(row[2])
+	if tech_id == "bt0":
+		return "res://tests/lab/pl_bt0.tscn"
+	return ""
+
+## คืน true ถ้าเล่นฉากแล้ว (กินเหตุการณ์ของเทิร์นนี้แทนเอฟเฟกต์เดิม)
+func _try_cutin() -> bool:
+	if not cutins or step_delay <= 0.0 or b.techs == null:
+		return false
+	var main: Dictionary = {}
+	for e in b.events:
+		if e.has("tech") and e.get("src") == hero and e["tgt"] != hero:
+			main = e
+			break
+	if main.is_empty():
+		return false
+	var t: Tech = b.techs.get_tech(str(main["tech"]))
+	if t == null:
+		return false
+	var scene := _cutin_scene(t.id)
+	var tgt: Actor = main["tgt"]
+	if scene == "" or not ResourceLoader.exists(scene) or not FileAccess.file_exists("res://assets/sprites/monsters_px_draft/%s_0.png" % tgt.id):
+		return false
+	var dmg := 0
+	var hits := 0
+	for e in b.events:
+		if e.get("tgt") == tgt and not e.has("dot"):
+			dmg += int(e.get("dmg", 0))
+			hits += 1
+	b.events.clear()
+	var layer := CanvasLayer.new()
+	layer.layer = 20
+	add_child(layer)
+	var bgd := ColorRect.new()   # ขอบดำกันจอศึกโผล่ (สัดส่วนฉาก 300x168 ใกล้ 384x216)
+	bgd.color = Color.BLACK
+	bgd.size = get_viewport().get_visible_rect().size
+	layer.add_child(bgd)
+	var box := SubViewportContainer.new()
+	box.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	box.size = Vector2(CUTIN_W, CUTIN_H)
+	var scr := get_viewport().get_visible_rect().size
+	var k := minf(scr.x / CUTIN_W, scr.y / CUTIN_H)
+	box.scale = Vector2(k, k)
+	box.position = (scr - Vector2(CUTIN_W, CUTIN_H) * k) / 2.0
+	layer.add_child(box)
+	var vp := SubViewport.new()
+	vp.size = Vector2i(CUTIN_W, CUTIN_H)
+	vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+	box.add_child(vp)
+	Engine.set_meta("lab_embed", {"foe": tgt.id, "bg": CUTIN_BG, "dmg": dmg, "hits": maxi(1, hits), "aff": 0, "kill": tgt.down})
+	var stage: Node = load(scene).instantiate()
+	vp.add_child(stage)
+	await stage.embed_done
+	layer.queue_free()
+	return true
 
 # ── คำสั่งของผู้เล่น ─────────────────────────────────────────
 func _show_commands() -> void:

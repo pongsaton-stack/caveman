@@ -15,7 +15,7 @@ const ENEMY_STEP := 0.9
 const CHASE_RANGE := 4
 const MAP_PATH := "res://data/map_ashfield.txt"
 const REGION := "ที่ราบเถ้า"   # ภูมิภาคของแผนที่นี้ (คอลัมน์ region ใน monsters.csv / shops.csv)
-const SPRITE_DIR := "res://assets/sprites/rion_px"
+const SPRITE_DIR := "res://assets/sprites/rion_walk_pl"   # ท่าเดิน PixelLab 8 เฟรม (kwan 30 ต.ค. ชุด rion_px เดิมไม่ผ่าน · tools/sprites/rion_walk_pl.py)
 
 # Rion พิกเซล 32-bit (kwan 16 ต.ค. 2026 เลือกเปลี่ยนแนวภาพเป็นพิกเซล ตัวสูง ~72) · tools/sprites/rion_px_game.py
 # ผืน 96x112 เท้าแถว ~108 · เดิน 8 เฟรม/ทิศ (2 ก้าว/รอบ · w0 = ภาพตอนหยุด) · โหลดตามไฟล์ที่มี (<ทิศ>_w0, _w1, ...)
@@ -69,6 +69,24 @@ var panel_label: Label
 var busy := false
 var enemy_clock := 0.0
 
+# ── เพลง (kwan 30 ต.ค. "เพลงที่ทำไว้ เอาเข้ามาลองจริง") · repo reborner-jrpg-battle-music ปรับดัง −16 LUFS ──
+const MUSIC := {"field": "res://assets/audio/music/field.mp3", "battle": "res://assets/audio/music/battle.mp3", "boss": "res://assets/audio/music/boss.mp3"}
+var music: AudioStreamPlayer
+var music_key := ""
+
+func play_music(key: String) -> void:
+	if key == music_key or not MUSIC.has(key) or not ResourceLoader.exists(MUSIC[key]):
+		return
+	music_key = key
+	if music == null:
+		music = AudioStreamPlayer.new()
+		music.volume_db = -6.0
+		add_child(music)
+	var st: AudioStream = load(MUSIC[key])
+	st.set("loop", true)
+	music.stream = st
+	music.play()
+
 func _ready() -> void:
 	rng.randomize()
 	randomize()
@@ -99,6 +117,7 @@ func _ready() -> void:
 		ps.cell = map.start
 		ps.rest_cell = map.start
 	_build_hero()
+	play_music("field")
 	_build_dog()
 	_build_drops()
 	_spawn_chests()
@@ -791,7 +810,9 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 	var amb_txt := {"ally": " · ลอบตีสำเร็จ", "foe": " · ถูกลอบตี"}
 	screen.setup(b, "%s%s%s" % ["บอส: " if e.is_boss else "", e.label_text, amb_txt.get(ambush, "")], ps.auto_battle)
 	add_child(screen)
+	play_music("boss" if e.is_boss else "battle")
 	var res: Dictionary = await screen.finished
+	play_music("field")
 	ps.auto_battle = bool(res.get("auto", ps.auto_battle))
 
 	var lines: Array[String] = []

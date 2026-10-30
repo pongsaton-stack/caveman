@@ -150,6 +150,10 @@ var weapons: Array = []   # [รหัส, ชื่อ, weapon_base หรื�
 var weapon_id := ""
 var art_id := ""   # ชิ้นที่ภาพ Rion ถืออยู่จริง (ชิ้นตั้งต้นของสาย หรือไม้ที่มีสกิน)
 var speed := 1.0   # ความเร็วเล่น (ปุ่มในเมนู · เก็บใน Engine meta "lab_speed")
+## โหมดฝังในศึกจริง (kwan 30 ต.ค. "ฉากท่า … เอาเข้ามาลองจริง"): BattleScreen ตั้ง Engine meta "lab_embed"
+## {foe, bg, dmg, hits, aff, kill} แล้ววางฉากใน SubViewport → เล่นครั้งเดียว ไม่มีเมนู/เพลงของแลป ไม่แตะหน้าต่าง → embed_done
+signal embed_done
+var embed := {}
 var debris: Array = []   # [kind, สี, x, y, vx, vy, g, life, เฟรมเกิด]
 
 # ── ส่วนที่ท่าแต่ละท่าเขียนทับ ──────────────────────────
@@ -170,6 +174,12 @@ func _ready() -> void:
 	foe = str(Engine.get_meta("lab_foe", "M01"))
 	bg_id = str(Engine.get_meta("lab_bg", "frost_volcano"))
 	speed = float(Engine.get_meta("lab_speed", 1.0))
+	embed = Engine.get_meta("lab_embed", {})
+	if not embed.is_empty():
+		Engine.remove_meta("lab_embed")
+		foe = str(embed.get("foe", foe))
+		bg_id = str(embed.get("bg", bg_id))
+		speed = 1.0
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--foe="):
 			foe = a.substr(6)
@@ -189,7 +199,16 @@ func _ready() -> void:
 			Engine.set_meta("lab_weapon_" + tech_id().substr(0, 2), a.substr(9))
 	if not BGS.has(bg_id):
 		bg_id = "frost_volcano"
-	playing = recording or bool(Engine.get_meta("lab_auto", false))
+	playing = recording or bool(Engine.get_meta("lab_auto", false)) or not embed.is_empty()
+	if not embed.is_empty():
+		_audio_bus()
+		_load_monster()
+		_build_stage()
+		setup()
+		_build_ui()
+		menu.visible = false
+		_step()
+		return
 	var win := get_window()
 	win.content_scale_size = Vector2i(W, H)
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS   # วาดตามขนาดจอจริง: ตัวอักษรคม (kwan 27 ต.ค. "ขอตัวอักษรชัดหน่อย") · ภาพพิกเซลยังกรองแบบ nearest
@@ -253,6 +272,11 @@ func _load_monster() -> void:
 	aff = d[1]
 	hits = d[2]
 	kill = dmg >= hp
+	if not embed.is_empty():   # ตัวเลขจริงจาก Battle
+		dmg = int(embed.get("dmg", dmg))
+		hits = maxi(1, int(embed.get("hits", hits)))
+		aff = int(embed.get("aff", aff))
+		kill = bool(embed.get("kill", kill))
 	mon_img = _img(MPX + foe + "_0.png")
 	mw = mon_img.get_width()
 	mh = mon_img.get_height()
@@ -1240,6 +1264,12 @@ func _button(text: String, pos: Vector2, size: Vector2, text_h: float) -> Button
 
 ## เล่นวนอยู่: แตะ/คลิกจอ = หยุดวน (จบรอบนี้แล้วขึ้นเมนู)
 func _input(event: InputEvent) -> void:
+	if not embed.is_empty():   # ในศึกจริง: Enter/คลิก/แตะ = ข้ามฉาก
+		if playing and (event.is_action_pressed("ui_accept") or ((event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed)):
+			get_viewport().set_input_as_handled()
+			playing = false
+			embed_done.emit()
+		return
 	if playing and bool(Engine.get_meta("lab_loop", false)) and (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
 		Engine.set_meta("lab_loop", false)
 		caption_lbl.text = "หยุดวนแล้ว · จบรอบนี้แล้วกลับเมนู"
@@ -1277,6 +1307,10 @@ func _process(delta: float) -> void:
 	if not snaps.is_empty() and snaps.values().all(func(v): return v):
 		get_tree().quit()
 	if t > end_frame() * SEC + 0.5:
+		if not embed.is_empty():
+			playing = false
+			embed_done.emit()
+			return
 		if recording:
 			get_tree().quit()
 		elif bool(Engine.get_meta("lab_loop", false)):   # เล่นวน: เริ่มท่าเดิมใหม่ทันที
@@ -1358,7 +1392,8 @@ func _audio_bus() -> void:
 		AudioServer.set_bus_volume_db(AudioServer.bus_count - 1, linear_to_db(0.28 * 0.85))
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabSfx"), bool(Engine.get_meta("lab_mute", false)))
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("LabMusic"), bool(Engine.get_meta("lab_music_off", false)))
-	_music()
+	if embed.is_empty():   # ในศึกจริงใช้เพลงของเกม
+		_music()
 	for k in 12:
 		var p := AudioStreamPlayer.new()
 		p.bus = "LabSfx"

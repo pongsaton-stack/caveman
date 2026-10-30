@@ -14,7 +14,7 @@ func _initialize() -> void:
 	var b := Battle.new(); b.techs = techs
 	b.actors.append(ps.make_hero())
 	for j in 2: b.actors.append(Actor.from_csv(by_id["B1"]))
-	screen = BattleScreen.new(); screen.step_delay = 0.08; screen.end_delay = 0.0
+	screen = BattleScreen.new(); screen.step_delay = 0.08; screen.end_delay = 0.0; screen.cutins = false   # ตรวจท่าฟันเฟรมเดิม (ฉากห้องทดลองตรวจแยก)
 	screen.setup(b, "anim", true)
 	screen.finished.connect(_done)
 	root.add_child(screen)
