@@ -36,6 +36,7 @@ var guards := 0
 var status_deaths := 0
 var enrages := 0                 # มอนที่โกรธในศึกนี้ (data/enrage.csv)
 var combos := 0
+var defeated_ids: Array[String] = []   # monster_id ของศัตรูที่ล้ม ตามลำดับ (ตรวจสิทธิ์ขอเข้าทีม · MONSTER_ALLY_SYSTEM_SPEC 2.1)
 ## รอบ (COMBO_TECH_SPEC ส่วน 2 · นิยาม 30 ต.ค.) = ทุกตัวที่ยืนอยู่ตอนเริ่มรอบได้ถึงคิวครบอย่างน้อย 1 ครั้ง
 ## ถึงคิวแล้วถูกข้าม (ขัดจังหวะ/สถานะ) ก็นับ (kwan 30 ต.ค. "1") · ตัวที่เข้ามากลางรอบเริ่มนับรอบถัดไป
 ## ต่างจาก `rounds` ที่นับทุกแอ็กชัน (คงไว้ — Sim/เทสต์ใช้อยู่)
@@ -354,6 +355,7 @@ func _tick_status_damage(a: Actor) -> bool:
 		status_deaths += 1
 		if a.side == "foe":
 			kills += 1
+			defeated_ids.append(a.id)
 		else:
 			downs += 1
 			if not a.is_hero:
@@ -699,6 +701,7 @@ func _strike(src: Actor, tgt: Actor, tech: Tech, bonus: float) -> void:
 		tgt.down = true
 		if tgt.side == "foe":
 			kills += 1; hits_on_kill += tgt.hits
+			defeated_ids.append(tgt.id)
 		else:
 			downs += 1
 			if not tgt.is_hero:
@@ -843,5 +846,5 @@ func _result() -> Dictionary:
 		"statuses": statuses_applied, "guards": guards, "status_deaths": status_deaths, "enrages": enrages,
 		"combos": combos, "telegraphs": telegraphs, "interrupts": interrupts,
 		"ambush": ambush,
-		"understanding": understanding.duplicate(), "understood": understood(),
+		"understanding": understanding.duplicate(), "understood": understood(), "defeated": defeated_ids.duplicate(),
 	}

@@ -11,7 +11,11 @@ func _init() -> void:
 	var ps := PlayerState.new()
 	ps.init_new(techs, Vector2i(3, 3))
 	ps.seed_party(comp_rows)
-	_check(ps.party.size() == 2, "seed 2 companions")
+	_check(ps.party.is_empty(), "start alone (kwan 30 ต.ค. · companions.csv ว่าง)")
+	ps.join_ally("M03", "หนอนหินร่วมทาง")
+	ps.join_ally("M06", "ค้างคาวร่วมทาง")
+	for m in ps.party:
+		m["loyalty"] = 7   # ค่าเดียวกับที่ Sim ใช้
 	ps.seed_party(comp_rows)
 	_check(ps.party.size() == 2, "seed only once")
 	_check(PlayerState.monster_slots_for(0, slot_rows) == 2 and PlayerState.monster_slots_for(6, slot_rows) == 2 and PlayerState.monster_slots_for(12, slot_rows) == 2, "slots fixed 2 at every EC (kwan 30 ต.ค.)")
@@ -57,5 +61,5 @@ func _init() -> void:
 	var ps3 := PlayerState.new()
 	ps3.from_dict({"prof": 12})
 	ps3.seed_party(comp_rows)
-	_check(ps3.party.size() == 2, "v1 save seeds party on load")
+	_check(ps3.party.is_empty(), "v1 save: seed ว่าง = เริ่มคนเดียว")
 	quit()

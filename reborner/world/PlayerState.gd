@@ -38,6 +38,8 @@ var auto_battle := true                # กฎ UX ข้อ 1 ของ kwan: �
 var materials: Dictionary = {}         # ชื่อของดรอป -> จำนวน (คอลัมน์ drop ใน monsters.csv)
 var ground_drops: Dictionary = {}      # key_of(ช่อง) -> Array ชื่อของดรอปที่ยังไม่เก็บ (กฎ UX ข้อ 3) · อาวุธ = WEAPON_DROP_PREFIX + รหัส
 var pity: Dictionary = {}              # monster_id -> {misses, kills} ดรอปอาวุธ (core/WeaponDrop.gd) · ไม่รีเซ็ตตอน NG+
+var ally_checks: Dictionary = {}       # monster_id -> ครั้งที่ตรวจสิทธิ์ขอเข้าทีมแล้ว (MONSTER_ALLY_SYSTEM_SPEC 2.2 · แยกจาก pity อาวุธ)
+var opening_checks := 0                # ตรวจไปกี่ครั้งระหว่างมีพวก 1 ตัว (การันตีพวกตัวที่สอง · สเปก 2.0 ข้อ 4)
 const WEAPON_DROP_PREFIX := "อาวุธ:"   # ของบนพื้นที่เป็นอาวุธ (ไม่ใช่วัตถุดิบ)
 var seized: Array[Dictionary] = []     # ท่าที่ยึดจากมอน (GDD 5.2): {id, name, slots} — สลับได้ (ลืมแล้วยึดใหม่)
 var insight := 0.0                     # Insight ที่ค้างจากศึกก่อน (Insight.CARRY_BATTLE)
@@ -297,6 +299,51 @@ func recruit(row: Dictionary) -> String:
 		met_species.append(str(row["monster_id"]))
 	return nm
 
+# ── ขอเข้าทีมหลังชนะ (MONSTER_ALLY_SYSTEM_SPEC 2 · kwan 29–30 ต.ค.) ──
+## พวกที่ยังมี LP (ใช้ตัดสินว่ามอนอันตรายบนแผนที่ตื่นหรือยัง)
+func ally_count() -> int:
+	var n := 0
+	for m in party:
+		if int(m["lp"]) > 0:
+			n += 1
+	return n
+
+func has_species(monster_id: String) -> bool:
+	for m in party:
+		if str(m["id"]) == monster_id:
+			return true
+	return false
+
+## ชนิดที่เข้าข่ายตรวจในศึกนี้: ตามลำดับที่ถูกปราบ · ชนิดละครั้ง · มอนปกติ (M..) ที่ยังไม่มีในคลัง · บอส/มินิบอส (MB · เฉพาะ NG+ ยังไม่มี) ไม่ตรวจ
+func ally_candidates(defeated_ids: Array, by_id: Dictionary) -> Array[String]:
+	var out: Array[String] = []
+	for id in defeated_ids:
+		var sid := str(id)
+		if out.has(sid) or has_species(sid) or not sid.begins_with("M") or sid.begins_with("MB") or not by_id.has(sid):
+			continue
+		if int(by_id[sid].get("is_boss", 0)) == 1:
+			continue
+		out.append(sid)
+	return out
+
+## ตรวจสิทธิ์ 1 ครั้ง (roll = ค่าสุ่ม 0–1) → true = ขอเข้าทีม
+## ยังไม่มีพวก: M01/M03 สำเร็จแน่นอน · มีพวก 1 ตัว: ตรวจครบ ALLY_OPENING_PITY ครั้งแล้ว ครั้งถัดไปสำเร็จแน่นอน
+## (ไม่รับ = การันตียังอยู่ · สเปก 2.0 ข้อ 2/4)
+func ally_check(monster_id: String, roll: float) -> bool:
+	ally_checks[monster_id] = int(ally_checks.get(monster_id, 0)) + 1
+	var n := ally_count()
+	if n == 0 and Formulas.ALLY_OPENING_FIRST.has(monster_id):
+		return true
+	if n == 1:
+		opening_checks += 1
+		if opening_checks > Formulas.ALLY_OPENING_PITY:
+			return true
+	return roll < Formulas.ALLY_RATE
+
+## รับเข้าคลังพวก (ชนิดละ 1 ตัว · rank เริ่ม 1 · ไม่มีต้นทุน)
+func join_ally(monster_id: String, name: String) -> String:
+	return recruit({"monster_id": monster_id, "name": name, "slots": 1, "loyalty": Formulas.TRUST_MIN})
+
 static func slot_cost(m: Dictionary) -> int:
 	return maxi(1, int(m.get("slots", 1)))
 
@@ -427,6 +474,7 @@ func to_dict() -> Dictionary:
 		"auto_battle": auto_battle, "materials": materials.duplicate(), "ground_drops": ground_drops.duplicate(true), "pity": pity.duplicate(true),
 		"seized": seized.duplicate(true), "reads": reads.duplicate(true), "insight": insight,
 		"falls": falls, "demo_end_seen": demo_end_seen,
+		"ally_checks": ally_checks.duplicate(), "opening_checks": opening_checks,
 	}
 
 func from_dict(d: Dictionary) -> void:
@@ -477,6 +525,11 @@ func from_dict(d: Dictionary) -> void:
 	for n in d.get("met_species", []):
 		met_species.append(str(n))
 	rest_count = int(d.get("rest_count", 0))
+	ally_checks.clear()
+	var ac: Dictionary = d.get("ally_checks", {})
+	for k in ac:
+		ally_checks[str(k)] = int(ac[k])
+	opening_checks = int(d.get("opening_checks", 0))
 	fought_since_rest = bool(d.get("fought_since_rest", false))
 	items.clear()
 	var it: Dictionary = d.get("items", {})

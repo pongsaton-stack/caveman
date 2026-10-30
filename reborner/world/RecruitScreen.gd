@@ -1,7 +1,7 @@
-# world/RecruitScreen.gd — ชนะแล้วเข้าใจท่าเด่นครบ → เลือกทางเดียว (GDD 5.2)
-#   ยึดท่า     = ได้ 1 ท่า เสียช่องความจำ (สลับได้ในเมนู)
-#   รับเข้าทีม = ได้ทั้งตัว เสียช่องปาร์ตี้ · ทีมเต็มก็รับได้ ตัวที่เกินช่องไปสำรอง
-# แสดงเฉพาะทางที่มอนตัวนั้นมี (กฎ 5.3: ท่ายึดได้ = seize_techs.csv · รับได้ = recruits.csv)
+# world/RecruitScreen.gd — กล่องเลือกหลังชนะ 2 แบบ
+#   setup()     ยึดท่า: เข้าใจท่าเด่นครบ → ยึด 1 ท่า เสียช่องความจำ (GDD 5.2 · seize_techs.csv)
+#   setup_ask() ขอเข้าทีม: มอนที่ถูกปราบสุ่มขอเข้าทีมเอง → รับ (เข้าคลังพวก) / ไม่รับ (ไม่เสียอะไร)
+#               (MONSTER_ALLY_SYSTEM_SPEC 2 · kwan 29 ต.ค. แทนการรับเข้าทีมแบบเดิมที่ต้องเลือกแทนการยึด)
 class_name RecruitScreen
 extends CanvasLayer
 
@@ -13,6 +13,12 @@ var cost := 1               # ช่องปาร์ตี้ (-1 = รับ�
 var full := false
 var seize_cost := 0         # ช่องความจำ (0 = ยึดไม่ได้)
 var memory_left := 0        # ช่องความจำที่ยังว่าง
+var asking := false         # โหมดมอนขอเข้าทีม
+
+func setup_ask(monster_name: String, team_full: bool) -> void:
+	mon_name = monster_name
+	full = team_full
+	asking = true
 
 func setup(monster_name: String, signature: String, slot_cost: int, team_full: bool,
 		seize_slots: int = 0, memory_free: int = 0) -> void:
@@ -37,7 +43,7 @@ func _ready() -> void:
 	panel.position = Vector2(52, 64)
 	panel.size = Vector2(280, 80)
 	root.add_child(panel)
-	var head := UiKit.label("◇ เข้าใจท่า %s ของ%sแล้ว" % [tech_name, mon_name], 8, UiKit.C_GOLD)
+	var head := UiKit.label(("♥ %s อยากเข้าทีม!" % mon_name) if asking else ("◇ เข้าใจท่า %s ของ%sแล้ว" % [tech_name, mon_name]), 8, UiKit.C_GOLD)
 	head.position = Vector2(60, 68)
 	head.size = Vector2(264, 12)
 	head.clip_text = true
@@ -48,7 +54,10 @@ func _ready() -> void:
 		parts.append("ยึดท่า กินความจำ %d (ว่าง %d)" % [seize_cost, memory_left])
 	if cost > 0:
 		parts.append("รับเข้าทีม กิน %d ช่อง%s" % [cost, " · ทีมเต็ม→สำรอง" if full else ""])
-	var body := UiKit.label("เลือกทางเดียว: " + " · ".join(parts), 7, UiKit.C_TEXT)
+	var text := "เลือกทางเดียว: " + " · ".join(parts)
+	if asking:
+		text = "รับ = เข้าคลังพวก%s · ไม่รับ = ไม่เสียอะไร" % (" (ทีมเต็ม สลับตัวที่จุดพัก)" if full else "")
+	var body := UiKit.label(text, 7, UiKit.C_TEXT)
 	body.position = Vector2(60, 82)
 	body.size = Vector2(264, 12)
 	body.clip_text = true
@@ -59,11 +68,15 @@ func _ready() -> void:
 		sz.disabled = seize_cost > memory_left
 		sz.pressed.connect(_done.bind("seize"))
 		buttons.append(sz)
-	if cost > 0:
+	if asking:
+		var ok := UiKit.button("รับ", 84)
+		ok.pressed.connect(_done.bind("recruit"))
+		buttons.append(ok)
+	elif cost > 0:
 		var rc := UiKit.button("รับเข้าทีม", 84)
 		rc.pressed.connect(_done.bind("recruit"))
 		buttons.append(rc)
-	var no := UiKit.button("ไม่เอา", 84)
+	var no := UiKit.button("ไม่รับ" if asking else "ไม่เอา", 84)
 	no.pressed.connect(_done.bind(""))
 	buttons.append(no)
 	var x := 60.0

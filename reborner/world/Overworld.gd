@@ -46,7 +46,6 @@ var chest_nodes: Dictionary = {}   # "x,y" -> Node2D
 var slot_rows: Array = []          # data/party_slots.csv
 var companion_rows: Array = []     # data/companions.csv
 var item_rows: Array = []          # data/items.csv
-var recruit_rows := {}             # data/recruits.csv — มอนที่รับเข้าทีมได้ (GDD 5.2/5.3)
 var dialogue_rows: Array = []      # data/dialogue.csv — บทพูด (STORY_DRAFT · ห้าม hardcode)
 var techs := TechDb.new()
 var map: MapData
@@ -83,7 +82,6 @@ func _ready() -> void:
 	slot_rows = CsvDb.load_csv("res://data/party_slots.csv")
 	companion_rows = CsvDb.load_csv("res://data/companions.csv")
 	item_rows = CsvDb.load_csv("res://data/items.csv")
-	recruit_rows = CsvDb.index_by(CsvDb.load_csv("res://data/recruits.csv"), "monster_id")
 	dialogue_rows = CsvDb.load_csv("res://data/dialogue.csv")
 	map = MapData.load_map(MAP_PATH)
 	if map == null or by_id.is_empty() or techs.all.is_empty():
@@ -322,8 +320,7 @@ func _pick_up_drops() -> bool:
 	_show("🎁 เก็บ " + " · ".join(names), 1.4)
 	return true
 
-## ชนะแล้วเข้าใจท่าเด่นครบ → ถามทีละสายพันธุ์: ยึดท่า หรือ รับเข้าทีม (เลือกทางเดียว · GDD 5.2)
-## มอนที่ไม่มีทั้งสองทาง (ท่าเฉพาะตัวแต่รับไม่ได้ / ยึดไปแล้ว) ข้าม
+## ชนะแล้วเข้าใจท่าเด่นครบ → เสนอยึดท่า (GDD 5.2) · การรับเข้าทีมแยกไปเป็นการขอเข้าทีมหลังชนะ (_offer_allies)
 func _offer_recruits(ids: Array) -> Array[String]:
 	var notes: Array[String] = []
 	for id in ids:
@@ -331,28 +328,36 @@ func _offer_recruits(ids: Array) -> Array[String]:
 		if not by_id.has(sid):
 			continue
 		var st: Tech = techs.seize_for(sid)
-		if st != null and ps.has_seized(sid):
-			st = null
-		var can_recruit := recruit_rows.has(sid)
-		if st == null and not can_recruit:
+		if st == null or ps.has_seized(sid):
 			continue
-		var slots := _monster_slots()
-		var used := 0
-		for m in ps.active_members(slots):
-			used += PlayerState.slot_cost(m)
-		var row: Dictionary = recruit_rows.get(sid, {})
-		var cost := int(row.get("slots", 1)) if can_recruit else -1
 		var screen := RecruitScreen.new()
-		screen.setup(str(by_id[sid]["name_th"]), str(by_id[sid]["signature_tech"]), cost, can_recruit and used + cost > slots,
-			st.slots if st != null else 0, ps.memory_slots() - ps.used_memory())
+		screen.setup(str(by_id[sid]["name_th"]), str(by_id[sid]["signature_tech"]), -1, false,
+			st.slots, ps.memory_slots() - ps.used_memory())
 		add_child(screen)
 		var choice: String = await screen.decided
-		if choice == "recruit" and can_recruit:
-			var nm := ps.recruit(row)
-			var bench := not ps.active_members(slots).has(ps._member(nm))
-			notes.append("◇ %s เข้าทีมแล้ว%s" % [nm, " (สำรอง)" if bench else ""])
-		elif choice == "seize" and st != null and ps.seize(st):
+		if choice == "seize" and ps.seize(st):
 			notes.append("◇ ยึดท่า %s ได้แล้ว (ความจำ %d/%d)" % [st.name, ps.used_memory(), ps.memory_slots()])
+	return notes
+
+## หลังชนะ: มอนที่ถูกปราบสุ่มขอเข้าทีม (MONSTER_ALLY_SYSTEM_SPEC 2.1) · ตรวจชนิดละครั้งตามลำดับที่ปราบ
+## ได้สูงสุด 1 ตัวต่อศึก · ไม่รับ = ตรวจชนิดถัดไปต่อ · ศึกบอสไม่ตรวจ
+func _offer_allies(defeated_ids: Array, boss: bool) -> Array[String]:
+	var notes: Array[String] = []
+	if boss:
+		return notes
+	for sid in ps.ally_candidates(defeated_ids, by_id):
+		if not ps.ally_check(sid, rng.randf()):
+			continue
+		var full := ps.active_members(_monster_slots()).size() >= _monster_slots()
+		var screen := RecruitScreen.new()
+		screen.setup_ask(str(by_id[sid]["name_th"]), full)
+		add_child(screen)
+		var choice: String = await screen.decided
+		if choice == "recruit":
+			var nm := ps.join_ally(sid, str(by_id[sid]["name_th"]))
+			var bench := not ps.active_members(_monster_slots()).has(ps._member(nm))
+			notes.append("♥ %s เข้าทีมแล้ว%s" % [nm, " (อยู่ในคลัง สลับตัวที่จุดพัก)" if bench else ""])
+			break
 	return notes
 
 func _build_dog() -> void:
@@ -481,12 +486,14 @@ func _spawn_enemies() -> void:
 		e.home = e.cell
 		e.label_text = str(row["label"])
 		e.is_boss = str(row.get("boss", 0)) == "1"
+		e.needs_allies = int(row.get("needs_allies", 0))
 		for mid in e.group:
 			e.tier = maxi(e.tier, int(by_id[mid]["tier"]))
 		e.position = _cell_center(e.cell)
 		e.load_sprite()
 		add_child(e)
 		e.set_danger(ps.prof)
+		e.set_asleep(ps.ally_count() < e.needs_allies)
 		enemies.append(e)
 
 # ── หีบสมบัติ ─────────────────────────────────────────────────
@@ -543,7 +550,7 @@ func _enemy_at(c: Vector2i) -> WorldEnemy:
 
 func _enemies_step() -> void:
 	for e in enemies:
-		if e.is_boss:
+		if e.is_boss or e.asleep:
 			continue
 		var dir := _enemy_dir(e)
 		if dir == Vector2i.ZERO:
@@ -577,6 +584,7 @@ func _enemy_dir(e: WorldEnemy) -> Vector2i:
 func _refresh_enemy_colors() -> void:
 	for e in enemies:
 		e.set_danger(ps.prof)
+		e.set_asleep(ps.ally_count() < e.needs_allies)
 
 # ── อินพุต ────────────────────────────────────────────────────
 ## ใครอยู่ต่ำกว่าบนจอวาดทีหลัง (บังตัวที่อยู่สูงกว่า) — เดิม z คงที่: หมาโดน Rion ทับเสมอแม้ยืนอยู่ช่องล่าง
@@ -700,6 +708,10 @@ func _try_move(dir: Vector2i) -> void:
 		return
 	var e := _enemy_at(nxt)
 	_play_anim(dir, e == null)
+	if e != null and e.asleep:
+		_stop_walk()
+		_show("%s หลับอยู่… ยังสู้ไม่ไหว — หาพวกมาช่วยก่อน (ต้องมีพวก %d ตัว)" % [e.label_text, e.needs_allies], 1.6)
+		return
 	if e != null:
 		_stop_walk()
 		# เดินชนจากด้านหลัง (ทิศเดียวกับที่มันหัน) = ลอบตีสำเร็จ
@@ -821,6 +833,8 @@ func _encounter(e: WorldEnemy, ambush: String) -> void:
 		lines.append(n)
 	if res["won"]:
 		for n in await _offer_recruits(res.get("understood", [])):
+			lines.append(n)
+		for n in await _offer_allies(res.get("defeated", []), e.is_boss):
 			lines.append(n)
 	SaveGame.save(ps)
 	_refresh_enemy_colors()

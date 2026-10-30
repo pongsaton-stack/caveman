@@ -149,9 +149,12 @@ func _show_actions() -> void:
 		if first == null and not btn.disabled:
 			first = btn
 	if ps.party.size() > 1:
-		var arrange := _add(UiKit.button("จัดทีม", 123))
+		# สลับพวกได้เฉพาะที่จุดพัก (MONSTER_ALLY_SYSTEM_SPEC 4.3 · kwan 29 ต.ค.)
+		var at_rest := ps.at_rest()
+		var arrange := _add(UiKit.button("จัดทีม" if at_rest else "จัดทีม (จุดพัก)", 123))
+		arrange.disabled = not at_rest
 		arrange.pressed.connect(_pick_front)
-		arrange.focus_entered.connect(func(): _info.text = "เลือกมอนขึ้นหัวทีม — ตัวหัวทีมได้ลงสนามก่อน ที่เกินช่องไปสำรอง")
+		arrange.focus_entered.connect(func(): _info.text = "เลือกพวกขึ้นหัวทีม — 2 ตัวแรกได้ลงสนาม ที่เหลืออยู่ในคลัง" if at_rest else "สลับพวกได้เฉพาะที่จุดพัก")
 	if not ps.seized.is_empty():
 		var mem := _add(UiKit.button("ท่าที่ยึด %d/%d" % [ps.used_memory(), ps.memory_slots()], 123))
 		mem.pressed.connect(_pick_forget)

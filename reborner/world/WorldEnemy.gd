@@ -9,6 +9,8 @@ var group: Array[String] = []   # รหัสมอนในกลุ่ม เ
 var label_text := ""
 var tier := 1
 var is_boss := false
+var needs_allies := 0           # พวกขั้นต่ำก่อนมันตื่น (encounters.csv · Rion คนเดียวชนะ 0% · GDD 11.30 · kwan 30 ต.ค.)
+var asleep := false             # หลับ = ไม่ไล่ · เดินชนไม่เข้าศึก
 var body_color := Color("b5705a")
 var _label: Label
 # รูปสไตล์ Last Light (kwan อนุมัติแล้ว) · ไม่มีรูป = กล่องสีแบบเดิม
@@ -90,6 +92,11 @@ func set_danger(prof: int) -> void:
 		body_color = Color("d25a5a")
 	queue_redraw()
 
+func set_asleep(v: bool) -> void:
+	asleep = v
+	modulate = Color(0.75, 0.75, 0.85, 0.8) if v else Color.WHITE
+	queue_redraw()
+
 func within_leash(c: Vector2i) -> bool:
 	return absi(c.x - home.x) + absi(c.y - home.y) <= LEASH
 
@@ -101,6 +108,8 @@ func _draw() -> void:
 	draw_rect(Rect2(-s, -s, s * 2.0, s * 2.0), body_color)
 	draw_rect(Rect2(-s, -s, s * 2.0, s * 2.0), Color.BLACK, false, 1.0)
 	# จุดขาวบอกทิศที่หัน — เดินเข้าหาจากฝั่งตรงข้ามจุดนี้ = ลอบตี
+	if asleep:
+		_draw_zz(Vector2(s - 2.0, -s - 4.0))
 	var f := Vector2(facing) * (s - 2.0)
 	draw_rect(Rect2(f.x - 2.0, f.y - 2.0, 4.0, 4.0), Color.WHITE)
 
@@ -125,3 +134,14 @@ func _draw_sprite() -> void:
 	if _face_left:
 		rect.size.x = -rect.size.x   # ขนาดติดลบ = พลิกซ้าย-ขวาในกรอบเดิม (ไม่ต้องเลื่อนตำแหน่ง)
 	draw_texture_rect(tex, rect, false)
+	if asleep:
+		_draw_zz(Vector2(sz.x * 0.3, FEET_Y - sz.y * 0.8))
+
+## Zz ลอยเหนือหัว (วาดเป็นพิกเซล ไม่พึ่งฟอนต์)
+func _draw_zz(at: Vector2) -> void:
+	for i in 2:
+		var o := at + Vector2(i * 6.0, -i * 6.0)
+		var w := 5.0 - i
+		var pts := PackedVector2Array([o, o + Vector2(w, 0), o + Vector2(0, w), o + Vector2(w, w)])
+		draw_polyline(pts, Color.BLACK, 2.0)
+		draw_polyline(pts, Color.WHITE, 1.0)
