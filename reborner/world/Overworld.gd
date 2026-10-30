@@ -375,7 +375,7 @@ func _offer_allies(defeated_ids: Array, boss: bool) -> Array[String]:
 		if choice == "recruit":
 			var nm := ps.join_ally(sid, str(by_id[sid]["name_th"]))
 			var bench := not ps.active_members(_monster_slots()).has(ps._member(nm))
-			notes.append("♥ %s เข้าทีมแล้ว%s" % [nm, " (อยู่ในคลัง สลับตัวที่จุดพัก)" if bench else ""])
+			notes.append("★ %s เข้าทีมแล้ว%s" % [nm, " (อยู่ในคลัง สลับตัวที่จุดพัก)" if bench else ""])
 			break
 	return notes
 

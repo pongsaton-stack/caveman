@@ -207,6 +207,7 @@ func _ready() -> void:
 		setup()
 		_build_ui()
 		menu.visible = false
+		caption_lbl.visible = false   # แถบคำอธิบายของแลป ไม่ใช่ของเกม
 		_step()
 		return
 	var win := get_window()
@@ -1063,6 +1064,7 @@ func _build_ui() -> void:
 	bar.color = Color(16 / 255.0, 12 / 255.0, 8 / 255.0, 0.62)
 	bar.position = Vector2(0, H - 10)
 	bar.size = Vector2(W, 10)
+	bar.visible = embed.is_empty()   # ในศึกจริงไม่มีแถบคำอธิบาย
 	ui.add_child(bar)
 	caption_lbl = label(7, Color("#f0e4c8"), 0, false)
 	caption_lbl.position = Vector2(4, H - 11)
@@ -1306,6 +1308,10 @@ func _process(delta: float) -> void:
 		get_viewport().get_texture().get_image().save_png("%s/%s_%s_f%03d.png" % [snap_dir, scene_file_path.get_file().get_basename(), foe, Fn])
 	if not snaps.is_empty() and snaps.values().all(func(v): return v):
 		get_tree().quit()
+	if not embed.is_empty() and t > end_frame() * SEC * float(embed.get("tail", 1.0)):   # ในศึกจริงตัดช่วงยืนค้างท้ายฉาก
+		playing = false
+		embed_done.emit()
+		return
 	if t > end_frame() * SEC + 0.5:
 		if not embed.is_empty():
 			playing = false

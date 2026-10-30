@@ -3,6 +3,7 @@ extends SceneTree
 var screen: BattleScreen
 var n := 0
 var seen := false
+var scenes := {}
 var embed_dmg := -1
 var done := false
 var fails := 0
@@ -16,7 +17,7 @@ func _initialize() -> void:
 	ps.init_new(techs, Vector2i.ZERO)
 	var b := Battle.new(); b.techs = techs
 	b.actors.append(ps.make_hero())
-	b.actors.append(Actor.from_csv(by_id["M01"]))
+	b.actors.append(Actor.from_csv(by_id["M15"]))   # หมาป่าอึดพอให้ได้ตีกลับ
 	screen = BattleScreen.new(); screen.step_delay = 0.05; screen.end_delay = 0.0
 	screen.setup(b, "ทดสอบฉากท่า", true)
 	root.add_child(screen)
@@ -27,13 +28,18 @@ func _process(_d: float) -> bool:
 		if c is CanvasLayer and c.layer == 20:
 			for vp in c.find_children("*", "SubViewport", true, false):
 				for st in vp.get_children():
-					if not seen and st.get("embed") != null:
-						seen = true
-						embed_dmg = int(st.dmg)
+					if st.get("embed") != null and not st.has_meta("t_skip"):
+						st.set_meta("t_skip", true)
+						var who := str(st.scene_file_path).get_file()
+						scenes[who] = true
+						if not seen and not who.begins_with("ma_"):
+							seen = true
+							embed_dmg = int(st.dmg)
 						st.embed_done.emit.call_deferred()   # ข้ามฉาก (เหมือนกด Enter)
 	if done or n > 3000:
 		ok(seen, "ตัดเข้าฉากท่าห้องทดลอง")
 		ok(embed_dmg > 0, "ตัวเลขดาเมจจริงส่งเข้าฉาก (%d)" % embed_dmg)
+		ok(scenes.has("ma_hit.tscn") or scenes.has("ma_guard.tscn"), "มอนตี Rion → ฉากมอนโจมตี %s" % str(scenes.keys()))
 		ok(done, "ศึกเดินต่อจนจบหลังฉาก")
 		print("FAILS %d" % fails)
 		quit(1 if fails > 0 else 0)

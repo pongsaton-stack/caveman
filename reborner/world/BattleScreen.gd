@@ -138,9 +138,11 @@ func _advance() -> void:
 		else:
 			b.auto_act(cur)
 			_flush_log()
+			if not await _try_cutin():
+				_refresh()
+				_play_events()
+				await _react_hero()
 			_refresh()
-			_play_events()
-			await _react_hero()
 		await get_tree().create_timer(step_delay).timeout
 
 func _commit(action: Dictionary) -> void:
@@ -220,6 +222,7 @@ const CUTIN_BG := "ash_village"
 var cutins := true   # เทสต์ภาพท่าเดิม (animtest) ปิดได้
 const CUTIN_W := 300
 const CUTIN_H := 168
+const CUTIN_TAIL := 1.0   # จบตรง end_frame ของฉาก (แลปค้างเพิ่ม 0.5 วิ · ในศึกตัดออก) · ยาวไปกด Enter ข้ามได้
 const LAB_STAGE := "res://tests/lab/lab_stage.gd"
 
 func _cutin_scene(tech_id: String) -> String:
@@ -234,27 +237,33 @@ func _cutin_scene(tech_id: String) -> String:
 	return ""
 
 ## คืน true ถ้าเล่นฉากแล้ว (กินเหตุการณ์ของเทิร์นนี้แทนเอฟเฟกต์เดิม)
+## Rion ใช้ท่า → ฉากท่านั้น (มอนตัวที่โดน) · มอนตี Rion → ฉากมอนโจมตี ma_hit / ma_guard (ตั้งรับอยู่)
 func _try_cutin() -> bool:
 	if not cutins or step_delay <= 0.0 or b.techs == null:
 		return false
 	var main: Dictionary = {}
 	for e in b.events:
-		if e.has("tech") and e.get("src") == hero and e["tgt"] != hero:
+		if e.has("tech") and e.has("src") and e["src"] != e["tgt"] and (e["src"] == hero or e["tgt"] == hero):
 			main = e
 			break
 	if main.is_empty():
 		return false
-	var t: Tech = b.techs.get_tech(str(main["tech"]))
-	if t == null:
-		return false
-	var scene := _cutin_scene(t.id)
+	var src: Actor = main["src"]
 	var tgt: Actor = main["tgt"]
-	if scene == "" or not ResourceLoader.exists(scene) or not FileAccess.file_exists("res://assets/sprites/monsters_px_draft/%s_0.png" % tgt.id):
+	var foe_a: Actor = tgt if src == hero else src
+	var scene := ""
+	if src == hero:
+		var t: Tech = b.techs.get_tech(str(main["tech"]))
+		scene = _cutin_scene(t.id) if t != null else ""
+	elif ResourceLoader.exists(LAB_STAGE):
+		scene = "res://tests/lab/ma_guard.tscn" if hero.guarding else "res://tests/lab/ma_hit.tscn"
+	var mon_png := "res://assets/sprites/monsters_px_draft/%s_0.png" % foe_a.id
+	if scene == "" or not ResourceLoader.exists(scene) or not (ResourceLoader.exists(mon_png) or FileAccess.file_exists(mon_png)):   # เกม export = ไฟล์ import แล้ว
 		return false
 	var dmg := 0
 	var hits := 0
 	for e in b.events:
-		if e.get("tgt") == tgt and not e.has("dot"):
+		if e.get("tgt") == tgt and e.get("src") == src and not e.has("dot"):
 			dmg += int(e.get("dmg", 0))
 			hits += 1
 	b.events.clear()
@@ -277,7 +286,8 @@ func _try_cutin() -> bool:
 	vp.size = Vector2i(CUTIN_W, CUTIN_H)
 	vp.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
 	box.add_child(vp)
-	Engine.set_meta("lab_embed", {"foe": tgt.id, "bg": CUTIN_BG, "dmg": dmg, "hits": maxi(1, hits), "aff": 0, "kill": tgt.down})
+	Engine.set_meta("lab_embed", {"foe": foe_a.id, "bg": CUTIN_BG, "dmg": dmg, "hits": maxi(1, hits), "aff": 0,
+		"kill": tgt.down, "tail": CUTIN_TAIL})
 	var stage: Node = load(scene).instantiate()
 	vp.add_child(stage)
 	await stage.embed_done
@@ -509,9 +519,53 @@ func _load_textures() -> void:
 			_tex_attack.clear()
 			for i in range(1, 5):
 				_tex_attack.append(held[i])
+	_load_px_set()
 	_load_hires()
 	if _hero_tex != null:   # โหลดหลัง _build (ต้องรู้ hero ก่อน) → ตั้งภาพยืนให้ตัวที่สร้างไว้แล้ว
 		_hero_tex.texture = _rest_tex()
+
+## Rion ชุดห้องทดลอง (PixelLab px_set · kwan 30 ต.ค. เอาของห้องทดลองลงเกม) แทนชุด rion_px เดิม
+## ผืน 120x112 เท้าแถว 108 · ยืนตามสายอาวุธที่ถือ · ท่าฟัน/โดนตี/ล้ม/ตั้งรับ ชุดเดียวกับฉากท่า
+const PX_SET := "res://assets/sprites/pixellab_draft/px_set"
+const PX_SCHOOL := {"SL": "bl", "CR": "bt", "PC": "pt", "ST": "rg", "BD": "fs", "DV": "dv"}
+
+## ภาพจากโฟลเดอร์ร่าง (.gdignore = ไม่ผ่าน import) → อ่านไฟล์ตรง · ไม่มีไฟล์ = null
+static func draft_tex(path: String) -> Texture2D:
+	if ResourceLoader.exists(path):
+		return load(path)
+	if not FileAccess.file_exists(path):
+		return null
+	var img := Image.load_from_file(ProjectSettings.globalize_path(path))
+	return ImageTexture.create_from_image(img) if img != null and not img.is_empty() else null
+
+func _px_clip(name: String) -> Array[Texture2D]:
+	var out: Array[Texture2D] = []
+	for i in 16:
+		var t := draft_tex("%s/%s_%d.png" % [PX_SET, name, i])
+		if t == null:
+			break
+		out.append(t)
+	return out
+
+func _load_px_set() -> void:
+	var sc: String = PX_SCHOOL.get(hero.weapon_id.get_slice("-", 0), "bl") if hero != null else "bl"
+	var idle := _px_clip("pls_idle_" + sc)
+	if idle.is_empty():
+		return
+	_tex_idle_loop.clear(); _tex_idle_loop.append_array(idle)
+	_tex_idle = idle[0]
+	var atk := _px_clip("pls_atk_" + sc)
+	if not atk.is_empty():
+		_tex_attack.clear(); _tex_attack.append_array(atk)
+	var hurt := _px_clip("pls_hurt")
+	if not hurt.is_empty():
+		_tex_hurt.clear(); _tex_hurt.append_array(hurt)
+	var ko := _px_clip("pls_ko")
+	if not ko.is_empty():
+		_tex_ko.clear(); _tex_ko.append_array(ko)
+	if _hero_tex != null:   # ผืนกว้างกว่า rion_px 24 · เท้าสูงกว่า 1 → เลื่อนให้กลางตัว/เท้าที่เดิม
+		_hero_tex.size = Vector2(120, 112)
+		_hero_tex.position = Vector2(HERO_X + 32 - 60, STAGE_FEET_Y - 108.0)
 
 ## ภาพคม: โหลดเฟรมจากโฟลเดอร์ร่าง (.gdignore → ไม่ผ่าน import ต้องอ่านไฟล์ตรง ใช้ได้ตอนรันจากโฟลเดอร์โปรเจกต์เท่านั้น)
 ## มีภาพคมแล้วไม่ปนท่าพิกเซล: ท่าฟัน/โดนตี/ล้มพิกเซลถูกปิด (เหลือท่าพุ่งของ FX) จนกว่าจะมีชุดภาพคม
@@ -554,6 +608,19 @@ func _hires_tick(delta: float) -> void:
 	_hero_tex.texture = _hires_idle[int(_hires_t * HIRES_FPS) % _hires_idle.size()]
 	_tex_idle = _hero_tex.texture
 
+## ฉากหลังหมู่บ้านเถ้าของห้องทดลอง ย่อกว้าง 384 แล้วตัดแถบสูง 79 ให้เส้นพื้น (69% ของภาพ) ตรงเท้า STAGE_FEET_Y
+const LAB_BG := "res://docs/art-bible/pixellab_test/bg_ash_village.jpg"
+const LAB_BG_GROUND := 0.69
+func _lab_stage_bg() -> Texture2D:
+	var t := draft_tex(LAB_BG)
+	if t == null:
+		return null
+	var img := t.get_image()
+	var h := int(round(img.get_height() * 384.0 / img.get_width()))
+	img.resize(384, h, Image.INTERPOLATE_BILINEAR)
+	var y0 := clampi(int(h * LAB_BG_GROUND) - int(STAGE_FEET_Y - 24.0), 0, h - 79)
+	return ImageTexture.create_from_image(img.get_region(Rect2i(0, y0, 384, 79)))
+
 func _build() -> void:
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -563,7 +630,16 @@ func _build() -> void:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(bg)
 	var stage_bg := _hires_tex(HIRES_BG) if OS.get_environment("REBORNER_HIRES") == "1" else null
-	if stage_bg != null:   # ภาพคม: ฉากหลังวาด 1920x395 ย่อลงแถบเวทีเดิม (tools/sprites/battle_bg_hires.py)
+	var lab_bg := _lab_stage_bg()
+	if stage_bg == null and lab_bg != null:   # ฉากหลังเดียวกับห้องทดลอง (หมู่บ้านเถ้า) ตัดแถบรอบพื้น
+		var lb := TextureRect.new()
+		lb.texture = lab_bg
+		lb.position = Vector2(0, 24)
+		lb.size = Vector2(384, 79)
+		lb.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		root.add_child(lb)
+		stage_bg = lab_bg
+	elif stage_bg != null:   # ภาพคม: ฉากหลังวาด 1920x395 ย่อลงแถบเวทีเดิม (tools/sprites/battle_bg_hires.py)
 		var sb := TextureRect.new()
 		sb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE   # ตั้งก่อนใส่ภาพ/ขนาด ไม่งั้นช่องขยายเท่าภาพ 1920x395
 		sb.stretch_mode = TextureRect.STRETCH_SCALE

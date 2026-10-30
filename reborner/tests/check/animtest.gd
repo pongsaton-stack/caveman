@@ -21,24 +21,23 @@ func _initialize() -> void:
 
 func _process(_d: float) -> bool:
 	if screen != null and is_instance_valid(screen) and screen._hero_tex != null and screen._hero_tex.texture != null:
-		seen[screen._hero_tex.texture.resource_path.get_file()] = true
+		seen[screen._hero_tex.texture] = true   # px_set อ่านไฟล์ตรง (ImageTexture ไม่มี resource_path) → เก็บตัว texture
 		if screen.hero != null and screen.hero.down: hero_down_ever = true
 	return false
 
 func _done(r: Dictionary) -> void:
-	print("seen ", seen.keys(), " won=", r["won"])
-	# Rion พิกเซล 32-bit (kwan 16 ต.ค. 2026): ถือมีดในภาพเอง · ภาพ weapons_held (วาดบน Rion เก่า) ไม่ใช้แล้ว
+	print("seen ", seen.size(), " ภาพ · won=", r["won"])
+	# Rion ชุดห้องทดลอง px_set (kwan 30 ต.ค. เอาของห้องทดลองลงเกม) · ไม่มีไฟล์ร่าง = ชุด rion_px เดิม
 	var wid: String = screen.hero.weapon_id
 	ok(wid != "", "ตัวเอกรู้อาวุธที่ถือ (%s)" % wid)
-	ok(screen._hero_tex.texture.resource_path.begins_with(BattleScreen.SPRITE_DIR), "ภาพมาจาก " + BattleScreen.SPRITE_DIR)
+	var px := screen._px_clip("pls_idle_bl")
+	ok(px.size() == 4 and screen._tex_idle_loop.size() == 4, "ยืนหายใจ px_set 4 เฟรม")
 	for i in screen._tex_attack.size():
-		ok(seen.has("west_a%d.png" % i), "ท่าฟันครบทุกเฟรม: west_a%d" % i)
+		ok(seen.has(screen._tex_attack[i]), "ท่าฟันครบทุกเฟรม: %d" % i)
 	ok(screen._tex_attack.size() >= 4, "ท่าฟัน %d เฟรม" % screen._tex_attack.size())
-	ok(seen.has("west_h0.png"), "เห็น west_h0.png")
-	ok(not seen.has("%s_0.png" % wid), "ไม่ปนภาพ Rion เก่าถืออาวุธ")
-	ok(screen._tex_idle_loop.size() >= 2 and screen._tex_idle == screen._tex_idle_loop[0], "ยืนหายใจวน %d เฟรม" % screen._tex_idle_loop.size())
+	ok(screen._tex_hurt.size() > 0 and seen.has(screen._tex_hurt[0]), "เห็นท่าโดนตีเฟรมแรก")
+	ok(screen._tex_idle == screen._tex_idle_loop[0], "ภาพยืน = เฟรมแรกของวงหายใจ")
 	if hero_down_ever:
-		var last := "west_k%d.png" % (screen._tex_ko.size() - 1)
-		ok(seen.has(last), "ตัวเอกล้ม → ท่านอน " + last)
+		ok(seen.has(screen._tex_ko[screen._tex_ko.size() - 1]), "ตัวเอกล้ม → ท่านอนเฟรมสุดท้าย")
 	print("FAILS ", fails)
 	quit()

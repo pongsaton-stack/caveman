@@ -35,7 +35,8 @@ func setup() -> void:
 	for r in CsvDb.load_csv("res://data/monsters.csv"):
 		if str(r.monster_id) == foe:
 			atk = int(r.atk)
-	dmg = maxi(1, int(roundf(atk * 100 / 100.0 * MIT_K / (MIT_K + DEF) * (0.5 if guard() else 1.0))))
+	if embed.is_empty():   # ในศึกจริงใช้ดาเมจจาก Battle (ตั้งใน _load_monster)
+		dmg = maxi(1, int(roundf(atk * 100 / 100.0 * MIT_K / (MIT_K + DEF) * (0.5 if guard() else 1.0))))
 	place_monster(MX)
 	front = home - 60 + 40   # ขอบหน้าตัว Rion (ผืน x40) · Rion ยืนที่ W−100
 	near = roundf(front - mw / 2.0 + 6)

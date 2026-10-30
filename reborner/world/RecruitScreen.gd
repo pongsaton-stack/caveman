@@ -43,7 +43,7 @@ func _ready() -> void:
 	panel.position = Vector2(52, 64)
 	panel.size = Vector2(280, 80)
 	root.add_child(panel)
-	var head := UiKit.label(("♥ %s อยากเข้าทีม!" % mon_name) if asking else ("◇ เข้าใจท่า %s ของ%sแล้ว" % [tech_name, mon_name]), 8, UiKit.C_GOLD)
+	var head := UiKit.label(("★ %s อยากเข้าทีม!" % mon_name) if asking else ("◇ เข้าใจท่า %s ของ%sแล้ว" % [tech_name, mon_name]), 8, UiKit.C_GOLD)
 	head.position = Vector2(60, 68)
 	head.size = Vector2(264, 12)
 	head.clip_text = true
