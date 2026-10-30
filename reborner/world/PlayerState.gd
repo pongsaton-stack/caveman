@@ -3,7 +3,7 @@
 class_name PlayerState
 extends RefCounted
 
-const SAVE_VERSION := 2   # 2 = มีปาร์ตี้มอน · ไอเท็ม · ร้าน
+const SAVE_VERSION := 3   # 2 = มีปาร์ตี้มอน · ไอเท็ม · ร้าน · 3 = ความเชื่อใจสเกล 1–10
 
 var prof := 8               # ความชำนาญ — เริ่มจากแทบไม่มีอะไร
 var weapon_base := 14       # มีดทำครัว (weapons_workbook W11)
@@ -350,7 +350,7 @@ func after_battle(actors: Array) -> Array[String]:
 		m["clean_cd"] = maxi(0, int(m["clean_cd"]) - 1)
 		var trust_up := 0
 		if int(m["battles"]) % Formulas.TRUST_BATTLES == 0:
-			trust_up += 1
+			trust_up += Formulas.TRUST_STEP
 		if a.down:
 			m["lp"] = int(m["lp"]) - 1
 			if int(m["lp"]) <= 0:
@@ -360,7 +360,7 @@ func after_battle(actors: Array) -> Array[String]:
 				continue
 			notes.append("%s ล้ม — LP เหลือ %d%s" % [m["name"], m["lp"], " · บาดเจ็บสาหัส!" if int(m["lp"]) == 1 else ""])
 		elif int(m["clean_cd"]) == 0:
-			trust_up += 1
+			trust_up += Formulas.TRUST_STEP
 			m["clean_cd"] = Formulas.TRUST_CLEAN_COOLDOWN
 		if trust_up > 0 and int(m["loyalty"]) < Formulas.TRUST_MAX:
 			m["loyalty"] = mini(Formulas.TRUST_MAX, int(m["loyalty"]) + trust_up)
@@ -460,10 +460,14 @@ func from_dict(d: Dictionary) -> void:
 	var rc: Array = d.get("rest_cell", [0, 0])
 	rest_cell = Vector2i(int(rc[0]), int(rc[1]))
 	party.clear()
+	var old_trust := int(d.get("version", 0)) < 3   # เซฟก่อนสเกล 1–10: เดิม x → 1 + 2x
 	for m in d.get("party", []):
 		var md: Dictionary = m
+		var loy := int(md.get("loyalty", 0))
+		if old_trust:
+			loy = mini(Formulas.TRUST_MAX, Formulas.TRUST_MIN + 2 * loy)
 		party.append({"id": str(md.get("id", "")), "name": str(md.get("name", "")), "lp": int(md.get("lp", 0)),
-			"loyalty": int(md.get("loyalty", 0)), "battles": int(md.get("battles", 0)), "clean_cd": int(md.get("clean_cd", 0)),
+			"loyalty": loy, "battles": int(md.get("battles", 0)), "clean_cd": int(md.get("clean_cd", 0)),
 			"slots": int(md.get("slots", 1))})
 	party_seeded = bool(d.get("party_seeded", false))
 	lost.clear()

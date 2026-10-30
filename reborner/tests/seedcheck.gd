@@ -21,7 +21,7 @@ func _init() -> void:
 			h.learned.append(techs.root_of("คม").name)
 			b.actors.append(h)
 			for mid in ["M03", "M06"]:
-				var m := Actor.from_csv(by_id[mid]); m.side = "ally"; m.loyalty = 3; m.max_hp = int(m.max_hp * 1.6); m.hp = m.max_hp
+				var m := Actor.from_csv(by_id[mid]); m.side = "ally"; m.loyalty = 7; m.max_hp = int(m.max_hp * 1.6); m.hp = m.max_hp
 				b.actors.append(m)
 			for j in spec[2]:
 				b.actors.append(Actor.from_csv(by_id[spec[0]]))

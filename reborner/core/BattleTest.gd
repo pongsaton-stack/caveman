@@ -47,7 +47,7 @@ func _ready() -> void:
 		var m := Actor.from_csv(by_id[spec["id"]])
 		m.name = str(spec["n"])
 		m.side = "ally"
-		m.loyalty = 3
+		m.loyalty = 7
 		m.max_hp = int(m.max_hp * Formulas.COMPANION_HP_MULT)
 		m.hp = m.max_hp
 		b.actors.append(m)

@@ -36,6 +36,12 @@ var guards := 0
 var status_deaths := 0
 var enrages := 0                 # มอนที่โกรธในศึกนี้ (data/enrage.csv)
 var combos := 0
+## รอบ (COMBO_TECH_SPEC ส่วน 2 · นิยาม 30 ต.ค.) = ทุกตัวที่ยืนอยู่ตอนเริ่มรอบได้ถึงคิวครบอย่างน้อย 1 ครั้ง
+## ถึงคิวแล้วถูกข้าม (ขัดจังหวะ/สถานะ) ก็นับ (kwan 30 ต.ค. "1") · ตัวที่เข้ามากลางรอบเริ่มนับรอบถัดไป
+## ต่างจาก `rounds` ที่นับทุกแอ็กชัน (คงไว้ — Sim/เทสต์ใช้อยู่)
+var cycle := 0
+var _cycle_members: Array = []
+var _cycle_acted: Array = []
 var telegraphs := 0
 var interrupts := 0
 # ความเข้าใจท่าเด่นของศัตรู (GDD 5.2) — นับต่อสายพันธุ์ · บันทึกอย่างเดียว ไม่แตะการสุ่ม
@@ -162,6 +168,7 @@ func next_turn() -> Actor:
 	alive.sort_custom(func(x, y): return x.av < y.av)
 	var cur: Actor = alive[0]
 	rounds += 1
+	_mark_cycle(cur, alive)
 
 	# ศัตรูที่กำลังจะถึงคิว (ช่อง 2-4) มีโอกาสเปิดเผยท่าเด่น
 	_set_telegraphs()
@@ -189,6 +196,20 @@ func next_turn() -> Actor:
 		return null
 	current = cur
 	return cur
+
+## ปิดรอบเมื่อสมาชิกรอบที่ยังยืนอยู่ได้คิวครบแล้ว แล้วนับ cur เข้ารอบปัจจุบัน
+func _mark_cycle(cur: Actor, alive: Array) -> void:
+	var done := cycle > 0
+	for a in _cycle_members:
+		if not a.down and not _cycle_acted.has(a):
+			done = false
+			break
+	if cycle == 0 or done:
+		cycle += 1
+		_cycle_members = alive.duplicate()
+		_cycle_acted.clear()
+	if _cycle_members.has(cur) and not _cycle_acted.has(cur):
+		_cycle_acted.append(cur)
 
 ## ให้ AI ทำแอ็กชันแทน (ศัตรู มอนร่วมทีม และตัวเอกใน Sim)
 func auto_act(cur: Actor) -> void:

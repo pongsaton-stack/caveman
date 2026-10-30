@@ -43,7 +43,7 @@ func _init() -> void:
 					ps.init_new(techs, Vector2i.ZERO)
 					b.actors.append(ps.make_hero())
 					for mid in ["M03", "M06"]:
-						var m := Actor.from_csv(by_id[mid]); m.side = "ally"; m.loyalty = 3; m.max_hp = int(m.max_hp * 1.6); m.hp = m.max_hp; m.telegraph = {}
+						var m := Actor.from_csv(by_id[mid]); m.side = "ally"; m.loyalty = 7; m.max_hp = int(m.max_hp * 1.6); m.hp = m.max_hp; m.telegraph = {}
 						b.actors.append(m)
 					for j in 2:
 						var e := Actor.from_csv(by_id[c[1]])

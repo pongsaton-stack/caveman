@@ -192,7 +192,7 @@ func make_party() -> Array[Actor]:
 		m.side = "ally"
 		m.is_hero = false
 		m.lp = Formulas.LP_MAX
-		m.loyalty = 3   # rank 3 = ยิงคอมโบกับตัวเอกได้ (GDD 5.4)
+		m.loyalty = 7   # = เดิม 3 ในสเกล 0–5 (แปลง 1 + 2x) · ยิงคอมโบได้ (rank ≥ 5)
 		# มอนร่วมทีมแข็งกว่าตัวป่าเล็กน้อย และ "ไม่" สเกลตามความชำนาญตัวเอก
 		# (GDD 5.1 — มอนคือค่าคงที่ ตัวเอกคือตัวแปร)
 		m.max_hp = int(m.max_hp * Formulas.COMPANION_HP_MULT)

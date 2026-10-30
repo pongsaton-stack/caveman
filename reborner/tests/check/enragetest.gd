@@ -19,7 +19,7 @@ func _battle(ids: Array, team := false) -> Battle:
 	b.actors.append(ps.make_hero())
 	if team:   # ทีมเริ่มเกมแบบ tests/measure/mb1.gd
 		for mid in ["M03", "M06"]:
-			var m := Actor.from_csv(by_id[mid]); m.side = "ally"; m.loyalty = 3; m.max_hp = int(m.max_hp * 1.6); m.hp = m.max_hp; m.telegraph = {}
+			var m := Actor.from_csv(by_id[mid]); m.side = "ally"; m.loyalty = 7; m.max_hp = int(m.max_hp * 1.6); m.hp = m.max_hp; m.telegraph = {}
 			b.actors.append(m)
 	for id in ids:
 		b.actors.append(Actor.from_csv(by_id[id]))

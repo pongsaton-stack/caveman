@@ -14,13 +14,13 @@ func _init() -> void:
 	_check(ps.party.size() == 2, "seed 2 companions")
 	ps.seed_party(comp_rows)
 	_check(ps.party.size() == 2, "seed only once")
-	_check(PlayerState.monster_slots_for(0, slot_rows) == 2 and PlayerState.monster_slots_for(6, slot_rows) == 3 and PlayerState.monster_slots_for(12, slot_rows) == 4, "slots 2/3/4 at EC 0/6/11+")
+	_check(PlayerState.monster_slots_for(0, slot_rows) == 2 and PlayerState.monster_slots_for(6, slot_rows) == 2 and PlayerState.monster_slots_for(12, slot_rows) == 2, "slots fixed 2 at every EC (kwan 30 ต.ค.)")
 	var comps := ps.make_companions(by_id, 2)
-	_check(comps.size() == 2 and comps[0].lp == 3 and comps[0].loyalty == 3 and comps[0].max_hp == int(int(by_id["M03"]["hp"]) * 1.6), "companion actors built")
+	_check(comps.size() == 2 and comps[0].lp == 3 and comps[0].loyalty == 7 and comps[0].max_hp == int(int(by_id["M03"]["hp"]) * 1.6), "companion actors built")
 	comps[0].down = true
 	var notes := ps.after_battle(comps)
 	_check(int(ps.party[0]["lp"]) == 2, "down -> LP 2  " + str(notes))
-	_check(int(ps.party[1]["loyalty"]) == 4, "clean win -> trust +1 (bat)")
+	_check(int(ps.party[1]["loyalty"]) == 7 + Formulas.TRUST_STEP, "clean win -> trust +TRUST_STEP (bat)")
 	# rest regen: needs fighting between rests
 	var msgs := []
 	for i in 3:
