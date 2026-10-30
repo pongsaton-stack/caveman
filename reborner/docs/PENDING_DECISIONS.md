@@ -33,6 +33,9 @@
 17. Dialogic: บั๊ก segfault ตอนปิดเกม · ยังไม่ใช้ในเกม — เก็บ/แก้/ถอด
 18. เปิด Blender อัตโนมัติตอนเริ่ม session — kwan ต้องใส่ hook ใน `.claude/settings.json` เอง
 
+### ระบบพวก + Combo Tech
+17. ~~สเปกพวก/คอมโบ 29 ต.ค. ขัดเกม 4 จุด~~ ✅ 30 ต.ค. ตัดสินแล้ว (`docs/design/allies/DECISIONS_2026-10-30.md`) · รอ Muse ปรับสเปก
+
 ## ข. ร่างที่รออนุมัติเข้าเกม (ดูได้ในหน้า animation test / UI Kit)
 
 19. แสง VFX จากชีตตัวเอก → แทน `_fx_*` ใน BattleScreen
